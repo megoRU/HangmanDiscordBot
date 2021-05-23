@@ -111,17 +111,17 @@ public class DataBase {
   }
 
   //Добавляем в Бд данные о результате игры
-  public void addResultGame(long id, boolean result, Date game_date) {
+  public void addResultGame(long id, boolean result, long game_date) {
     try {
       String sql = "INSERT INTO games ("
           + "id, "
           + "result, "
-          + "game_date "
+          + "game_date) "
           + "VALUES (?, ?, ?)";
       PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
       preparedStatement.setLong(1, id);
       preparedStatement.setBoolean(2, result);
-      preparedStatement.setDate(3, game_date);
+      preparedStatement.setTimestamp(3, new Timestamp(game_date));
       preparedStatement.execute();
       preparedStatement.close();
     } catch (SQLException e) {
@@ -130,14 +130,14 @@ public class DataBase {
   }
 
   //Добавляем связь id игры с игроком
-  public void addResultPlayer(int userId, int games_id) {
+  public void addResultPlayer(long userIdLong, int games_id) {
     try {
       String sql = "INSERT INTO player ("
               + "user_id_long, "
-              + "games_id "
+              + "games_id) "
               + "VALUES (?, ?)";
       PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
-      preparedStatement.setInt(1, userId);
+      preparedStatement.setLong(1, userIdLong);
       preparedStatement.setInt(2, games_id);
       preparedStatement.execute();
       preparedStatement.close();

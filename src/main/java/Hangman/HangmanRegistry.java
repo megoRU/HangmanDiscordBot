@@ -30,7 +30,7 @@ public class HangmanRegistry {
   }
 
   public synchronized int getIdGame() {
-    return idGame++;
+    return idGame = idGame + 1;
   }
 
   public synchronized void getSetIdGame() {

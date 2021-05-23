@@ -1,22 +1,22 @@
 package Hangman;
 
+import db.DataBase;
 import jsonparser.JSONGameParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import org.apache.commons.io.IOUtils;
-import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import startbot.BotStart;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.sql.Date;
 
 public class Hangman implements HangmanHelper {
 
@@ -139,6 +139,7 @@ public class Hangman implements HangmanHelper {
           win.clear();
           WORD = null;
           clearingCollections();
+          win();
           return;
         }
 
@@ -175,6 +176,7 @@ public class Hangman implements HangmanHelper {
           info.clear();
           WORD = null;
           clearingCollections();
+          lose();
           return;
         }
 
@@ -197,6 +199,16 @@ public class Hangman implements HangmanHelper {
       }
 
     }
+  }
+
+  private void win() {
+    DataBase.getInstance().addResultGame(idGame, true, Instant.now().toEpochMilli());
+    DataBase.getInstance().addResultPlayer(Long.parseLong(user.getId()), idGame);
+  }
+
+  private void lose() {
+    DataBase.getInstance().addResultGame(idGame, false, Instant.now().toEpochMilli());
+    DataBase.getInstance().addResultPlayer(Long.parseLong(user.getId()), idGame);
   }
 
   private String getDescription(int count) {
