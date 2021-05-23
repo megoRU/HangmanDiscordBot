@@ -8,6 +8,7 @@ public class DataBase {
 
 //  INSERT INTO games(id, result, game_date) VALUES (1, true, "2021-05-23 14:25:10");
 //  SELECT * FROM player, games WHERE player.games_id = games.id;
+//  SELECT * FROM player, games WHERE player.user_id_long = '250699265389625347' AND player.games_id = games.id
 
 //  сделано:
 //  CREATE TABLE
