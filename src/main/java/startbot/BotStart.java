@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class BotStart {
 
-  public static final String activity = "!help | ";
+  public static final String activity = "!help";
   public static final String version = "v15";
   private static JDA jda;
   private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
@@ -42,7 +42,7 @@ public class BotStart {
 
     jdaBuilder.setAutoReconnect(true);
     jdaBuilder.setStatus(OnlineStatus.ONLINE); //version + TopGGAndStatcordThread.serverCount +
-    jdaBuilder.setActivity(Activity.playing(activity + " | " +  "New update!"));
+    jdaBuilder.setActivity(Activity.playing(activity + " | " +  "!hg"));
     jdaBuilder.setBulkDeleteSplittingEnabled(false);
     jdaBuilder.addEventListeners(new MessageWhenBotJoinToGuild());
     jdaBuilder.addEventListeners(new PrefixChange());

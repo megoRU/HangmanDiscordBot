@@ -36,16 +36,6 @@ public class LanguageChange extends ListenerAdapter {
       prefix_LANG_RESET = BotStart.getMapPrefix().get(event.getAuthor().getId()) + "lang reset";
     }
 
-    if ((message.equals(prefix_LANG_RUS)
-        || message.equals(prefix_LANG_RESET)
-        || message.equals(prefix_LANG_ENG))
-        && !event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-      event.getChannel()
-          .sendMessage(jsonParsers.getLocale("language_change_Not_Admin", event.getAuthor().getId()))
-          .queue();
-      return;
-    }
-
     if (message.equals(prefix_LANG_RUS) || message.equals(prefix_LANG_ENG)) {
       BotStart.getMapLanguages().put(event.getAuthor().getId(), messages[1]);
       DataBase.getInstance().removeLanguageFromDB(event.getAuthor().getId());
