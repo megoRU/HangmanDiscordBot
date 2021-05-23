@@ -1,7 +1,7 @@
 # HangmanDiscordBot
 [![Java CI](https://github.com/megoRU/HangmanDiscordBot/actions/workflows/build.yml/badge.svg)](https://github.com/megoRU/HangmanDiscordBot/actions/workflows/build.yml)
 [![Discord](https://img.shields.io/discord/779317239722672128?label=Discord)](https://discord.gg/UrWG3R683d)
-[![Add](https://img.shields.io/badge/invite-Giveaway-blue?logo=discord)](https://top.gg/bot/808277484524011531/invite/)
+[![Add](https://img.shields.io/badge/invite-Hangman-blue?logo=discord)](https://top.gg/bot/845974873682608129/invite/)
 [![top](https://img.shields.io/badge/TOP.GG-pink?logo=discord)](https://top.gg/bot/845974873682608129) [![Discord Bots](https://top.gg/api/widget/servers/845974873682608129.svg)](https://top.gg/bot/845974873682608129)
 
 ## LICENSE

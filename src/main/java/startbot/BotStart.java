@@ -98,7 +98,7 @@ public class BotStart {
       ResultSet rs = statement.executeQuery(sql);
 
       while (rs.next()) {
-        mapLanguages.put(rs.getString("user_id_long"), rs.getString("language"));
+        mapGameLanguages.put(rs.getString("user_id_long"), rs.getString("language"));
       }
 
       rs.close();

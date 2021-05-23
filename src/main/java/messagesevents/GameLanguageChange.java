@@ -47,7 +47,7 @@ public class GameLanguageChange extends ListenerAdapter {
     }
 
     if (message.equals(prefix_LANG_RUS) || message.equals(prefix_LANG_ENG)) {
-      BotStart.getMapLanguages().put(event.getAuthor().getId(), messages[1]);
+      BotStart.getMapGameLanguages().put(event.getAuthor().getId(), messages[1]);
 
       DataBase.getInstance().removeGameLanguageFromDB(event.getAuthor().getId());
       DataBase.getInstance().addGameLanguageToDB(event.getAuthor().getId(), messages[1]);
@@ -62,7 +62,7 @@ public class GameLanguageChange extends ListenerAdapter {
     }
 
     if (message.equals(prefix_LANG_RESET)) {
-      BotStart.getMapLanguages().remove(event.getAuthor().getId());
+      BotStart.getMapGameLanguages().remove(event.getAuthor().getId());
 
       DataBase.getInstance().removeGameLanguageFromDB(event.getAuthor().getId());
 

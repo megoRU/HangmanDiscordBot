@@ -26,6 +26,21 @@
   "prefix_change_Prefix_Now_Standard": "Префикс теперь стандартный: `!`",
   "language_change_Not_Admin": "Вы не являетесь Админом или не можете управлять сервером!",
   "language_change_lang": "Вы изменили язык на: ",
-  "language_change_lang_reset": "The language is now standard: `ENG`"
-
+  "language_change_lang_reset": "The language is now standard: `ENG`",
+  "giveaway_registry_Error": "Giveaway был отменен, потому что бот не смог получить ID своего сообщения\nПожалуйста, попробуйте снова. **Напишите нам, что именно произошло.\nМы пытаемся исправить эту ошибку. Сервер поддержки:** https://discord.gg/UrWG3R683d",
+  "Game_Title": "Виселица",
+  "Game_Start": "Отправляйте по одной\nбукве в чат **без** `{0}`\nКириллица!",
+  "Game_Current_Word": "\nТекущее слово: `",
+  "Game_Player": "\nИгрок: <@",
+  "Game_You_Use_This_Letter": "Вы уже использовали эту букву!\n",
+  "Game_Have_Attempts": "У вас попыток: `",
+  "Game_Stop_Win": "Игра завершена, вы победили!\n",
+  "Game_You_Guess_Letter": "Вы угадали букву!\n",
+  "Game_You_Lose": "Вы проиграли!\n",
+  "Game_Word_That_Was": "\nСлово которое было: `",
+  "Game_No_Such_Letter": "Такой буквы нет!\n",
+  "Game_Attempts_Left": "Осталось попыток: `",
+  "Hangman_Listener_You_Play": "Сейчас вы играете.\nНужно прислать одну букву в чат.\nЧтобы завершить игру напишите: {0} stop",
+  "Hangman_Eng_game": "Вы завершили игру.\nЧтобы начать новую игру напишите: `{0}`\nДалее присылайте в чат по одной букве.",
+  "Hangman_You_Are_Not_Play": "Вы сейчас не играете."
 }

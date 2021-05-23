@@ -1,5 +1,6 @@
 package Hangman;
 
+import jsonparser.JSONParsers;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -8,6 +9,7 @@ import startbot.BotStart;
 
 public class GameHangmanListener extends ListenerAdapter {
 
+  private final JSONParsers jsonParsers = new JSONParsers();
   private static final String HG = "!hg";
   private static final String HG_STOP = "!hg stop";
   private static final String HG_ONE_LETTER = "[А-Яа-я]";
@@ -33,10 +35,10 @@ public class GameHangmanListener extends ListenerAdapter {
 
     long userIdLong = event.getAuthor().getIdLong();
     if ((message.matches(HG_ONE_LETTER) || message.matches(HG_ONE_LETTER_ENG)) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-      if (message.matches(HG_ONE_LETTER_ENG)) {
-        event.getChannel().sendMessage("Поддерживается только кириллица!").queue();
-        return;
-      }
+//      if (message.matches(HG_ONE_LETTER_ENG)) {
+//        event.getChannel().sendMessage("Поддерживается только кириллица!").queue();
+//        return;
+//      }
       HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).logic(message);
       return;
     }
@@ -44,24 +46,20 @@ public class GameHangmanListener extends ListenerAdapter {
     if (message.equals(prefix) || message.equals(prefix2)) {
 
       if (message.equals(prefix) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-        event.getChannel().sendMessage(
-            "Сейчас вы играете.\n"
-                + "Нужно прислать одну букву в чат.\n"
-                + "Чтобы завершить игру напишите: " + prefix + "hg stop")
-            .queue();
+        event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_Listener_You_Play",
+                event.getAuthor().getId()).replaceAll("\\{0}", prefix)).queue();
         return;
       }
 
       if (message.equals(prefix2) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
         HangmanRegistry.getInstance().getActiveHangman().remove(userIdLong);
-        event.getChannel().sendMessage("Вы завершили игру.\n" +
-            "Чтобы начать новую игру напишите: `" + prefix + "`\n" +
-            "Далее присылайте в чат по одной букве.").queue();
+        event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_Eng_game",
+                event.getAuthor().getId()).replaceAll("\\{0}", prefix)).queue();
         return;
       }
 
       if (message.equals(prefix2) && !HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-        event.getChannel().sendMessage("Вы сейчас не играете.").queue();
+        event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_You_Are_Not_Play", event.getAuthor().getId())).queue();
         return;
       }
 

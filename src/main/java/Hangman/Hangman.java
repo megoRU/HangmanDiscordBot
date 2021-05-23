@@ -1,13 +1,21 @@
 package Hangman;
 
-import db.DataBase;
+import jsonparser.JSONGameParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import startbot.BotStart;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class Hangman implements HangmanHelper {
@@ -25,6 +33,7 @@ public class Hangman implements HangmanHelper {
   private final Guild guild;
   private final TextChannel channel;
   private int idGame;
+  private final JSONGameParsers jsonParsers = new JSONGameParsers();
 
   public Hangman(Guild guild, TextChannel channel, User user) {
     this.guild = guild;
@@ -33,13 +42,26 @@ public class Hangman implements HangmanHelper {
   }
 
   private String getWord() throws IOException {
-    final String URL = "https://evilcoder.ru/random_word/";
-    Document doc = Jsoup.connect(URL)
-          .userAgent(
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.72 Safari/537.36")
-          .referrer("https://www.yandex.com/")
-          .get();
-    return doc.select("body").text().substring(3, doc.text().indexOf("П"));
+    final String URL_RU = "https://evilcoder.ru/random_word/";
+    final String URL_EN = "https://random-word-api.herokuapp.com/word?number=1";
+
+    if (BotStart.getMapGameLanguages().get(user.getId()) != null) {
+
+      switch (BotStart.getMapGameLanguages().get(user.getId())) {
+        case "rus" -> {
+          Document doc = Jsoup.connect(URL_RU)
+                  .userAgent(
+                          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.72 Safari/537.36")
+                  .referrer("https://www.yandex.com/")
+                  .get();
+          return doc.select("body").text().substring(3, doc.text().indexOf("П"));
+        }
+        case "eng" -> {
+          return IOUtils.toString(new URL(URL_EN), StandardCharsets.UTF_8).replaceAll("\\[\"", "").replaceAll("\"]", "");
+        }
+      }
+    }
+    return "URL_RU";
   }
 
   public void startGame(TextChannel channel, User user) {
@@ -56,12 +78,11 @@ public class Hangman implements HangmanHelper {
 
     EmbedBuilder start = new EmbedBuilder();
     start.setColor(0x00FF00);
-    start.setTitle("Виселица");
-    start.setDescription("Игра началась!\n"
-        + "Отправляйте по одной букве в чат\n **без**" + " `!`\n"
+    start.setTitle(jsonParsers.getLocale("Game_Title", user.getId()));
+    start.setDescription(jsonParsers.getLocale("Game_Start", user.getId()).replaceAll("\\{0}", BotStart.getMapPrefix().get(guild.getId()) == null ? "!" : BotStart.getMapPrefix().get(guild.getId()))
         + getDescription(count2)
-        + "\nТекущее слово: `" + hideWord(WORD.length()) + "`"
-        + "\nИгрок: <@" + user.getIdLong() + ">");
+        + jsonParsers.getLocale("Game_Current_Word", user.getId()) + hideWord(WORD.length()) + "`"
+        + jsonParsers.getLocale("Game_Player", user.getId()) + user.getIdLong() + ">");
 
     channel.sendMessage(start.build()).queue(m -> HangmanRegistry.getInstance().getMessageId().put(user.getIdLong(), m.getId()));
     start.clear();
@@ -88,12 +109,12 @@ public class Hangman implements HangmanHelper {
       if (isIsLetterPresent()) {
         EmbedBuilder info = new EmbedBuilder();
         info.setColor(0x00FF00);
-        info.setTitle("Виселица");
-        info.setDescription("Вы уже использовали эту букву!\n"
-            + "У вас попыток: `" + (6 - count2) + "`\n"
+        info.setTitle(jsonParsers.getLocale("Game_Title", user.getId()));
+        info.setDescription(jsonParsers.getLocale("Game_You_Use_This_Letter", user.getId())
+            + jsonParsers.getLocale("Game_Have_Attempts", user.getId()) + (6 - count2) + "`\n"
             + getDescription(count2)
-            + "\nТекущее слово: `" + replacementLetters(WORD.indexOf(inputs)) + "`"
-            + "\nИгрок: <@" + user.getIdLong() + ">");
+            + jsonParsers.getLocale("Game_Current_Word", user.getId()) + replacementLetters(WORD.indexOf(inputs)) + "`"
+            + jsonParsers.getLocale("Game_Player", user.getId()) + user.getIdLong() + ">");
 
         editMessage(info, this.guild.getIdLong(), this.user.getIdLong(), this.channel.getIdLong());
         info.clear();
@@ -108,11 +129,11 @@ public class Hangman implements HangmanHelper {
         if (!wordList.get(wordList.size() - 1).contains("_")) {
           EmbedBuilder win = new EmbedBuilder();
           win.setColor(0x00FF00);
-          win.setTitle("Виселица");
-          win.setDescription("Игра завершена, вы победили!\n"
+          win.setTitle(jsonParsers.getLocale("Game_Title", user.getId()));
+          win.setDescription(jsonParsers.getLocale("Game_Stop_Win", user.getId())
               + getDescription(count2)
-              + "\nТекущее слово: `" + result + "`"
-              + "\nИгрок: <@" + user.getIdLong() + ">");
+              + jsonParsers.getLocale("Game_Current_Word", user.getId()) + result + "`"
+              + jsonParsers.getLocale("Game_Player", user.getId()) + user.getIdLong() + ">");
 
           editMessage(win, this.guild.getIdLong(), this.user.getIdLong(), this.channel.getIdLong());
           win.clear();
@@ -123,12 +144,12 @@ public class Hangman implements HangmanHelper {
 
         EmbedBuilder info = new EmbedBuilder();
         info.setColor(0x00FF00);
-        info.setTitle("Виселица");
-        info.setDescription("Вы угадали букву!\n"
-            + "У вас попыток: `" + (6 - count2) + "`\n"
+        info.setTitle(jsonParsers.getLocale("Game_Title", user.getId()));
+        info.setDescription(jsonParsers.getLocale("Game_You_Guess_Letter", user.getId())
+            + jsonParsers.getLocale("Game_Have_Attempts", user.getId()) + (6 - count2) + "`\n"
             + getDescription(count2)
-            + "\nТекущее слово: `" + result + "`"
-            + "\nИгрок: <@" + user.getIdLong() + ">");
+            + jsonParsers.getLocale("Game_Current_Word", user.getId()) + result + "`"
+            + jsonParsers.getLocale("Game_Player", user.getId()) + user.getIdLong() + ">");
 
         channel.editMessageById(HangmanRegistry.getInstance().getMessageId().get(user.getIdLong()), info.build())
             .queue(null, (exception) -> channel.sendMessage(removeGameException(user.getIdLong())).queue());
@@ -143,12 +164,12 @@ public class Hangman implements HangmanHelper {
         if (count2 >= 5) {
           EmbedBuilder info = new EmbedBuilder();
           info.setColor(0x00FF00);
-          info.setTitle("Виселица");
-          info.setDescription("Вы проиграли!\n"
+          info.setTitle(jsonParsers.getLocale("Game_Title", user.getId()));
+          info.setDescription(jsonParsers.getLocale("Game_You_Lose", user.getId())
               + getDescription(count2)
-              + "\nТекущее слово: `" + replacementLetters(WORD.indexOf(inputs)) + "`"
-              + "\nСлово которое было: `" + WORD + "`"
-              + "\nИгрок: <@" + user.getIdLong() + ">");
+              + jsonParsers.getLocale("Game_Current_Word", user.getId()) + replacementLetters(WORD.indexOf(inputs)) + "`"
+              + jsonParsers.getLocale("Game_Word_That_Was", user.getId()) + WORD + "`"
+              + jsonParsers.getLocale("Game_Player", user.getId()) + user.getIdLong() + ">");
 
           editMessage(info, this.guild.getIdLong(), this.user.getIdLong(), this.channel.getIdLong());
           info.clear();
@@ -161,12 +182,12 @@ public class Hangman implements HangmanHelper {
 
           EmbedBuilder wordNotFound = new EmbedBuilder();
           wordNotFound.setColor(0x00FF00);
-          wordNotFound.setTitle("Виселица");
-          wordNotFound.setDescription("Такой буквы нет!\n"
-              + "Осталось попыток: `" + (6 - count2) + "`\n"
+          wordNotFound.setTitle(jsonParsers.getLocale("Game_Title", user.getId()));
+          wordNotFound.setDescription(jsonParsers.getLocale("Game_No_Such_Letter", user.getId())
+              + jsonParsers.getLocale("Game_Attempts_Left", user.getId()) + (6 - count2) + "`\n"
               + getDescription(count2)
-              + "\nТекущее слово: `" + replacementLetters(WORD.indexOf(inputs)) + "`"
-              + "\nИгрок: <@" + user.getIdLong() + ">");
+              + jsonParsers.getLocale("Game_Current_Word", user.getId()) + replacementLetters(WORD.indexOf(inputs)) + "`"
+              + jsonParsers.getLocale("Game_Player", user.getId()) + user.getIdLong() + ">");
 
           channel.editMessageById(HangmanRegistry.getInstance().getMessageId().get(user.getIdLong()), wordNotFound.build())
               .queue(null, (exception) ->
