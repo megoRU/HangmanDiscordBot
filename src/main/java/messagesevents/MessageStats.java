@@ -42,7 +42,7 @@ public class MessageStats extends ListenerAdapter {
                 //Формула:
                 //Количество побед / Общее количество * Максимальное количество процентов
                 if (Integer.parseInt(statistic[0]) == 0) {
-                    event.getChannel().sendMessage("У Вас `0` игр, а мы не сумасшедшие!").queue();
+                    event.getChannel().sendMessage(jsonParsers.getLocale("messages_events_Title", userIdLong)).queue();
                     return;
                 }
 

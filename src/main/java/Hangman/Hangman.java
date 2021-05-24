@@ -70,6 +70,13 @@ public class Hangman implements HangmanHelper {
                 hideWord(WORD.length());
             }
 
+            if (WORD.equals("URL_RU")) {
+                channel.sendMessage("An error occurred. The game was deleted.\nPlease try again in 5 seconds!").queue();
+                WORD = null;
+                clearingCollections();
+                return;
+            }
+
             EmbedBuilder start = new EmbedBuilder();
             start.setColor(0x00FF00);
             start.setTitle(jsonParsers.getLocale("Game_Title", user.getId()));

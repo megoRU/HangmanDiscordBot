@@ -46,5 +46,6 @@
   "MessageStats_Your_Stats": "Ваша статистика",
   "MessageStats_Game_Count": ":video_game: Колличество игр: `{0}`\n",
   "MessageStats_Game_Wins": ":first_place: Колличество побед: `{0}`\n",
-  "MessageStats_Game_Percentage": ":trophy: Процент побед: `{0}%`"
+  "MessageStats_Game_Percentage": ":trophy: Процент побед: `{0}%`",
+  "MessageStats_Zero_Divide": "У Вас `0` игр, а мы не сумасшедшие!"
 }
