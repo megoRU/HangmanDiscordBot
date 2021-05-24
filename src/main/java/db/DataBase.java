@@ -10,6 +10,15 @@ public class DataBase {
 //  SELECT * FROM player, games WHERE player.games_id = games.id;
 //  SELECT * FROM player, games WHERE player.user_id_long = '250699265389625347' AND player.games_id = games.id
 
+
+//SELECT
+//COUNT(games_id) AS COUNT_GAMES,
+//SUM(CASE WHEN result = 0 THEN 1 ELSE 0 END) AS TOTAL_ZEROS,
+//SUM(CASE WHEN result = 1 THEN 1 ELSE 0 END) AS TOTAL_ONES
+//
+//FROM player, games WHERE player.user_id_long = '250699265389625347' AND player.games_id = games.id
+
+
 //  сделано:
 //  CREATE TABLE
 //
@@ -192,6 +201,26 @@ public class DataBase {
     }
   }
 
+  public String getStatistic(String userIdLong) {
+    try {
+      Statement statement = DataBase.getConnection().createStatement();
+      String sql = "SELECT COUNT(games_id) AS COUNT_GAMES, " +
+              "SUM(CASE WHEN result = 0 THEN 1 ELSE 0 END) AS TOTAL_ZEROS, " +
+              "SUM(CASE WHEN result = 1 THEN 1 ELSE 0 END) AS TOTAL_ONES " +
+              "FROM player, games WHERE player.user_id_long = '" + userIdLong + "' " +
+              "AND player.games_id = games.id";
+      ResultSet rs = statement.executeQuery(sql);
+
+      while (rs.next()) {
+        return rs.getString("COUNT_GAMES") + " " +
+                rs.getString("TOTAL_ZEROS") + " " +
+                rs.getString("TOTAL_ONES");
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return "";
+  }
 
   /**
    * Получаем максимальное число (ID)

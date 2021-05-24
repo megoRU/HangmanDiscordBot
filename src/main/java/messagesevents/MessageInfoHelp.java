@@ -67,7 +67,8 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
 
       info.addField(jsonParsers.getLocale("messages_events_Title", userIdLong), "`"
               + p + jsonParsers.getLocale("messages_events_Start_Hangman", userIdLong) + "`"
-              + p + jsonParsers.getLocale("messages_events_Stop_Hangman", userIdLong), false);
+              + p + jsonParsers.getLocale("messages_events_Stop_Hangman", userIdLong) + "`"
+              + p + jsonParsers.getLocale("messages_events_Stats_Hangman", userIdLong), false);
 
       info.addField(jsonParsers.getLocale("messages_events_Links", userIdLong),
           jsonParsers.getLocale("messages_events_Site", userIdLong) +

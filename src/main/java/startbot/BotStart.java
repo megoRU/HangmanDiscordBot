@@ -5,10 +5,7 @@ import Hangman.HangmanRegistry;
 import config.Config;
 import db.DataBase;
 import events.MessageWhenBotJoinToGuild;
-import messagesevents.GameLanguageChange;
-import messagesevents.LanguageChange;
-import messagesevents.MessageInfoHelp;
-import messagesevents.PrefixChange;
+import messagesevents.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -50,6 +47,7 @@ public class BotStart {
     jdaBuilder.addEventListeners(new LanguageChange());
     jdaBuilder.addEventListeners(new GameLanguageChange());
     jdaBuilder.addEventListeners(new GameHangmanListener());
+    jdaBuilder.addEventListeners(new MessageStats());
 
 
     jda = jdaBuilder.build();
@@ -62,11 +60,9 @@ public class BotStart {
       Statement statement = DataBase.getConnection().createStatement();
       String sql = "select * from prefixs";
       ResultSet rs = statement.executeQuery(sql);
-
       while (rs.next()) {
         mapPrefix.put(rs.getString("serverId"), rs.getString("prefix"));
       }
-
       rs.close();
       statement.close();
     } catch (SQLException e) {

@@ -8,7 +8,8 @@
   "messages_events_Game_Language": "game rus` - Сохраняет для всех игр: `(rus|eng)`\n",
   "messages_events_Title": "Виселица:",
   "messages_events_Start_Hangman": "hg` - Начать игру\n",
-  "messages_events_Stop_Hangman": "hg stop` - Закончить игру",
+  "messages_events_Stop_Hangman": "hg stop` - Закончить игру\n",
+  "messages_events_Stats_Hangman": "hg stats` - Узнать свою статистику",
   "messages_events_Links": "Ссылки:",
   "messages_events_Site": ":zap: [megoru.ru](https://megoru.ru)\n",
   "messages_events_Add_Me_To_Other_Guilds": ":robot: [Добавь меня в другие гильдии](https://discord.com/oauth2/authorize?client_id=845974873682608129&scope=bot&permissions=2147502080)\n",
@@ -41,5 +42,9 @@
   "Hangman_Listener_You_Play": "Сейчас вы играете.\nНужно прислать одну букву в чат.\nЧтобы завершить игру напишите: {0} stop",
   "Hangman_Listener_Need_Set_Language": "Для начала Вам нужно установить язык для слов.\nНапишите `{0}game rus` или `!game eng` для установки языка.\nЗатем повторно напишите `{0}hg`",
   "Hangman_Eng_game": "Вы завершили игру.\nЧтобы начать новую игру напишите: `{0}`\nДалее присылайте в чат по одной букве.",
-  "Hangman_You_Are_Not_Play": "Вы сейчас не играете."
+  "Hangman_You_Are_Not_Play": "Вы сейчас не играете.",
+  "MessageStats_Your_Stats": "Ваша статистика",
+  "MessageStats_Game_Count": ":video_game: Колличество игр: `{0}`\n",
+  "MessageStats_Game_Wins": ":first_place: Колличество побед: `{0}`\n",
+  "MessageStats_Game_Percentage": ":trophy: Процент побед: `{0}%`"
 }
