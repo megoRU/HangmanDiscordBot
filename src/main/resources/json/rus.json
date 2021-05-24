@@ -26,7 +26,6 @@
   "prefix_change_Prefix_Now_Standard": "Префикс теперь стандартный: `!`",
   "language_change_Not_Admin": "Вы не являетесь Админом или не можете управлять сервером!",
   "language_change_lang": "Вы изменили язык на: ",
-  "language_change_lang_reset": "The language is now standard: `ENG`",
   "giveaway_registry_Error": "Giveaway был отменен, потому что бот не смог получить ID своего сообщения\nПожалуйста, попробуйте снова. **Напишите нам, что именно произошло.\nМы пытаемся исправить эту ошибку. Сервер поддержки:** https://discord.gg/UrWG3R683d",
   "Game_Title": "Виселица",
   "Game_Start": "Отправляйте по одной\nбукве в чат **без** `{0}`\nКириллица!",
@@ -41,6 +40,7 @@
   "Game_No_Such_Letter": "Такой буквы нет!\n",
   "Game_Attempts_Left": "Осталось попыток: `",
   "Hangman_Listener_You_Play": "Сейчас вы играете.\nНужно прислать одну букву в чат.\nЧтобы завершить игру напишите: {0} stop",
+  "Hangman_Listener_Need_Set_Language": "Для начала Вам нужно установить язык для слов.\nНапишите `{0}game rus` или `!game eng` для установки языка.\nЗатем повторно напишите `{0}hg`",
   "Hangman_Eng_game": "Вы завершили игру.\nЧтобы начать новую игру напишите: `{0}`\nДалее присылайте в чат по одной букве.",
   "Hangman_You_Are_Not_Play": "Вы сейчас не играете."
 }
