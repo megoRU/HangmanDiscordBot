@@ -63,14 +63,11 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
 
       info.addField(jsonParsers.getLocale("messages_events_Language_Title", userIdLong), "`"
               + p + jsonParsers.getLocale("messages_events_Language", userIdLong) + "`"
-              + p + jsonParsers.getLocale("messages_events_Language_Reset", userIdLong) + "`"
-              + p + jsonParsers.getLocale("messages_events_Game_Language", userIdLong) + "`"
-              + p + jsonParsers.getLocale("messages_events_Game_Language_Reset", userIdLong), false);
+              + p + jsonParsers.getLocale("messages_events_Game_Language", userIdLong), false);
 
       info.addField(jsonParsers.getLocale("messages_events_Title", userIdLong), "`"
               + p + jsonParsers.getLocale("messages_events_Start_Hangman", userIdLong) + "`"
-              + p + jsonParsers.getLocale("messages_events_Stop_Hangman", userIdLong)
-              , false);
+              + p + jsonParsers.getLocale("messages_events_Stop_Hangman", userIdLong), false);
 
       info.addField(jsonParsers.getLocale("messages_events_Links", userIdLong),
           jsonParsers.getLocale("messages_events_Site", userIdLong) +
@@ -84,7 +81,6 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
       info.addField(
           jsonParsers.getLocale("messages_events_Support", userIdLong),
           jsonParsers.getLocale("messages_events_Support_Url_Discord", userIdLong), false);
-
       try {
         switch (channelType) {
           case TEXT -> {
@@ -93,7 +89,7 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
               return;
             }
             event.getChannel().sendMessage(jsonParsers.getLocale("messages_events_Send_Private_Message",
-                event.getGuild().getId())).delay(5, TimeUnit.SECONDS)
+                    userIdLong)).delay(5, TimeUnit.SECONDS)
                 .flatMap(Message::delete).queue();
             event.getMember().getUser().openPrivateChannel()
                 .flatMap(channel -> channel.sendMessage(info.build()))

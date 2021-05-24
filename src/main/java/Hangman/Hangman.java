@@ -216,8 +216,8 @@ public class Hangman implements HangmanHelper {
         }
     }
 
-    private void resultGame(boolean bool) {
-        DataBase.getInstance().addResultGame(idGame, bool, Instant.now().toEpochMilli());
+    private void resultGame(boolean resultBool) {
+        DataBase.getInstance().addResultGame(idGame, resultBool, Instant.now().toEpochMilli());
         DataBase.getInstance().addResultPlayer(Long.parseLong(user.getId()), idGame);
     }
 
