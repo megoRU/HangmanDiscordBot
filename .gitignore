@@ -32,5 +32,3 @@ hs_err_pid*
 src/test/
 target/
 target/generated-sources/
-src/main/java/config/Config.java
-src/main/java/config/
