@@ -48,6 +48,7 @@ public class BotStart {
     jdaBuilder.addEventListeners(new GameLanguageChange());
     jdaBuilder.addEventListeners(new GameHangmanListener());
     jdaBuilder.addEventListeners(new MessageStats());
+    jdaBuilder.addEventListeners(new MessageGlobalStats());
 
 
     jda = jdaBuilder.build();

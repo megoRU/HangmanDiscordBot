@@ -63,6 +63,21 @@ public class DataBase {
 //   UNIQUE KEY `user_id_long` (`user_id_long`))
 //   ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
+//  SELECT COUNT(games_id) AS COUNT_GAMES, user_id_long AS USER_ID_LONG,
+//  SUM(CASE WHEN result = 0 THEN 1 ELSE 0 END) AS TOTAL_ZEROS,
+//  SUM(CASE WHEN result = 1 THEN 1 ELSE 0 END) AS TOTAL_ONES
+//  FROM player, games WHERE player.user_id_long = 575694550517940245
+//  AND player.games_id = games.id
+//
+//  UNION
+//
+//  SELECT COUNT(games_id) AS COUNT_GAMES, user_id_long AS USER_ID_LONG,
+//  SUM(CASE WHEN result = 0 THEN 1 ELSE 0 END) AS TOTAL_ZEROS,
+//  SUM(CASE WHEN result = 1 THEN 1 ELSE 0 END) AS TOTAL_ONES
+//  FROM player, games WHERE player.user_id_long = 250699265389625347
+//  AND player.games_id = games.id
+
   private static volatile Connection connection;
   private static volatile DataBase dataBase;
 

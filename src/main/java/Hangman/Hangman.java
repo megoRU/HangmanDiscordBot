@@ -7,8 +7,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import org.apache.commons.io.IOUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import org.json.JSONObject;
 import startbot.BotStart;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -31,7 +30,7 @@ public class Hangman implements HangmanHelper {
     private final TextChannel channel;
     private int idGame;
     private final JSONGameParsers jsonParsers = new JSONGameParsers();
-    private static final String URL_RU = "https://evilcoder.ru/random_word/";
+    private static final String URL_RU = "https://random-word-api.megoru.ru/api/russian";
     private static final String URL_EN = "https://random-word-api.herokuapp.com/word?number=1";
 
     public Hangman(Guild guild, TextChannel channel, User user) {
@@ -44,12 +43,8 @@ public class Hangman implements HangmanHelper {
         try {
             switch (BotStart.getMapGameLanguages().get(user.getId())) {
                 case "rus" -> {
-                    Document doc = Jsoup.connect(URL_RU)
-                            .userAgent(
-                                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.72 Safari/537.36")
-                            .referrer("https://www.yandex.com/")
-                            .get();
-                    return doc.select("body").text().substring(3, doc.text().indexOf("П"));
+                    JSONObject json = new JSONObject(IOUtils.toString(new URL(URL_RU), StandardCharsets.UTF_8));
+                    return String.valueOf(json.get("russian_WORD"));
                 }
                 case "eng" -> {
                     return IOUtils.toString(new URL(URL_EN), StandardCharsets.UTF_8).replaceAll("\\[\"", "").replaceAll("\"]", "");
