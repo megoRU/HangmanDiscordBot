@@ -2,6 +2,7 @@ package startbot;
 
 import Hangman.GameHangmanListener;
 import Hangman.HangmanRegistry;
+import Hangman.Reactions;
 import config.Config;
 import db.DataBase;
 import events.MessageWhenBotJoinToGuild;
@@ -49,7 +50,7 @@ public class BotStart {
     jdaBuilder.addEventListeners(new GameHangmanListener());
     jdaBuilder.addEventListeners(new MessageStats());
     jdaBuilder.addEventListeners(new MessageGlobalStats());
-
+    jdaBuilder.addEventListeners(new Reactions());
 
     jda = jdaBuilder.build();
     jda.awaitReady();

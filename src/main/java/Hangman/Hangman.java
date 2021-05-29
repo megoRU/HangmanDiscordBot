@@ -3,9 +3,7 @@ package Hangman;
 import db.DataBase;
 import jsonparser.JSONGameParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import startbot.BotStart;
@@ -30,7 +28,7 @@ public class Hangman implements HangmanHelper {
     private final TextChannel channel;
     private int idGame;
     private final JSONGameParsers jsonParsers = new JSONGameParsers();
-    private static final String URL_RU = "https://random-word-api.megoru.ru/api/russian";
+    private static final String URL_RU = "http://45.138.72.66:8085/api/russian";
     private static final String URL_EN = "https://random-word-api.herokuapp.com/word?number=1";
 
     public Hangman(Guild guild, TextChannel channel, User user) {
@@ -139,7 +137,8 @@ public class Hangman implements HangmanHelper {
                                 + jsonParsers.getLocale("Game_Current_Word", user.getId()) + result + "`"
                                 + jsonParsers.getLocale("Game_Player", user.getId()) + user.getIdLong() + ">");
 
-                        editMessage(win, this.guild.getIdLong(), this.user.getIdLong(), this.channel.getIdLong());
+                        channel.editMessageById(HangmanRegistry.getInstance().getMessageId().get(user.getIdLong()), win.build())
+                                .queue(message -> message.addReaction(Reactions.emojiNextTrack).queue());
                         win.clear();
                         WORD = null;
                         clearingCollections();
@@ -184,7 +183,8 @@ public class Hangman implements HangmanHelper {
                                 + jsonParsers.getLocale("Game_Word_That_Was", user.getId()) + WORD + "`"
                                 + jsonParsers.getLocale("Game_Player", user.getId()) + user.getIdLong() + ">");
 
-                        editMessage(info, this.guild.getIdLong(), this.user.getIdLong(), this.channel.getIdLong());
+                        channel.editMessageById(HangmanRegistry.getInstance().getMessageId().get(user.getIdLong()), info.build())
+                                .queue(message -> message.addReaction(Reactions.emojiNextTrack).queue());
                         info.clear();
                         WORD = null;
                         clearingCollections();
