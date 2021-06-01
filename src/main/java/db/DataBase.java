@@ -167,7 +167,7 @@ public class DataBase {
   //Добавление языка
   public void addLanguageToDB(String userIdLong, String language) {
     try {
-      String sql = "INSERT INTO language (user_id_long, language) VALUES (?, ?)";
+      String sql = "REPLACE INTO language (user_id_long, language) VALUES (?, ?)";
       PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
       preparedStatement.setString(1, userIdLong);
       preparedStatement.setString(2, language);
@@ -193,7 +193,7 @@ public class DataBase {
   //Добавление языка игры
   public void addGameLanguageToDB(String userIdLong, String language) {
     try {
-      String sql = "INSERT INTO game_language (user_id_long, language) VALUES (?, ?)";
+      String sql = "REPLACE INTO game_language (user_id_long, language) VALUES (?, ?)";
       PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
       preparedStatement.setString(1, userIdLong);
       preparedStatement.setString(2, language);
