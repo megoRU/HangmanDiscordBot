@@ -19,13 +19,15 @@ public class Reactions extends ListenerAdapter {
             return;
         }
         try {
-            String emoji = event.getReactionEmote().getEmoji();
-            long userIdLong = event.getUserIdLong();
-            if (emoji.equals(emojiNextTrack)) {
-                HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getGuild(), event.getChannel(), event.getMember().getUser()));
-                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel(), event.getMember().getUser());
-            }
+            if (event.getReactionEmote().isEmoji()) {
+                String emoji = event.getReactionEmote().getEmoji();
 
+                long userIdLong = event.getUserIdLong();
+                if (emoji.equals(emojiNextTrack)) {
+                    HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getGuild(), event.getChannel(), event.getMember().getUser()));
+                    HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel(), event.getMember().getUser());
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
