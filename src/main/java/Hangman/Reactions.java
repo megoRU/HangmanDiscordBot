@@ -24,7 +24,7 @@ public class Reactions extends ListenerAdapter {
 
                 long userIdLong = event.getUserIdLong();
                 if (emoji.equals(emojiNextTrack)) {
-                    HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getGuild(), event.getChannel(), event.getMember().getUser()));
+                    HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getChannel()));
                     HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel(), event.getMember().getUser());
                 }
             }

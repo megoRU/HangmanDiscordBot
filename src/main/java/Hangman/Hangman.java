@@ -23,23 +23,23 @@ public class Hangman implements HangmanHelper {
     private boolean isLetterPresent;
     private Integer count = 0;
     private Integer count2 = 0;
-    private final User user;
-    private final Guild guild;
+    private final String userId;
+    private final String guildId;
     private final TextChannel channel;
     private int idGame;
     private final JSONGameParsers jsonParsers = new JSONGameParsers();
     private static final String URL_RU = "http://45.138.72.66:8085/api/russian";
     private static final String URL_EN = "https://random-word-api.herokuapp.com/word?number=1";
 
-    public Hangman(Guild guild, TextChannel channel, User user) {
-        this.guild = guild;
+    public Hangman(String userId, String guildId, TextChannel channel) {
+        this.userId = userId;
+        this.guildId = guildId;
         this.channel = channel;
-        this.user = user;
     }
 
     private String getWord() {
         try {
-            switch (BotStart.getMapGameLanguages().get(user.getId())) {
+            switch (BotStart.getMapGameLanguages().get(getUserId())) {
                 case "rus" -> {
                     JSONObject json = new JSONObject(IOUtils.toString(new URL(URL_RU), StandardCharsets.UTF_8));
                     return String.valueOf(json.get("russian_WORD"));
@@ -72,13 +72,13 @@ public class Hangman implements HangmanHelper {
 
             EmbedBuilder start = new EmbedBuilder();
             start.setColor(0x00FF00);
-            start.setTitle(jsonParsers.getLocale("Game_Title", user.getId()));
-            start.setDescription(jsonParsers.getLocale("Game_Start", user.getId()).replaceAll("\\{0}", BotStart.getMapPrefix().get(guild.getId()) == null ? "!" : BotStart.getMapPrefix().get(guild.getId()))
+            start.setTitle(jsonParsers.getLocale("Game_Title", userId));
+            start.setDescription(jsonParsers.getLocale("Game_Start", userId).replaceAll("\\{0}", BotStart.getMapPrefix().get(guildId) == null ? "!" : BotStart.getMapPrefix().get(guildId))
                     + getDescription(count2)
-                    + jsonParsers.getLocale("Game_Current_Word", user.getId()) + hideWord(WORD.length()) + "`"
-                    + jsonParsers.getLocale("Game_Player", user.getId()) + user.getIdLong() + ">");
+                    + jsonParsers.getLocale("Game_Current_Word", userId) + hideWord(WORD.length()) + "`"
+                    + jsonParsers.getLocale("Game_Player", userId) + Long.parseLong(userId) + ">");
 
-            channel.sendMessage(start.build()).queue(m -> HangmanRegistry.getInstance().getMessageId().put(user.getIdLong(), m.getId()));
+            channel.sendMessage(start.build()).queue(m -> HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId), m.getId()));
             start.clear();
         } catch (Exception e) {
             e.printStackTrace();
@@ -107,14 +107,14 @@ public class Hangman implements HangmanHelper {
                 try {
                     EmbedBuilder info = new EmbedBuilder();
                     info.setColor(0x00FF00);
-                    info.setTitle(jsonParsers.getLocale("Game_Title", user.getId()));
-                    info.setDescription(jsonParsers.getLocale("Game_You_Use_This_Letter", user.getId())
-                            + jsonParsers.getLocale("Game_Have_Attempts", user.getId()) + (6 - count2) + "`\n"
+                    info.setTitle(jsonParsers.getLocale("Game_Title", userId));
+                    info.setDescription(jsonParsers.getLocale("Game_You_Use_This_Letter", userId)
+                            + jsonParsers.getLocale("Game_Have_Attempts", userId) + (6 - count2) + "`\n"
                             + getDescription(count2)
-                            + jsonParsers.getLocale("Game_Current_Word", user.getId()) + replacementLetters(WORD.indexOf(inputs)) + "`"
-                            + jsonParsers.getLocale("Game_Player", user.getId()) + user.getIdLong() + ">");
+                            + jsonParsers.getLocale("Game_Current_Word", userId) + replacementLetters(WORD.indexOf(inputs)) + "`"
+                            + jsonParsers.getLocale("Game_Player", userId) + userId + ">");
 
-                    editMessage(info, this.guild.getIdLong(), this.user.getIdLong(), this.channel.getIdLong());
+                    editMessage(info, Long.parseLong(userId), Long.parseLong(userId), this.channel.getIdLong());
                     info.clear();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -131,13 +131,13 @@ public class Hangman implements HangmanHelper {
                     try {
                         EmbedBuilder win = new EmbedBuilder();
                         win.setColor(0x00FF00);
-                        win.setTitle(jsonParsers.getLocale("Game_Title", user.getId()));
-                        win.setDescription(jsonParsers.getLocale("Game_Stop_Win", user.getId())
+                        win.setTitle(jsonParsers.getLocale("Game_Title", userId));
+                        win.setDescription(jsonParsers.getLocale("Game_Stop_Win", userId)
                                 + getDescription(count2)
-                                + jsonParsers.getLocale("Game_Current_Word", user.getId()) + result + "`"
-                                + jsonParsers.getLocale("Game_Player", user.getId()) + user.getIdLong() + ">");
+                                + jsonParsers.getLocale("Game_Current_Word", userId) + result + "`"
+                                + jsonParsers.getLocale("Game_Player", userId) + Long.parseLong(userId) + ">");
 
-                        channel.editMessageById(HangmanRegistry.getInstance().getMessageId().get(user.getIdLong()), win.build())
+                        channel.editMessageById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), win.build())
                                 .queue(message -> message.addReaction(Reactions.emojiNextTrack).queue());
                         win.clear();
                         WORD = null;
@@ -152,15 +152,15 @@ public class Hangman implements HangmanHelper {
                 try {
                     EmbedBuilder info = new EmbedBuilder();
                     info.setColor(0x00FF00);
-                    info.setTitle(jsonParsers.getLocale("Game_Title", user.getId()));
-                    info.setDescription(jsonParsers.getLocale("Game_You_Guess_Letter", user.getId())
-                            + jsonParsers.getLocale("Game_Have_Attempts", user.getId()) + (6 - count2) + "`\n"
+                    info.setTitle(jsonParsers.getLocale("Game_Title", userId));
+                    info.setDescription(jsonParsers.getLocale("Game_You_Guess_Letter", userId)
+                            + jsonParsers.getLocale("Game_Have_Attempts", userId) + (6 - count2) + "`\n"
                             + getDescription(count2)
-                            + jsonParsers.getLocale("Game_Current_Word", user.getId()) + result + "`"
-                            + jsonParsers.getLocale("Game_Player", user.getId()) + user.getIdLong() + ">");
+                            + jsonParsers.getLocale("Game_Current_Word", userId) + result + "`"
+                            + jsonParsers.getLocale("Game_Player", userId) + Long.parseLong(userId) + ">");
 
-                    channel.editMessageById(HangmanRegistry.getInstance().getMessageId().get(user.getIdLong()), info.build())
-                            .queue(null, (exception) -> channel.sendMessage(removeGameException(user.getIdLong())).queue());
+                    channel.editMessageById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), info.build())
+                            .queue(null, (exception) -> channel.sendMessage(removeGameException(Long.parseLong(userId))).queue());
                     info.clear();
 
                     return;
@@ -176,14 +176,14 @@ public class Hangman implements HangmanHelper {
                     try {
                         EmbedBuilder info = new EmbedBuilder();
                         info.setColor(0x00FF00);
-                        info.setTitle(jsonParsers.getLocale("Game_Title", user.getId()));
-                        info.setDescription(jsonParsers.getLocale("Game_You_Lose", user.getId())
+                        info.setTitle(jsonParsers.getLocale("Game_Title", userId));
+                        info.setDescription(jsonParsers.getLocale("Game_You_Lose", userId)
                                 + getDescription(count2)
-                                + jsonParsers.getLocale("Game_Current_Word", user.getId()) + replacementLetters(WORD.indexOf(inputs)) + "`"
-                                + jsonParsers.getLocale("Game_Word_That_Was", user.getId()) + WORD + "`"
-                                + jsonParsers.getLocale("Game_Player", user.getId()) + user.getIdLong() + ">");
+                                + jsonParsers.getLocale("Game_Current_Word", userId) + replacementLetters(WORD.indexOf(inputs)) + "`"
+                                + jsonParsers.getLocale("Game_Word_That_Was", userId) + WORD + "`"
+                                + jsonParsers.getLocale("Game_Player", userId) + Long.parseLong(userId) + ">");
 
-                        channel.editMessageById(HangmanRegistry.getInstance().getMessageId().get(user.getIdLong()), info.build())
+                        channel.editMessageById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), info.build())
                                 .queue(message -> message.addReaction(Reactions.emojiNextTrack).queue());
                         info.clear();
                         WORD = null;
@@ -199,16 +199,16 @@ public class Hangman implements HangmanHelper {
                     try {
                         EmbedBuilder wordNotFound = new EmbedBuilder();
                         wordNotFound.setColor(0x00FF00);
-                        wordNotFound.setTitle(jsonParsers.getLocale("Game_Title", user.getId()));
-                        wordNotFound.setDescription(jsonParsers.getLocale("Game_No_Such_Letter", user.getId())
-                                + jsonParsers.getLocale("Game_Attempts_Left", user.getId()) + (6 - count2) + "`\n"
+                        wordNotFound.setTitle(jsonParsers.getLocale("Game_Title", userId));
+                        wordNotFound.setDescription(jsonParsers.getLocale("Game_No_Such_Letter", userId)
+                                + jsonParsers.getLocale("Game_Attempts_Left", userId) + (6 - count2) + "`\n"
                                 + getDescription(count2)
-                                + jsonParsers.getLocale("Game_Current_Word", user.getId()) + replacementLetters(WORD.indexOf(inputs)) + "`"
-                                + jsonParsers.getLocale("Game_Player", user.getId()) + user.getIdLong() + ">");
+                                + jsonParsers.getLocale("Game_Current_Word", userId) + replacementLetters(WORD.indexOf(inputs)) + "`"
+                                + jsonParsers.getLocale("Game_Player", userId) + Long.parseLong(userId) + ">");
 
-                        channel.editMessageById(HangmanRegistry.getInstance().getMessageId().get(user.getIdLong()), wordNotFound.build())
+                        channel.editMessageById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), wordNotFound.build())
                                 .queue(null, (exception) ->
-                                        channel.sendMessage(removeGameException(user.getIdLong())).queue());
+                                        channel.sendMessage(removeGameException(Long.parseLong(userId))).queue());
                         wordNotFound.clear();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -220,7 +220,7 @@ public class Hangman implements HangmanHelper {
 
     private void resultGame(boolean resultBool) {
         DataBase.getInstance().addResultGame(idGame, resultBool, Instant.now().toEpochMilli());
-        DataBase.getInstance().addResultPlayer(Long.parseLong(user.getId()), idGame);
+        DataBase.getInstance().addResultPlayer(Long.parseLong(userId), idGame);
     }
 
     private String getDescription(int count) {
@@ -241,8 +241,8 @@ public class Hangman implements HangmanHelper {
     }
 
     private void clearingCollections() {
-        HangmanRegistry.getInstance().removeHangman(user.getIdLong());
-        HangmanRegistry.getInstance().getMessageId().remove(user.getIdLong());
+        HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
+        HangmanRegistry.getInstance().getMessageId().remove(Long.parseLong(userId));
     }
 
     //Создает скрытую линию из длины слова
@@ -295,12 +295,12 @@ public class Hangman implements HangmanHelper {
                 "своего сообщения для редактирования. Попробуйте ещё раз.";
     }
 
-    public User getUser() {
-        return user;
+    public String getUserId() {
+        return userId;
     }
 
-    public Guild getGuild() {
-        return guild;
+    public String getGuildId() {
+        return guildId;
     }
 
     public TextChannel getChannel() {
