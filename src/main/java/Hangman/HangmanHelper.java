@@ -5,7 +5,7 @@ import startbot.BotStart;
 
 public interface HangmanHelper {
 
-  default void editMessage(EmbedBuilder embedBuilder, long guildId, long userIdLong, long channelId) {
+  default void editMessage(EmbedBuilder embedBuilder, Long guildId, Long userIdLong, Long channelId) {
     try {
       BotStart.getJda()
           .getGuildById(guildId)

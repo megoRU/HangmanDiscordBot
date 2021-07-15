@@ -114,7 +114,7 @@ public class Hangman implements HangmanHelper {
                             + jsonParsers.getLocale("Game_Current_Word", userId) + replacementLetters(WORD.indexOf(inputs)) + "`"
                             + jsonParsers.getLocale("Game_Player", userId) + userId + ">");
 
-                    editMessage(info, Long.parseLong(userId), Long.parseLong(userId), this.channel.getIdLong());
+                    editMessage(info, Long.parseLong(guildId), Long.parseLong(userId), this.channel.getIdLong());
                     info.clear();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -248,8 +248,10 @@ public class Hangman implements HangmanHelper {
     //Создает скрытую линию из длины слова
     private String hideWord(int length) {
         StringBuilder sb = new StringBuilder();
-        while (sb.length() < length) {
-            sb.append('_');
+        int localLength = 0;
+        while (localLength < length) {
+            sb.append(sb.length() == 0 ? "_" : " _");
+            localLength++;
         }
         return WORD_HIDDEN = sb.toString();
     }
@@ -262,8 +264,11 @@ public class Hangman implements HangmanHelper {
         }
         int size = wordList.size() - 1;
         StringBuilder sb = new StringBuilder(wordList.get(size));
+
         for (int i = 0; i < index.size(); i++) {
-            sb.replace(index.get(i), index.get(i) + 1, String.valueOf(strToArray[length]));
+            sb.replace(index.get(i) == 0 ? index.get(i) : index.get(i) * 2,
+                    index.get(i) == 0 ? index.get(i) + 1 : index.get(i) * 2 + 1,
+                    String.valueOf(strToArray[length]));
         }
         wordList.add(sb.toString());
         index.clear();
