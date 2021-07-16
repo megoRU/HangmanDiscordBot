@@ -91,7 +91,10 @@ public class Hangman implements HangmanHelper {
     public void logic(String inputs) {
 
         if (WORD_HIDDEN.contains("_")) {
-            addGuesses(inputs.toUpperCase());
+
+            if (!guesses.toString().contains(inputs.toUpperCase())) {
+                addGuesses(inputs.toUpperCase());
+            }
             for (String listLoop : usedLetters) {
                 if (listLoop.contains(inputs)) {
                     isLetterPresent = true;
@@ -111,6 +114,7 @@ public class Hangman implements HangmanHelper {
                     EmbedBuilder info = new EmbedBuilder();
                     info.setColor(0x00FF00);
                     info.setTitle(jsonParsers.getLocale("Game_Title", userId));
+                    info.appendDescription(jsonParsers.getLocale("Game_You_Use_This_Letter", userId));
 
                     info.setThumbnail("https://megoru.ru/hangman/" + count2 + ".png");
                     info.addField(jsonParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
