@@ -17,6 +17,7 @@ public class Hangman implements HangmanHelper {
     private String WORD = null;
     private char[] strToArray;
     private String WORD_HIDDEN = "";
+    private final StringBuilder guesses = new StringBuilder();
     private final ArrayList<String> wordList = new ArrayList<>();
     private final ArrayList<Integer> index = new ArrayList<>();
     private final ArrayList<String> usedLetters = new ArrayList<>();
@@ -73,10 +74,12 @@ public class Hangman implements HangmanHelper {
             EmbedBuilder start = new EmbedBuilder();
             start.setColor(0x00FF00);
             start.setTitle(jsonParsers.getLocale("Game_Title", userId));
-            start.setDescription(jsonParsers.getLocale("Game_Start", userId).replaceAll("\\{0}", BotStart.getMapPrefix().get(guildId) == null ? "!" : BotStart.getMapPrefix().get(guildId))
-                    + getDescription(count2)
-                    + jsonParsers.getLocale("Game_Current_Word", userId) + hideWord(WORD.length()) + "`"
-                    + jsonParsers.getLocale("Game_Player", userId) + Long.parseLong(userId) + ">");
+
+            start.setThumbnail("https://megoru.ru/hangman/" + count2 + ".png");
+            start.addField(jsonParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
+            start.addField(jsonParsers.getLocale("Game_Guesses", userId), "", false);
+            start.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + hideWord(WORD.length()) + "`", false);
+
 
             channel.sendMessageEmbeds(start.build()).queue(m -> HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId), m.getId()));
             start.clear();
@@ -88,7 +91,7 @@ public class Hangman implements HangmanHelper {
     public void logic(String inputs) {
 
         if (WORD_HIDDEN.contains("_")) {
-
+            addGuesses(inputs.toUpperCase());
             for (String listLoop : usedLetters) {
                 if (listLoop.contains(inputs)) {
                     isLetterPresent = true;
@@ -108,11 +111,13 @@ public class Hangman implements HangmanHelper {
                     EmbedBuilder info = new EmbedBuilder();
                     info.setColor(0x00FF00);
                     info.setTitle(jsonParsers.getLocale("Game_Title", userId));
-                    info.setDescription(jsonParsers.getLocale("Game_You_Use_This_Letter", userId)
-                            + jsonParsers.getLocale("Game_Have_Attempts", userId) + (6 - count2) + "`\n"
-                            + getDescription(count2)
-                            + jsonParsers.getLocale("Game_Current_Word", userId) + replacementLetters(WORD.indexOf(inputs)) + "`"
-                            + jsonParsers.getLocale("Game_Player", userId) + userId + ">");
+
+                    info.setThumbnail("https://megoru.ru/hangman/" + count2 + ".png");
+                    info.addField(jsonParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
+                    info.addField(jsonParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
+                    info.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
+
+
 
                     editMessage(info, Long.parseLong(guildId), Long.parseLong(userId), this.channel.getIdLong());
                     info.clear();
@@ -131,11 +136,11 @@ public class Hangman implements HangmanHelper {
                     try {
                         EmbedBuilder win = new EmbedBuilder();
                         win.setColor(0x00FF00);
-                        win.setTitle(jsonParsers.getLocale("Game_Title", userId));
-                        win.setDescription(jsonParsers.getLocale("Game_Stop_Win", userId)
-                                + getDescription(count2)
-                                + jsonParsers.getLocale("Game_Current_Word", userId) + result + "`"
-                                + jsonParsers.getLocale("Game_Player", userId) + Long.parseLong(userId) + ">");
+
+                        win.setThumbnail("https://megoru.ru/hangman/" + count2 + ".png");
+                        win.addField(jsonParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
+                        win.addField(jsonParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
+                        win.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
 
                         channel.editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), win.build())
                                 .queue(message -> message.addReaction(Reactions.emojiNextTrack).queue());
@@ -153,11 +158,12 @@ public class Hangman implements HangmanHelper {
                     EmbedBuilder info = new EmbedBuilder();
                     info.setColor(0x00FF00);
                     info.setTitle(jsonParsers.getLocale("Game_Title", userId));
-                    info.setDescription(jsonParsers.getLocale("Game_You_Guess_Letter", userId)
-                            + jsonParsers.getLocale("Game_Have_Attempts", userId) + (6 - count2) + "`\n"
-                            + getDescription(count2)
-                            + jsonParsers.getLocale("Game_Current_Word", userId) + result + "`"
-                            + jsonParsers.getLocale("Game_Player", userId) + Long.parseLong(userId) + ">");
+                    info.setDescription(jsonParsers.getLocale("Game_You_Guess_Letter", userId));
+
+                    info.setThumbnail("https://megoru.ru/hangman/" + count2 + ".png");
+                    info.addField(jsonParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
+                    info.addField(jsonParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
+                    info.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
 
                     channel.editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), info.build())
                             .queue(null, (exception) -> channel.sendMessage(removeGameException(Long.parseLong(userId))).queue());
@@ -172,16 +178,18 @@ public class Hangman implements HangmanHelper {
             if (!WORD.contains(inputs)) {
                 count2++;
 
-                if (count2 >= 6) {
+                if (count2 >= 5) {
                     try {
                         EmbedBuilder info = new EmbedBuilder();
                         info.setColor(0x00FF00);
                         info.setTitle(jsonParsers.getLocale("Game_Title", userId));
-                        info.setDescription(jsonParsers.getLocale("Game_You_Lose", userId)
-                                + getDescription(count2)
-                                + jsonParsers.getLocale("Game_Current_Word", userId) + replacementLetters(WORD.indexOf(inputs)) + "`"
-                                + jsonParsers.getLocale("Game_Word_That_Was", userId) + WORD + "`"
-                                + jsonParsers.getLocale("Game_Player", userId) + Long.parseLong(userId) + ">");
+                        info.setDescription(jsonParsers.getLocale("Game_You_Lose", userId));
+
+                        info.setThumbnail("https://megoru.ru/hangman/" + count2 + ".png");
+                        info.addField(jsonParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
+                        info.addField(jsonParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
+                        info.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
+                        info.addField(jsonParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase() + "`", false);
 
                         channel.editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), info.build())
                                 .queue(message -> message.addReaction(Reactions.emojiNextTrack).queue());
@@ -195,16 +203,18 @@ public class Hangman implements HangmanHelper {
                     }
                 }
 
-                if (count2 < 6) {
+                if (count2 < 5) {
                     try {
                         EmbedBuilder wordNotFound = new EmbedBuilder();
                         wordNotFound.setColor(0x00FF00);
                         wordNotFound.setTitle(jsonParsers.getLocale("Game_Title", userId));
-                        wordNotFound.setDescription(jsonParsers.getLocale("Game_No_Such_Letter", userId)
-                                + jsonParsers.getLocale("Game_Attempts_Left", userId) + (6 - count2) + "`\n"
-                                + getDescription(count2)
-                                + jsonParsers.getLocale("Game_Current_Word", userId) + replacementLetters(WORD.indexOf(inputs)) + "`"
-                                + jsonParsers.getLocale("Game_Player", userId) + Long.parseLong(userId) + ">");
+                        wordNotFound.setDescription(jsonParsers.getLocale("Game_No_Such_Letter", userId));
+
+                        wordNotFound.setThumbnail("https://megoru.ru/hangman/" + count2 + ".png");
+                        wordNotFound.addField(jsonParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
+                        wordNotFound.addField(jsonParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
+                        wordNotFound.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
+
 
                         channel.editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), wordNotFound.build())
                                 .queue(null, (exception) ->
@@ -218,26 +228,13 @@ public class Hangman implements HangmanHelper {
         }
     }
 
+    private void addGuesses(String letter) {
+        guesses.append(guesses.length() == 0 ? letter : ", " + letter);
+    }
+
     private void resultGame(boolean resultBool) {
         DataBase.getInstance().addResultGame(idGame, resultBool, Instant.now().toEpochMilli());
         DataBase.getInstance().addResultPlayer(Long.parseLong(userId), idGame);
-    }
-
-    private String getDescription(int count) {
-        return "```"
-                + (count >= 0 ? "|‾‾‾‾‾‾|      " : " ")
-                + "   \n|     "
-                + (count >= 1 ? "🎩" : " ")
-                + "   \n|     "
-                + (count >= 2 ? "\uD83E\uDD75" : " ")
-                + "   \n|   "
-                + (count >= 3 ? "👌👕\uD83E\uDD19" : " ")
-                + "   \n|     "
-                + (count >= 4 ? "🩳" : " ")
-                + "   \n|    "
-                + (count >= 5 ? "👞👞" : " ")
-                + "   \n|     \n|__________\n\n"
-                + "```";
     }
 
     private void clearingCollections() {
