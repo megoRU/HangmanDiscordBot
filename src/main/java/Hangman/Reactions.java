@@ -14,7 +14,7 @@ public class Reactions extends ListenerAdapter {
         if (event.getUser().isBot()) {
             return;
         }
-
+        System.out.println(event.getUser().getId());
         if (HangmanRegistry.getInstance().hasHangman(event.getUserIdLong())) {
             return;
         }
@@ -25,7 +25,7 @@ public class Reactions extends ListenerAdapter {
                 long userIdLong = event.getUserIdLong();
                 if (emoji.equals(emojiNextTrack)) {
                     HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getChannel()));
-                    HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel(), event.getMember().getUser());
+                    HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel());
                 }
             }
         } catch (Exception e) {

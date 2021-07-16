@@ -35,10 +35,9 @@ public class GameHangmanListener extends ListenerAdapter {
             prefix3 = BotStart.getMapPrefix().get(event.getGuild().getId());
         }
 
-
         long userIdLong = event.getAuthor().getIdLong();
         if ((message.matches(HG_ONE_LETTER) || message.matches(HG_ONE_LETTER_ENG)) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-            HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).logic(message);
+            HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).logic(message, event.getMessage());
             return;
         }
 
@@ -69,7 +68,7 @@ public class GameHangmanListener extends ListenerAdapter {
 
             if (!HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getAuthor().getId(), event.getGuild().getId(), event.getChannel()));
-                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel(), event.getMember().getUser());
+                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel());
             }
         }
     }

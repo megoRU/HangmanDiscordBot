@@ -3,14 +3,17 @@ package Hangman;
 import db.DataBase;
 import jsonparser.JSONGameParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import startbot.BotStart;
+import java.awt.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Hangman implements HangmanHelper {
 
@@ -31,6 +34,7 @@ public class Hangman implements HangmanHelper {
     private final JSONGameParsers jsonParsers = new JSONGameParsers();
     private static final String URL_RU = "http://45.138.72.66:8085/api/russian";
     private static final String URL_EN = "https://random-word-api.herokuapp.com/word?number=1";
+    private final List<Message> messageList = new ArrayList<>(17);
 
     public Hangman(String userId, String guildId, TextChannel channel) {
         this.userId = userId;
@@ -55,8 +59,19 @@ public class Hangman implements HangmanHelper {
         return "URL_RU";
     }
 
-    public void startGame(TextChannel channel, User user) {
+    public void startGame(TextChannel channel) {
         try {
+            if (BotStart.getMapGameLanguages().get(getUserId()) == null) {
+                EmbedBuilder embedBuilder = new EmbedBuilder();
+                embedBuilder.setColor(Color.RED);
+                embedBuilder.setDescription(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", userId)
+                        .replaceAll("\\{0}", BotStart.getMapPrefix().get(guildId) == null ? "!" : BotStart.getMapPrefix().get(guildId)));
+
+                channel.sendMessageEmbeds(embedBuilder.build()).queue();
+                clearingCollections();
+                return;
+            }
+
             setIdGame();
             if (WORD == null) {
                 WORD = getWord();
@@ -88,8 +103,8 @@ public class Hangman implements HangmanHelper {
         }
     }
 
-    public void logic(String inputs) {
-
+    public void logic(String inputs, Message messages) {
+        messageList.add(messages);
         if (WORD_HIDDEN.contains("_")) {
 
             if (!guesses.toString().contains(inputs.toUpperCase())) {
@@ -122,7 +137,6 @@ public class Hangman implements HangmanHelper {
                     info.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
 
 
-
                     editMessage(info, Long.parseLong(guildId), Long.parseLong(userId), this.channel.getIdLong());
                     info.clear();
                 } catch (Exception e) {
@@ -136,15 +150,15 @@ public class Hangman implements HangmanHelper {
                 checkMethod(strToArray, c);
                 String result = replacementLetters(WORD.indexOf(inputs));
 
-                if (!wordList.get(wordList.size() - 1).contains("_")) {
+                if (!result.contains("_")) {
                     try {
                         EmbedBuilder win = new EmbedBuilder();
                         win.setColor(0x00FF00);
-
+                        win.setDescription(jsonParsers.getLocale("Game_Stop_Win", userId));
                         win.setThumbnail("https://megoru.ru/hangman/" + count2 + ".png");
                         win.addField(jsonParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
                         win.addField(jsonParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
-                        win.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
+                        win.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + result.toUpperCase() + "`", false);
 
                         channel.editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), win.build())
                                 .queue(message -> message.addReaction(Reactions.emojiNextTrack).queue());
@@ -158,6 +172,7 @@ public class Hangman implements HangmanHelper {
                     }
                 }
 
+
                 try {
                     EmbedBuilder info = new EmbedBuilder();
                     info.setColor(0x00FF00);
@@ -167,7 +182,7 @@ public class Hangman implements HangmanHelper {
                     info.setThumbnail("https://megoru.ru/hangman/" + count2 + ".png");
                     info.addField(jsonParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
                     info.addField(jsonParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
-                    info.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
+                    info.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + result.toUpperCase() + "`", false);
 
                     channel.editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), info.build())
                             .queue(null, (exception) -> channel.sendMessage(removeGameException(Long.parseLong(userId))).queue());
@@ -242,6 +257,16 @@ public class Hangman implements HangmanHelper {
     }
 
     private void clearingCollections() {
+        try {
+            if (messageList.size() > 2 && BotStart.getJda().getGuildById(guildId).getSelfMember().hasPermission(channel, Permission.MESSAGE_MANAGE)) {
+                BotStart.getJda()
+                        .getGuildById(guildId)
+                        .getTextChannelById(channel.getId())
+                        .deleteMessages(messageList).queue();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
         HangmanRegistry.getInstance().getMessageId().remove(Long.parseLong(userId));
     }
