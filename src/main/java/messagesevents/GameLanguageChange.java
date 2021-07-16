@@ -16,9 +16,8 @@ public class GameLanguageChange extends ListenerAdapter {
 
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) {
-            return;
-        }
+        if (event.getAuthor().isBot()) return;
+
         if (!event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_WRITE)) {
             return;
         }
@@ -40,7 +39,13 @@ public class GameLanguageChange extends ListenerAdapter {
 
             event.getChannel()
                     .sendMessage(jsonParsers.getLocale("language_change_lang", event.getAuthor().getId())
-                    + "`" + messages[1].toUpperCase() + "`").queue();
+                            + "`" + messages[1].toUpperCase() + "`").queue();
         }
     }
+
+    public void changeGameLanguage(String message, String userIdLong) {
+        BotStart.getMapGameLanguages().put(userIdLong, message);
+        DataBase.getInstance().addGameLanguageToDB(userIdLong, message);
+    }
 }
+

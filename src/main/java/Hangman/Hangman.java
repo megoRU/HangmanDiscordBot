@@ -5,9 +5,12 @@ import jsonparser.JSONGameParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Button;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import startbot.BotStart;
+
 import java.awt.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -35,6 +38,7 @@ public class Hangman implements HangmanHelper {
     private static final String URL_RU = "http://45.138.72.66:8085/api/russian";
     private static final String URL_EN = "https://random-word-api.herokuapp.com/word?number=1";
     private final List<Message> messageList = new ArrayList<>(17);
+    private final List<ActionRow> buttons = new ArrayList<>();
 
     public Hangman(String userId, String guildId, TextChannel channel) {
         this.userId = userId;
@@ -89,6 +93,9 @@ public class Hangman implements HangmanHelper {
             EmbedBuilder start = new EmbedBuilder();
             start.setColor(0x00FF00);
             start.setTitle(jsonParsers.getLocale("Game_Title", userId));
+
+            start.addField(jsonParsers.getLocale("Game_Start_How_Play", userId), jsonParsers.getLocale("Game_Start", userId).replaceAll("\\{0}",
+                    BotStart.getMapPrefix().get(guildId) == null ? "!" : BotStart.getMapPrefix().get(guildId)), false);
 
             start.setThumbnail("https://megoru.ru/hangman/" + count2 + ".png");
             start.addField(jsonParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
@@ -152,6 +159,10 @@ public class Hangman implements HangmanHelper {
 
                 if (!result.contains("_")) {
                     try {
+                        buttons.add(ActionRow.of(Button.success(userId + ":" + ReactionsButton.START_NEW_GAME, "Play again")));
+                        buttons.add(ActionRow.of(Button.primary(userId + ":" + ReactionsButton.START_CHANGE_GAME_LANGUAGE, jsonParsers.getLocale("Hangman_Change_Language", userId)
+                                + (BotStart.getMapGameLanguages().get(getUserId()).equals("rus") ? "eng" : "rus"))));
+
                         EmbedBuilder win = new EmbedBuilder();
                         win.setColor(0x00FF00);
                         win.setDescription(jsonParsers.getLocale("Game_Stop_Win", userId));
@@ -161,7 +172,9 @@ public class Hangman implements HangmanHelper {
                         win.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + result.toUpperCase() + "`", false);
 
                         channel.editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), win.build())
-                                .queue(message -> message.addReaction(Reactions.emojiNextTrack).queue());
+                                .setActionRows(buttons)
+                                .queue();
+
                         win.clear();
                         WORD = null;
                         clearingCollections();
@@ -199,6 +212,10 @@ public class Hangman implements HangmanHelper {
 
                 if (count2 >= 5) {
                     try {
+                        buttons.add(ActionRow.of(Button.success(userId + ":" + ReactionsButton.START_NEW_GAME, "Play again")));
+                        buttons.add(ActionRow.of(Button.primary(userId + ":" + ReactionsButton.START_CHANGE_GAME_LANGUAGE, jsonParsers.getLocale("Hangman_Change_Language", userId)
+                                + (BotStart.getMapGameLanguages().get(getUserId()).equals("rus") ? "eng" : "rus"))));
+
                         EmbedBuilder info = new EmbedBuilder();
                         info.setColor(0x00FF00);
                         info.setTitle(jsonParsers.getLocale("Game_Title", userId));
@@ -211,7 +228,9 @@ public class Hangman implements HangmanHelper {
                         info.addField(jsonParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase() + "`", false);
 
                         channel.editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), info.build())
-                                .queue(message -> message.addReaction(Reactions.emojiNextTrack).queue());
+                                .setActionRows(buttons)
+                                .queue();
+
                         info.clear();
                         WORD = null;
                         clearingCollections();

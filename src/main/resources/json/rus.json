@@ -28,7 +28,8 @@
   "language_change_lang": "Вы изменили язык на: ",
   "giveaway_registry_Error": "Giveaway был отменен, потому что бот не смог получить ID своего сообщения\nПожалуйста, попробуйте снова. **Напишите нам, что именно произошло.\nМы пытаемся исправить эту ошибку. Сервер поддержки:** https://discord.gg/UrWG3R683d",
   "Game_Title": "Виселица",
-  "Game_Start": "Отправляйте по одной\nбукве в чат **без** `{0}`\nКириллица!\n",
+  "Game_Start": "Отправляйте по одной\nбукве в чат **без** `{0}`. Кириллица!",
+  "Game_Start_How_Play": "Как играть",
   "Game_Guesses": "Догадки",
   "Game_Current_Word": "Текущее слово",
   "Game_Player": "Игрок",
@@ -48,5 +49,7 @@
   "MessageStats_Game_Count": ":video_game: Колличество игр: `{0}`\n",
   "MessageStats_Game_Wins": ":first_place: Колличество побед: `{0}`\n",
   "MessageStats_Game_Percentage": ":trophy: Процент побед: `{0}%`",
-  "MessageStats_Zero_Divide": "У Вас `0` игр, а мы не сумасшедшие!"
+  "MessageStats_Zero_Divide": "У Вас `0` игр, а мы не сумасшедшие!",
+  "ReactionsButton_Save": "Вы изменили язык на: `{0}`",
+  "Hangman_Change_Language": "Изменить язык на: "
 }

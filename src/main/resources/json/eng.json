@@ -28,7 +28,8 @@
   "language_change_lang": "You changed the language to: ",
   "giveaway_registry_Error": "The giveaway was canceled because the bot was unable to get the ID\nyour post for editing. Please try again. **Write us what exactly happened.\nWe are trying to fix this bug. Support guild:** https://discord.gg/UrWG3R683d",
   "Game_Title": "Hangman",
-  "Game_Start": "Send one letter at a time\n to the chat **without** `{0}`\nLatin alphabet\n",
+  "Game_Start": "Send one letter at a time\n to the chat **without** `{0}`. Latin alphabet",
+  "Game_Start_How_Play": "How to play",
   "Game_Guesses": "Guesses",
   "Game_Current_Word": "Current word",
   "Game_Player": "Player",
@@ -48,5 +49,7 @@
   "MessageStats_Game_Count": ":video_game: Number of games: `{0}`\n",
   "MessageStats_Game_Wins": ":first_place: Number of wins: `{0}`\n",
   "MessageStats_Game_Percentage": ":trophy: Winning percentage: `{0}%`",
-  "MessageStats_Zero_Divide": "You have '0' games, and we are not crazy!"
+  "MessageStats_Zero_Divide": "You have '0' games, and we are not crazy!",
+  "ReactionsButton_Save": "You changed the language to: `{0}`",
+  "Hangman_Change_Language": "Change the language to: "
 }
