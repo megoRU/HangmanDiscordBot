@@ -10,7 +10,7 @@ public interface HangmanHelper {
       BotStart.getJda()
           .getGuildById(guildId)
           .getTextChannelById(channelId)
-          .editMessageById(HangmanRegistry.getInstance().getMessageId().get(userIdLong), embedBuilder.build())
+          .editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(userIdLong), embedBuilder.build())
           .queue();
       embedBuilder.clear();
     } catch (Exception e) {

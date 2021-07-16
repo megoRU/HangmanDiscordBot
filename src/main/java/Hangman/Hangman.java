@@ -78,7 +78,7 @@ public class Hangman implements HangmanHelper {
                     + jsonParsers.getLocale("Game_Current_Word", userId) + hideWord(WORD.length()) + "`"
                     + jsonParsers.getLocale("Game_Player", userId) + Long.parseLong(userId) + ">");
 
-            channel.sendMessage(start.build()).queue(m -> HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId), m.getId()));
+            channel.sendMessageEmbeds(start.build()).queue(m -> HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId), m.getId()));
             start.clear();
         } catch (Exception e) {
             e.printStackTrace();
@@ -137,7 +137,7 @@ public class Hangman implements HangmanHelper {
                                 + jsonParsers.getLocale("Game_Current_Word", userId) + result + "`"
                                 + jsonParsers.getLocale("Game_Player", userId) + Long.parseLong(userId) + ">");
 
-                        channel.editMessageById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), win.build())
+                        channel.editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), win.build())
                                 .queue(message -> message.addReaction(Reactions.emojiNextTrack).queue());
                         win.clear();
                         WORD = null;
@@ -159,7 +159,7 @@ public class Hangman implements HangmanHelper {
                             + jsonParsers.getLocale("Game_Current_Word", userId) + result + "`"
                             + jsonParsers.getLocale("Game_Player", userId) + Long.parseLong(userId) + ">");
 
-                    channel.editMessageById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), info.build())
+                    channel.editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), info.build())
                             .queue(null, (exception) -> channel.sendMessage(removeGameException(Long.parseLong(userId))).queue());
                     info.clear();
 
@@ -172,7 +172,7 @@ public class Hangman implements HangmanHelper {
             if (!WORD.contains(inputs)) {
                 count2++;
 
-                if (count2 >= 5) {
+                if (count2 >= 6) {
                     try {
                         EmbedBuilder info = new EmbedBuilder();
                         info.setColor(0x00FF00);
@@ -183,7 +183,7 @@ public class Hangman implements HangmanHelper {
                                 + jsonParsers.getLocale("Game_Word_That_Was", userId) + WORD + "`"
                                 + jsonParsers.getLocale("Game_Player", userId) + Long.parseLong(userId) + ">");
 
-                        channel.editMessageById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), info.build())
+                        channel.editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), info.build())
                                 .queue(message -> message.addReaction(Reactions.emojiNextTrack).queue());
                         info.clear();
                         WORD = null;
@@ -195,7 +195,7 @@ public class Hangman implements HangmanHelper {
                     }
                 }
 
-                if (count2 < 5) {
+                if (count2 < 6) {
                     try {
                         EmbedBuilder wordNotFound = new EmbedBuilder();
                         wordNotFound.setColor(0x00FF00);
@@ -206,7 +206,7 @@ public class Hangman implements HangmanHelper {
                                 + jsonParsers.getLocale("Game_Current_Word", userId) + replacementLetters(WORD.indexOf(inputs)) + "`"
                                 + jsonParsers.getLocale("Game_Player", userId) + Long.parseLong(userId) + ">");
 
-                        channel.editMessageById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), wordNotFound.build())
+                        channel.editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), wordNotFound.build())
                                 .queue(null, (exception) ->
                                         channel.sendMessage(removeGameException(Long.parseLong(userId))).queue());
                         wordNotFound.clear();
