@@ -37,7 +37,7 @@
   "Game_Stop_Win": "The game is over, you have won!\n",
   "Game_You_Guess_Letter": "You guessed the letter!",
   "Game_You_Lose": "You lost!",
-  "Game_Word_That_Was": "The word that was:",
+  "Game_Word_That_Was": "The word that was",
   "Game_No_Such_Letter": "There is no such letter!",
   "Game_Attempts_Left": "No more attempts left",
   "Hangman_Listener_You_Play": "You're playing now.\nYou need to send one letter to the chat.\nTo end the game, write: {0} stop",
