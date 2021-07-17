@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class BotStart {
 
-    public static final String activity = "!help";
+    public static final String activity = "!help | ";
     private static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
     private static final Map<String, String> mapPrefix = new HashMap<>();
@@ -40,7 +40,7 @@ public class BotStart {
 
         jdaBuilder.setAutoReconnect(true);
         jdaBuilder.setStatus(OnlineStatus.ONLINE);
-        jdaBuilder.setActivity(Activity.playing(activity + " | " + TopGG.serverCount));
+        jdaBuilder.setActivity(Activity.playing(activity + TopGG.serverCount + " guilds"));
         jdaBuilder.setBulkDeleteSplittingEnabled(false);
         jdaBuilder.addEventListeners(new MessageWhenBotJoinToGuild());
         jdaBuilder.addEventListeners(new PrefixChange());
