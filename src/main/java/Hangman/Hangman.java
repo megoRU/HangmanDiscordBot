@@ -4,13 +4,12 @@ import db.DataBase;
 import jsonparser.JSONGameParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import startbot.BotStart;
-
 import java.awt.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +37,7 @@ public class Hangman implements HangmanHelper {
     private static final String URL_RU = "http://45.138.72.66:8085/api/russian";
     private static final String URL_EN = "https://random-word-api.herokuapp.com/word?number=1";
     private final List<Message> messageList = new ArrayList<>(17);
-    private final List<ActionRow> buttons = new ArrayList<>();
+    private final List<Button> buttons = new ArrayList<>();
 
     public Hangman(String userId, String guildId, TextChannel channel) {
         this.userId = userId;
@@ -159,9 +158,10 @@ public class Hangman implements HangmanHelper {
 
                 if (!result.contains("_")) {
                     try {
-                        buttons.add(ActionRow.of(Button.success(userId + ":" + ReactionsButton.START_NEW_GAME, "Play again")));
-                        buttons.add(ActionRow.of(Button.primary(userId + ":" + ReactionsButton.START_CHANGE_GAME_LANGUAGE, jsonParsers.getLocale("Hangman_Change_Language", userId)
-                                + (BotStart.getMapGameLanguages().get(getUserId()).equals("rus") ? "eng" : "rus"))));
+                        buttons.add(Button.success(userId + ":" + ReactionsButton.START_NEW_GAME, "Play again"));
+                        buttons.add(Button.primary(userId + ":" + ReactionsButton.START_CHANGE_GAME_LANGUAGE, jsonParsers.getLocale("Hangman_Change_Language", userId)
+                                + (BotStart.getMapGameLanguages().get(getUserId()).equals("rus") ? "eng" : "rus")));
+                        buttons.add(Button.primary(userId + ":" + ReactionsButton.MY_STATS, "My stats"));
 
                         EmbedBuilder win = new EmbedBuilder();
                         win.setColor(0x00FF00);
@@ -172,7 +172,7 @@ public class Hangman implements HangmanHelper {
                         win.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + result.toUpperCase() + "`", false);
 
                         channel.editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), win.build())
-                                .setActionRows(buttons)
+                                .setActionRow(buttons)
                                 .queue();
 
                         win.clear();
@@ -212,9 +212,11 @@ public class Hangman implements HangmanHelper {
 
                 if (count2 >= 5) {
                     try {
-                        buttons.add(ActionRow.of(Button.success(userId + ":" + ReactionsButton.START_NEW_GAME, "Play again")));
-                        buttons.add(ActionRow.of(Button.primary(userId + ":" + ReactionsButton.START_CHANGE_GAME_LANGUAGE, jsonParsers.getLocale("Hangman_Change_Language", userId)
-                                + (BotStart.getMapGameLanguages().get(getUserId()).equals("rus") ? "eng" : "rus"))));
+                        buttons.add(Button.success(userId + ":" + ReactionsButton.START_NEW_GAME, "Play again"));
+                        buttons.add(Button.primary(userId + ":" + ReactionsButton.START_CHANGE_GAME_LANGUAGE, jsonParsers.getLocale("Hangman_Change_Language", userId)
+                                + (BotStart.getMapGameLanguages().get(getUserId()).equals("rus") ? "eng" : "rus")));
+                        buttons.add(Button.primary(userId + ":" + ReactionsButton.MY_STATS, "My stats"));
+
 
                         EmbedBuilder info = new EmbedBuilder();
                         info.setColor(0x00FF00);
@@ -228,7 +230,7 @@ public class Hangman implements HangmanHelper {
                         info.addField(jsonParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase() + "`", false);
 
                         channel.editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), info.build())
-                                .setActionRows(buttons)
+                                .setActionRow(buttons)
                                 .queue();
 
                         info.clear();

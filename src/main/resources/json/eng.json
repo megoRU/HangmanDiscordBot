@@ -43,7 +43,7 @@
   "Game_Attempts_Left": "No more attempts left",
   "Hangman_Listener_You_Play": "You're playing now.\nYou need to send one letter to the chat.\nTo end the game, write: {0} stop",
   "Hangman_Listener_Need_Set_Language": "First you need to set the language for the words.\nWrite `{0}game rus` or `!game eng` to set the language.\nThen re-write `{0}hg`",
-  "Hangman_Eng_game": "You have completed the game.\nTo start a new game write: `{0}`\nThen send one letter each to the chat.",
+  "Hangman_Eng_game": "You have completed the game.",
   "Hangman_You_Are_Not_Play": "You're not playing right now.",
   "MessageStats_Your_Stats": "Your statistics",
   "MessageStats_Game_Count": ":video_game: Number of games: `{0}`\n",
@@ -51,5 +51,6 @@
   "MessageStats_Game_Percentage": ":trophy: Winning percentage: `{0}%`",
   "MessageStats_Zero_Divide": "You have '0' games, and we are not crazy!",
   "ReactionsButton_Save": "You changed the language to: `{0}`",
-  "Hangman_Change_Language": "Change the language to: "
+  "Hangman_Change_Language": "Change the language to: ",
+  "ReactionsButton_When_Play": "During the game, you can not change the language or start a new game without completing the active one."
 }
