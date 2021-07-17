@@ -71,7 +71,7 @@ public class MessageStats extends ListenerAdapter {
                         jsonParsers.getLocale("MessageStats_Game_Percentage",
                         event.getAuthor().getId()).replaceAll("\\{0}", df.format(percentage)));
 
-                event.getChannel().sendMessage(stats.build()).queue();
+                event.getChannel().sendMessageEmbeds(stats.build()).queue();
                 stats.clear();
             }
         }

@@ -93,7 +93,7 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
                     userIdLong)).delay(5, TimeUnit.SECONDS)
                 .flatMap(Message::delete).queue();
             event.getMember().getUser().openPrivateChannel()
-                .flatMap(channel -> channel.sendMessage(info.build()))
+                .flatMap(channel -> channel.sendMessageEmbeds(info.build()))
                 .queue(null, error -> event.getChannel()
                     .sendMessage(jsonParsers.getLocale("messages_events_Failed_To_Send_Message", event.getGuild().getId())).queue());
           }

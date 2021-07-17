@@ -8,7 +8,7 @@ public interface SenderMessage {
 
   default void sendMessage(EmbedBuilder embedBuilder, @NotNull MessageReceivedEvent event) {
     try {
-      event.getChannel().sendMessage(embedBuilder.build()).queue();
+      event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
     } catch (Exception e) {
       e.printStackTrace();
     }

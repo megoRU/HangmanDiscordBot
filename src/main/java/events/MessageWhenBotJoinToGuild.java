@@ -32,7 +32,7 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
       welcome.addField("Vote", ":boom: [Vote for this bot](https://top.gg/bot/808277484524011531/vote)"
           , false);
 
-      event.getGuild().getDefaultChannel().sendMessage(welcome.build()).queue();
+      event.getGuild().getDefaultChannel().sendMessageEmbeds(welcome.build()).queue();
       welcome.clear();
     } catch (Exception e) {
       e.printStackTrace();

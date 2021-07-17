@@ -76,7 +76,7 @@ public class MessageGlobalStats extends ListenerAdapter {
                     "First place: <@" + gameStatsByUsers.get(gameStatsByUsers.size() - 1).getID_LONG() + "> `" + gameStatsByUsers.get(gameStatsByUsers.size() - 1).getPercentage() + "%`\n " +
                     "Second place: <@" + gameStatsByUsers.get(gameStatsByUsers.size() - 2).getID_LONG() + "> `" + gameStatsByUsers.get(gameStatsByUsers.size() - 2).getPercentage() + "%`\n " +
                     "Third  place: <@" + gameStatsByUsers.get(gameStatsByUsers.size() - 3).getID_LONG() + "> `" + gameStatsByUsers.get(gameStatsByUsers.size() - 3).getPercentage() + "%`");
-            event.getChannel().sendMessage(globalStats.build()).queue();
+            event.getChannel().sendMessageEmbeds(globalStats.build()).queue();
             globalStats.clear();
 
             insertQuery = new StringBuilder();
