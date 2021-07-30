@@ -1,20 +1,23 @@
-package Hangman;
+package hangman;
 
 import jsonparser.JSONParsers;
 import messagesevents.GameLanguageChange;
+import messagesevents.MessageInfoHelp;
 import messagesevents.MessageStats;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import startbot.BotStart;
 
 import java.util.Objects;
 
 public class ReactionsButton extends ListenerAdapter {
 
-    private final JSONParsers jsonParsers = new JSONParsers();
     public static final String START_NEW_GAME = "NEW_GAME";
     public static final String START_CHANGE_GAME_LANGUAGE = "CHANGE_GAME_LANGUAGE";
     public static final String MY_STATS = "MY_STATS";
+    public static final String BUTTON_HELP = "BUTTON_HELP";
+    private final JSONParsers jsonParsers = new JSONParsers();
 
     @Override
     public void onButtonClick(@NotNull ButtonClickEvent event) {
@@ -27,11 +30,25 @@ public class ReactionsButton extends ListenerAdapter {
 
             if (HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong()) &&
                     (Objects.equals(event.getButton().getId(), event.getMember().getUser().getId() + ":" + START_NEW_GAME)
-                    || Objects.equals(event.getButton().getId(), event.getMember().getUser().getId() + ":" + START_CHANGE_GAME_LANGUAGE))) {
+                            || Objects.equals(event.getButton().getId(), event.getMember().getUser().getId() + ":" + START_CHANGE_GAME_LANGUAGE))) {
                 event.deferEdit().queue();
                 event.getHook().sendMessage(jsonParsers
-                        .getLocale("ReactionsButton_When_Play", event.getMember().getId()))
+                                .getLocale("ReactionsButton_When_Play", event.getMember().getId()))
                         .setEphemeral(true).queue();
+                return;
+            }
+
+            if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + BUTTON_HELP)) {
+
+                event.deferEdit().queue();
+                MessageInfoHelp messageInfoHelp = new MessageInfoHelp();
+                messageInfoHelp.buildMessage(
+                        BotStart.getMapPrefix().get(event.getGuild().getId()) == null ? "!" : BotStart.getMapPrefix().get(event.getGuild().getId()),
+                        event.getTextChannel(),
+                        event.getUser().getAvatarUrl(),
+                        event.getGuild().getId(),
+                        event.getUser().getName()
+                );
                 return;
             }
 
@@ -47,8 +64,8 @@ public class ReactionsButton extends ListenerAdapter {
                 event.deferEdit().queue();
                 new GameLanguageChange().changeGameLanguage(event.getButton().getLabel().contains("rus") ? "rus" : "eng", event.getMember().getId());
                 event.getHook().sendMessage(jsonParsers
-                        .getLocale("ReactionsButton_Save", event.getMember().getId())
-                        .replaceAll("\\{0}", event.getButton().getLabel().contains("rus") ? "rus" : "eng"))
+                                .getLocale("ReactionsButton_Save", event.getMember().getId())
+                                .replaceAll("\\{0}", event.getButton().getLabel().contains("rus") ? "rus" : "eng"))
                         .setEphemeral(true).queue();
             }
 

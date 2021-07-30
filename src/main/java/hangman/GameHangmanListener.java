@@ -1,4 +1,4 @@
-package Hangman;
+package hangman;
 
 import jsonparser.JSONParsers;
 import net.dv8tion.jda.api.Permission;
@@ -8,16 +8,13 @@ import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
 import startbot.BotStart;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class GameHangmanListener extends ListenerAdapter {
 
-    private final JSONParsers jsonParsers = new JSONParsers();
     private static final String HG = "!hg";
     private static final String HG_STOP = "!hg stop";
     private static final String HG_ONE_LETTER = "[А-Яа-я]";
     private static final String HG_ONE_LETTER_ENG = "[A-Za-z]";
+    private final JSONParsers jsonParsers = new JSONParsers();
 
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
@@ -61,7 +58,7 @@ public class GameHangmanListener extends ListenerAdapter {
             if (message.equals(prefix2) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 HangmanRegistry.getInstance().getActiveHangman().remove(userIdLong);
                 event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_Eng_game",
-                        event.getAuthor().getId()).replaceAll("\\{0}", prefix))
+                                event.getAuthor().getId()).replaceAll("\\{0}", prefix))
                         .setActionRow(Button.success(userIdLong + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
                         .queue();
                 return;

@@ -1,4 +1,4 @@
-package Hangman;
+package hangman;
 
 import db.DataBase;
 import jsonparser.JSONGameParsers;
@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.components.Button;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import startbot.BotStart;
+
 import java.awt.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -19,25 +20,25 @@ import java.util.List;
 
 public class Hangman implements HangmanHelper {
 
-    private String WORD = null;
-    private char[] strToArray;
-    private String WORD_HIDDEN = "";
+    private static final String URL_RU = "http://45.138.72.66:8085/api/russian";
+    private static final String URL_EN = "https://random-word-api.herokuapp.com/word?number=1";
     private final StringBuilder guesses = new StringBuilder();
     private final ArrayList<String> wordList = new ArrayList<>();
     private final ArrayList<Integer> index = new ArrayList<>();
     private final ArrayList<String> usedLetters = new ArrayList<>();
-    private boolean isLetterPresent;
-    private Integer count = 0;
-    private Integer count2 = 0;
     private final String userId;
     private final String guildId;
     private final TextChannel channel;
-    private int idGame;
     private final JSONGameParsers jsonParsers = new JSONGameParsers();
-    private static final String URL_RU = "http://45.138.72.66:8085/api/russian";
-    private static final String URL_EN = "https://random-word-api.herokuapp.com/word?number=1";
     private final List<Message> messageList = new ArrayList<>(17);
     private final List<Button> buttons = new ArrayList<>();
+    private String WORD = null;
+    private char[] strToArray;
+    private String WORD_HIDDEN = "";
+    private boolean isLetterPresent;
+    private Integer count = 0;
+    private Integer count2 = 0;
+    private int idGame;
 
     public Hangman(String userId, String guildId, TextChannel channel) {
         this.userId = userId;

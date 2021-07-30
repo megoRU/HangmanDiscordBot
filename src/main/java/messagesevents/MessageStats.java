@@ -5,18 +5,18 @@ import jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import startbot.BotStart;
+
 import java.text.DecimalFormat;
 
 public class MessageStats extends ListenerAdapter {
 
     private static final String STATS = "!hg stats";
-    private final JSONParsers jsonParsers = new JSONParsers();
     private static final DecimalFormat df = new DecimalFormat("##.#");
+    private final JSONParsers jsonParsers = new JSONParsers();
 
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {

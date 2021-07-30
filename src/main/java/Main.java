@@ -1,4 +1,4 @@
-import Hangman.HangmanRegistry;
+import hangman.HangmanRegistry;
 import startbot.BotStart;
 import threads.TopGG;
 

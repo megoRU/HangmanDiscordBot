@@ -1,8 +1,8 @@
 package startbot;
 
-import Hangman.GameHangmanListener;
-import Hangman.HangmanRegistry;
-import Hangman.ReactionsButton;
+import hangman.GameHangmanListener;
+import hangman.HangmanRegistry;
+import hangman.ReactionsButton;
 import config.Config;
 import db.DataBase;
 import events.MessageWhenBotJoinToGuild;
@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import threads.TopGG;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -21,11 +22,11 @@ import java.util.Map;
 public class BotStart {
 
     public static final String activity = "!help | ";
-    private static JDA jda;
-    private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
     private static final Map<String, String> mapPrefix = new HashMap<>();
     private static final Map<String, String> mapLanguages = new HashMap<>();
     private static final Map<String, String> mapGameLanguages = new HashMap<>();
+    private static JDA jda;
+    private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
 
     public void startBot() throws Exception {
         //Теперь HangmanRegistry знает колличство игр и может отдавать правильное значение

@@ -52,5 +52,6 @@
   "MessageStats_Zero_Divide": "You have '0' games, and we are not crazy!",
   "ReactionsButton_Save": "You changed the language to: `{0}`",
   "Hangman_Change_Language": "Change the language to: ",
-  "ReactionsButton_When_Play": "During the game, you can not change the language or start a new game without completing the active one."
+  "ReactionsButton_When_Play": "During the game, you can not change the language or start a new game without completing the active one.",
+  "button_Help": "!help"
 }

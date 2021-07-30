@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import startbot.BotStart;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -74,8 +75,8 @@ public class MessageGlobalStats extends ListenerAdapter {
                     event.getAuthor().getId()));
             globalStats.setDescription(
                     "First place: <@" + gameStatsByUsers.get(gameStatsByUsers.size() - 1).getID_LONG() + "> `" + gameStatsByUsers.get(gameStatsByUsers.size() - 1).getPercentage() + "%`\n " +
-                    "Second place: <@" + gameStatsByUsers.get(gameStatsByUsers.size() - 2).getID_LONG() + "> `" + gameStatsByUsers.get(gameStatsByUsers.size() - 2).getPercentage() + "%`\n " +
-                    "Third  place: <@" + gameStatsByUsers.get(gameStatsByUsers.size() - 3).getID_LONG() + "> `" + gameStatsByUsers.get(gameStatsByUsers.size() - 3).getPercentage() + "%`");
+                            "Second place: <@" + gameStatsByUsers.get(gameStatsByUsers.size() - 2).getID_LONG() + "> `" + gameStatsByUsers.get(gameStatsByUsers.size() - 2).getPercentage() + "%`\n " +
+                            "Third  place: <@" + gameStatsByUsers.get(gameStatsByUsers.size() - 3).getID_LONG() + "> `" + gameStatsByUsers.get(gameStatsByUsers.size() - 3).getPercentage() + "%`");
             event.getChannel().sendMessageEmbeds(globalStats.build()).queue();
             globalStats.clear();
 

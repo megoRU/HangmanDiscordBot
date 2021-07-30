@@ -52,5 +52,6 @@
   "MessageStats_Zero_Divide": "У Вас `0` игр, а мы не сумасшедшие!",
   "ReactionsButton_Save": "Вы изменили язык на: `{0}`",
   "Hangman_Change_Language": "Изменить язык на: ",
-  "ReactionsButton_When_Play": "Во время игры нельзя изменять язык или начинать новую игру без завершения активной."
+  "ReactionsButton_When_Play": "Во время игры нельзя изменять язык или начинать новую игру без завершения активной.",
+  "button_Help": "!help"
 }

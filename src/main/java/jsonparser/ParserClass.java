@@ -1,8 +1,9 @@
 package jsonparser;
 
-import Hangman.HangmanRegistry;
+import hangman.HangmanRegistry;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,6 +11,9 @@ import java.io.InputStreamReader;
 public class ParserClass {
 
     private static volatile ParserClass parserClass;
+
+    private ParserClass() {
+    }
 
     public static ParserClass getInstance() {
         if (parserClass == null) {
@@ -21,8 +25,6 @@ public class ParserClass {
         }
         return parserClass;
     }
-
-    private ParserClass() {}
 
     public String getTranslation(String key, String language) {
         try {
