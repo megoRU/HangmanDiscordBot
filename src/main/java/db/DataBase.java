@@ -3,6 +3,7 @@ package db;
 import config.Config;
 
 import java.sql.*;
+import java.time.*;
 
 public class DataBase {
 
@@ -137,13 +138,15 @@ public class DataBase {
     }
 
     //Добавляем в Бд данные о результате игры
-    public void addResultGame(long id, boolean result, long game_date) {
+    public void addResultGame(long id, boolean result) {
         try {
+            ZonedDateTime now = ZonedDateTime.of(LocalDateTime.now(), ZoneOffset.UTC);
+            Timestamp timestamp = Timestamp.valueOf(now.toLocalDateTime());
             String sql = "INSERT IGNORE INTO games (id, result, game_date) VALUES (?, ?, ?)";
             PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
             preparedStatement.setLong(1, id);
             preparedStatement.setBoolean(2, result);
-            preparedStatement.setTimestamp(3, new Timestamp(game_date));
+            preparedStatement.setTimestamp(3, new Timestamp(timestamp.getTime()));
             preparedStatement.execute();
             preparedStatement.close();
         } catch (SQLException e) {

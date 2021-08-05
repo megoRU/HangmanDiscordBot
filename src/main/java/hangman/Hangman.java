@@ -14,7 +14,6 @@ import startbot.BotStart;
 import java.awt.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -274,8 +273,9 @@ public class Hangman implements HangmanHelper {
     }
 
     private void resultGame(boolean resultBool) {
-        DataBase.getInstance().addResultGame(idGame, resultBool, Instant.now().toEpochMilli());
+        DataBase.getInstance().addResultGame(idGame, resultBool);
         DataBase.getInstance().addResultPlayer(Long.parseLong(userId), idGame);
+
     }
 
     private void clearingCollections() {
