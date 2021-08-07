@@ -42,7 +42,7 @@
   "Game_No_Such_Letter": "There is no such letter!",
   "Game_Attempts_Left": "No more attempts left",
   "Hangman_Listener_You_Play": "You're playing now.\nYou need to send one letter to the chat.\nTo end the game, write: {0} stop",
-  "Hangman_Listener_Need_Set_Language": "First you need to set the language for the words.\nWrite `{0}game rus` or `!game eng` to set the language.\nThen re-write `{0}hg`",
+  "Hangman_Listener_Need_Set_Language": "First you need to set the language for the words.\nThis can be done by pressing on the button with the language.\nThen click on the Play button",
   "Hangman_Eng_game": "You have completed the game.",
   "Hangman_You_Are_Not_Play": "You're not playing right now.",
   "MessageStats_Your_Stats": "Your statistics",

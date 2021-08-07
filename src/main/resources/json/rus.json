@@ -42,7 +42,7 @@
   "Game_No_Such_Letter": "Такой буквы нет!",
   "Game_Attempts_Left": "Осталось попыток:",
   "Hangman_Listener_You_Play": "Сейчас вы играете.\nНужно прислать одну букву в чат.\nЧтобы завершить игру напишите: {0} stop",
-  "Hangman_Listener_Need_Set_Language": "Для начала Вам нужно установить язык для слов.\nНапишите `{0}game rus` или `!game eng` для установки языка.\nЗатем повторно напишите `{0}hg`",
+  "Hangman_Listener_Need_Set_Language": "Для начала Вам нужно установить язык для слов.\nЭто можно сделать нажатием на кнопку с языком.\nЗатем нажмите на кнопку Play",
   "Hangman_Eng_game": "Вы завершили игру.",
   "Hangman_You_Are_Not_Play": "Вы сейчас не играете.",
   "MessageStats_Your_Stats": "Ваша статистика",

@@ -2,6 +2,7 @@ package hangman;
 
 import jsonparser.JSONParsers;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
@@ -45,7 +46,16 @@ public class GameHangmanListener extends ListenerAdapter {
         if (message.equals(prefix) || message.equals(prefix2)) {
             if (BotStart.getMapGameLanguages().get(event.getAuthor().getId()) == null) {
                 event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language",
-                        event.getAuthor().getId()).replaceAll("\\{0}", prefix3)).queue();
+                                event.getMessage().getAuthor().getId()))
+                        .setActionRow(
+                                Button.secondary(event.getGuild().getId() + ":" + ReactionsButton.BUTTON_RUS, "Кириллица")
+                                        .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")),
+
+                                Button.secondary(event.getGuild().getId() + ":" + ReactionsButton.BUTTON_ENG, "Latin")
+                                        .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")),
+                                Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play"))
+                        .queue();
+
                 return;
             }
 

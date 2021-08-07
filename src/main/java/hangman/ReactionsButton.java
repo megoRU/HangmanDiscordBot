@@ -13,11 +13,13 @@ import java.util.Objects;
 
 public class ReactionsButton extends ListenerAdapter {
 
+    private final JSONParsers jsonParsers = new JSONParsers();
     public static final String START_NEW_GAME = "NEW_GAME";
     public static final String START_CHANGE_GAME_LANGUAGE = "CHANGE_GAME_LANGUAGE";
     public static final String MY_STATS = "MY_STATS";
     public static final String BUTTON_HELP = "BUTTON_HELP";
-    private final JSONParsers jsonParsers = new JSONParsers();
+    public static final String BUTTON_RUS = "LANGUAGE_RUS";
+    public static final String BUTTON_ENG = "LANGUAGE_ENG";
 
     @Override
     public void onButtonClick(@NotNull ButtonClickEvent event) {
@@ -38,6 +40,24 @@ public class ReactionsButton extends ListenerAdapter {
                 return;
             }
 
+            if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + BUTTON_RUS)) {
+                event.deferEdit().queue();
+                new GameLanguageChange().changeGameLanguage("rus", event.getUser().getId());
+                event.getHook().sendMessage(jsonParsers
+                                .getLocale("language_change_lang", event.getMember().getId()) + "Кириллица")
+                        .setEphemeral(true).queue();
+                return;
+            }
+
+            if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + BUTTON_ENG)) {
+                event.deferEdit().queue();
+                new GameLanguageChange().changeGameLanguage("eng", event.getUser().getId());
+                event.getHook().sendMessage(jsonParsers
+                                .getLocale("language_change_lang", event.getMember().getId()) + "Latin")
+                        .setEphemeral(true).queue();
+                return;
+            }
+
             if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + BUTTON_HELP)) {
 
                 event.deferEdit().queue();
@@ -53,14 +73,14 @@ public class ReactionsButton extends ListenerAdapter {
             }
 
             long userIdLong = event.getUser().getIdLong();
-            if (Objects.equals(event.getButton().getId(), event.getMember().getUser().getId() + ":" + START_NEW_GAME)) {
+            if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + START_NEW_GAME)) {
                 event.deferEdit().queue();
                 HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getTextChannel()));
                 HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getTextChannel());
                 return;
             }
 
-            if (Objects.equals(event.getButton().getId(), event.getMember().getUser().getId() + ":" + START_CHANGE_GAME_LANGUAGE)) {
+            if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + START_CHANGE_GAME_LANGUAGE)) {
                 event.deferEdit().queue();
                 new GameLanguageChange().changeGameLanguage(event.getButton().getLabel().contains("rus") ? "rus" : "eng", event.getMember().getId());
                 event.getHook().sendMessage(jsonParsers
@@ -69,7 +89,7 @@ public class ReactionsButton extends ListenerAdapter {
                         .setEphemeral(true).queue();
             }
 
-            if (Objects.equals(event.getButton().getId(), event.getMember().getUser().getId() + ":" + MY_STATS)) {
+            if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + MY_STATS)) {
                 event.deferEdit().queue();
                 new MessageStats().sendStats(
                         event.getTextChannel(),
