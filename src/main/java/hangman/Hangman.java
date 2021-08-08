@@ -2,6 +2,7 @@ package hangman;
 
 import db.DataBase;
 import jsonparser.JSONGameParsers;
+import jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
@@ -29,7 +30,8 @@ public class Hangman implements HangmanHelper {
     private final String userId;
     private final String guildId;
     private final TextChannel channel;
-    private final JSONGameParsers jsonParsers = new JSONGameParsers();
+    private final JSONGameParsers jsonGameParsers = new JSONGameParsers();
+    private final JSONParsers jsonParsers = new JSONParsers();
     private final List<Message> messageList = new ArrayList<>(17);
     private final List<Button> buttons = new ArrayList<>();
     private String WORD = null;
@@ -95,15 +97,15 @@ public class Hangman implements HangmanHelper {
 
             EmbedBuilder start = new EmbedBuilder();
             start.setColor(0x00FF00);
-            start.setTitle(jsonParsers.getLocale("Game_Title", userId));
+            start.setTitle(jsonGameParsers.getLocale("Game_Title", userId));
 
-            start.addField(jsonParsers.getLocale("Game_Start_How_Play", userId), jsonParsers.getLocale("Game_Start", userId).replaceAll("\\{0}",
+            start.addField(jsonGameParsers.getLocale("Game_Start_How_Play", userId), jsonGameParsers.getLocale("Game_Start", userId).replaceAll("\\{0}",
                     BotStart.getMapPrefix().get(guildId) == null ? "!" : BotStart.getMapPrefix().get(guildId)), false);
 
             start.setThumbnail(HANGMAN_URL + hangmanErrors + ".png");
-            start.addField(jsonParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
-            start.addField(jsonParsers.getLocale("Game_Guesses", userId), "", false);
-            start.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + hideWord(WORD.length()) + "`", false);
+            start.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
+            start.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "", false);
+            start.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + hideWord(WORD.length()) + "`", false);
 
 
             channel.sendMessageEmbeds(start.build()).queue(m -> HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId), m.getId()));
@@ -138,13 +140,13 @@ public class Hangman implements HangmanHelper {
                 try {
                     EmbedBuilder info = new EmbedBuilder();
                     info.setColor(0x00FF00);
-                    info.setTitle(jsonParsers.getLocale("Game_Title", userId));
-                    info.appendDescription(jsonParsers.getLocale("Game_You_Use_This_Letter", userId));
+                    info.setTitle(jsonGameParsers.getLocale("Game_Title", userId));
+                    info.appendDescription(jsonGameParsers.getLocale("Game_You_Use_This_Letter", userId));
 
                     info.setThumbnail(HANGMAN_URL + hangmanErrors + ".png");
-                    info.addField(jsonParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
-                    info.addField(jsonParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
-                    info.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
+                    info.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
+                    info.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
+                    info.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
 
 
                     editMessage(info, Long.parseLong(guildId), Long.parseLong(userId), this.channel.getIdLong());
@@ -163,17 +165,24 @@ public class Hangman implements HangmanHelper {
                 if (!result.contains("_")) {
                     try {
                         buttons.add(Button.success(guildId + ":" + ReactionsButton.START_NEW_GAME, "Play again"));
-                        buttons.add(Button.primary(guildId + ":" + ReactionsButton.START_CHANGE_GAME_LANGUAGE, jsonParsers.getLocale("Hangman_Change_Language", userId)
-                                + (BotStart.getMapGameLanguages().get(getUserId()).equals("rus") ? "eng" : "rus")));
+
+                        if (BotStart.getMapGameLanguages().get(getUserId()).equals("eng")) {
+                            buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_RUS, "Кириллица")
+                                    .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
+                        } else {
+                            buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_ENG, "Latin")
+                                    .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
+                        }
+
                         buttons.add(Button.primary(guildId + ":" + ReactionsButton.MY_STATS, "My stats"));
 
                         EmbedBuilder win = new EmbedBuilder();
                         win.setColor(0x00FF00);
-                        win.setDescription(jsonParsers.getLocale("Game_Stop_Win", userId));
+                        win.setDescription(jsonGameParsers.getLocale("Game_Stop_Win", userId));
                         win.setThumbnail(HANGMAN_URL + hangmanErrors + ".png");
-                        win.addField(jsonParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
-                        win.addField(jsonParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
-                        win.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + result.toUpperCase() + "`", false);
+                        win.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
+                        win.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
+                        win.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + result.toUpperCase() + "`", false);
 
                         channel.editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), win.build())
                                 .setActionRow(buttons)
@@ -192,13 +201,13 @@ public class Hangman implements HangmanHelper {
                 try {
                     EmbedBuilder info = new EmbedBuilder();
                     info.setColor(0x00FF00);
-                    info.setTitle(jsonParsers.getLocale("Game_Title", userId));
-                    info.setDescription(jsonParsers.getLocale("Game_You_Guess_Letter", userId));
+                    info.setTitle(jsonGameParsers.getLocale("Game_Title", userId));
+                    info.setDescription(jsonGameParsers.getLocale("Game_You_Guess_Letter", userId));
 
                     info.setThumbnail(HANGMAN_URL + hangmanErrors + ".png");
-                    info.addField(jsonParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
-                    info.addField(jsonParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
-                    info.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + result.toUpperCase() + "`", false);
+                    info.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
+                    info.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
+                    info.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + result.toUpperCase() + "`", false);
 
                     channel.editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), info.build()).queue();
                     info.clear();
@@ -212,21 +221,28 @@ public class Hangman implements HangmanHelper {
                 if (hangmanErrors >= 6) {
                     try {
                         buttons.add(Button.success(guildId + ":" + ReactionsButton.START_NEW_GAME, "Play again"));
-                        buttons.add(Button.primary(guildId + ":" + ReactionsButton.START_CHANGE_GAME_LANGUAGE, jsonParsers.getLocale("Hangman_Change_Language", userId)
-                                + (BotStart.getMapGameLanguages().get(getUserId()).equals("rus") ? "eng" : "rus")));
+
+                        if (BotStart.getMapGameLanguages().get(getUserId()).equals("eng")) {
+                            buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_RUS, "Кириллица")
+                                    .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
+                        } else {
+                            buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_ENG, "Latin")
+                                    .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
+                        }
+
                         buttons.add(Button.primary(guildId + ":" + ReactionsButton.MY_STATS, "My stats"));
 
 
                         EmbedBuilder info = new EmbedBuilder();
                         info.setColor(0x00FF00);
-                        info.setTitle(jsonParsers.getLocale("Game_Title", userId));
-                        info.setDescription(jsonParsers.getLocale("Game_You_Lose", userId));
+                        info.setTitle(jsonGameParsers.getLocale("Game_Title", userId));
+                        info.setDescription(jsonGameParsers.getLocale("Game_You_Lose", userId));
 
                         info.setThumbnail(HANGMAN_URL + hangmanErrors + ".png");
-                        info.addField(jsonParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
-                        info.addField(jsonParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
-                        info.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
-                        info.addField(jsonParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase() + "`", false);
+                        info.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
+                        info.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
+                        info.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
+                        info.addField(jsonGameParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase() + "`", false);
 
                         channel.editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), info.build())
                                 .setActionRow(buttons)
@@ -243,13 +259,13 @@ public class Hangman implements HangmanHelper {
                     try {
                         EmbedBuilder wordNotFound = new EmbedBuilder();
                         wordNotFound.setColor(0x00FF00);
-                        wordNotFound.setTitle(jsonParsers.getLocale("Game_Title", userId));
-                        wordNotFound.setDescription(jsonParsers.getLocale("Game_No_Such_Letter", userId));
+                        wordNotFound.setTitle(jsonGameParsers.getLocale("Game_Title", userId));
+                        wordNotFound.setDescription(jsonGameParsers.getLocale("Game_No_Such_Letter", userId));
 
                         wordNotFound.setThumbnail(HANGMAN_URL + hangmanErrors + ".png");
-                        wordNotFound.addField(jsonParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
-                        wordNotFound.addField(jsonParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
-                        wordNotFound.addField(jsonParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
+                        wordNotFound.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
+                        wordNotFound.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
+                        wordNotFound.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
 
 
                         channel.editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)), wordNotFound.build()).queue();
