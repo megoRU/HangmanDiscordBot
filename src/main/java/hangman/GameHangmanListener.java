@@ -67,16 +67,17 @@ public class GameHangmanListener extends ListenerAdapter {
 
             if (message.equals(prefix2) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 HangmanRegistry.getInstance().getActiveHangman().remove(userIdLong);
+
                 event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_Eng_game",
                                 event.getAuthor().getId()).replaceAll("\\{0}", prefix))
-                        .setActionRow(Button.success(userIdLong + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
+                        .setActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
                         .queue();
                 return;
             }
 
             if (message.equals(prefix2) && !HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_You_Are_Not_Play", event.getAuthor().getId()))
-                        .setActionRow(Button.success(userIdLong + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
+                        .setActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
                         .queue();
                 return;
             }
