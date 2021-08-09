@@ -13,7 +13,7 @@ public class GameHangmanListener extends ListenerAdapter {
 
     private static final String HG = "!hg";
     private static final String HG_STOP = "!hg stop";
-    private static final String HG_ONE_LETTER = "[А-Яа-я]";
+    private static final String HG_ONE_LETTER = "[А-ЯЁа-яё]";
     private static final String HG_ONE_LETTER_ENG = "[A-Za-z]";
     private final JSONParsers jsonParsers = new JSONParsers();
 
