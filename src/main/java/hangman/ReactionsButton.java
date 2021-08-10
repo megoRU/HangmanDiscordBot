@@ -75,7 +75,7 @@ public class ReactionsButton extends ListenerAdapter {
             long userIdLong = event.getUser().getIdLong();
             if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + START_NEW_GAME)) {
                 event.deferEdit().queue();
-                HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getTextChannel()));
+                HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getIdLong(), event.getTextChannel().getIdLong()));
                 HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getTextChannel());
                 return;
             }
