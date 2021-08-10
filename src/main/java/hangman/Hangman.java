@@ -17,8 +17,12 @@ import startbot.BotStart;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @Setter
 @Getter
@@ -29,9 +33,9 @@ public class Hangman implements HangmanHelper {
     private static final String HANGMAN_URL = "https://megoru.ru/hangman2/";
     private final StringBuilder guesses = new StringBuilder(); //
     private final ArrayList<Integer> index = new ArrayList<>();
-    private final StringBuilder usedLetters = new StringBuilder(); //
+    private int countUsedLetters;
     private final String userId;
-    private final Long guildId;
+    private final String guildId;
     private final Long channelId;
     private final JSONGameParsers jsonGameParsers = new JSONGameParsers();
     private final JSONParsers jsonParsers = new JSONParsers();
@@ -42,13 +46,14 @@ public class Hangman implements HangmanHelper {
     private String WORD_HIDDEN = ""; //
     private String currentHiddenWord;
     private volatile boolean isLetterPresent;
-    private Integer hangmanErrors = -1; //
+    private int hangmanErrors = -1; //
     private int idGame; //запрашивать у класса а то будет перезатирание
 
-    public Hangman(String userId, Long guildId, Long channelId) {
+    public Hangman(String userId, String guildId, Long channelId) {
         this.userId = userId;
         this.guildId = guildId;
         this.channelId = channelId;
+        autoInsert();
     }
 
     private String getWord() {
@@ -84,7 +89,6 @@ public class Hangman implements HangmanHelper {
                 return;
             }
 
-            setIdGame();
             if (WORD == null) {
                 WORD = getWord();
                 wordToChar = WORD.toCharArray(); // Преобразуем строку str в массив символов (char)
@@ -118,19 +122,49 @@ public class Hangman implements HangmanHelper {
         }
     }
 
+    private void executeInsert() {
+        try {
+            if ((getGuesses().toString().length() > countUsedLetters) && HangmanRegistry.getInstance().hasHangman(Long.parseLong(userId))) {
+                countUsedLetters = getGuesses().toString().length();
+
+                DataBase.getInstance().updateGame(userId,
+                        HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)),
+                        String.valueOf(channelId),
+                        guildId, WORD, currentHiddenWord,
+                        guesses.toString(),
+                        String.valueOf(hangmanErrors));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("По каким то причинам игры уже нет!");
+        }
+    }
+
+    //Автоматически отправляет в БД данные
+    public void autoInsert() {
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            public void run() throws NullPointerException {
+                try {
+                    executeInsert();
+                } catch (Exception e) {
+                    Thread.currentThread().interrupt();
+                    e.printStackTrace();
+                }
+            }
+        }, 1, 5000);
+    }
+
+
     public void logic(String inputs, Message messages) {
         messageList.add(messages);
         if (WORD_HIDDEN.contains("_")) {
 
-            if (!guesses.toString().contains(inputs.toUpperCase())) {
+            boolean contains = guesses.toString().contains(inputs.toUpperCase());
+            if (!contains) {
                 addGuesses(inputs.toUpperCase());
             }
 
-            isLetterPresent = usedLetters.toString().contains(inputs);
-
-            if (!isLetterPresent()) {
-                usedLetters.append(inputs);
-            }
+            isLetterPresent = contains;
 
             if (isLetterPresent()) {
                 try {
@@ -269,8 +303,10 @@ public class Hangman implements HangmanHelper {
     }
 
     private void resultGame(boolean resultBool) {
+        idGame = HangmanRegistry.getInstance().getIdGame();
         DataBase.getInstance().addResultGame(idGame, resultBool);
         DataBase.getInstance().addResultPlayer(Long.parseLong(userId), idGame);
+        DataBase.getInstance().deleteActiveGame(userId);
     }
 
     private void clearingCollections() {
@@ -327,10 +363,6 @@ public class Hangman implements HangmanHelper {
                 index.add(i);
             }
         }
-    }
-
-    private void setIdGame() {
-        idGame = HangmanRegistry.getInstance().getIdGame();
     }
 
 }

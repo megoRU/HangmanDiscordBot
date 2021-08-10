@@ -1,9 +1,12 @@
 package db;
 
 import config.Config;
+import hangman.HangmanRegistry;
 
 import java.sql.*;
-import java.time.*;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 public class DataBase {
 
@@ -37,6 +40,41 @@ public class DataBase {
             }
         }
         return dataBase;
+    }
+
+    public void deleteActiveGame(String userIdLong) {
+        try {
+            String sql = "DELETE FROM ActiveHangman WHERE user_id_long = '" + userIdLong + "'";
+            PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateGame(String userId, String messageIdLong, String channelId, String guildId,
+                           String WORD, String currentHiddenWord,
+                           String guesses, String hangmanErrors) {
+        try {
+            String sql = "REPLACE INTO ActiveHangman " +
+                    "(user_id_long, message_id_long, channel_id_long, " +
+                    "guild_long_id, word, current_hidden_word, " +
+                    "guesses, hangman_errors) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
+            preparedStatement.setString(1, userId);
+            preparedStatement.setString(2, messageIdLong);
+            preparedStatement.setString(3, channelId);
+            preparedStatement.setString(4, guildId);
+            preparedStatement.setString(5, WORD);
+            preparedStatement.setString(6, currentHiddenWord);
+            preparedStatement.setString(7, guesses);
+            preparedStatement.setString(8, hangmanErrors);
+            preparedStatement.execute();
+
+        } catch (SQLException e) {
+            System.out.println("Скорее всего игра уже закончилась!");
+        }
     }
 
     //Добавление префикса

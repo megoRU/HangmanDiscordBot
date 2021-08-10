@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface HangmanHelper {
 
-    default void editMessage(EmbedBuilder embedBuilder, Long guildId, Long userIdLong, Long channelId) {
+    default void editMessage(EmbedBuilder embedBuilder, String guildId, Long userIdLong, Long channelId) {
         try {
             BotStart.getJda()
                     .getGuildById(guildId)
@@ -21,7 +21,7 @@ public interface HangmanHelper {
         }
     }
 
-    default void editMessageWithButtons(EmbedBuilder embedBuilder, Long guildId, Long userIdLong, Long channelId, List<Button> buttons) {
+    default void editMessageWithButtons(EmbedBuilder embedBuilder, String guildId, Long userIdLong, Long channelId, List<Button> buttons) {
         try {
             BotStart.getJda()
                     .getGuildById(guildId)

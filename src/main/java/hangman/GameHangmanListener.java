@@ -83,7 +83,7 @@ public class GameHangmanListener extends ListenerAdapter {
             }
 
             if (!HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getAuthor().getId(), event.getGuild().getIdLong(), event.getChannel().getIdLong()));
+                HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getAuthor().getId(), event.getGuild().getId(), event.getChannel().getIdLong()));
                 HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel());
             }
         }

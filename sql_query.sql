@@ -46,8 +46,6 @@ CREATE TABLE `ActiveHangman`
     `word`                varchar(255),
     `current_hidden_word` varchar(255),
     `guesses`             varchar(255),
-    `word_list`           varchar(255),
-    `used_letters`        varchar(255),
     `hangman_errors`      int(3) NOT NULL,
     PRIMARY KEY (`user_id_long`),
     UNIQUE KEY `user_id_long` (`user_id_long`)
