@@ -1,5 +1,6 @@
 package hangman;
 
+import db.DataBase;
 import jsonparser.JSONParsers;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
@@ -72,6 +73,7 @@ public class GameHangmanListener extends ListenerAdapter {
                                 event.getAuthor().getId()).replaceAll("\\{0}", prefix))
                         .setActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
                         .queue();
+                DataBase.getInstance().deleteActiveGame(String.valueOf(userIdLong));
                 return;
             }
 

@@ -1,7 +1,6 @@
 package db;
 
 import config.Config;
-import hangman.HangmanRegistry;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -52,7 +51,7 @@ public class DataBase {
         }
     }
 
-    public void updateGame(String userId, String messageIdLong, String channelId, String guildId,
+    public void createGame(String userId, String messageIdLong, String channelId, String guildId,
                            String WORD, String currentHiddenWord,
                            String guesses, String hangmanErrors) {
         try {
@@ -70,6 +69,19 @@ public class DataBase {
             preparedStatement.setString(6, currentHiddenWord);
             preparedStatement.setString(7, guesses);
             preparedStatement.setString(8, hangmanErrors);
+            preparedStatement.execute();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateGame(String userId, String currentHiddenWord, String guesses, String hangmanErrors) {
+        try {
+            String sql = "UPDATE ActiveHangman SET current_hidden_word='" +
+                    currentHiddenWord + "', guesses= '" +
+                    guesses + "', hangman_errors= '" + hangmanErrors + "' WHERE user_id_long= '" + userId + "'";
+            PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
             preparedStatement.execute();
 
         } catch (SQLException e) {

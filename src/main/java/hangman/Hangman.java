@@ -17,8 +17,6 @@ import startbot.BotStart;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -114,25 +112,32 @@ public class Hangman implements HangmanHelper {
             start.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "", false);
             start.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + hideWord(WORD.length()) + "`", false);
 
+            channel.sendMessageEmbeds(start.build()).queue(m -> {
+                        HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId), m.getId());
+                        DataBase.getInstance().createGame(userId,
+                                m.getId(),
+                                String.valueOf(channelId),
+                                guildId,
+                                WORD,
+                                WORD_HIDDEN,
+                                guesses.toString(),
+                                String.valueOf(hangmanErrors));
+                    }
+            );
 
-            channel.sendMessageEmbeds(start.build()).queue(m -> HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId), m.getId()));
+
             start.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    //TODO: Возможно произойдет так что игру закончили. Удалили данные из БД и произойдет REPLACE и игра не завершится
     private void executeInsert() {
         try {
             if ((getGuesses().toString().length() > countUsedLetters) && HangmanRegistry.getInstance().hasHangman(Long.parseLong(userId))) {
                 countUsedLetters = getGuesses().toString().length();
-
-                DataBase.getInstance().updateGame(userId,
-                        HangmanRegistry.getInstance().getMessageId().get(Long.parseLong(userId)),
-                        String.valueOf(channelId),
-                        guildId, WORD, currentHiddenWord,
-                        guesses.toString(),
-                        String.valueOf(hangmanErrors));
+                DataBase.getInstance().updateGame(userId, currentHiddenWord, guesses.toString(), String.valueOf(hangmanErrors));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -153,7 +158,6 @@ public class Hangman implements HangmanHelper {
             }
         }, 1, 5000);
     }
-
 
     public void logic(String inputs, Message messages) {
         messageList.add(messages);
@@ -303,10 +307,14 @@ public class Hangman implements HangmanHelper {
     }
 
     private void resultGame(boolean resultBool) {
-        idGame = HangmanRegistry.getInstance().getIdGame();
-        DataBase.getInstance().addResultGame(idGame, resultBool);
-        DataBase.getInstance().addResultPlayer(Long.parseLong(userId), idGame);
-        DataBase.getInstance().deleteActiveGame(userId);
+        try {
+            idGame = HangmanRegistry.getInstance().getIdGame();
+            DataBase.getInstance().addResultGame(idGame, resultBool);
+            DataBase.getInstance().addResultPlayer(Long.parseLong(userId), idGame);
+            DataBase.getInstance().deleteActiveGame(userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void clearingCollections() {
@@ -363,6 +371,15 @@ public class Hangman implements HangmanHelper {
                 index.add(i);
             }
         }
+    }
+
+    public void updateVariables(String guesses, String word, String currentHiddenWord, int hangmanErrors) {
+        this.guesses.append(guesses);
+        this.WORD = word;
+        this.WORD_HIDDEN = currentHiddenWord;
+        this.currentHiddenWord = currentHiddenWord;
+        this.hangmanErrors = hangmanErrors;
+        this.wordToChar = word.toCharArray();
     }
 
 }
