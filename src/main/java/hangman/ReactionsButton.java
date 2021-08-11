@@ -78,13 +78,16 @@ public class ReactionsButton extends ListenerAdapter {
                 HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getTextChannel().getIdLong()));
                 HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getTextChannel());
                 return;
-            } else {
+            }
+
+            if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + START_NEW_GAME) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 event.deferEdit().queue();
                 event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_Listener_You_Play",
                         event.getUser().getId()).replaceAll("\\{0}",
                         BotStart.getMapPrefix().get(event.getGuild().getId()) == null
                                 ? "!hg"
                                 : BotStart.getMapPrefix().get(event.getGuild().getId()) + "hg")).queue();
+                return;
             }
 
             if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + START_CHANGE_GAME_LANGUAGE)) {
@@ -94,6 +97,7 @@ public class ReactionsButton extends ListenerAdapter {
                                 .getLocale("ReactionsButton_Save", event.getMember().getId())
                                 .replaceAll("\\{0}", event.getButton().getLabel().contains("rus") ? "rus" : "eng"))
                         .setEphemeral(true).queue();
+                return;
             }
 
             if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + MY_STATS)) {

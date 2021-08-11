@@ -1,5 +1,5 @@
 INSERT INTO games(id, result, game_date)
-VALUES (1, true, "2021-05-23 14:25:10");
+VALUES (1, true, '2021-05-23 14:25:10');
 SELECT *
 FROM player,
      games
@@ -8,7 +8,7 @@ SELECT *
 FROM player,
      games
 WHERE player.user_id_long = '250699265389625347'
-  AND player.games_id = games.id
+  AND player.games_id = games.id;
 
 
 SELECT COUNT(games_id)                             AS COUNT_GAMES,
@@ -18,7 +18,11 @@ SELECT COUNT(games_id)                             AS COUNT_GAMES,
 FROM player,
      games
 WHERE player.user_id_long = '250699265389625347'
-  AND player.games_id = games.id сделано:
+  AND player.games_id = games.id;
+
+
+
+#   сделано:
 CREATE TABLE
     games
 (
@@ -33,7 +37,7 @@ CREATE TABLE player
     `user_id_long` bigint(30) NOT NULL,
     games_id       int,
     FOREIGN KEY (games_id) REFERENCES games (id)
-) );
+);
 
 
 -- Сделано:
@@ -53,10 +57,10 @@ CREATE TABLE `ActiveHangman`
 
 CREATE TABLE `language`
 (
-    `user_id_long ` varchar(255) NOT NULL,
+    `user_id_long` varchar(255) NOT NULL,
     `language`      varchar(255) NOT NULL,
-    PRIMARY KEY (` user_id_long `),
-    UNIQUE KEY ` user_id_long ` (` user_id_long `)
+    PRIMARY KEY (user_id_long),
+    UNIQUE KEY ` user_id_long ` (user_id_long)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
