@@ -76,7 +76,6 @@ public class MessageStats extends ListenerAdapter {
                                     userIdLong).replaceAll("\\{0}", df.format(percentage)));
 
             textChannel.sendMessageEmbeds(stats.build()).queue();
-            stats.clear();
         }
     }
 }
