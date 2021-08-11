@@ -3,81 +3,11 @@ package db;
 import config.Config;
 
 import java.sql.*;
-import java.time.*;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 public class DataBase {
-
-//  INSERT INTO games(id, result, game_date) VALUES (1, true, "2021-05-23 14:25:10");
-//  SELECT * FROM player, games WHERE player.games_id = games.id;
-//  SELECT * FROM player, games WHERE player.user_id_long = '250699265389625347' AND player.games_id = games.id
-
-
-//SELECT
-//COUNT(games_id) AS COUNT_GAMES,
-//SUM(CASE WHEN result = 0 THEN 1 ELSE 0 END) AS TOTAL_ZEROS,
-//SUM(CASE WHEN result = 1 THEN 1 ELSE 0 END) AS TOTAL_ONES
-//
-//FROM player, games WHERE player.user_id_long = '250699265389625347' AND player.games_id = games.id
-
-
-//  сделано:
-//  CREATE TABLE
-//
-//  games(
-//          id int NOT NULL AUTO_INCREMENT,
-//          result BOOLEAN,
-//          game_date DATETIME,
-//          PRIMARY KEY (id)
-//);
-
-//CREATE TABLE
-//
-//  player(
-//    `user_id_long` bigint(30) NOT NULL,
-//
-//  games_id int,
-//
-//  FOREIGN KEY(games_id)
-//
-//  REFERENCES games(id))
-//);
-
-
-//  Сделано:
-//  CREATE TABLE `ActiveHangman`(`user_id_long` bigint(30) NOT NULL,
-//   `message_id_long` bigint(30) NOT NULL,
-//   `channel_id_long` bigint(30) NOT NULL,
-//   `guild_long_id` bigint(30) NOT NULL,
-//   `wordList` varchar(255),
-//   `index` varchar(255),
-//   `usedLetters` varchar(255),
-//   `count` int(6) NOT NULL,
-//   `count2` int(6) NOT NULL,
-//  PRIMARY KEY (`user_id_long`),
-//  UNIQUE KEY `user_id_long` (`user_id_long`))
-//  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-//   CREATE TABLE `language` (
-//   user_id_long` varchar(255) NOT NULL,
-//   `language` varchar(255) NOT NULL,
-//   PRIMARY KEY (`user_id_long`),
-//   UNIQUE KEY `user_id_long` (`user_id_long`))
-//   ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-
-//  SELECT COUNT(games_id) AS COUNT_GAMES, user_id_long AS USER_ID_LONG,
-//  SUM(CASE WHEN result = 0 THEN 1 ELSE 0 END) AS TOTAL_ZEROS,
-//  SUM(CASE WHEN result = 1 THEN 1 ELSE 0 END) AS TOTAL_ONES
-//  FROM player, games WHERE player.user_id_long = 575694550517940245
-//  AND player.games_id = games.id
-//
-//  UNION
-//
-//  SELECT COUNT(games_id) AS COUNT_GAMES, user_id_long AS USER_ID_LONG,
-//  SUM(CASE WHEN result = 0 THEN 1 ELSE 0 END) AS TOTAL_ZEROS,
-//  SUM(CASE WHEN result = 1 THEN 1 ELSE 0 END) AS TOTAL_ONES
-//  FROM player, games WHERE player.user_id_long = 250699265389625347
-//  AND player.games_id = games.id
 
     private static volatile Connection connection;
     private static volatile DataBase dataBase;
@@ -109,6 +39,54 @@ public class DataBase {
             }
         }
         return dataBase;
+    }
+
+    public void deleteActiveGame(String userIdLong) {
+        try {
+            String sql = "DELETE FROM ActiveHangman WHERE user_id_long = '" + userIdLong + "'";
+            PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createGame(String userId, String messageIdLong, String channelId, String guildId,
+                           String WORD, String currentHiddenWord,
+                           String guesses, String hangmanErrors) {
+        try {
+            String sql = "REPLACE INTO ActiveHangman " +
+                    "(user_id_long, message_id_long, channel_id_long, " +
+                    "guild_long_id, word, current_hidden_word, " +
+                    "guesses, hangman_errors) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
+            preparedStatement.setString(1, userId);
+            preparedStatement.setString(2, messageIdLong);
+            preparedStatement.setString(3, channelId);
+            preparedStatement.setString(4, guildId);
+            preparedStatement.setString(5, WORD);
+            preparedStatement.setString(6, currentHiddenWord);
+            preparedStatement.setString(7, guesses);
+            preparedStatement.setString(8, hangmanErrors);
+            preparedStatement.execute();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateGame(String userId, String currentHiddenWord, String guesses, String hangmanErrors) {
+        try {
+            String sql = "UPDATE ActiveHangman SET current_hidden_word='" +
+                    currentHiddenWord + "', guesses= '" +
+                    guesses + "', hangman_errors= '" + hangmanErrors + "' WHERE user_id_long= '" + userId + "'";
+            PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
+            preparedStatement.execute();
+
+        } catch (SQLException e) {
+            System.out.println("Скорее всего игра уже закончилась!");
+        }
     }
 
     //Добавление префикса

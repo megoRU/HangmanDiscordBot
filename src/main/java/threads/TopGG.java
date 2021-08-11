@@ -1,6 +1,7 @@
 package threads;
 
 import config.Config;
+import db.DataBase;
 import net.dv8tion.jda.api.entities.Activity;
 import org.discordbots.api.client.DiscordBotListAPI;
 import startbot.BotStart;
@@ -13,6 +14,7 @@ public class TopGG extends Thread {
     public void run() {
         try {
             while (true) {
+                DataBase.getConnection().isClosed();
                 DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
                         .token(Config.getTopGgApiToken())
                         .botId(Config.getBotId())

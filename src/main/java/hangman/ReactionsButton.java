@@ -73,11 +73,18 @@ public class ReactionsButton extends ListenerAdapter {
             }
 
             long userIdLong = event.getUser().getIdLong();
-            if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + START_NEW_GAME)) {
+            if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + START_NEW_GAME) && !HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 event.deferEdit().queue();
-                HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getTextChannel()));
+                HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getTextChannel().getIdLong()));
                 HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getTextChannel());
                 return;
+            } else {
+                event.deferEdit().queue();
+                event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_Listener_You_Play",
+                        event.getUser().getId()).replaceAll("\\{0}",
+                        BotStart.getMapPrefix().get(event.getGuild().getId()) == null
+                                ? "!hg"
+                                : BotStart.getMapPrefix().get(event.getGuild().getId()) + "hg")).queue();
             }
 
             if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + START_CHANGE_GAME_LANGUAGE)) {

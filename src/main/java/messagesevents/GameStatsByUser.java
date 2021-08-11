@@ -1,5 +1,8 @@
 package messagesevents;
 
+import lombok.Getter;
+
+@Getter
 public class GameStatsByUser {
 
     private final double percentage;
@@ -10,18 +13,6 @@ public class GameStatsByUser {
         this.percentage = percentage;
         this.ID_LONG = id_long;
         this.COUNT_GAMES = COUNT_GAMES;
-    }
-
-    public double getPercentage() {
-        return percentage;
-    }
-
-    public String getID_LONG() {
-        return ID_LONG;
-    }
-
-    public String getCOUNT_GAMES() {
-        return COUNT_GAMES;
     }
 
 }
