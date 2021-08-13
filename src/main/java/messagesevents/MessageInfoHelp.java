@@ -4,6 +4,7 @@ import jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
@@ -78,6 +79,9 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
                 + p + jsonParsers.getLocale("messages_events_Start_Hangman", userIdLong) + "`"
                 + p + jsonParsers.getLocale("messages_events_Stop_Hangman", userIdLong) + "`"
                 + p + jsonParsers.getLocale("messages_events_Stats_Hangman", userIdLong), false);
+
+        info.addField(jsonParsers.getLocale("help_delete_Title", userIdLong), "`"
+                + p + jsonParsers.getLocale("help_delete", userIdLong), false);
 
         info.addField(jsonParsers.getLocale("messages_events_Links", userIdLong),
                 jsonParsers.getLocale("messages_events_Site", userIdLong) +

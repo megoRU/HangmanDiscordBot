@@ -18,8 +18,7 @@
 ##### • The Bot developer (me)
 
 ### 3. How can I get rid of the data stored?
-#### You can delete data about the current game by writing `!hg stop`.
-It is not yet possible to delete the results of past games, but we are working on this possibility
+#### You can delete all the data with one command: `!delete`.
 
 ### 4. Why does it store the data?
 #### To provide you with statistics and for the convenience of using the bot.
@@ -28,4 +27,4 @@ It is not yet possible to delete the results of past games, but we are working o
 #### Feel free to join my [Discord server](https://discord.gg/UrWG3R683d)
 
 ### Please note, that we can change this policy without any warning at any given time.
-#### **Last changed:** `11.08.2021`
+#### **Last changed:** `13.08.2021`

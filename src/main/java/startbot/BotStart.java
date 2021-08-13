@@ -7,6 +7,7 @@ import hangman.GameHangmanListener;
 import hangman.Hangman;
 import hangman.HangmanRegistry;
 import hangman.ReactionsButton;
+import lombok.Getter;
 import messagesevents.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -23,10 +24,17 @@ import java.util.Map;
 public class BotStart {
 
     public static final String activity = "!help | ";
+    @Getter
+    private static final Map<String, String> secretCode = new HashMap<>();
+    @Getter
     private static final Map<String, String> mapPrefix = new HashMap<>();
+    @Getter
     private static final Map<String, String> mapLanguages = new HashMap<>();
+    @Getter
     private static final Map<String, String> mapGameLanguages = new HashMap<>();
+    @Getter
     private static JDA jda;
+
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
 
     public void startBot() throws Exception {
@@ -54,6 +62,7 @@ public class BotStart {
         jdaBuilder.addEventListeners(new MessageStats());
         jdaBuilder.addEventListeners(new MessageGlobalStats());
         jdaBuilder.addEventListeners(new ReactionsButton());
+        jdaBuilder.addEventListeners(new DeleteAllMyData());
 
         jda = jdaBuilder.build();
         jda.awaitReady();
@@ -138,22 +147,6 @@ public class BotStart {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    public static Map<String, String> getMapPrefix() {
-        return mapPrefix;
-    }
-
-    public static Map<String, String> getMapLanguages() {
-        return mapLanguages;
-    }
-
-    public static Map<String, String> getMapGameLanguages() {
-        return mapGameLanguages;
-    }
-
-    public static JDA getJda() {
-        return jda;
     }
 
 }

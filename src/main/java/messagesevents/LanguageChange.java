@@ -16,9 +16,8 @@ public class LanguageChange extends ListenerAdapter {
 
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) {
-            return;
-        }
+        if (event.getAuthor().isBot()) return;
+
         if (!event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_WRITE)) {
             return;
         }
@@ -28,9 +27,9 @@ public class LanguageChange extends ListenerAdapter {
         String prefix_LANG_RUS = LANG_RUS;
         String prefix_LANG_ENG = LANG_ENG;
 
-        if (BotStart.getMapPrefix().containsKey(event.getAuthor().getId())) {
-            prefix_LANG_RUS = BotStart.getMapPrefix().get(event.getAuthor().getId()) + "lang rus";
-            prefix_LANG_ENG = BotStart.getMapPrefix().get(event.getAuthor().getId()) + "lang eng";
+        if (BotStart.getMapPrefix().containsKey(event.getGuild().getId())) {
+            prefix_LANG_RUS = BotStart.getMapPrefix().get(event.getGuild().getId()) + "lang rus";
+            prefix_LANG_ENG = BotStart.getMapPrefix().get(event.getGuild().getId()) + "lang eng";
         }
 
         if (message.equals(prefix_LANG_RUS) || message.equals(prefix_LANG_ENG)) {

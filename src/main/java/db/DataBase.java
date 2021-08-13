@@ -41,6 +41,25 @@ public class DataBase {
         return dataBase;
     }
 
+    public void deleteAllMyData(String userIdLong) {
+        try {
+        String sql = "DELETE g FROM DiscordBotHangmanDEV.games g " +
+        "JOIN player p on g.id = p.games_id " +
+        "WHERE p.user_id_long ='" + userIdLong + "'";
+
+        PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
+        preparedStatement.execute();
+
+        //Удаляем так же языки
+        removeGameLanguageFromDB(userIdLong);
+        removeLanguageFromDB(userIdLong);
+        deleteActiveGame(userIdLong);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void deleteActiveGame(String userIdLong) {
         try {
             String sql = "DELETE FROM ActiveHangman WHERE user_id_long = '" + userIdLong + "'";
