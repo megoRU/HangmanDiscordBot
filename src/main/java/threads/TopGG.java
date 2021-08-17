@@ -14,7 +14,7 @@ public class TopGG extends Thread {
     public void run() {
         try {
             while (true) {
-                DataBase.getConnection().isClosed();
+                DataBase.getConnection();
                 DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
                         .token(Config.getTopGgApiToken())
                         .botId(Config.getBotId())

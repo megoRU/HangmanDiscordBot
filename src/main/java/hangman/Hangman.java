@@ -27,10 +27,10 @@ import java.util.TimerTask;
 public class Hangman implements HangmanHelper {
 
     private static final String URL_RU = "http://45.138.72.66:8085/api/russian";
-    private static final String URL_EN = "https://random-word-api.herokuapp.com/word?number=1";
+    private static final String URL_EN = "http://45.138.72.66:8085/api/english";
     private static final String HANGMAN_URL = "https://megoru.ru/hangman2/";
-    private final StringBuilder guesses = new StringBuilder(); //
-    private final ArrayList<Integer> index = new ArrayList<>();
+    private final StringBuilder guesses = new StringBuilder();
+    private final List<Integer> index = new ArrayList<>();
     private int countUsedLetters;
     private final String userId;
     private final String guildId;
@@ -39,13 +39,13 @@ public class Hangman implements HangmanHelper {
     private final JSONParsers jsonParsers = new JSONParsers();
     private final List<Message> messageList = new ArrayList<>(17);
     private final List<Button> buttons = new ArrayList<>();
-    private String WORD = null; //
+    private String WORD = null;
     private char[] wordToChar;
-    private String WORD_HIDDEN = ""; //
+    private String WORD_HIDDEN = "";
     private String currentHiddenWord;
     private volatile boolean isLetterPresent;
-    private int hangmanErrors = -1; //
-    private int idGame; //запрашивать у класса а то будет перезатирание
+    private int hangmanErrors = -1;
+    private int idGame;
 
     public Hangman(String userId, String guildId, Long channelId) {
         this.userId = userId;
@@ -59,16 +59,18 @@ public class Hangman implements HangmanHelper {
             switch (BotStart.getMapGameLanguages().get(getUserId())) {
                 case "rus" -> {
                     JSONObject json = new JSONObject(IOUtils.toString(new URL(URL_RU), StandardCharsets.UTF_8));
-                    return String.valueOf(json.get("russian_WORD"));
+                    return String.valueOf(json.getString("word"));
                 }
                 case "eng" -> {
-                    return IOUtils.toString(new URL(URL_EN), StandardCharsets.UTF_8).replaceAll("\\[\"", "").replaceAll("\"]", "");
+                    JSONObject json = new JSONObject(IOUtils.toString(new URL(URL_EN), StandardCharsets.UTF_8));
+                    return String.valueOf(json.getString("word"));
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "URL_RU";
+        System.out.println("Скорее всего API не работает");
+        return null;
     }
 
     public void startGame(TextChannel channel) {
@@ -87,15 +89,12 @@ public class Hangman implements HangmanHelper {
                 return;
             }
 
-            if (WORD == null) {
-                WORD = getWord();
+            WORD = getWord();
+            if (WORD != null) {
                 wordToChar = WORD.toCharArray(); // Преобразуем строку str в массив символов (char)
                 hideWord(WORD.length());
-            }
-
-            if (WORD.equals("URL_RU")) {
-                channel.sendMessage("An error occurred. The game was deleted.\nPlease try again in 5 seconds!").queue();
-                WORD = null;
+            } else {
+                channel.sendMessage(jsonParsers.getLocale("errors", userId)).queue();
                 clearingCollections();
                 return;
             }
@@ -125,8 +124,6 @@ public class Hangman implements HangmanHelper {
                     }
             );
 
-
-            start.clear();
         } catch (Exception e) {
             e.printStackTrace();
         }

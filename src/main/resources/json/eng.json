@@ -59,5 +59,6 @@
   "restore_Data_Success": "The code was successfully accepted.\nYour data on the server has been successfully deleted.",
   "restore_Data_Failure": "I can't find this code for you.\nTry writing `!delete` again in the same chat!",
   "help_delete_Title": "Deleting data:",
-  "help_delete": "delete` - deleting your data."
+  "help_delete": "delete` - deleting your data.",
+  "errors": "An error has occurred.\nPlease try again in 5 seconds!\nIf the error persists, write here: https://discord.gg/UrWG3R683d"
 }
