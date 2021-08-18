@@ -3,16 +3,15 @@ package startbot;
 import config.Config;
 import db.DataBase;
 import events.MessageWhenBotJoinToGuild;
-import hangman.GameHangmanListener;
-import hangman.Hangman;
-import hangman.HangmanRegistry;
-import hangman.ReactionsButton;
+import hangman.*;
 import lombok.Getter;
 import messagesevents.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import threads.TopGG;
 
 import java.sql.ResultSet;
@@ -63,9 +62,33 @@ public class BotStart {
         jdaBuilder.addEventListeners(new MessageGlobalStats());
         jdaBuilder.addEventListeners(new ReactionsButton());
         jdaBuilder.addEventListeners(new DeleteAllMyData());
+        jdaBuilder.addEventListeners(new SlashCommand());
 
         jda = jdaBuilder.build();
         jda.awaitReady();
+
+        //Slash
+//        CommandListUpdateAction commands = jda.updateCommands();
+//        commands.addCommands(
+//                new CommandData("hg-start", "Start the game"),
+//                new CommandData("hg-stop", "Stop the game")
+//        );
+////        commands.queue();
+
+
+
+//        Как я понял заменяет все старые на эти команды
+//        jda.updateCommands().addCommands(
+//                        new CommandData("hg-start", "Start the game"),
+//                        new CommandData("hg-stop", "Stop the game"))
+//                .queue();
+
+
+
+//        Обновляет или создает
+
+//        jda.upsertCommand("hg-start", "Start the game").queue();
+//        jda.upsertCommand("hg-stop", "Stop the game").queue();
 
     }
 
