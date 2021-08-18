@@ -2,6 +2,7 @@ package hangman;
 
 import db.DataBase;
 import jsonparser.JSONParsers;
+import messagesevents.GameLanguageChange;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -11,6 +12,7 @@ import startbot.BotStart;
 
 public class SlashCommand extends ListenerAdapter {
     private final JSONParsers jsonParsers = new JSONParsers();
+    private static final String LANGUAGE_REGEX = "/language\\sgame:\\s(rus|eng)\\sbot:\\s(rus|eng)";
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
@@ -60,9 +62,30 @@ public class SlashCommand extends ListenerAdapter {
                         .addActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
                         .queue();
             }
-
+            return;
         }
 
+        if (event.getCommandString().matches(LANGUAGE_REGEX) && HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
+            event.reply(jsonParsers.getLocale("ReactionsButton_When_Play", event.getUser().getId()))
+                    .addActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
+                    .queue();
+            return;
+        }
 
+        //0 - game | 1 - bot
+        if (event.getCommandString().matches(LANGUAGE_REGEX)) {
+
+            new GameLanguageChange().changeGameLanguage(event.getOptions().get(0).getAsString(), event.getUser().getId());
+
+            BotStart.getMapLanguages().put(event.getUser().getId(), event.getOptions().get(1).getAsString());
+            DataBase.getInstance().addLanguageToDB(event.getUser().getId(), event.getOptions().get(1).getAsString());
+
+            event.reply(jsonParsers.getLocale("slash_language", event.getUser().getId())
+                            .replaceAll("\\{0}", event.getOptions().get(0).getAsString())
+                            .replaceAll("\\{1}", event.getOptions().get(1).getAsString()))
+
+                    .addActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
+                    .queue();
+        }
     }
 }

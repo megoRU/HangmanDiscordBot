@@ -10,8 +10,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import threads.TopGG;
 
 import java.sql.ResultSet;
@@ -37,7 +35,7 @@ public class BotStart {
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
 
     public void startBot() throws Exception {
-        //Теперь HangmanRegistry знает колличство игр и может отдавать правильное значение
+        //Теперь HangmanRegistry знает количество игр и может отдавать правильное значение
         HangmanRegistry.getInstance().getSetIdGame();
         //Получаем все префиксы из базы данных
         getPrefixFromDB();
@@ -67,26 +65,21 @@ public class BotStart {
         jda = jdaBuilder.build();
         jda.awaitReady();
 
-        //Slash
-//        CommandListUpdateAction commands = jda.updateCommands();
-//        commands.addCommands(
-//                new CommandData("hg-start", "Start the game"),
-//                new CommandData("hg-stop", "Stop the game")
-//        );
-////        commands.queue();
+//        Удалить все команды
+//        jda.updateCommands().queue();
 
-
-
-//        Как я понял заменяет все старые на эти команды
-//        jda.updateCommands().addCommands(
-//                        new CommandData("hg-start", "Start the game"),
-//                        new CommandData("hg-stop", "Stop the game"))
-//                .queue();
-
-
-
-//        Обновляет или создает
-
+//        List<OptionData> options = new ArrayList<>();
+//        options.add(new OptionData(OptionType.STRING, "game", "Setting the Game language")
+//                .addChoice("eng", "eng")
+//                .addChoice("rus", "rus")
+//                .setRequired(true));
+//
+//        options.add(new OptionData(OptionType.STRING, "bot", "Setting the bot language")
+//                .addChoice("eng", "eng")
+//                .addChoice("rus", "rus")
+//                .setRequired(true));
+//
+//        jda.upsertCommand("language", "Setting language").addOptions(options).queue();
 //        jda.upsertCommand("hg-start", "Start the game").queue();
 //        jda.upsertCommand("hg-stop", "Stop the game").queue();
 

@@ -52,7 +52,7 @@
   "MessageStats_Zero_Divide": "You have `0` games, and we are not crazy!",
   "ReactionsButton_Save": "You changed the language to: `{0}`",
   "Hangman_Change_Language": "Change the language to: ",
-  "ReactionsButton_When_Play": "During the game, you can not change the language or start a new game without completing the active one.",
+  "ReactionsButton_When_Play": "During the game, you can not change the language or start a new game\nwithout completing the active one.",
   "button_Help": "!help",
   "restore_Data": "I sent you a private message with a confirmation code,\nand you will see further instructions there.",
   "restore_Data_PM": "To delete all your data that we store, write to the same chat:\n`!delete {0}`",
@@ -60,5 +60,6 @@
   "restore_Data_Failure": "I can't find this code for you.\nTry writing `!delete` again in the same chat!",
   "help_delete_Title": "Deleting data:",
   "help_delete": "delete` - deleting your data.",
-  "errors": "An error has occurred.\nPlease try again in 5 seconds!\nIf the error persists, write here: https://discord.gg/UrWG3R683d"
+  "errors": "An error has occurred.\nPlease try again in 5 seconds!\nIf the error persists, write here: https://discord.gg/UrWG3R683d",
+  "slash_language": "You have successfully changed the languages to:\nBot: `{0}` и Game: `{1}`"
 }
