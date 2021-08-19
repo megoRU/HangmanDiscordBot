@@ -10,8 +10,10 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 import startbot.BotStart;
 
@@ -73,6 +75,64 @@ public class Hangman implements HangmanHelper {
         return null;
     }
 
+    public void startGame(@NotNull SlashCommandEvent event) {
+        try {
+            if (BotStart.getMapGameLanguages().get(getUserId()) == null) {
+                buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_RUS, "Кириллица")
+                        .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
+                buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_ENG, "Latin")
+                        .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
+                buttons.add(Button.success(guildId + ":" + ReactionsButton.START_NEW_GAME, "Play"));
+
+                event.reply(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", userId))
+                        .addActionRow(buttons)
+                        .queue();
+                clearingCollections();
+                return;
+            }
+
+            WORD = getWord();
+            if (WORD != null) {
+                wordToChar = WORD.toCharArray(); // Преобразуем строку str в массив символов (char)
+                hideWord(WORD.length());
+            } else {
+                event.reply(jsonParsers.getLocale("errors", userId)).queue();
+                clearingCollections();
+                return;
+            }
+
+            EmbedBuilder start = new EmbedBuilder();
+            start.setColor(0x00FF00);
+            start.setTitle(jsonGameParsers.getLocale("Game_Title", userId));
+
+            start.addField(jsonGameParsers.getLocale("Game_Start_How_Play", userId), jsonGameParsers.getLocale("Game_Start", userId).replaceAll("\\{0}",
+                    BotStart.getMapPrefix().get(guildId) == null ? "!" : BotStart.getMapPrefix().get(guildId)), false);
+
+            start.setThumbnail(HANGMAN_URL + hangmanErrors + ".png");
+            start.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
+            start.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "", false);
+            start.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + hideWord(WORD.length()) + "`", false);
+
+            event.replyEmbeds(start.build())
+                    .queue(m -> m.retrieveOriginal()
+                    .queue(message -> {
+                HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId),
+                        message.getId());
+                DataBase.getInstance().createGame(userId,
+                        message.getId(),
+                        String.valueOf(channelId),
+                        guildId,
+                        WORD,
+                        WORD_HIDDEN,
+                        guesses.toString(),
+                        String.valueOf(hangmanErrors));
+                    }
+            ));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void startGame(TextChannel channel) {
         try {
             if (BotStart.getMapGameLanguages().get(getUserId()) == null) {
@@ -123,7 +183,6 @@ public class Hangman implements HangmanHelper {
                                 String.valueOf(hangmanErrors));
                     }
             );
-
         } catch (Exception e) {
             e.printStackTrace();
         }

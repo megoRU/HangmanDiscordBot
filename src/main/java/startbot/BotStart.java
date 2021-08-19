@@ -10,12 +10,16 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import threads.TopGG;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BotStart {
@@ -82,6 +86,18 @@ public class BotStart {
 //        jda.upsertCommand("language", "Setting language").addOptions(options).queue();
 //        jda.upsertCommand("hg-start", "Start the game").queue();
 //        jda.upsertCommand("hg-stop", "Stop the game").queue();
+
+
+//        try {
+//            for (int i = 0; i < jda.getGuilds().size(); i++) {
+//                System.out.println(jda.getGuilds().get(i).getName());
+//
+//                jda.getGuilds().get(i).upsertCommand("language", "Setting language").addOptions(options).queue();
+//                jda.getGuilds().get(i).upsertCommand("hg-start", "Start the game").queue();
+//                jda.getGuilds().get(i).upsertCommand("hg-stop", "Stop the game").queue();
+//            }
+//        } catch (Exception e) {
+//        }
 
     }
 

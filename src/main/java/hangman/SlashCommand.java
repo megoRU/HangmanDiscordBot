@@ -12,7 +12,6 @@ import startbot.BotStart;
 
 public class SlashCommand extends ListenerAdapter {
     private final JSONParsers jsonParsers = new JSONParsers();
-    private static final String LANGUAGE_REGEX = "/language\\sgame:\\s(rus|eng)\\sbot:\\s(rus|eng)";
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
@@ -37,9 +36,8 @@ public class SlashCommand extends ListenerAdapter {
                 event.reply(jsonParsers.getLocale("Hangman_Listener_You_Play",
                         event.getUser().getId()).replaceAll("\\{0}", BotStart.getMapPrefix().get(event.getGuild().getId()) == null ? "!hg" : BotStart.getMapPrefix().get(event.getGuild().getId()))).queue();
             } else {
-                event.reply("The Discord API...").queue();
                 HangmanRegistry.getInstance().setHangman(event.getUser().getIdLong(), new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getChannel().getIdLong()));
-                HangmanRegistry.getInstance().getActiveHangman().get(event.getUser().getIdLong()).startGame(event.getTextChannel());
+                HangmanRegistry.getInstance().getActiveHangman().get(event.getUser().getIdLong()).startGame(event);
             }
             return;
         }
@@ -65,7 +63,7 @@ public class SlashCommand extends ListenerAdapter {
             return;
         }
 
-        if (event.getCommandString().matches(LANGUAGE_REGEX) && HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
+        if (event.getName().equals("language") && HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
             event.reply(jsonParsers.getLocale("ReactionsButton_When_Play", event.getUser().getId()))
                     .addActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
                     .queue();
@@ -73,7 +71,7 @@ public class SlashCommand extends ListenerAdapter {
         }
 
         //0 - game | 1 - bot
-        if (event.getCommandString().matches(LANGUAGE_REGEX)) {
+        if (event.getName().equals("language")) {
 
             new GameLanguageChange().changeGameLanguage(event.getOptions().get(0).getAsString(), event.getUser().getId());
 
