@@ -37,15 +37,15 @@ public class Hangman implements HangmanHelper {
     private final String userId;
     private final String guildId;
     private final Long channelId;
-    private final JSONGameParsers jsonGameParsers = new JSONGameParsers();
-    private final JSONParsers jsonParsers = new JSONParsers();
+    private static final JSONGameParsers jsonGameParsers = new JSONGameParsers();
+    private static final JSONParsers jsonParsers = new JSONParsers();
     private final List<Message> messageList = new ArrayList<>(17);
     private final List<Button> buttons = new ArrayList<>();
     private String WORD = null;
     private char[] wordToChar;
     private String WORD_HIDDEN = "";
     private String currentHiddenWord;
-    private volatile boolean isLetterPresent;
+    private boolean isLetterPresent;
     private int hangmanErrors = -1;
     private int idGame;
 
@@ -328,7 +328,7 @@ public class Hangman implements HangmanHelper {
                         info.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
                         info.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
                         info.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
-                        info.addField(jsonGameParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase() + "`", false);
+                        info.addField(jsonGameParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase().replaceAll(".(?!$)", "$0 ") + "`", false);
 
                         editMessageWithButtons(info, guildId, Long.parseLong(userId), channelId, buttons);
 
