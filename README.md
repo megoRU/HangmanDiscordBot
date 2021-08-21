@@ -23,4 +23,4 @@
 
 ## Privacy Policy
 
-Here you can read more about what we store and how we store it. [Privacy Policy]()
+Here you can read more about what we store and how we store it. [Privacy Policy](https://github.com/megoRU/HangmanDiscordBot/blob/main/.github/privacy.md)
