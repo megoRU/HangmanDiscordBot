@@ -10,8 +10,10 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 import startbot.BotStart;
 
@@ -35,15 +37,15 @@ public class Hangman implements HangmanHelper {
     private final String userId;
     private final String guildId;
     private final Long channelId;
-    private final JSONGameParsers jsonGameParsers = new JSONGameParsers();
-    private final JSONParsers jsonParsers = new JSONParsers();
+    private static final JSONGameParsers jsonGameParsers = new JSONGameParsers();
+    private static final JSONParsers jsonParsers = new JSONParsers();
     private final List<Message> messageList = new ArrayList<>(17);
     private final List<Button> buttons = new ArrayList<>();
     private String WORD = null;
     private char[] wordToChar;
     private String WORD_HIDDEN = "";
     private String currentHiddenWord;
-    private volatile boolean isLetterPresent;
+    private boolean isLetterPresent;
     private int hangmanErrors = -1;
     private int idGame;
 
@@ -71,6 +73,64 @@ public class Hangman implements HangmanHelper {
         }
         System.out.println("Скорее всего API не работает");
         return null;
+    }
+
+    public void startGame(@NotNull SlashCommandEvent event) {
+        try {
+            if (BotStart.getMapGameLanguages().get(getUserId()) == null) {
+                buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_RUS, "Кириллица")
+                        .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
+                buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_ENG, "Latin")
+                        .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
+                buttons.add(Button.success(guildId + ":" + ReactionsButton.START_NEW_GAME, "Play"));
+
+                event.reply(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", userId))
+                        .addActionRow(buttons)
+                        .queue();
+                clearingCollections();
+                return;
+            }
+
+            WORD = getWord();
+            if (WORD != null) {
+                wordToChar = WORD.toCharArray(); // Преобразуем строку str в массив символов (char)
+                hideWord(WORD.length());
+            } else {
+                event.reply(jsonParsers.getLocale("errors", userId)).queue();
+                clearingCollections();
+                return;
+            }
+
+            EmbedBuilder start = new EmbedBuilder();
+            start.setColor(0x00FF00);
+            start.setTitle(jsonGameParsers.getLocale("Game_Title", userId));
+
+            start.addField(jsonGameParsers.getLocale("Game_Start_How_Play", userId), jsonGameParsers.getLocale("Game_Start", userId).replaceAll("\\{0}",
+                    BotStart.getMapPrefix().get(guildId) == null ? "!" : BotStart.getMapPrefix().get(guildId)), false);
+
+            start.setThumbnail(HANGMAN_URL + hangmanErrors + ".png");
+            start.addField("Attention for Admins", "[Add slash commands](https://discord.com/api/oauth2/authorize?client_id=845974873682608129&scope=applications.commands%20bot)", false);
+            start.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
+            start.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "", false);
+            start.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + hideWord(WORD.length()) + "`", false);
+            event.replyEmbeds(start.build())
+                    .queue(m -> m.retrieveOriginal()
+                    .queue(message -> {
+                HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId),
+                        message.getId());
+                DataBase.getInstance().createGame(userId,
+                        message.getId(),
+                        String.valueOf(channelId),
+                        guildId,
+                        WORD,
+                        WORD_HIDDEN,
+                        guesses.toString(),
+                        String.valueOf(hangmanErrors));
+                    }
+            ));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void startGame(TextChannel channel) {
@@ -107,6 +167,7 @@ public class Hangman implements HangmanHelper {
                     BotStart.getMapPrefix().get(guildId) == null ? "!" : BotStart.getMapPrefix().get(guildId)), false);
 
             start.setThumbnail(HANGMAN_URL + hangmanErrors + ".png");
+            start.addField("Attention for Admins", "[Add slash commands](https://discord.com/api/oauth2/authorize?client_id=845974873682608129&scope=applications.commands%20bot)", false);
             start.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
             start.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "", false);
             start.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + hideWord(WORD.length()) + "`", false);
@@ -123,7 +184,6 @@ public class Hangman implements HangmanHelper {
                                 String.valueOf(hangmanErrors));
                     }
             );
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -268,7 +328,7 @@ public class Hangman implements HangmanHelper {
                         info.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
                         info.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
                         info.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
-                        info.addField(jsonGameParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase() + "`", false);
+                        info.addField(jsonGameParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase().replaceAll(".(?!$)", "$0 ") + "`", false);
 
                         editMessageWithButtons(info, guildId, Long.parseLong(userId), channelId, buttons);
 

@@ -1,16 +1,14 @@
 package jsonparser;
 
 import hangman.HangmanRegistry;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class ParserClass {
 
     private static volatile ParserClass parserClass;
+    public static final ConcurrentMap<String, String> russian = new ConcurrentHashMap<>();
+    public static final ConcurrentMap<String, String> english = new ConcurrentHashMap<>();
 
     private ParserClass() {
     }
@@ -28,15 +26,11 @@ public class ParserClass {
 
     public String getTranslation(String key, String language) {
         try {
-            InputStream inputStream = getClass().getResourceAsStream("/json/" + language + ".json");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            JSONParser parser = new JSONParser();
-            Object obj = parser.parse(reader);
-            JSONObject jsonObject = (JSONObject) obj;
-            reader.close();
-            inputStream.close();
-            reader.close();
-            return jsonObject.get(key).toString();
+            if (language.equals("eng")) {
+                return english.get(key);
+            } else {
+                return russian.get(key);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
