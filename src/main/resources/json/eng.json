@@ -61,5 +61,5 @@
   "help_delete_Title": "Deleting data:",
   "help_delete": "delete` - deleting your data.",
   "errors": "An error has occurred.\nPlease try again in 5 seconds!\nIf the error persists, write here: https://discord.gg/UrWG3R683d",
-  "slash_language": "You have successfully changed the languages to:\nBot: `{0}` и Game: `{1}`"
+  "slash_language": "You have successfully changed the languages to:\nGame: `{0}` and Bot: `{1}`"
 }

@@ -5,7 +5,6 @@ import db.DataBase;
 import events.MessageWhenBotJoinToGuild;
 import hangman.*;
 import jsonparser.ParserClass;
-import lombok.Getter;
 import messagesevents.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -20,8 +19,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -30,17 +27,11 @@ import java.util.*;
 public class BotStart {
 
     public static final String activity = "!help | ";
-    @Getter
-    private static final Map<String, String> secretCode = new HashMap<>();
-    @Getter
-    private static final Map<String, String> mapPrefix = new HashMap<>();
-    @Getter
-    private static final Map<String, String> mapLanguages = new HashMap<>();
-    @Getter
-    private static final Map<String, String> mapGameLanguages = new HashMap<>();
-    @Getter
-    private static JDA jda;
-
+    public static final Map<String, String> secretCode = new HashMap<>();
+    public static final Map<String, String> mapPrefix = new HashMap<>();
+    public static final Map<String, String> mapLanguages = new HashMap<>();
+    public static final Map<String, String> mapGameLanguages = new HashMap<>();
+    public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
 
     public void startBot() throws Exception {
@@ -217,4 +208,23 @@ public class BotStart {
         }
     }
 
+    public static Map<String, String> getMapPrefix() {
+        return mapPrefix;
+    }
+
+    public static Map<String, String> getMapLanguages() {
+        return mapLanguages;
+    }
+
+    public static Map<String, String> getMapGameLanguages() {
+        return mapGameLanguages;
+    }
+
+    public static JDA getJda() {
+        return jda;
+    }
+
+    public static Map<String, String> getSecretCode() {
+        return secretCode;
+    }
 }

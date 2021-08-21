@@ -72,11 +72,8 @@ public class SlashCommand extends ListenerAdapter {
 
         //0 - game | 1 - bot
         if (event.getName().equals("language")) {
-
-            new GameLanguageChange().changeGameLanguage(event.getOptions().get(0).getAsString(), event.getUser().getId());
-
+            BotStart.getMapGameLanguages().put(event.getUser().getId(), event.getOptions().get(0).getAsString());
             BotStart.getMapLanguages().put(event.getUser().getId(), event.getOptions().get(1).getAsString());
-            DataBase.getInstance().addLanguageToDB(event.getUser().getId(), event.getOptions().get(1).getAsString());
 
             event.reply(jsonParsers.getLocale("slash_language", event.getUser().getId())
                             .replaceAll("\\{0}", event.getOptions().get(0).getAsString())
@@ -84,6 +81,8 @@ public class SlashCommand extends ListenerAdapter {
 
                     .addActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
                     .queue();
+            DataBase.getInstance().addGameLanguageToDB(event.getUser().getId(), event.getOptions().get(0).getAsString());
+            DataBase.getInstance().addLanguageToDB(event.getUser().getId(), event.getOptions().get(1).getAsString());
         }
     }
 }
