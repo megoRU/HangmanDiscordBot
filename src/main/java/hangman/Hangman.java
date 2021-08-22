@@ -249,7 +249,7 @@ public class Hangman implements HangmanHelper {
 
             if (WORD.contains(inputs)) {
                 char c = inputs.charAt(0);
-                checkMethod(wordToChar, c);
+                checkLetterInWord(wordToChar, c);
                 String result = replacementLetters(WORD.indexOf(inputs));
 
                 if (!result.contains("_")) {
@@ -421,10 +421,9 @@ public class Hangman implements HangmanHelper {
     }
 
     //Ищет все одинаковые буквы и записывает в коллекцию
-    private void checkMethod(char[] checkArray, char letter) {
+    private void checkLetterInWord(char[] checkArray, char letter) {
         for (int i = 0; i < checkArray.length; i++) {
             if (checkArray[i] == letter) {
-                checkArray[i] = letter;
                 index.add(i);
             }
         }

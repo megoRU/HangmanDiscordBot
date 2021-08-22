@@ -2,7 +2,6 @@ package hangman;
 
 import db.DataBase;
 import jsonparser.JSONParsers;
-import messagesevents.GameLanguageChange;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
