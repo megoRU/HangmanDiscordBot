@@ -15,7 +15,7 @@ public class ParserClass {
 
     public static ParserClass getInstance() {
         if (parserClass == null) {
-            synchronized (HangmanRegistry.class) {
+            synchronized (ParserClass.class) {
                 if (parserClass == null) {
                     parserClass = new ParserClass();
                 }

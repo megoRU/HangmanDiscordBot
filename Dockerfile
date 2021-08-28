@@ -10,7 +10,7 @@ ADD pom.xml $HOME
 
 RUN ["/usr/local/bin/mvn-entrypoint.sh", "mvn", "verify", "clean", "--fail-never"]
 
-ADD ../../Users/savin/Desktop $HOME
+ADD . $HOME
 
 RUN ["mvn", "install"]
 
