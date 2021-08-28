@@ -47,7 +47,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>4.3.0_309</version>
+            <version>4.3.0_310</version>
             <exclusions>
                 <exclusion>
                     <groupId>club.minnced</groupId>
@@ -77,6 +77,11 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>io.quickchart</groupId>
+            <artifactId>QuickChart</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 
         <!--        &lt;!&ndash; https://mvnrepository.com/artifact/com.github.oshi/oshi-core &ndash;&gt;-->
 <!--        <dependency>-->

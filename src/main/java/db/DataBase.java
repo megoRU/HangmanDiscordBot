@@ -257,4 +257,17 @@ public class DataBase {
         }
         return 0;
     }
+
+    public ResultSet getAllStatistic() {
+        try {
+            Statement statement = DataBase.getConnection().createStatement();
+            String sql = "SELECT COUNT(*) AS count, game_date FROM games GROUP BY MONTH (game_date);";
+
+            return statement.executeQuery(sql);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+       return null;
+    }
 }

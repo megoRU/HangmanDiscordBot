@@ -64,6 +64,7 @@ public class BotStart {
         jdaBuilder.addEventListeners(new ReactionsButton());
         jdaBuilder.addEventListeners(new DeleteAllMyData());
         jdaBuilder.addEventListeners(new SlashCommand());
+        jdaBuilder.addEventListeners(new GetGlobalStatsInGraph());
 
         jda = jdaBuilder.build();
         jda.awaitReady();
