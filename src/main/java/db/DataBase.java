@@ -43,17 +43,17 @@ public class DataBase {
 
     public void deleteAllMyData(String userIdLong) {
         try {
-        String sql = "DELETE g FROM DiscordBotHangmanDEV.games g " +
-        "JOIN player p on g.id = p.games_id " +
-        "WHERE p.user_id_long ='" + userIdLong + "'";
+            String sql = "DELETE g FROM DiscordBotHangmanDEV.games g " +
+                    "JOIN player p on g.id = p.games_id " +
+                    "WHERE p.user_id_long ='" + userIdLong + "'";
 
-        PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
-        preparedStatement.execute();
+            PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
+            preparedStatement.execute();
 
-        //Удаляем так же языки
-        removeGameLanguageFromDB(userIdLong);
-        removeLanguageFromDB(userIdLong);
-        deleteActiveGame(userIdLong);
+            //Удаляем так же языки
+            removeGameLanguageFromDB(userIdLong);
+            removeLanguageFromDB(userIdLong);
+            deleteActiveGame(userIdLong);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -268,6 +268,23 @@ public class DataBase {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-       return null;
+        return null;
+    }
+
+    public ResultSet getMyAllStatistic(String userIdLong) {
+        try {
+            Statement statement = DataBase.getConnection().createStatement();
+            String sql = "SELECT SUM(IF(result = 0, 1, 0)) AS TOTAL_ZEROS, " +
+                    "SUM(IF(result = 1, 1, 0)) AS TOTAL_ONES, " +
+                    "game_date " +
+                    "FROM player, games " +
+                    "WHERE player.user_id_long = '" + userIdLong + "' AND player.games_id = games.id GROUP BY MONTH (game_date);";
+
+            return statement.executeQuery(sql);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

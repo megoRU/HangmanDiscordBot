@@ -78,7 +78,10 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
         info.addField(jsonParsers.getLocale("messages_events_Title", userIdLong), "`"
                 + p + jsonParsers.getLocale("messages_events_Start_Hangman", userIdLong) + "`"
                 + p + jsonParsers.getLocale("messages_events_Stop_Hangman", userIdLong) + "`"
-                + p + jsonParsers.getLocale("messages_events_Stats_Hangman", userIdLong), false);
+                + p + jsonParsers.getLocale("messages_events_Stats_Hangman", userIdLong) + "`"
+                + p + jsonParsers.getLocale("messages_events_My_Stats_Hangman", userIdLong) + "`"
+                + p + jsonParsers.getLocale("messages_events_All_Stats_Hangman", userIdLong),
+                false);
 
         info.addField(jsonParsers.getLocale("help_delete_Title", userIdLong), "`"
                 + p + jsonParsers.getLocale("help_delete", userIdLong), false);
@@ -96,9 +99,6 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
                 jsonParsers.getLocale("messages_events_Support", userIdLong),
                 jsonParsers.getLocale("messages_events_Support_Url_Discord", userIdLong), false);
 
-        List<Button> buttons = new ArrayList<>();
-
         sendMessage(info, textChannel);
-
     }
 }

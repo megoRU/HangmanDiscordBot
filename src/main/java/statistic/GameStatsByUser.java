@@ -1,4 +1,4 @@
-package messagesevents;
+package statistic;
 
 import lombok.Getter;
 

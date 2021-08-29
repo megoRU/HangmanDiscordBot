@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import messagesevents.GetGlobalStatsInGraph;
 import threads.TopGG;
 
 import java.io.BufferedReader;
@@ -45,7 +46,6 @@ public class BotStart {
         getGameLocalizationFromDB();
         //Восстанавливаем игры активные
         getAndSetActiveGames();
-
         //Устанавливаем языки
         setLanguages();
 
@@ -60,7 +60,6 @@ public class BotStart {
         jdaBuilder.addEventListeners(new GameLanguageChange());
         jdaBuilder.addEventListeners(new GameHangmanListener());
         jdaBuilder.addEventListeners(new MessageStats());
-        jdaBuilder.addEventListeners(new MessageGlobalStats());
         jdaBuilder.addEventListeners(new ReactionsButton());
         jdaBuilder.addEventListeners(new DeleteAllMyData());
         jdaBuilder.addEventListeners(new SlashCommand());

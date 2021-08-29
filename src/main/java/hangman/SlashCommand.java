@@ -70,7 +70,7 @@ public class SlashCommand extends ListenerAdapter {
         }
 
         //0 - game | 1 - bot
-        if (event.getName().equals("language")) {
+        if (event.getName().equals("language") && event.getOptions().size() == 2) {
             BotStart.getMapGameLanguages().put(event.getUser().getId(), event.getOptions().get(0).getAsString());
             BotStart.getMapLanguages().put(event.getUser().getId(), event.getOptions().get(1).getAsString());
 
