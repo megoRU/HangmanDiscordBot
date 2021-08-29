@@ -39,7 +39,7 @@ public class Hangman implements HangmanHelper {
     private final Long channelId;
     private static final JSONGameParsers jsonGameParsers = new JSONGameParsers();
     private static final JSONParsers jsonParsers = new JSONParsers();
-    private final List<Message> messageList = new ArrayList<>(17);
+    private final List<Message> messageList = new ArrayList<>(20);
     private final List<Button> buttons = new ArrayList<>();
     private String WORD = null;
     private char[] wordToChar;
@@ -254,17 +254,8 @@ public class Hangman implements HangmanHelper {
 
                 if (!result.contains("_")) {
                     try {
-                        buttons.add(Button.success(guildId + ":" + ReactionsButton.START_NEW_GAME, "Play again"));
-
-                        if (BotStart.getMapGameLanguages().get(getUserId()).equals("eng")) {
-                            buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_RUS, "Кириллица")
-                                    .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
-                        } else {
-                            buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_ENG, "Latin")
-                                    .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
-                        }
-
-                        buttons.add(Button.primary(guildId + ":" + ReactionsButton.MY_STATS, "My stats"));
+                        //Добавляем кнопки когда игра завершена
+                        addButtonsWhenGameOver();
 
                         EmbedBuilder win = new EmbedBuilder();
                         win.setColor(0x00FF00);
@@ -306,18 +297,8 @@ public class Hangman implements HangmanHelper {
                 hangmanErrors++;
                 if (hangmanErrors >= 6) {
                     try {
-                        buttons.add(Button.success(guildId + ":" + ReactionsButton.START_NEW_GAME, "Play again"));
-
-                        if (BotStart.getMapGameLanguages().get(getUserId()).equals("eng")) {
-                            buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_RUS, "Кириллица")
-                                    .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
-                        } else {
-                            buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_ENG, "Latin")
-                                    .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
-                        }
-
-                        buttons.add(Button.primary(guildId + ":" + ReactionsButton.MY_STATS, "My stats"));
-
+                        //Добавляем кнопки когда игра завершена
+                        addButtonsWhenGameOver();
 
                         EmbedBuilder info = new EmbedBuilder();
                         info.setColor(0x00FF00);
@@ -359,6 +340,20 @@ public class Hangman implements HangmanHelper {
         }
     }
 
+    private void addButtonsWhenGameOver() {
+        buttons.add(Button.success(guildId + ":" + ReactionsButton.START_NEW_GAME, "Play again"));
+
+        if (BotStart.getMapGameLanguages().get(getUserId()).equals("eng")) {
+            buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_RUS, "Кириллица")
+                    .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
+        } else {
+            buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_ENG, "Latin")
+                    .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
+        }
+
+        buttons.add(Button.primary(guildId + ":" + ReactionsButton.MY_STATS, "My stats"));
+    }
+
     private void addGuesses(String letter) {
         guesses.append(guesses.length() == 0 ? letter : ", " + letter);
     }
@@ -380,16 +375,13 @@ public class Hangman implements HangmanHelper {
                     .getSelfMember()
                     .hasPermission(BotStart.getJda().getGuildById(guildId).getTextChannelById(channelId), Permission.MESSAGE_MANAGE)) {
 
-                BotStart.getJda()
-                        .getGuildById(guildId)
-                        .getTextChannelById(channelId)
-                        .deleteMessages(messageList).queue();
+                deleteUserGameMessages(guildId, channelId, messageList);
             }
+            HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
+            HangmanRegistry.getInstance().getMessageId().remove(Long.parseLong(userId));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
-        HangmanRegistry.getInstance().getMessageId().remove(Long.parseLong(userId));
     }
 
     //Создает скрытую линию из длины слова

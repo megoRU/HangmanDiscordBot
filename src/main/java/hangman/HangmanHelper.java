@@ -1,6 +1,7 @@
 package hangman;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.interactions.components.Button;
 import startbot.BotStart;
 
@@ -33,6 +34,16 @@ public interface HangmanHelper {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
+    default void deleteUserGameMessages(String guildId, Long channelId, List<Message> messageList) {
+        try {
+            BotStart.getJda()
+                    .getGuildById(guildId)
+                    .getTextChannelById(channelId)
+                    .deleteMessages(messageList).queue();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

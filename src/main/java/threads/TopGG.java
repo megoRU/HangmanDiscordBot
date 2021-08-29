@@ -6,29 +6,36 @@ import net.dv8tion.jda.api.entities.Activity;
 import org.discordbots.api.client.DiscordBotListAPI;
 import startbot.BotStart;
 
-public class TopGG extends Thread {
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class TopGG {
 
     public static int serverCount;
 
-    @Override
-    public void run() {
-        try {
-            while (true) {
-                DataBase.getConnection();
-                DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
-                        .token(Config.getTopGgApiToken())
-                        .botId(Config.getBotId())
-                        .build();
-                serverCount = (int) BotStart.getJda().getGuildCache().size();
-                TOP_GG_API.setStats(serverCount);
-                BotStart.getJda().getPresence().setActivity(Activity.playing(BotStart.activity
-                        + TopGG.serverCount + " guilds"));
+    public void runTask() {
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() throws NullPointerException {
+                try {
+                    System.out.println("Начал");
+                    DataBase.getConnection();
+                    DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
+                            .token(Config.getTopGgApiToken())
+                            .botId(Config.getBotId())
+                            .build();
+                    serverCount = (int) BotStart.getJda().getGuildCache().size();
+                    TOP_GG_API.setStats(serverCount);
+                    BotStart.getJda().getPresence().setActivity(Activity.playing(BotStart.activity
+                            + TopGG.serverCount + " guilds"));
+                    System.out.println("закончил");
 
-                TopGG.sleep(180000);
+                } catch (Exception e) {
+                    Thread.currentThread().interrupt();
+                    e.printStackTrace();
+                }
             }
-        } catch (Exception e) {
-            TopGG.currentThread().interrupt();
-            e.printStackTrace();
-        }
+        }, 1, 180000L);
     }
+
 }

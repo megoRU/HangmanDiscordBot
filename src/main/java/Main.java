@@ -8,6 +8,8 @@ public class Main {
         HangmanRegistry.getInstance();
         BotStart botStart = new BotStart();
         botStart.startBot();
-        new TopGG().start();
+        new TopGG().runTask();
+        System.out.println("18:16");
+
     }
 }

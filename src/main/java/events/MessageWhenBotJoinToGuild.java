@@ -17,7 +17,7 @@ import java.util.List;
 
 public class MessageWhenBotJoinToGuild extends ListenerAdapter {
 
-    private final JSONParsers jsonParsers = new JSONParsers();
+    private static final JSONParsers jsonParsers = new JSONParsers();
 
     //bot join msg
     @Override
