@@ -9,7 +9,7 @@ public class Main {
         BotStart botStart = new BotStart();
         botStart.startBot();
         new TopGG().runTask();
-        System.out.println("18:16");
+        System.out.println("19:57");
 
     }
 }

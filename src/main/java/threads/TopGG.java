@@ -18,7 +18,6 @@ public class TopGG {
             @Override
             public void run() throws NullPointerException {
                 try {
-                    System.out.println("Начал");
                     DataBase.getConnection();
                     DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
                             .token(Config.getTopGgApiToken())
@@ -28,7 +27,6 @@ public class TopGG {
                     TOP_GG_API.setStats(serverCount);
                     BotStart.getJda().getPresence().setActivity(Activity.playing(BotStart.activity
                             + TopGG.serverCount + " guilds"));
-                    System.out.println("закончил");
 
                 } catch (Exception e) {
                     Thread.currentThread().interrupt();

@@ -46,6 +46,7 @@ public class GetGlobalStatsInGraph extends ListenerAdapter {
         }
 
         if (message.equals(prefix2)) {
+            event.getMessage().getTextChannel().sendTyping().queue();
             CreatorGraph creatorGraph = new CreatorGraph(
                     DataBase.getInstance().getMyAllStatistic(event.getAuthor().getId()),
                     event.getGuild().getId(),
