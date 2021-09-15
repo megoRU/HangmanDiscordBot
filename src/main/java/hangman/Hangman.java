@@ -28,8 +28,8 @@ import java.util.TimerTask;
 @Getter
 public class Hangman implements HangmanHelper {
 
-    private static final String URL_RU = "http://45.138.72.66:8085/api/russian";
-    private static final String URL_EN = "http://45.138.72.66:8085/api/english";
+    private static final String URL_RU = "http://45.140.167.181:8085/api/russian";
+    private static final String URL_EN = "http://45.140.167.181:8085/api/english";
     private static final String HANGMAN_URL = "https://megoru.ru/hangman2/";
     private final StringBuilder guesses = new StringBuilder();
     private final List<Integer> index = new ArrayList<>();

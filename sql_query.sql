@@ -23,8 +23,7 @@ WHERE player.user_id_long = '250699265389625347'
 
 
 #   сделано:
-CREATE TABLE
-    games
+CREATE TABLE games
 (
     id        int NOT NULL AUTO_INCREMENT,
     result    BOOLEAN,
