@@ -20,9 +20,8 @@ public class GameHangmanListener extends ListenerAdapter {
 
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) {
-            return;
-        }
+        if (event.getAuthor().isBot()) return;
+
         if (!event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_WRITE)) {
             return;
         }
@@ -30,12 +29,10 @@ public class GameHangmanListener extends ListenerAdapter {
 
         String prefix = HG;
         String prefix2 = HG_STOP;
-        String prefix3 = "!";
 
         if (BotStart.getMapPrefix().containsKey(event.getGuild().getId())) {
             prefix = BotStart.getMapPrefix().get(event.getGuild().getId()) + "hg";
             prefix2 = BotStart.getMapPrefix().get(event.getGuild().getId()) + "hg stop";
-            prefix3 = BotStart.getMapPrefix().get(event.getGuild().getId());
         }
 
         long userIdLong = event.getAuthor().getIdLong();

@@ -50,6 +50,7 @@ CREATE TABLE `ActiveHangman`
     `current_hidden_word` varchar(255),
     `guesses`             varchar(255),
     `hangman_errors`      int(3) NOT NULL,
+    `game_created_time`   DATETIME(6),
     PRIMARY KEY (`user_id_long`),
     UNIQUE KEY `user_id_long` (`user_id_long`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

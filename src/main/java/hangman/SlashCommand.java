@@ -16,7 +16,7 @@ public class SlashCommand extends ListenerAdapter {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (event.getUser().isBot()) return;
 
-        if (event.getGuild().getId() == null || event.getUser() == null) return;
+        if (event.getGuild() == null) return;
 
         try {
             if (event.getName().equals("hg-start")) {

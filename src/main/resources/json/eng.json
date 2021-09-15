@@ -64,5 +64,8 @@
   "help_delete": "delete` - deleting your data.",
   "errors": "An error has occurred.\nPlease try again in 5 seconds!\nIf the error persists, write here: https://discord.gg/UrWG3R683d",
   "slash_language": "You have successfully changed the languages to:\nGame: `{0}` and Bot: `{1}`",
-  "MessageStats_All_Stats": "Number of games per month"
+  "MessageStats_All_Stats": "Number of games per month",
+  "gameOver": "The game is over",
+  "timeIsOver": "You ran out of time, the game was completed.\nYou were not counted as a loss.",
+  "gameOverTime": "The game will end"
 }
