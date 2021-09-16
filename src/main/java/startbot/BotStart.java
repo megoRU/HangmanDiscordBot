@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.entities.Activity;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import messagesevents.GetGlobalStatsInGraph;
 import threads.TopGG;
 
 import java.io.BufferedReader;
@@ -23,7 +22,13 @@ import java.io.InputStreamReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class BotStart {
 
@@ -115,6 +120,7 @@ public class BotStart {
                 String currentHiddenWord = rs.getString("current_hidden_word");
                 String guesses = rs.getString("guesses");
                 int hangmanErrors = rs.getInt("hangman_errors");
+                LocalDateTime game_created_time = rs.getTimestamp("game_created_time").toInstant().atZone(ZoneOffset.UTC).toLocalDateTime();
 
                 HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(String.valueOf(userIdLong), guildIdLong, Long.parseLong(channelIdLong)));
                 HangmanRegistry.getInstance().getMessageId().put(userIdLong, message_id_long);
@@ -123,6 +129,14 @@ public class BotStart {
                         .updateVariables(guesses, word, currentHiddenWord, hangmanErrors);
 
                 HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).autoInsert();
+
+                HangmanRegistry.getInstance().getTimeCreatedGame().put(userIdLong, game_created_time);
+
+                Instant specificTime = Instant.ofEpochMilli(game_created_time.toInstant(ZoneOffset.UTC).toEpochMilli());
+
+                HangmanRegistry.getInstance().getEndAutoDelete().put(
+                        userIdLong,
+                        specificTime.plusSeconds(600L).toString());
             }
             rs.close();
             statement.close();

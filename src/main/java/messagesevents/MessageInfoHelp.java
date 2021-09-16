@@ -4,15 +4,10 @@ import jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
 import startbot.BotStart;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
 
@@ -76,11 +71,11 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
                 + p + jsonParsers.getLocale("messages_events_Game_Language", userIdLong), false);
 
         info.addField(jsonParsers.getLocale("messages_events_Title", userIdLong), "`"
-                + p + jsonParsers.getLocale("messages_events_Start_Hangman", userIdLong) + "`"
-                + p + jsonParsers.getLocale("messages_events_Stop_Hangman", userIdLong) + "`"
-                + p + jsonParsers.getLocale("messages_events_Stats_Hangman", userIdLong) + "`"
-                + p + jsonParsers.getLocale("messages_events_My_Stats_Hangman", userIdLong) + "`"
-                + p + jsonParsers.getLocale("messages_events_All_Stats_Hangman", userIdLong),
+                        + p + jsonParsers.getLocale("messages_events_Start_Hangman", userIdLong) + "`"
+                        + p + jsonParsers.getLocale("messages_events_Stop_Hangman", userIdLong) + "`"
+                        + p + jsonParsers.getLocale("messages_events_Stats_Hangman", userIdLong) + "`"
+                        + p + jsonParsers.getLocale("messages_events_My_Stats_Hangman", userIdLong) + "`"
+                        + p + jsonParsers.getLocale("messages_events_All_Stats_Hangman", userIdLong),
                 false);
 
         info.addField(jsonParsers.getLocale("help_delete_Title", userIdLong), "`"

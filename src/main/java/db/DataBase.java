@@ -74,11 +74,13 @@ public class DataBase {
                            String WORD, String currentHiddenWord,
                            String guesses, String hangmanErrors) {
         try {
+            ZonedDateTime now = ZonedDateTime.of(LocalDateTime.now(), ZoneOffset.UTC);
+
             String sql = "REPLACE INTO ActiveHangman " +
                     "(user_id_long, message_id_long, channel_id_long, " +
                     "guild_long_id, word, current_hidden_word, " +
-                    "guesses, hangman_errors) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                    "guesses, hangman_errors, game_created_time) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
             preparedStatement.setString(1, userId);
             preparedStatement.setString(2, messageIdLong);
@@ -88,6 +90,7 @@ public class DataBase {
             preparedStatement.setString(6, currentHiddenWord);
             preparedStatement.setString(7, guesses);
             preparedStatement.setString(8, hangmanErrors);
+            preparedStatement.setTimestamp(9, new Timestamp(Timestamp.valueOf(now.toLocalDateTime()).getTime()));
             preparedStatement.execute();
 
         } catch (SQLException e) {

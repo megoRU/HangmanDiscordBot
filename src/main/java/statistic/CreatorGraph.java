@@ -12,18 +12,16 @@ import java.sql.ResultSet;
 @Getter
 public class CreatorGraph implements SenderMessage {
 
+    private static final JSONParsers jsonParsers = new JSONParsers();
     private final ResultSet resultSet;
     private final String guildIdLong;
     private final String textChannelIdLong;
     private final String userIdLong;
     private final String userName;
     private final String userAvatarUrl;
-
     private final StringBuilder date = new StringBuilder();
     private final StringBuilder columnFirst = new StringBuilder();
     private final StringBuilder columnSecond = new StringBuilder();
-
-    private static final JSONParsers jsonParsers = new JSONParsers();
 
     public CreatorGraph(ResultSet resultSet, String guildIdLong, String textChannelIdLong, String userIdLong, String userName, String userUrl) {
         this.resultSet = resultSet;
@@ -95,7 +93,7 @@ public class CreatorGraph implements SenderMessage {
                     "        label: 'Count games'," +
                     "        backgroundColor: 'rgb(255, 99, 132)'," +
                     "        borderColor: 'rgb(255, 99, 132)'," +
-                    "        data: [" + columnFirst +"]," +
+                    "        data: [" + columnFirst + "]," +
                     "        fill: false," +
                     "      }," +
                     "    " +

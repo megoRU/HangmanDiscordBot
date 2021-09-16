@@ -2,6 +2,7 @@ package hangman;
 
 import db.DataBase;
 import jsonparser.JSONParsers;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -20,9 +21,8 @@ public class GameHangmanListener extends ListenerAdapter {
 
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) {
-            return;
-        }
+        if (event.getAuthor().isBot()) return;
+
         if (!event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_WRITE)) {
             return;
         }
@@ -30,12 +30,10 @@ public class GameHangmanListener extends ListenerAdapter {
 
         String prefix = HG;
         String prefix2 = HG_STOP;
-        String prefix3 = "!";
 
         if (BotStart.getMapPrefix().containsKey(event.getGuild().getId())) {
             prefix = BotStart.getMapPrefix().get(event.getGuild().getId()) + "hg";
             prefix2 = BotStart.getMapPrefix().get(event.getGuild().getId()) + "hg stop";
-            prefix3 = BotStart.getMapPrefix().get(event.getGuild().getId());
         }
 
         long userIdLong = event.getAuthor().getIdLong();
@@ -61,8 +59,16 @@ public class GameHangmanListener extends ListenerAdapter {
             }
 
             if (message.equals(prefix) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_Listener_You_Play",
-                        event.getAuthor().getId()).replaceAll("\\{0}", prefix)).queue();
+                EmbedBuilder youPlay = new EmbedBuilder();
+
+                youPlay.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
+                youPlay.setColor(0x00FF00);
+                youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play",
+                        event.getAuthor().getId()).replaceAll("\\{0}", prefix));
+
+                event.getChannel().sendMessageEmbeds(youPlay.build())
+                        .setActionRow(Button.danger(event.getGuild().getId() + ":" + ReactionsButton.BUTTON_STOP, "Stop game"))
+                        .queue();
                 return;
             }
 

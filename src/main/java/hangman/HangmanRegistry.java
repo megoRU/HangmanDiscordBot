@@ -2,13 +2,16 @@ package hangman;
 
 import db.DataBase;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 public class HangmanRegistry {
-
+    //Long это UserIdLong
     private static final Map<Long, Hangman> activeHangman = new HashMap<>();
     private static final Map<Long, String> messageId = new HashMap<>();
+    private static final Map<Long, LocalDateTime> timeCreatedGame = new HashMap<>();
+    private static final Map<Long, String> endAutoDelete = new HashMap<>();
     private static volatile HangmanRegistry hangmanRegistry;
     private volatile int idGame;
 
@@ -24,6 +27,14 @@ public class HangmanRegistry {
             }
         }
         return hangmanRegistry;
+    }
+
+    public Map<Long, LocalDateTime> getTimeCreatedGame() {
+        return timeCreatedGame;
+    }
+
+    public Map<Long, String> getEndAutoDelete() {
+        return endAutoDelete;
     }
 
     private synchronized void setIdGame() {
