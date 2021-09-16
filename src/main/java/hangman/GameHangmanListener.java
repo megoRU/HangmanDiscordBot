@@ -11,8 +11,6 @@ import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
 import startbot.BotStart;
 
-import java.time.OffsetDateTime;
-
 public class GameHangmanListener extends ListenerAdapter {
 
     private static final String HG = "!hg";

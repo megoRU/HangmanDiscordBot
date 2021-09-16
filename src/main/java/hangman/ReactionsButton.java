@@ -6,20 +6,16 @@ import messagesevents.GameLanguageChange;
 import messagesevents.MessageInfoHelp;
 import messagesevents.MessageStats;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
 import startbot.BotStart;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class ReactionsButton extends ListenerAdapter {
 
-    private final JSONParsers jsonParsers = new JSONParsers();
     public static final String START_NEW_GAME = "NEW_GAME";
     public static final String START_CHANGE_GAME_LANGUAGE = "CHANGE_GAME_LANGUAGE";
     public static final String MY_STATS = "MY_STATS";
@@ -27,6 +23,7 @@ public class ReactionsButton extends ListenerAdapter {
     public static final String BUTTON_RUS = "LANGUAGE_RUS";
     public static final String BUTTON_ENG = "LANGUAGE_ENG";
     public static final String BUTTON_STOP = "BUTTON_STOP";
+    private final JSONParsers jsonParsers = new JSONParsers();
 
     @Override
     public void onButtonClick(@NotNull ButtonClickEvent event) {
@@ -96,8 +93,8 @@ public class ReactionsButton extends ListenerAdapter {
                 youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play",
                         event.getUser().getId()).replaceAll("\\{0}",
                         BotStart.getMapPrefix().get(event.getGuild().getId()) == null
-                        ? "!hg"
-                        : BotStart.getMapPrefix().get(event.getGuild().getId()) + "hg"));
+                                ? "!hg"
+                                : BotStart.getMapPrefix().get(event.getGuild().getId()) + "hg"));
 
                 event.getChannel().sendMessageEmbeds(youPlay.build())
                         .setActionRow(Button.danger(event.getGuild().getId() + ":" + ReactionsButton.BUTTON_STOP, "Stop game")).queue();

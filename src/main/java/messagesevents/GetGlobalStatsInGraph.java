@@ -2,12 +2,12 @@ package messagesevents;
 
 import db.DataBase;
 import lombok.SneakyThrows;
-import statistic.CreatorGraph;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import startbot.BotStart;
+import statistic.CreatorGraph;
 import statistic.Statistic;
 
 public class GetGlobalStatsInGraph extends ListenerAdapter {

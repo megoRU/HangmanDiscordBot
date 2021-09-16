@@ -32,7 +32,6 @@ public class GameLanguageChange extends ListenerAdapter {
         String prefix_LANG_ENG = LANG_ENG;
 
 
-
         if (BotStart.getMapPrefix().containsKey(event.getAuthor().getId())) {
             prefix_LANG_RUS = BotStart.getMapPrefix().get(event.getGuild().getId()) + "game rus";
             prefix_LANG_ENG = BotStart.getMapPrefix().get(event.getGuild().getId()) + "game eng";
