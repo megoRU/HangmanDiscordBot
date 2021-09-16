@@ -2,6 +2,7 @@ package hangman;
 
 import db.DataBase;
 import jsonparser.JSONParsers;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -33,8 +34,18 @@ public class SlashCommand extends ListenerAdapter {
                             .queue();
 
                 } else if (HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
-                    event.reply(jsonParsers.getLocale("Hangman_Listener_You_Play",
-                            event.getUser().getId()).replaceAll("\\{0}", BotStart.getMapPrefix().get(event.getGuild().getId()) == null ? "!hg" : BotStart.getMapPrefix().get(event.getGuild().getId()))).queue();
+
+                    EmbedBuilder youPlay = new EmbedBuilder();
+
+                    youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
+                    youPlay.setColor(0x00FF00);
+                    youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play",
+                            event.getUser().getId()).replaceAll("\\{0}", BotStart.getMapPrefix().get(event.getGuild().getId()) == null
+                            ? "!hg" : BotStart.getMapPrefix().get(event.getGuild().getId())));
+
+                    event.replyEmbeds(youPlay.build())
+                            .addActionRow(Button.danger(event.getGuild().getId() + ":" + ReactionsButton.BUTTON_STOP, "Stop game"))
+                            .queue();
                 } else {
                     HangmanRegistry.getInstance().setHangman(event.getUser().getIdLong(), new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getChannel().getIdLong()));
                     HangmanRegistry.getInstance().getActiveHangman().get(event.getUser().getIdLong()).startGame(event);
@@ -52,10 +63,7 @@ public class SlashCommand extends ListenerAdapter {
                             .addActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
                             .queue();
                     DataBase.getInstance().deleteActiveGame(event.getUser().getId());
-                    return;
-                }
-
-                if (!HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
+                } else {
                     event.reply(jsonParsers.getLocale("Hangman_You_Are_Not_Play", event.getUser().getId()))
                             .addActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
                             .queue();
@@ -64,7 +72,13 @@ public class SlashCommand extends ListenerAdapter {
             }
 
             if (event.getName().equals("language") && HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
-                event.reply(jsonParsers.getLocale("ReactionsButton_When_Play", event.getUser().getId()))
+                EmbedBuilder whenPlay = new EmbedBuilder();
+
+                whenPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
+                whenPlay.setColor(0x00FF00);
+                whenPlay.setDescription(jsonParsers.getLocale("ReactionsButton_When_Play", event.getUser().getId()));
+
+                event.replyEmbeds(whenPlay.build())
                         .addActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
                         .queue();
                 return;

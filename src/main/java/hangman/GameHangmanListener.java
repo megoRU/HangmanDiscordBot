@@ -2,6 +2,7 @@ package hangman;
 
 import db.DataBase;
 import jsonparser.JSONParsers;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -9,6 +10,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
 import startbot.BotStart;
+
+import java.time.OffsetDateTime;
 
 public class GameHangmanListener extends ListenerAdapter {
 
@@ -58,8 +61,16 @@ public class GameHangmanListener extends ListenerAdapter {
             }
 
             if (message.equals(prefix) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_Listener_You_Play",
-                        event.getAuthor().getId()).replaceAll("\\{0}", prefix)).queue();
+                EmbedBuilder youPlay = new EmbedBuilder();
+
+                youPlay.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
+                youPlay.setColor(0x00FF00);
+                youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play",
+                        event.getAuthor().getId()).replaceAll("\\{0}", prefix));
+
+                event.getChannel().sendMessageEmbeds(youPlay.build())
+                        .setActionRow(Button.danger(event.getGuild().getId() + ":" + ReactionsButton.BUTTON_STOP, "Stop game"))
+                        .queue();
                 return;
             }
 

@@ -43,7 +43,7 @@
   "Game_Word_That_Was": "The word that was",
   "Game_No_Such_Letter": "There is no such letter!",
   "Game_Attempts_Left": "No more attempts left",
-  "Hangman_Listener_You_Play": "You're playing now.\nYou need to send one letter to the chat.\nTo end the game, write: {0} stop",
+  "Hangman_Listener_You_Play": "You're playing now.\nTo finish the game, click on the button",
   "Hangman_Listener_Need_Set_Language": "First you need to set the language for the words.\nThis can be done by pressing on the button with the language.\nThen click on the Play button",
   "Hangman_Eng_game": "You have completed the game.",
   "Hangman_You_Are_Not_Play": "You're not playing right now.",
@@ -66,6 +66,6 @@
   "slash_language": "You have successfully changed the languages to:\nGame: `{0}` and Bot: `{1}`",
   "MessageStats_All_Stats": "Number of games per month",
   "gameOver": "The game is over",
-  "timeIsOver": "You ran out of time, the game was completed.\nYou were not counted as a loss.",
+  "timeIsOver": "You ran out of time, the game was completed.\nWe didn't count you a loss.",
   "gameOverTime": "The game will end"
 }
