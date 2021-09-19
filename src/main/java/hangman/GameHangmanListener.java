@@ -44,8 +44,13 @@ public class GameHangmanListener extends ListenerAdapter {
 
         if (message.equals(prefix) || message.equals(prefix2)) {
             if (BotStart.getMapGameLanguages().get(event.getAuthor().getId()) == null) {
-                event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language",
-                                event.getMessage().getAuthor().getId()))
+                EmbedBuilder needSetLanguage = new EmbedBuilder();
+
+                needSetLanguage.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
+                needSetLanguage.setColor(0x00FF00);
+                needSetLanguage.setDescription(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getAuthor().getId()));
+
+                event.getChannel().sendMessageEmbeds(needSetLanguage.build())
                         .setActionRow(
                                 Button.secondary(event.getGuild().getId() + ":" + ReactionsButton.BUTTON_RUS, "Кириллица")
                                         .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")),
@@ -92,7 +97,7 @@ public class GameHangmanListener extends ListenerAdapter {
 
             if (!HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getAuthor().getId(), event.getGuild().getId(), event.getChannel().getIdLong()));
-                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel());
+                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel(), event.getAuthor().getAvatarUrl(), event.getAuthor().getName());
             }
         }
     }

@@ -87,7 +87,13 @@ public class Hangman implements HangmanHelper {
                         .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
                 buttons.add(Button.success(guildId + ":" + ReactionsButton.START_NEW_GAME, "Play"));
 
-                event.reply(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", userId))
+                EmbedBuilder needSetLanguage = new EmbedBuilder();
+
+                needSetLanguage.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
+                needSetLanguage.setColor(0x00FF00);
+                needSetLanguage.setDescription(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getId()));
+
+                event.replyEmbeds(needSetLanguage.build())
                         .addActionRow(buttons)
                         .queue();
                 clearingCollections();
@@ -168,7 +174,7 @@ public class Hangman implements HangmanHelper {
 
     }
 
-    public void startGame(TextChannel channel) {
+    public void startGame(TextChannel textChannel, String avatarUrl, String userName) {
         try {
             if (BotStart.getMapGameLanguages().get(getUserId()) == null) {
                 buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_RUS, "Кириллица")
@@ -177,7 +183,13 @@ public class Hangman implements HangmanHelper {
                         .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
                 buttons.add(Button.success(guildId + ":" + ReactionsButton.START_NEW_GAME, "Play"));
 
-                channel.sendMessage(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", userId))
+                EmbedBuilder needSetLanguage = new EmbedBuilder();
+
+                needSetLanguage.setAuthor(userName, null, avatarUrl);
+                needSetLanguage.setColor(0x00FF00);
+                needSetLanguage.setDescription(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", this.userId));
+
+                textChannel.sendMessageEmbeds(needSetLanguage.build())
                         .setActionRow(buttons)
                         .queue();
                 clearingCollections();
@@ -189,7 +201,7 @@ public class Hangman implements HangmanHelper {
                 wordToChar = WORD.toCharArray(); // Преобразуем строку str в массив символов (char)
                 hideWord(WORD.length());
             } else {
-                channel.sendMessage(jsonParsers.getLocale("errors", userId)).queue();
+                textChannel.sendMessage(jsonParsers.getLocale("errors", userId)).queue();
                 clearingCollections();
                 return;
             }
@@ -216,7 +228,7 @@ public class Hangman implements HangmanHelper {
             start.setTimestamp(OffsetDateTime.parse(String.valueOf(specificTime)).plusMinutes(10L));
             start.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
 
-            channel.sendMessageEmbeds(start.build()).queue(m -> {
+            textChannel.sendMessageEmbeds(start.build()).queue(m -> {
                         HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId), m.getId());
                         DataBase.getInstance().createGame(userId,
                                 m.getId(),

@@ -32,7 +32,7 @@ public interface HangmanHelper {
                     .queue();
             embedBuilder.clear();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Скорее всего бота удалили из гильдии!");
         }
     }
 

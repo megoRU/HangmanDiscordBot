@@ -23,7 +23,13 @@ public class SlashCommand extends ListenerAdapter {
             if (event.getName().equals("hg-start")) {
 
                 if (BotStart.getMapGameLanguages().get(event.getUser().getId()) == null) {
-                    event.reply(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getId()))
+                    EmbedBuilder needSetLanguage = new EmbedBuilder();
+
+                    needSetLanguage.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
+                    needSetLanguage.setColor(0x00FF00);
+                    needSetLanguage.setDescription(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getId()));
+
+                    event.replyEmbeds(needSetLanguage.build())
                             .addActionRow(
                                     Button.secondary(event.getGuild().getId() + ":" + ReactionsButton.BUTTON_RUS, "Кириллица")
                                             .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")),
