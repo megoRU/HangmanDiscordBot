@@ -21,13 +21,18 @@ public class EngGameByTime {
                 try {
                     Map<Long, LocalDateTime> timeCreatedGame = new HashMap<>(HangmanRegistry.getInstance().getTimeCreatedGame());
 
+
                     for (Map.Entry<Long, LocalDateTime> entry : timeCreatedGame.entrySet()) {
                         Instant specificTime = Instant.ofEpochMilli(Instant.now().toEpochMilli());
 
                         if (entry.getValue().isBefore(ChronoLocalDateTime.from(OffsetDateTime.parse(String.valueOf(specificTime)).minusMinutes(10L)))) {
-                            HangmanRegistry.getInstance().getActiveHangman().get(entry.getKey()).stopGameByTime();
-                            HangmanRegistry.getInstance().getTimeCreatedGame().remove(entry.getKey());
-                            DataBase.getInstance().deleteActiveGame(String.valueOf(entry.getKey()));
+                            synchronized (this) {
+                                if (HangmanRegistry.getInstance().hasHangman(entry.getKey())) {
+                                    HangmanRegistry.getInstance().getActiveHangman().get(entry.getKey()).stopGameByTime();
+                                    HangmanRegistry.getInstance().getTimeCreatedGame().remove(entry.getKey());
+                                    DataBase.getInstance().deleteActiveGame(String.valueOf(entry.getKey()));
+                                }
+                            }
                         }
                     }
                 } catch (Exception e) {

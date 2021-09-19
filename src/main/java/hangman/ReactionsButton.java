@@ -6,6 +6,7 @@ import messagesevents.GameLanguageChange;
 import messagesevents.MessageInfoHelp;
 import messagesevents.MessageStats;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
@@ -28,11 +29,14 @@ public class ReactionsButton extends ListenerAdapter {
     @Override
     public void onButtonClick(@NotNull ButtonClickEvent event) {
         try {
+            if (event.getUser().isBot()) return;
             if (event.getButton() == null) return;
-
             if (event.getGuild() == null || event.getMember() == null) return;
 
-            if (event.getUser().isBot()) return;
+            if (!event.getGuild().getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_WRITE) ||
+                    !event.getGuild().getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+                return;
+            }
 
             if (HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong()) &&
                     (Objects.equals(event.getButton().getId(), event.getMember().getUser().getId() + ":" + START_NEW_GAME)

@@ -24,8 +24,11 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
 
         try {
-            if (!event.getGuild().getSelfMember().hasPermission(event.getGuild().getDefaultChannel(),
-                    Permission.MESSAGE_WRITE)) {
+            if (event.getGuild().getDefaultChannel() == null) return;
+
+            if (!event.getGuild().getSelfMember().hasPermission(event.getGuild().getDefaultChannel(), Permission.MESSAGE_WRITE)
+                    || !event.getGuild().getSelfMember().hasPermission(event.getGuild().getDefaultChannel(),
+                    Permission.MESSAGE_EMBED_LINKS)) {
                 return;
             }
             EmbedBuilder welcome = new EmbedBuilder();
