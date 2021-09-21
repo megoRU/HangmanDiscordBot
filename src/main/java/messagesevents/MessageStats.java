@@ -46,7 +46,14 @@ public class MessageStats extends ListenerAdapter {
             //Формула:
             //Количество побед / Общее количество * Максимальное количество процентов
             if (Integer.parseInt(statistic[0]) == 0) {
-                textChannel.sendMessage(jsonParsers.getLocale("MessageStats_Zero_Divide", userIdLong)).queue();
+
+                EmbedBuilder needSetLanguage = new EmbedBuilder();
+
+                needSetLanguage.setAuthor(name, null, userAvatarUrl);
+                needSetLanguage.setColor(0x00FF00);
+                needSetLanguage.setDescription(jsonParsers.getLocale("MessageStats_Zero_Divide", userIdLong));
+
+                textChannel.sendMessageEmbeds(needSetLanguage.build()).queue();
                 return;
             }
 

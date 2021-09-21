@@ -59,15 +59,8 @@ public class CreatorGraph implements SenderMessage {
             }
             EmbedBuilder globalStats = new EmbedBuilder();
 
-            if (statistic.name().equals("MY")) {
-                String avatar = null;
-                if (userAvatarUrl == null) {
-                    avatar = "https://cdn.discordapp.com/avatars/754093698681274369/dc4b416065569253bc6323efb6296703.png";
-                }
-                if (userAvatarUrl != null) {
-                    avatar = userAvatarUrl;
-                }
-                globalStats.setAuthor(userName, null, avatar);
+            if (statistic == Statistic.MY) {
+                globalStats.setAuthor(userName, null, userAvatarUrl);
             }
 
             globalStats.setColor(0x00FF00);
