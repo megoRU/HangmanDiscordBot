@@ -2,6 +2,7 @@ package messagesevents;
 
 import db.DataBase;
 import jsonparser.JSONParsers;
+import lombok.SneakyThrows;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -14,6 +15,7 @@ public class PrefixChange extends ListenerAdapter {
     private static final String PREFIX_RESET = "*prefix reset";
     private final JSONParsers jsonParsers = new JSONParsers();
 
+    @SneakyThrows
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
         if (event.getAuthor().isBot()) {

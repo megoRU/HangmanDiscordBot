@@ -1,5 +1,6 @@
 package statistic;
 
+import db.DataBase;
 import io.quickchart.QuickChart;
 import jsonparser.JSONParsers;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import java.sql.ResultSet;
 public class CreatorGraph implements SenderMessage {
 
     private static final JSONParsers jsonParsers = new JSONParsers();
-    private final ResultSet resultSet;
+    private ResultSet resultSet;
     private final String guildIdLong;
     private final String textChannelIdLong;
     private final String userIdLong;
@@ -38,6 +39,10 @@ public class CreatorGraph implements SenderMessage {
             chart.setBackgroundColor("white");
             chart.setWidth(800);
             chart.setHeight(400);
+
+            if (resultSet == null) {
+                resultSet = DataBase.getInstance().getAllStatistic();
+            }
 
             switch (statistic) {
                 case GLOBAL -> {

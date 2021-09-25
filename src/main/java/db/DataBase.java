@@ -46,9 +46,7 @@ public class DataBase {
             String sql = "DELETE g FROM DiscordBotHangmanDEV.games g " +
                     "JOIN player p on g.id = p.games_id " +
                     "WHERE p.user_id_long ='" + userIdLong + "'";
-
-            PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
-            preparedStatement.execute();
+            getConnection().prepareStatement(sql).execute();
 
             //Удаляем так же языки
             removeGameLanguageFromDB(userIdLong);
@@ -63,8 +61,7 @@ public class DataBase {
     public void deleteActiveGame(String userIdLong) {
         try {
             String sql = "DELETE FROM ActiveHangman WHERE user_id_long = '" + userIdLong + "'";
-            PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
-            preparedStatement.execute();
+            getConnection().prepareStatement(sql).execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -103,9 +100,7 @@ public class DataBase {
             String sql = "UPDATE ActiveHangman SET current_hidden_word='" +
                     currentHiddenWord + "', guesses= '" +
                     guesses + "', hangman_errors= '" + hangmanErrors + "' WHERE user_id_long= '" + userId + "'";
-            PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
-            preparedStatement.execute();
-
+            getConnection().prepareStatement(sql).execute();
         } catch (SQLException e) {
             System.out.println("Скорее всего игра уже закончилась!");
         }
@@ -126,15 +121,9 @@ public class DataBase {
     }
 
     //Удаление префикса
-    public void removePrefixFromDB(String serverId) {
-        try {
-            String sql = "DELETE FROM prefixs WHERE serverId='" + serverId + "'";
-            PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
-            preparedStatement.execute(sql);
-            preparedStatement.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public void removePrefixFromDB(String serverId) throws SQLException {
+        String sql = "DELETE FROM prefixs WHERE serverId='" + serverId + "'";
+        getConnection().prepareStatement(sql).execute();
     }
 
     //Добавляем в Бд данные о результате игры
@@ -183,15 +172,9 @@ public class DataBase {
     }
 
     //Удаление языка
-    public void removeLanguageFromDB(String userIdLong) {
-        try {
-            String sql = "DELETE FROM language WHERE user_id_long='" + userIdLong + "'";
-            PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
-            preparedStatement.execute(sql);
-            preparedStatement.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public void removeLanguageFromDB(String userIdLong) throws SQLException {
+        String sql = "DELETE FROM language WHERE user_id_long='" + userIdLong + "'";
+        getConnection().prepareStatement(sql).execute();
     }
 
     //Добавление языка игры
@@ -209,18 +192,12 @@ public class DataBase {
     }
 
     //Удаление языка игры
-    public void removeGameLanguageFromDB(String userIdLong) {
-        try {
-            String sql = "DELETE FROM game_language WHERE user_id_long='" + userIdLong + "'";
-            PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
-            preparedStatement.execute(sql);
-            preparedStatement.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public void removeGameLanguageFromDB(String userIdLong) throws SQLException {
+        String sql = "DELETE FROM game_language WHERE user_id_long='" + userIdLong + "'";
+        getConnection().prepareStatement(sql).execute();
     }
 
-    public String getStatistic(String userIdLong) {
+    public String getStatistic(String userIdLong) throws NullPointerException {
         try {
             Statement statement = DataBase.getConnection().createStatement();
             String sql = "SELECT COUNT(games_id) AS COUNT_GAMES, " +
@@ -238,7 +215,7 @@ public class DataBase {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return "";
+        throw new NullPointerException();
     }
 
     /**
@@ -250,7 +227,6 @@ public class DataBase {
             ResultSet resultSet = statement.executeQuery("SELECT MAX(id) AS id FROM games");
             if (resultSet.next()) {
                 System.out.println(resultSet.getInt(1));
-
                 return resultSet.getInt(1);
             }
             statement.close();
@@ -261,33 +237,30 @@ public class DataBase {
         return 0;
     }
 
-    public ResultSet getAllStatistic() {
-        try {
-            Statement statement = DataBase.getConnection().createStatement();
-            String sql = "SELECT COUNT(*) AS count, game_date FROM games GROUP BY MONTH (game_date);";
+    public ResultSet getAllStatistic() throws SQLException {
+        Statement statement = DataBase.getConnection().createStatement();
+        String sql = "SELECT COUNT(*) AS count, game_date FROM games GROUP BY MONTH (game_date);";
 
-            return statement.executeQuery(sql);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (statement.executeQuery(sql) == null) {
+            getAllStatistic();
         }
-        return null;
+
+        return statement.executeQuery(sql);
     }
 
-    public ResultSet getMyAllStatistic(String userIdLong) {
-        try {
-            Statement statement = DataBase.getConnection().createStatement();
-            String sql = "SELECT SUM(IF(result = 0, 1, 0)) AS TOTAL_ZEROS, " +
-                    "SUM(IF(result = 1, 1, 0)) AS TOTAL_ONES, " +
-                    "game_date " +
-                    "FROM player, games " +
-                    "WHERE player.user_id_long = '" + userIdLong + "' AND player.games_id = games.id GROUP BY MONTH (game_date);";
+    public ResultSet getMyAllStatistic(String userIdLong) throws SQLException {
 
-            return statement.executeQuery(sql);
+        Statement statement = DataBase.getConnection().createStatement();
+        String sql = "SELECT SUM(IF(result = 0, 1, 0)) AS TOTAL_ZEROS, " +
+                "SUM(IF(result = 1, 1, 0)) AS TOTAL_ONES, " +
+                "game_date " +
+                "FROM player, games " +
+                "WHERE player.user_id_long = '" + userIdLong + "' AND player.games_id = games.id GROUP BY MONTH (game_date);";
 
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (statement.executeQuery(sql) == null) {
+            getMyAllStatistic(userIdLong);
         }
-        return null;
+
+        return statement.executeQuery(sql);
     }
 }
