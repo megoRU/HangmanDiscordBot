@@ -1,13 +1,19 @@
 package messagesevents;
 
+import hangman.ReactionsButton;
 import jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
 import startbot.BotStart;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
 
@@ -43,12 +49,13 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
                     event.getChannel(),
                     event.getAuthor().getAvatarUrl(),
                     event.getAuthor().getId(),
-                    event.getAuthor().getName());
+                    event.getAuthor().getName(),
+                    event.getGuild().getId());
         }
 
     }
 
-    public void buildMessage(String p, TextChannel textChannel, String avatarUrl, String userIdLong, String name) {
+    public void buildMessage(String p, TextChannel textChannel, String avatarUrl, String userIdLong, String name, String guildLongId) {
 
         String avatar = null;
 
@@ -90,10 +97,27 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
                 jsonParsers.getLocale("messages_events_Bot_Creator", userIdLong),
                 jsonParsers.getLocale("messages_events_Bot_Creator_Url_Steam", userIdLong), false);
 
-        info.addField(
-                jsonParsers.getLocale("messages_events_Support", userIdLong),
-                jsonParsers.getLocale("messages_events_Support_Url_Discord", userIdLong), false);
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.link("https://discord.gg/UrWG3R683d", "Support"));
 
-        sendMessage(info, textChannel);
+        if (BotStart.getMapLanguages().get(userIdLong) != null) {
+
+            if (BotStart.getMapLanguages().get(userIdLong).equals("eng")) {
+
+                buttons.add(Button.secondary(guildLongId + ":" + ReactionsButton.CHANGE_LANGUAGE,
+                                "Сменить язык ")
+                        .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
+            } else {
+                buttons.add(Button.secondary(guildLongId + ":" + ReactionsButton.CHANGE_LANGUAGE,
+                                "Change language ")
+                        .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
+            }
+        } else {
+            buttons.add(Button.secondary(guildLongId + ":" + ReactionsButton.CHANGE_LANGUAGE,
+                            "Сменить язык ")
+                    .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
+        }
+
+        sendMessage(info, textChannel, buttons);
     }
 }

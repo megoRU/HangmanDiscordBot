@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
 import startbot.BotStart;
 
+import java.util.Locale;
 import java.util.Objects;
 
 public class ReactionsButton extends ListenerAdapter {
@@ -24,6 +25,7 @@ public class ReactionsButton extends ListenerAdapter {
     public static final String BUTTON_RUS = "LANGUAGE_RUS";
     public static final String BUTTON_ENG = "LANGUAGE_ENG";
     public static final String BUTTON_STOP = "BUTTON_STOP";
+    public static final String CHANGE_LANGUAGE = "CHANGE_LANGUAGE";
     private final JSONParsers jsonParsers = new JSONParsers();
 
     @Override
@@ -66,6 +68,21 @@ public class ReactionsButton extends ListenerAdapter {
                 return;
             }
 
+            if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + CHANGE_LANGUAGE)) {
+                event.deferEdit().queue();
+                String buttonName = event.getButton().getEmoji().getName().contains("\uD83C\uDDF7\uD83C\uDDFA") ? "rus" : "eng";
+                BotStart.getMapLanguages().put(event.getMember().getId(), buttonName);
+
+                event.getHook().sendMessage(jsonParsers
+                                .getLocale("ReactionsButton_Save", event.getMember().getId())
+                                .replaceAll("\\{0}", buttonName.toUpperCase()))
+                        .setEphemeral(true).queue();
+
+                DataBase.getInstance().addLanguageToDB(event.getMember().getId(), buttonName);
+                return;
+
+            }
+
             if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + BUTTON_HELP)) {
 
                 event.deferEdit().queue();
@@ -75,8 +92,8 @@ public class ReactionsButton extends ListenerAdapter {
                         event.getTextChannel(),
                         event.getUser().getAvatarUrl(),
                         event.getGuild().getId(),
-                        event.getUser().getName()
-                );
+                        event.getUser().getName(),
+                        event.getGuild().getId());
                 return;
             }
 
@@ -128,11 +145,13 @@ public class ReactionsButton extends ListenerAdapter {
 
             if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + START_CHANGE_GAME_LANGUAGE)) {
                 event.deferEdit().queue();
-                new GameLanguageChange().changeGameLanguage(event.getButton().getLabel().contains("rus") ? "rus" : "eng", event.getMember().getId());
+                String buttonName = event.getButton().getEmoji().getName().contains("\uD83C\uDDF7\uD83C\uDDFA") ? "rus" : "eng";
+                BotStart.getMapGameLanguages().put(event.getMember().getId(), buttonName);
                 event.getHook().sendMessage(jsonParsers
                                 .getLocale("ReactionsButton_Save", event.getMember().getId())
-                                .replaceAll("\\{0}", event.getButton().getLabel().contains("rus") ? "rus" : "eng"))
+                                .replaceAll("\\{0}", buttonName.toUpperCase()))
                         .setEphemeral(true).queue();
+                DataBase.getInstance().addGameLanguageToDB(event.getMember().getId(), buttonName);
                 return;
             }
 
