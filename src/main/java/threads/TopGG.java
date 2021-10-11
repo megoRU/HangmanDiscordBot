@@ -24,9 +24,7 @@ public class TopGG {
                             .botId(Config.getBotId())
                             .build();
 
-                    for (int i = 0; i < BotStart.getShardManager().getShards().size(); i++) {
-                        serverCount = BotStart.getShardManager().getGuilds().size();
-                    }
+                    serverCount = BotStart.getShardManager().getGuilds().size();
 
                     TOP_GG_API.setStats(serverCount);
 
