@@ -67,5 +67,6 @@
   "MessageStats_All_Stats": "Number of games per month",
   "gameOver": "The game is over",
   "timeIsOver": "You ran out of time, the game was completed.\nWe didn't count you a loss.",
-  "gameOverTime": "The game will end"
+  "gameOverTime": "The game will end",
+  "word_is_null": "Слово которое было, стало null, нам пришлось отменить игру. Начните новую игру\nЕсли ошибка повторится, напишите сюда: https://discord.gg/UrWG3R683d"
 }

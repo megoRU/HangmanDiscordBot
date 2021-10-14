@@ -90,6 +90,7 @@ public class BotStart {
         builder.setShardsTotal(TOTAL_SHARDS);
         shardManager = builder.build();
 
+        Thread.sleep(15000);
         for (int i = 0; i < TOTAL_SHARDS; i++) {
             shardManager.getShards().get(i).awaitReady();
         }
