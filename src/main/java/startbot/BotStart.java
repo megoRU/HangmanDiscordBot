@@ -6,10 +6,12 @@ import events.MessageWhenBotJoinToGuild;
 import hangman.*;
 import jsonparser.ParserClass;
 import messagesevents.*;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
+import net.dv8tion.jda.api.sharding.ShardManager;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -25,20 +27,21 @@ import java.sql.Statement;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BotStart {
 
     public static final String activity = "!help | ";
+    private static final Integer TOTAL_SHARDS = 4;
     public static final Map<String, String> secretCode = new HashMap<>();
     public static final Map<String, String> mapPrefix = new HashMap<>();
     public static final Map<String, String> mapLanguages = new HashMap<>();
     public static final Map<String, String> mapGameLanguages = new HashMap<>();
-    public static JDA jda;
-    private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
+    private static ShardManager shardManager;
+
+    public static ShardManager getShardManager() {
+        return shardManager;
+    }
 
     public void startBot() throws Exception {
         //Теперь HangmanRegistry знает количество игр и может отдавать правильное значение
@@ -54,24 +57,60 @@ public class BotStart {
         //Устанавливаем языки
         setLanguages();
 
-        jdaBuilder.setAutoReconnect(true);
-        jdaBuilder.setStatus(OnlineStatus.ONLINE);
-        jdaBuilder.setActivity(Activity.playing(activity + TopGG.serverCount + " guilds"));
-        jdaBuilder.setBulkDeleteSplittingEnabled(false);
-        jdaBuilder.addEventListeners(new MessageWhenBotJoinToGuild());
-        jdaBuilder.addEventListeners(new PrefixChange());
-        jdaBuilder.addEventListeners(new MessageInfoHelp());
-        jdaBuilder.addEventListeners(new LanguageChange());
-        jdaBuilder.addEventListeners(new GameLanguageChange());
-        jdaBuilder.addEventListeners(new GameHangmanListener());
-        jdaBuilder.addEventListeners(new MessageStats());
-        jdaBuilder.addEventListeners(new ReactionsButton());
-        jdaBuilder.addEventListeners(new DeleteAllMyData());
-        jdaBuilder.addEventListeners(new SlashCommand());
-        jdaBuilder.addEventListeners(new GetGlobalStatsInGraph());
+        List<GatewayIntent> intents = new ArrayList<>(
+                Arrays.asList(
+                        GatewayIntent.GUILD_MESSAGES,
+                        GatewayIntent.GUILD_EMOJIS,
+                        GatewayIntent.GUILD_MESSAGE_REACTIONS));
 
-        jda = jdaBuilder.build();
-        jda.awaitReady();
+        DefaultShardManagerBuilder builder = DefaultShardManagerBuilder.create(Config.getTOKEN(), intents);
+
+        builder.disableCache(
+                CacheFlag.CLIENT_STATUS,
+                CacheFlag.ACTIVITY,
+                CacheFlag.MEMBER_OVERRIDES,
+                CacheFlag.VOICE_STATE,
+                CacheFlag.ONLINE_STATUS);
+
+        builder.setAutoReconnect(true);
+        builder.setStatus(OnlineStatus.ONLINE);
+        builder.setActivity(Activity.playing(activity + TopGG.serverCount + " guilds"));
+        builder.setBulkDeleteSplittingEnabled(false);
+        builder.addEventListeners(new MessageWhenBotJoinToGuild());
+        builder.addEventListeners(new PrefixChange());
+        builder.addEventListeners(new MessageInfoHelp());
+        builder.addEventListeners(new LanguageChange());
+        builder.addEventListeners(new GameLanguageChange());
+        builder.addEventListeners(new GameHangmanListener());
+        builder.addEventListeners(new MessageStats());
+        builder.addEventListeners(new ReactionsButton());
+        builder.addEventListeners(new DeleteAllMyData());
+        builder.addEventListeners(new SlashCommand());
+        builder.addEventListeners(new GetGlobalStatsInGraph());
+        builder.setShardsTotal(TOTAL_SHARDS);
+        shardManager = builder.build();
+
+        Thread.sleep(15000);
+        for (int i = 0; i < TOTAL_SHARDS; i++) {
+            shardManager.getShards().get(i).awaitReady();
+        }
+
+        for (int i = 0; i < BotStart.getShardManager().getShards().size(); i++) {
+            System.out.println("Guild size: " + BotStart.getShardManager().getShards().get(i).getGuildCache().size() +
+                    " Shards id " +  BotStart.getShardManager().getStatus(i));
+        }
+
+
+//        Скорее всего нужно использовать такое:
+
+//        for (int i = 0; i < BotStart.getShardManager().getShards().size(); i++) {
+//            BotStart.getShardManager().getShards().get(i).updateCommands().queue();
+//        }
+
+
+//        Уже не поддерживается
+
+//        jda.awaitReady();
 
 //        Удалить все команды
 //        jda.updateCommands().queue();
@@ -234,9 +273,9 @@ public class BotStart {
         return mapGameLanguages;
     }
 
-    public static JDA getJda() {
-        return jda;
-    }
+//    public static JDA getJda() {
+//        return jda;
+//    }
 
     public static Map<String, String> getSecretCode() {
         return secretCode;

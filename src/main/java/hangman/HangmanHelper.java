@@ -11,7 +11,7 @@ public interface HangmanHelper {
 
     default void editMessage(EmbedBuilder embedBuilder, String guildId, Long userIdLong, Long channelId) {
         try {
-            BotStart.getJda()
+            BotStart.getShardManager()
                     .getGuildById(guildId)
                     .getTextChannelById(channelId)
                     .editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(userIdLong), embedBuilder.build())
@@ -24,7 +24,7 @@ public interface HangmanHelper {
 
     default void editMessageWithButtons(EmbedBuilder embedBuilder, String guildId, Long userIdLong, Long channelId, List<Button> buttons) {
         try {
-            BotStart.getJda()
+            BotStart.getShardManager()
                     .getGuildById(guildId)
                     .getTextChannelById(channelId)
                     .editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(userIdLong), embedBuilder.build())
@@ -38,7 +38,7 @@ public interface HangmanHelper {
 
     default void deleteUserGameMessages(String guildId, Long channelId, List<Message> messageList) {
         try {
-            BotStart.getJda()
+            BotStart.getShardManager()
                     .getGuildById(guildId)
                     .getTextChannelById(channelId)
                     .deleteMessages(messageList).queue();

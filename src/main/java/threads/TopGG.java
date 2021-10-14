@@ -23,9 +23,12 @@ public class TopGG {
                             .token(Config.getTopGgApiToken())
                             .botId(Config.getBotId())
                             .build();
-                    serverCount = (int) BotStart.getJda().getGuildCache().size();
+
+                    serverCount = BotStart.getShardManager().getGuilds().size();
+
                     TOP_GG_API.setStats(serverCount);
-                    BotStart.getJda().getPresence().setActivity(Activity.playing(BotStart.activity
+
+                    BotStart.getShardManager().setActivity(Activity.playing(BotStart.activity
                             + TopGG.serverCount + " guilds"));
 
                 } catch (Exception e) {

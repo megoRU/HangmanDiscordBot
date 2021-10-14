@@ -275,6 +275,20 @@ public class Hangman implements HangmanHelper {
 
     public void logic(String inputs, Message messages) {
         messageList.add(messages);
+        try {
+            if (WORD == null) {
+                addButtonsWhenGameOver();
+                messages.getTextChannel()
+                        .sendMessage(jsonParsers.getLocale("word_is_null", userId))
+                        .setActionRow(buttons)
+                        .queue();
+                clearingCollections();
+                return;
+            }
+        } catch (Exception e) {
+            System.out.println("Word null");
+        }
+
         if (WORD_HIDDEN.contains("_")) {
 
             boolean contains = guesses.toString().contains(inputs.toUpperCase());
@@ -406,6 +420,10 @@ public class Hangman implements HangmanHelper {
     }
 
     private void addButtonsWhenGameOver() {
+        if (!buttons.isEmpty()) {
+            buttons.clear();
+        }
+
         buttons.add(Button.success(guildId + ":" + ReactionsButton.START_NEW_GAME, "Play again"));
 
         if (BotStart.getMapGameLanguages().get(getUserId()).equals("eng")) {
@@ -436,9 +454,10 @@ public class Hangman implements HangmanHelper {
 
     private void clearingCollections() {
         try {
-            if (messageList.size() > 2 && BotStart.getJda().getGuildById(guildId)
+            if (messageList.size() > 2 && BotStart.getShardManager()
+                    .getGuildById(guildId)
                     .getSelfMember()
-                    .hasPermission(BotStart.getJda().getGuildById(guildId).getTextChannelById(channelId), Permission.MESSAGE_MANAGE)) {
+                    .hasPermission(BotStart.getShardManager().getGuildById(guildId).getTextChannelById(channelId), Permission.MESSAGE_MANAGE)) {
 
                 deleteUserGameMessages(guildId, channelId, messageList);
             }
