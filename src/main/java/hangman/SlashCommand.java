@@ -26,7 +26,7 @@ public class SlashCommand extends ListenerAdapter {
 
         try {
             if (event.getName().equals("hg-start")) {
-
+                //Проверяем установлен ли язык. Если нет - то возвращаем в чат ошибку
                 if (BotStart.getMapGameLanguages().get(event.getUser().getId()) == null) {
                     EmbedBuilder needSetLanguage = new EmbedBuilder();
 
@@ -43,7 +43,7 @@ public class SlashCommand extends ListenerAdapter {
                                             .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")),
                                     Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play"))
                             .queue();
-
+                //Проверяем если игрок уже играет. То присылаем в чат уведомление
                 } else if (HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
 
                     EmbedBuilder youPlay = new EmbedBuilder();
@@ -57,6 +57,7 @@ public class SlashCommand extends ListenerAdapter {
                     event.replyEmbeds(youPlay.build())
                             .addActionRow(Button.danger(event.getGuild().getId() + ":" + ReactionsButton.BUTTON_STOP, "Stop game"))
                             .queue();
+                //Если всё хорошо, создаем игру
                 } else {
                     HangmanRegistry.getInstance().setHangman(event.getUser().getIdLong(), new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getChannel().getIdLong()));
                     HangmanRegistry.getInstance().getActiveHangman().get(event.getUser().getIdLong()).startGame(event);
@@ -65,7 +66,7 @@ public class SlashCommand extends ListenerAdapter {
             }
 
             if (event.getName().equals("hg-stop")) {
-
+                //Проверяем играет ли сейчас игрок. Если да удаляем игру.
                 if (HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
                     HangmanRegistry.getInstance().getActiveHangman().remove(event.getUser().getIdLong());
 
@@ -74,6 +75,7 @@ public class SlashCommand extends ListenerAdapter {
                             .addActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
                             .queue();
                     DataBase.getInstance().deleteActiveGame(event.getUser().getId());
+                //Если игрок не играет, а хочет завершить игру то нудно ему это прислать уведомление что он сейчас не играет
                 } else {
                     event.reply(jsonParsers.getLocale("Hangman_You_Are_Not_Play", event.getUser().getId()))
                             .addActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
@@ -81,7 +83,7 @@ public class SlashCommand extends ListenerAdapter {
                 }
                 return;
             }
-
+            //Если игрок сейчас играет сменить язык не даст
             if (event.getName().equals("language") && HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
                 EmbedBuilder whenPlay = new EmbedBuilder();
 
