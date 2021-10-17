@@ -48,12 +48,6 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.example</groupId>
-            <artifactId>random.org-wrapper</artifactId>
-            <version>2.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
             <version>4.3.0_333</version>
