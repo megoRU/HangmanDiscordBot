@@ -18,17 +18,17 @@ public class PrefixChange extends ListenerAdapter {
     @SneakyThrows
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) {
+        if (event.getAuthor().isBot()) return;
+
+        if (!new CheckPermissions(event.getChannel()).checkMessageWrite()) {
             return;
         }
-        if (!event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_WRITE)) {
-            return;
-        }
+
         String message = event.getMessage().getContentRaw().toLowerCase().trim();
         String[] messages = message.split(" ", 2);
 
-        if ((message.equals(PREFIX_RESET) || message.matches(PREFIX)) && !event.getMember()
-                .hasPermission(Permission.MANAGE_SERVER)) {
+        if ((message.equals(PREFIX_RESET) || message.matches(PREFIX))
+                && !event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
             event.getChannel()
                     .sendMessage(jsonParsers.getLocale("prefix_change_Must_have_Permission", event.getGuild().getId()))
                     .queue();

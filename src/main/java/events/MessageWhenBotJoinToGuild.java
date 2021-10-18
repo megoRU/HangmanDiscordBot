@@ -3,8 +3,8 @@ package events;
 import hangman.ReactionsButton;
 import db.DataBase;
 import jsonparser.JSONParsers;
+import messagesevents.CheckPermissions;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -26,11 +26,10 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
         try {
             if (event.getGuild().getDefaultChannel() == null) return;
 
-            if (!event.getGuild().getSelfMember().hasPermission(event.getGuild().getDefaultChannel(), Permission.MESSAGE_WRITE)
-                    || !event.getGuild().getSelfMember().hasPermission(event.getGuild().getDefaultChannel(),
-                    Permission.MESSAGE_EMBED_LINKS)) {
+            if (!new CheckPermissions(event.getGuild().getDefaultChannel()).checkMessageWriteAndEmbedLinks()) {
                 return;
             }
+
             EmbedBuilder welcome = new EmbedBuilder();
             welcome.setColor(Color.GREEN);
             welcome.addField("hangman", "Thanks for adding " +

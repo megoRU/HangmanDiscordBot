@@ -2,8 +2,8 @@ package hangman;
 
 import db.DataBase;
 import jsonparser.JSONParsers;
+import messagesevents.CheckPermissions;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -19,8 +19,7 @@ public class SlashCommand extends ListenerAdapter {
         if (event.getUser().isBot()) return;
         if (event.getGuild() == null) return;
 
-        if (!event.getGuild().getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_WRITE) ||
-                !event.getGuild().getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+        if (!new CheckPermissions(event.getTextChannel()).checkMessageWriteAndEmbedLinks()) {
             return;
         }
 
@@ -75,7 +74,7 @@ public class SlashCommand extends ListenerAdapter {
                             .addActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
                             .queue();
                     DataBase.getInstance().deleteActiveGame(event.getUser().getId());
-                //Если игрок не играет, а хочет завершить игру то нудно ему это прислать уведомление что он сейчас не играет
+                //Если игрок не играет, а хочет завершить игру, то нужно ему это прислать уведомление, что он сейчас не играет
                 } else {
                     event.reply(jsonParsers.getLocale("Hangman_You_Are_Not_Play", event.getUser().getId()))
                             .addActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))

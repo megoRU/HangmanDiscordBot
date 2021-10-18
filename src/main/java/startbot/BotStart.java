@@ -33,9 +33,13 @@ public class BotStart {
 
     public static final String activity = "!help | ";
     private static final Integer TOTAL_SHARDS = 4;
+    //String - userLongId
     public static final Map<String, String> secretCode = new HashMap<>();
+    //String - guildLongId
     public static final Map<String, String> mapPrefix = new HashMap<>();
+    //String - userLongId
     public static final Map<String, String> mapLanguages = new HashMap<>();
+    //String - userLongId
     public static final Map<String, String> mapGameLanguages = new HashMap<>();
     private static ShardManager shardManager;
 
@@ -61,7 +65,9 @@ public class BotStart {
                 Arrays.asList(
                         GatewayIntent.GUILD_MESSAGES,
                         GatewayIntent.GUILD_EMOJIS,
-                        GatewayIntent.GUILD_MESSAGE_REACTIONS));
+                        GatewayIntent.GUILD_MESSAGE_REACTIONS,
+                        GatewayIntent.DIRECT_MESSAGES,
+                        GatewayIntent.DIRECT_MESSAGE_TYPING));
 
         DefaultShardManagerBuilder builder = DefaultShardManagerBuilder.create(Config.getTOKEN(), intents);
 

@@ -3,7 +3,6 @@ package messagesevents;
 import hangman.ReactionsButton;
 import jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -23,12 +22,11 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
 
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+        if (event.getAuthor().isBot()) return;
 
-        if (!event.getGuild().getSelfMember().hasPermission(event.getMessage().getTextChannel(), Permission.MESSAGE_WRITE)) {
+        if (!new CheckPermissions(event.getMessage().getTextChannel()).checkMessageWriteAndEmbedLinks()) {
             return;
         }
-
-        if (event.getAuthor().isBot()) return;
 
         String message = event.getMessage().getContentDisplay().trim();
 

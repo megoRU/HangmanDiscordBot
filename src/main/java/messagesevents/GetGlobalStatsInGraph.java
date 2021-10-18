@@ -2,7 +2,6 @@ package messagesevents;
 
 import db.DataBase;
 import lombok.SneakyThrows;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +19,7 @@ public class GetGlobalStatsInGraph extends ListenerAdapter {
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
 
-        if (!event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_WRITE)) {
+        if (!new CheckPermissions(event.getChannel()).checkMessageWriteAndEmbedLinks()) {
             return;
         }
 

@@ -2,6 +2,7 @@ package messagesevents;
 
 import db.DataBase;
 import jsonparser.JSONParsers;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +18,15 @@ public class DeleteAllMyData extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        if (event.getAuthor().isBot()) return;
+
         try {
+            if (event.getChannelType() == ChannelType.TEXT) {
+                if (!new CheckPermissions(event.getTextChannel()).checkMessageWrite()) {
+                    return;
+                }
+            }
+
             buildMessage(event, event.getMessage().getContentRaw(), event.getAuthor().getId());
         } catch (Exception e) {
             e.printStackTrace();
@@ -26,17 +35,9 @@ public class DeleteAllMyData extends ListenerAdapter {
 
     public void buildMessage(@NotNull MessageReceivedEvent event, String message, String authorId) {
 
-        String prefix_DELETE = DELETE;
-        String prefix_DELETE_WITH_CODE = DELETE_WITH_CODE;
-
         String[] split = message.split(" ", 2);
 
-        if (BotStart.getMapPrefix().containsKey(authorId)) {
-            prefix_DELETE = BotStart.getMapPrefix().get(authorId) + "delete";
-            prefix_DELETE_WITH_CODE = BotStart.getMapPrefix().get(authorId) + split[1];
-        }
-
-        if (message.equals(prefix_DELETE)) {
+        if (message.equals(DELETE)) {
             String code = UUID.randomUUID().toString().replaceAll("-", "");
             BotStart.getSecretCode().put(authorId, code);
 
@@ -49,17 +50,13 @@ public class DeleteAllMyData extends ListenerAdapter {
             return;
         }
 
-        if (message.matches(prefix_DELETE_WITH_CODE) && BotStart.getSecretCode().get(authorId) == null) {
+        if (message.matches(DELETE_WITH_CODE)
+                && (BotStart.getSecretCode().get(authorId) == null || !BotStart.getSecretCode().get(authorId).equals(split[1]))) {
             event.getChannel().sendMessage(jsonParsers.getLocale("restore_Data_Failure", authorId)).queue();
             return;
         }
 
-        if (message.matches(prefix_DELETE_WITH_CODE) && !BotStart.getSecretCode().get(authorId).equals(split[1])) {
-            event.getChannel().sendMessage(jsonParsers.getLocale("restore_Data_Failure", authorId)).queue();
-            return;
-        }
-
-        if (split.length > 1 && message.matches(prefix_DELETE_WITH_CODE)
+        if (split.length > 1 && message.matches(DELETE_WITH_CODE)
                 && BotStart.getSecretCode().get(authorId) != null
                 && BotStart.getSecretCode().get(authorId).equals(split[1])) {
             event.getChannel().sendMessage(jsonParsers.getLocale("restore_Data_Success", authorId)).queue();

@@ -2,18 +2,17 @@ package hangman;
 
 import db.DataBase;
 import jsonparser.JSONParsers;
+import messagesevents.CheckPermissions;
 import messagesevents.GameLanguageChange;
 import messagesevents.MessageInfoHelp;
 import messagesevents.MessageStats;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
 import startbot.BotStart;
 
-import java.util.Locale;
 import java.util.Objects;
 
 public class ReactionsButton extends ListenerAdapter {
@@ -35,8 +34,7 @@ public class ReactionsButton extends ListenerAdapter {
             if (event.getButton() == null) return;
             if (event.getGuild() == null || event.getMember() == null) return;
 
-            if (!event.getGuild().getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_WRITE) ||
-                    !event.getGuild().getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+            if (!new CheckPermissions(event.getTextChannel()).checkMessageWriteAndEmbedLinks()) {
                 return;
             }
 

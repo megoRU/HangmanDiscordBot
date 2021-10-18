@@ -2,8 +2,8 @@ package hangman;
 
 import db.DataBase;
 import jsonparser.JSONParsers;
+import messagesevents.CheckPermissions;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -23,10 +23,10 @@ public class GameHangmanListener extends ListenerAdapter {
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
 
-        if (!event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_WRITE) ||
-        !event.getGuild().getSelfMember().hasPermission(event.getChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+        if (!new CheckPermissions(event.getChannel()).checkMessageWriteAndEmbedLinks()) {
             return;
         }
+
         String message = event.getMessage().getContentRaw().trim().toLowerCase();
 
         String prefix = HG;
