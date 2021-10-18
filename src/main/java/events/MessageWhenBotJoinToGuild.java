@@ -32,7 +32,7 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
 
             EmbedBuilder welcome = new EmbedBuilder();
             welcome.setColor(Color.GREEN);
-            welcome.addField("hangman", "Thanks for adding " +
+            welcome.addField("Hangman", "Thanks for adding " +
                     "**"
                     + event.getGuild().getSelfMember().getUser().getName() +
                     "** " + "bot to " + event.getGuild().getName() +

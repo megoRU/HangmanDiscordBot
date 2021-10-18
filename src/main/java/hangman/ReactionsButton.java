@@ -38,6 +38,7 @@ public class ReactionsButton extends ListenerAdapter {
                 return;
             }
 
+            //Проверяем смену языка при активной игре. Если игра активна и идет сменя языка - запрещать
             if (HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong()) &&
                     (Objects.equals(event.getButton().getId(), event.getMember().getUser().getId() + ":" + START_NEW_GAME)
                             || Objects.equals(event.getButton().getId(), event.getMember().getUser().getId() + ":" + START_CHANGE_GAME_LANGUAGE))) {
@@ -66,6 +67,7 @@ public class ReactionsButton extends ListenerAdapter {
                 return;
             }
 
+            //Меняем язык на тот что был в кнопке
             if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + CHANGE_LANGUAGE)) {
                 event.deferEdit().queue();
                 String buttonName = event.getButton().getEmoji().getName().contains("\uD83C\uDDF7\uD83C\uDDFA") ? "rus" : "eng";
@@ -78,9 +80,9 @@ public class ReactionsButton extends ListenerAdapter {
 
                 DataBase.getInstance().addLanguageToDB(event.getMember().getId(), buttonName);
                 return;
-
             }
 
+            //При нажатии на кнопку HELP, бот присылает в чат информацию
             if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + BUTTON_HELP)) {
 
                 event.deferEdit().queue();
@@ -89,13 +91,15 @@ public class ReactionsButton extends ListenerAdapter {
                         BotStart.getMapPrefix().get(event.getGuild().getId()) == null ? "!" : BotStart.getMapPrefix().get(event.getGuild().getId()),
                         event.getTextChannel(),
                         event.getUser().getAvatarUrl(),
-                        event.getGuild().getId(),
+                        event.getUser().getId(),
                         event.getUser().getName(),
                         event.getGuild().getId());
                 return;
             }
 
             long userIdLong = event.getUser().getIdLong();
+
+            //Если нажата кнопка START, и нет активной игры, то создаем
             if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + START_NEW_GAME) && !HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 event.deferEdit().queue();
                 HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getTextChannel().getIdLong()));
@@ -103,6 +107,7 @@ public class ReactionsButton extends ListenerAdapter {
                 return;
             }
 
+            //Если нажата кнопка START, и игрок сейчас играет, присылаем в час уведомление
             if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + START_NEW_GAME) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 event.deferEdit().queue();
 
@@ -120,6 +125,7 @@ public class ReactionsButton extends ListenerAdapter {
                 return;
             }
 
+            //Если нажата кнопка STOP, и игрок сейчас играет, завершаем
             if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + BUTTON_STOP)) {
                 event.deferEdit().queue();
 
@@ -133,6 +139,7 @@ public class ReactionsButton extends ListenerAdapter {
                             .queue();
 
                     DataBase.getInstance().deleteActiveGame(event.getUser().getId());
+                    //Если нажата кнопка STOP, и игрок сейчас не играет, присылаем в час уведомление
                 } else {
                     event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_You_Are_Not_Play", event.getUser().getId()))
                             .setActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
@@ -140,7 +147,7 @@ public class ReactionsButton extends ListenerAdapter {
                 }
                 return;
             }
-
+            //Меняем язык на тот что был в кнопке
             if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + START_CHANGE_GAME_LANGUAGE)) {
                 event.deferEdit().queue();
                 String buttonName = event.getButton().getEmoji().getName().contains("\uD83C\uDDF7\uD83C\uDDFA") ? "rus" : "eng";
@@ -152,7 +159,7 @@ public class ReactionsButton extends ListenerAdapter {
                 DataBase.getInstance().addGameLanguageToDB(event.getMember().getId(), buttonName);
                 return;
             }
-
+            //Получаем статистику по нажатии на кнопку
             if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + MY_STATS)) {
                 event.deferEdit().queue();
                 new MessageStats().sendStats(
