@@ -65,6 +65,7 @@ public class GameHangmanListener extends ListenerAdapter {
             }
 
             if (message.equals(prefix) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+                event.getChannel().sendTyping().queue();
                 EmbedBuilder youPlay = new EmbedBuilder();
 
                 youPlay.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
@@ -97,6 +98,7 @@ public class GameHangmanListener extends ListenerAdapter {
             }
 
             if (!HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+                event.getChannel().sendTyping().queue();
                 HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getAuthor().getId(), event.getGuild().getId(), event.getChannel().getIdLong()));
                 HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel(), event.getAuthor().getAvatarUrl(), event.getAuthor().getName());
             }

@@ -102,8 +102,9 @@ public class BotStart {
         }
 
         for (int i = 0; i < BotStart.getShardManager().getShards().size(); i++) {
-            System.out.println("Guild size: " + BotStart.getShardManager().getShards().get(i).getGuildCache().size() +
-                    " Shards id " +  BotStart.getShardManager().getStatus(i));
+            System.out.println("Guilds in Shard: " +
+                    BotStart.getShardManager().getShards().get(i).getGuildCache().size() +
+                    " Shard: " + i + " "+  BotStart.getShardManager().getStatus(i));
         }
 
 

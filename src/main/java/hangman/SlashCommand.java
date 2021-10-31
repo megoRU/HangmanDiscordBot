@@ -25,6 +25,7 @@ public class SlashCommand extends ListenerAdapter {
 
         try {
             if (event.getName().equals("hg-start")) {
+                event.getChannel().sendTyping().queue();
                 //Проверяем установлен ли язык. Если нет - то возвращаем в чат ошибку
                 if (BotStart.getMapGameLanguages().get(event.getUser().getId()) == null) {
                     EmbedBuilder needSetLanguage = new EmbedBuilder();

@@ -102,6 +102,7 @@ public class ReactionsButton extends ListenerAdapter {
             //Если нажата кнопка START, и нет активной игры, то создаем
             if (Objects.equals(event.getButton().getId(), event.getGuild().getId() + ":" + START_NEW_GAME) && !HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 event.deferEdit().queue();
+                event.getChannel().sendTyping().queue();
                 HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getTextChannel().getIdLong()));
                 HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getTextChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
                 return;
@@ -168,8 +169,6 @@ public class ReactionsButton extends ListenerAdapter {
                         event.getUser().getId(),
                         event.getMember().getUser().getName());
             }
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }

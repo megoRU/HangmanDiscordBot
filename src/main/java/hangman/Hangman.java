@@ -73,9 +73,9 @@ public class Hangman implements HangmanHelper {
                 }
             }
         } catch (Exception e) {
+            System.out.println("Скорее всего API не работает");
             e.printStackTrace();
         }
-        System.out.println("Скорее всего API не работает");
         return null;
     }
 

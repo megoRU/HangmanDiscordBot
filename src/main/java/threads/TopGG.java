@@ -8,6 +8,7 @@ import startbot.BotStart;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 public class TopGG {
 
@@ -26,8 +27,7 @@ public class TopGG {
 
                     serverCount = BotStart.getShardManager().getGuilds().size();
 
-                    TOP_GG_API.setStats(serverCount);
-
+                    TOP_GG_API.setStats(BotStart.getShardManager().getShards().stream().map(guild -> guild.getGuilds().size()).collect(Collectors.toList()));
                     BotStart.getShardManager().setActivity(Activity.playing(BotStart.activity
                             + TopGG.serverCount + " guilds"));
 
