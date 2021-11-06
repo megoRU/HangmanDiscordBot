@@ -1,6 +1,12 @@
-version: '3.9'
+version: '3.3'
 
 services:
   hangman:
     image: megoru/hangman
     restart: always
+    environment:
+      PROD_TOKEN: 
+      DATABASE_URL: jdbc:mysql://your ip address:3306/
+      DATABASE_URL2: ?useSSL=false&serverTimezone=UTC&characterEncoding=utf8
+      DATABASE_PASS: 
+      TOP_GG_API_TOKEN:
