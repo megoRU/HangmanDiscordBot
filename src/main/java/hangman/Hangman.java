@@ -97,7 +97,7 @@ public class Hangman implements HangmanHelper {
         start.addField("Attention for Admins", "[Add slash commands](https://discord.com/api/oauth2/authorize?client_id=845974873682608129&scope=applications.commands%20bot)", false);
         start.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
         start.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "", false);
-        start.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + hideWord(WORD.length()) + "`", false);
+        start.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + WORD_HIDDEN.toUpperCase() + "`", false);
         start.setTimestamp(OffsetDateTime.parse(String.valueOf(specificTime)).plusMinutes(10L));
         start.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
     }
@@ -379,7 +379,7 @@ public class Hangman implements HangmanHelper {
                         info.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
                         info.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
                         info.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
-                        info.addField(jsonGameParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase().replaceAll(".(?!$)", "$0 ") + "`", false);
+                        info.addField(jsonGameParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase() + "`", false);
 
                         editMessageWithButtons(info, guildId, Long.parseLong(userId), channelId, buttons);
 
@@ -426,14 +426,14 @@ public class Hangman implements HangmanHelper {
     }
 
     //Создает скрытую линию из длины слова
-    private String hideWord(int length) {
+    private void hideWord(int length) {
         StringBuilder sb = new StringBuilder();
         int i = 0;
         while (i < length) {
             sb.append(sb.length() == 0 ? "_" : " _");
             i++;
         }
-        return WORD_HIDDEN = sb.toString();
+        WORD_HIDDEN = sb.toString();
     }
 
     //заменяет "_" на букву которая есть в слове
