@@ -21,7 +21,7 @@ public class GameLanguageChange extends ListenerAdapter {
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
 
-        if (!new CheckPermissions(event.getChannel()).checkMessageWriteAndEmbedLinks()) {
+        if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getChannel())) {
             return;
         }
 

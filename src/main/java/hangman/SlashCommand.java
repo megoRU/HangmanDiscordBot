@@ -19,7 +19,7 @@ public class SlashCommand extends ListenerAdapter {
         if (event.getUser().isBot()) return;
         if (event.getGuild() == null) return;
 
-        if (!new CheckPermissions(event.getTextChannel()).checkMessageWriteAndEmbedLinks()) {
+        if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) {
             return;
         }
 

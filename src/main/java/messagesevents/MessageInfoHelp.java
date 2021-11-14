@@ -24,7 +24,7 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
 
-        if (!new CheckPermissions(event.getMessage().getTextChannel()).checkMessageWriteAndEmbedLinks()) {
+        if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getMessage().getTextChannel())) {
             return;
         }
 

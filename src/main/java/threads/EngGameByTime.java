@@ -21,7 +21,6 @@ public class EngGameByTime {
                 try {
                     Map<Long, LocalDateTime> timeCreatedGame = new HashMap<>(HangmanRegistry.getInstance().getTimeCreatedGame());
 
-
                     for (Map.Entry<Long, LocalDateTime> entry : timeCreatedGame.entrySet()) {
                         Instant specificTime = Instant.ofEpochMilli(Instant.now().toEpochMilli());
 

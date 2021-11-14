@@ -9,25 +9,16 @@ import java.time.ZonedDateTime;
 
 public class DataBase {
 
-    private static volatile Connection connection;
     private static volatile DataBase dataBase;
 
     private DataBase() {
     }
 
-    //Создаем один коннект на программу
     public static Connection getConnection() throws SQLException {
-        if (connection == null || connection.isClosed()) {
-            synchronized (DataBase.class) {
-                if (connection == null || connection.isClosed()) {
-                    connection = DriverManager.getConnection(
-                            Config.getHangmanConnection(),
-                            Config.getHangmanUser(),
-                            Config.getHangmanPass());
-                }
-            }
-        }
-        return connection;
+        return DriverManager.getConnection(
+                    Config.getHangmanConnection(),
+                    Config.getHangmanUser(),
+                    Config.getHangmanPass());
     }
 
     public static DataBase getInstance() {
@@ -52,7 +43,6 @@ public class DataBase {
             removeGameLanguageFromDB(userIdLong);
             removeLanguageFromDB(userIdLong);
             deleteActiveGame(userIdLong);
-
         } catch (SQLException e) {
             e.printStackTrace();
         }

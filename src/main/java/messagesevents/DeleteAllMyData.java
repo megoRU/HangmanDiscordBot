@@ -22,7 +22,7 @@ public class DeleteAllMyData extends ListenerAdapter {
 
         try {
             if (event.getChannelType() == ChannelType.TEXT) {
-                if (!new CheckPermissions(event.getTextChannel()).checkMessageWrite()) {
+                if (CheckPermissions.isHasPermissionToWrite(event.getTextChannel())) {
                     return;
                 }
             }

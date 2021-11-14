@@ -34,7 +34,7 @@ public class ReactionsButton extends ListenerAdapter {
             if (event.getButton() == null) return;
             if (event.getGuild() == null || event.getMember() == null) return;
 
-            if (!new CheckPermissions(event.getTextChannel()).checkMessageWriteAndEmbedLinks()) {
+            if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) {
                 return;
             }
 
