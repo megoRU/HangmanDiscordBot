@@ -5,7 +5,7 @@ import jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
@@ -21,8 +21,10 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
     private final JSONParsers jsonParsers = new JSONParsers();
 
     @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
+
+        if (!event.isFromGuild()) return;
 
         if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getMessage().getTextChannel())) {
             return;
@@ -44,7 +46,7 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
         if (message.equals(prefix)) {
             buildMessage(
                     p,
-                    event.getChannel(),
+                    event.getTextChannel(),
                     event.getAuthor().getAvatarUrl(),
                     event.getAuthor().getId(),
                     event.getAuthor().getName(),
@@ -102,17 +104,17 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
 
             if (BotStart.getMapLanguages().get(userIdLong).equals("eng")) {
 
-                buttons.add(Button.secondary(guildLongId + ":" + ReactionsButton.CHANGE_LANGUAGE,
-                                "Сменить язык ")
+                buttons.add(Button.secondary(ReactionsButton.BUTTON_CHANGE_LANGUAGE,
+                                "Сменить язык")
                         .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
             } else {
-                buttons.add(Button.secondary(guildLongId + ":" + ReactionsButton.CHANGE_LANGUAGE,
-                                "Change language ")
+                buttons.add(Button.secondary(ReactionsButton.BUTTON_CHANGE_LANGUAGE,
+                                "Change language")
                         .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
             }
         } else {
-            buttons.add(Button.secondary(guildLongId + ":" + ReactionsButton.CHANGE_LANGUAGE,
-                            "Сменить язык ")
+            buttons.add(Button.secondary(ReactionsButton.BUTTON_CHANGE_LANGUAGE,
+                            "Сменить язык")
                     .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
         }
 

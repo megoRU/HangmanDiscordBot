@@ -36,12 +36,12 @@ public class SlashCommand extends ListenerAdapter {
 
                     event.replyEmbeds(needSetLanguage.build())
                             .addActionRow(
-                                    Button.secondary(event.getGuild().getId() + ":" + ReactionsButton.BUTTON_RUS, "Кириллица")
+                                    Button.secondary(ReactionsButton.BUTTON_RUS, "Кириллица")
                                             .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")),
 
-                                    Button.secondary(event.getGuild().getId() + ":" + ReactionsButton.BUTTON_ENG, "Latin")
+                                    Button.secondary(ReactionsButton.BUTTON_ENG, "Latin")
                                             .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")),
-                                    Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play"))
+                                    Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play"))
                             .queue();
                 //Проверяем если игрок уже играет. То присылаем в чат уведомление
                 } else if (HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
@@ -55,7 +55,7 @@ public class SlashCommand extends ListenerAdapter {
                             ? "!hg" : BotStart.getMapPrefix().get(event.getGuild().getId())));
 
                     event.replyEmbeds(youPlay.build())
-                            .addActionRow(Button.danger(event.getGuild().getId() + ":" + ReactionsButton.BUTTON_STOP, "Stop game"))
+                            .addActionRow(Button.danger(ReactionsButton.BUTTON_STOP, "Stop game"))
                             .queue();
                 //Если всё хорошо, создаем игру
                 } else {
@@ -72,13 +72,13 @@ public class SlashCommand extends ListenerAdapter {
 
                     event.reply(jsonParsers.getLocale("Hangman_Eng_game",
                                     event.getUser().getId()).replaceAll("\\{0}", BotStart.getMapPrefix().get(event.getGuild().getId()) == null ? "!hg" : BotStart.getMapPrefix().get(event.getGuild().getId())))
-                            .addActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
+                            .addActionRow(Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play again"))
                             .queue();
                     DataBase.getInstance().deleteActiveGame(event.getUser().getId());
                 //Если игрок не играет, а хочет завершить игру, то нужно ему это прислать уведомление, что он сейчас не играет
                 } else {
                     event.reply(jsonParsers.getLocale("Hangman_You_Are_Not_Play", event.getUser().getId()))
-                            .addActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
+                            .addActionRow(Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play again"))
                             .queue();
                 }
                 return;
@@ -92,7 +92,7 @@ public class SlashCommand extends ListenerAdapter {
                 whenPlay.setDescription(jsonParsers.getLocale("ReactionsButton_When_Play", event.getUser().getId()));
 
                 event.replyEmbeds(whenPlay.build())
-                        .addActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
+                        .addActionRow(Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play again"))
                         .queue();
                 return;
             }
@@ -106,7 +106,7 @@ public class SlashCommand extends ListenerAdapter {
                                 .replaceAll("\\{0}", event.getOptions().get(0).getAsString())
                                 .replaceAll("\\{1}", event.getOptions().get(1).getAsString()))
 
-                        .addActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
+                        .addActionRow(Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play again"))
                         .queue();
                 DataBase.getInstance().addGameLanguageToDB(event.getUser().getId(), event.getOptions().get(0).getAsString());
                 DataBase.getInstance().addLanguageToDB(event.getUser().getId(), event.getOptions().get(1).getAsString());

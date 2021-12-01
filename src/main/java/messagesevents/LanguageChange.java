@@ -2,7 +2,7 @@ package messagesevents;
 
 import db.DataBase;
 import jsonparser.JSONParsers;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import startbot.BotStart;
@@ -14,10 +14,12 @@ public class LanguageChange extends ListenerAdapter {
     private final JSONParsers jsonParsers = new JSONParsers();
 
     @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
 
-        if (CheckPermissions.isHasPermissionToWrite(event.getChannel())) {
+        if (!event.isFromGuild()) return;
+
+        if (CheckPermissions.isHasPermissionToWrite(event.getTextChannel())) {
             return;
         }
 
@@ -36,9 +38,17 @@ public class LanguageChange extends ListenerAdapter {
 
             DataBase.getInstance().addLanguageToDB(event.getAuthor().getId(), messages[1]);
 
+            String language;
+
+            if (messages[1].equals("rus")) {
+                language = "Русский";
+            } else {
+                language = "English";
+            }
+
             event.getChannel()
                     .sendMessage(jsonParsers.getLocale("language_change_lang", event.getAuthor().getId())
-                            + "`" + messages[1].toUpperCase() + "`").queue();
+                                    .replaceAll("\\{0}", language)).queue();
         }
     }
 }

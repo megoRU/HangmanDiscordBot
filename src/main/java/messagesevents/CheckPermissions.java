@@ -11,7 +11,7 @@ public class CheckPermissions {
             if (BotStart.getShardManager()
                     .getGuildById(textChannel.getGuild().getId())
                     .getSelfMember()
-                    .hasPermission(textChannel, Permission.MESSAGE_WRITE)) {
+                    .hasPermission(textChannel, Permission.MESSAGE_SEND)) {
                 return false;
             }
         } catch (Exception e) {
@@ -27,7 +27,7 @@ public class CheckPermissions {
             if (BotStart.getShardManager()
                     .getGuildById(textChannel.getGuild().getId())
                     .getSelfMember()
-                    .hasPermission(textChannel, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)) {
+                    .hasPermission(textChannel, Permission.MESSAGE_SEND, Permission.MESSAGE_EMBED_LINKS)) {
                 return false;
             }
         } catch (Exception e) {

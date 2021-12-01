@@ -2,7 +2,7 @@ package messagesevents;
 
 import db.DataBase;
 import lombok.SneakyThrows;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import startbot.BotStart;
@@ -16,10 +16,12 @@ public class GetGlobalStatsInGraph extends ListenerAdapter {
 
     @SneakyThrows
     @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
 
-        if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getChannel())) {
+        if (!event.isFromGuild()) return;
+
+        if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) {
             return;
         }
 
@@ -58,6 +60,4 @@ public class GetGlobalStatsInGraph extends ListenerAdapter {
         }
 
     }
-
-
 }

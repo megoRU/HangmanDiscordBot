@@ -493,11 +493,11 @@ public class Hangman implements HangmanHelper {
     }
 
     private void insertButtonsToCollection() {
-        buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_RUS, "Кириллица")
+        buttons.add(Button.secondary(ReactionsButton.BUTTON_RUS, "Кириллица")
                 .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
-        buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_ENG, "Latin")
+        buttons.add(Button.secondary(ReactionsButton.BUTTON_ENG, "Latin")
                 .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
-        buttons.add(Button.success(guildId + ":" + ReactionsButton.START_NEW_GAME, "Play"));
+        buttons.add(Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play"));
     }
 
     private void addButtonsWhenGameOver() {
@@ -505,17 +505,17 @@ public class Hangman implements HangmanHelper {
             buttons.clear();
         }
 
-        buttons.add(Button.success(guildId + ":" + ReactionsButton.START_NEW_GAME, "Play again"));
+        buttons.add(Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play again"));
 
         if (BotStart.getMapGameLanguages().get(getUserId()).equals("eng")) {
-            buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_RUS, "Кириллица")
+            buttons.add(Button.secondary(ReactionsButton.BUTTON_CHANGE_GAME_LANGUAGE, "Кириллица")
                     .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
         } else {
-            buttons.add(Button.secondary(guildId + ":" + ReactionsButton.BUTTON_ENG, "Latin")
+            buttons.add(Button.secondary(ReactionsButton.BUTTON_CHANGE_GAME_LANGUAGE, "Latin")
                     .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
         }
 
-        buttons.add(Button.primary(guildId + ":" + ReactionsButton.MY_STATS, "My stats"));
+        buttons.add(Button.primary(ReactionsButton.BUTTON_MY_STATS, "My stats"));
     }
 
     private void addGuesses(String letter) {

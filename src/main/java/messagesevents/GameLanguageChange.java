@@ -5,7 +5,7 @@ import hangman.HangmanRegistry;
 import hangman.ReactionsButton;
 import jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
@@ -18,10 +18,12 @@ public class GameLanguageChange extends ListenerAdapter {
     private final JSONParsers jsonParsers = new JSONParsers();
 
     @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
 
-        if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getChannel())) {
+        if (!event.isFromGuild()) return;
+
+        if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) {
             return;
         }
 
@@ -45,7 +47,7 @@ public class GameLanguageChange extends ListenerAdapter {
                 whenPlay.setDescription(jsonParsers.getLocale("ReactionsButton_When_Play", event.getAuthor().getId()));
 
                 event.getChannel().sendMessageEmbeds(whenPlay.build())
-                        .setActionRow(Button.danger(event.getGuild().getId() + ":" + ReactionsButton.BUTTON_STOP, "Stop game"))
+                        .setActionRow(Button.danger(ReactionsButton.BUTTON_STOP, "Stop game"))
                         .queue();
             } else {
                 BotStart.getMapGameLanguages().put(event.getAuthor().getId(), messages[1]);

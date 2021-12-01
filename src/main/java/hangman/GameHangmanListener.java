@@ -5,7 +5,7 @@ import jsonparser.JSONParsers;
 import messagesevents.CheckPermissions;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
@@ -20,10 +20,12 @@ public class GameHangmanListener extends ListenerAdapter {
     private static final JSONParsers jsonParsers = new JSONParsers();
 
     @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        if (!event.isFromGuild()) return;
+
         if (event.getAuthor().isBot()) return;
 
-        if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getChannel())) {
+        if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) {
             return;
         }
 
@@ -53,12 +55,12 @@ public class GameHangmanListener extends ListenerAdapter {
 
                 event.getChannel().sendMessageEmbeds(needSetLanguage.build())
                         .setActionRow(
-                                Button.secondary(event.getGuild().getId() + ":" + ReactionsButton.BUTTON_RUS, "Кириллица")
+                                Button.secondary(ReactionsButton.BUTTON_RUS, "Кириллица")
                                         .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")),
 
-                                Button.secondary(event.getGuild().getId() + ":" + ReactionsButton.BUTTON_ENG, "Latin")
+                                Button.secondary(ReactionsButton.BUTTON_ENG, "Latin")
                                         .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")),
-                                Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play"))
+                                Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play"))
                         .queue();
 
                 return;
@@ -74,7 +76,7 @@ public class GameHangmanListener extends ListenerAdapter {
                         event.getAuthor().getId()).replaceAll("\\{0}", prefix));
 
                 event.getChannel().sendMessageEmbeds(youPlay.build())
-                        .setActionRow(Button.danger(event.getGuild().getId() + ":" + ReactionsButton.BUTTON_STOP, "Stop game"))
+                        .setActionRow(Button.danger(ReactionsButton.BUTTON_STOP, "Stop game"))
                         .queue();
                 return;
             }
@@ -84,7 +86,7 @@ public class GameHangmanListener extends ListenerAdapter {
 
                 event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_Eng_game",
                                 event.getAuthor().getId()).replaceAll("\\{0}", prefix))
-                        .setActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
+                        .setActionRow(Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play again"))
                         .queue();
                 DataBase.getInstance().deleteActiveGame(String.valueOf(userIdLong));
                 return;
@@ -92,7 +94,7 @@ public class GameHangmanListener extends ListenerAdapter {
 
             if (message.equals(prefix2) && !HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_You_Are_Not_Play", event.getAuthor().getId()))
-                        .setActionRow(Button.success(event.getGuild().getId() + ":" + ReactionsButton.START_NEW_GAME, "Play again"))
+                        .setActionRow(Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play again"))
                         .queue();
                 return;
             }
@@ -100,7 +102,7 @@ public class GameHangmanListener extends ListenerAdapter {
             if (!HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 event.getChannel().sendTyping().queue();
                 HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getAuthor().getId(), event.getGuild().getId(), event.getChannel().getIdLong()));
-                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel(), event.getAuthor().getAvatarUrl(), event.getAuthor().getName());
+                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getTextChannel(), event.getAuthor().getAvatarUrl(), event.getAuthor().getName());
             }
         }
     }

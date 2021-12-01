@@ -4,7 +4,7 @@ import db.DataBase;
 import jsonparser.JSONParsers;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import startbot.BotStart;
@@ -17,10 +17,12 @@ public class PrefixChange extends ListenerAdapter {
 
     @SneakyThrows
     @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        if (!event.isFromGuild()) return;
+
         if (event.getAuthor().isBot()) return;
 
-        if (CheckPermissions.isHasPermissionToWrite(event.getChannel())) {
+        if (CheckPermissions.isHasPermissionToWrite(event.getTextChannel())) {
             return;
         }
 
