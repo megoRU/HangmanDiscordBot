@@ -53,8 +53,8 @@ public class GameLanguageChange extends ListenerAdapter {
                 BotStart.getMapGameLanguages().put(event.getAuthor().getId(), messages[1]);
                 DataBase.getInstance().addGameLanguageToDB(event.getAuthor().getId(), messages[1]);
                 event.getChannel()
-                        .sendMessage(jsonParsers.getLocale("language_change_lang", event.getAuthor().getId())
-                                + "`" + messages[1].toUpperCase() + "`").queue();
+                        .sendMessage(jsonParsers.getLocale("ReactionsButton_Save", event.getAuthor().getId())
+                                .replaceAll("\\{0}", messages[1].equals("rus") ? "Русский" : "English")).queue();
             }
         }
     }
