@@ -8,6 +8,8 @@ import jsonparser.ParserClass;
 import messagesevents.*;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
@@ -104,7 +106,7 @@ public class BotStart {
         for (int i = 0; i < BotStart.getShardManager().getShards().size(); i++) {
             System.out.println("Guilds in Shard: " +
                     BotStart.getShardManager().getShards().get(i).getGuildCache().size() +
-                    " Shard: " + i + " " +  BotStart.getShardManager().getStatus(i));
+                    " Shard: " + i + " " + BotStart.getShardManager().getStatus(i));
         }
 
 
@@ -120,34 +122,36 @@ public class BotStart {
 //        jda.awaitReady();
 
 //        Удалить все команды
+
 //        jda.updateCommands().queue();
 
-//        List<OptionData> options = new ArrayList<>();
-//        options.add(new OptionData(OptionType.STRING, "game", "Setting the Game language")
-//                .addChoice("eng", "eng")
-//                .addChoice("rus", "rus")
-//                .setRequired(true));
-//
-//        options.add(new OptionData(OptionType.STRING, "bot", "Setting the bot language")
-//                .addChoice("eng", "eng")
-//                .addChoice("rus", "rus")
-//                .setRequired(true));
-//
-//        jda.upsertCommand("language", "Setting language").addOptions(options).queue();
-//        jda.upsertCommand("hg-start", "Start the game").queue();
-//        jda.upsertCommand("hg-stop", "Stop the game").queue();
+        for (int i = 0; i < BotStart.getShardManager().getShards().size(); i++) {
+            BotStart.getShardManager().getShards().get(i).getGuilds().forEach(guild -> guild.updateCommands().queue());
+        }
+
+        Thread.sleep(4000);
+
+        for (int i = 0; i < BotStart.getShardManager().getShards().size(); i++) {
+
+            List<OptionData> options = new ArrayList<>();
+            options.add(new OptionData(OptionType.STRING, "game", "Setting the Game language")
+                    .addChoice("eng", "eng")
+                    .addChoice("rus", "rus")
+                    .setRequired(true));
+
+            options.add(new OptionData(OptionType.STRING, "bot", "Setting the bot language")
+                    .addChoice("eng", "eng")
+                    .addChoice("rus", "rus")
+                    .setRequired(true));
+
+            BotStart.getShardManager().getShards().get(i).getGuilds().forEach(guild -> {
+                guild.upsertCommand("language", "Setting language").addOptions(options).queue();
+                guild.upsertCommand("hg-start", "Start the game").queue();
+                guild.upsertCommand("hg-stop", "Stop the game").queue();
+            });
+        }
 
 
-//        try {
-//            for (int i = 0; i < jda.getGuilds().size(); i++) {
-//                System.out.println(jda.getGuilds().get(i).getName());
-//
-//                jda.getGuilds().get(i).upsertCommand("language", "Setting language").addOptions(options).queue();
-//                jda.getGuilds().get(i).upsertCommand("hg-start", "Start the game").queue();
-//                jda.getGuilds().get(i).upsertCommand("hg-stop", "Stop the game").queue();
-//            }
-//        } catch (Exception e) {
-//        }
 
     }
 
