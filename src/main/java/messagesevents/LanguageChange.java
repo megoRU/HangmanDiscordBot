@@ -2,6 +2,7 @@ package messagesevents;
 
 import db.DataBase;
 import jsonparser.JSONParsers;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -17,11 +18,9 @@ public class LanguageChange extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
 
-        if (!event.isFromGuild()) return;
+        if (!event.isFromType(ChannelType.TEXT)) return;
 
-        if (CheckPermissions.isHasPermissionToWrite(event.getTextChannel())) {
-            return;
-        }
+        if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
 
         String message = event.getMessage().getContentRaw().toLowerCase().trim();
         String[] messages = message.split(" ", 2);

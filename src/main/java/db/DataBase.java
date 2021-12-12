@@ -16,9 +16,9 @@ public class DataBase {
 
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(
-                    Config.getHangmanConnection(),
-                    Config.getHangmanUser(),
-                    Config.getHangmanPass());
+                Config.getHangmanConnection(),
+                Config.getHangmanUser(),
+                Config.getHangmanPass());
     }
 
     public static DataBase getInstance() {
@@ -227,30 +227,40 @@ public class DataBase {
         return 0;
     }
 
-    public ResultSet getAllStatistic() throws SQLException {
-        Statement statement = DataBase.getConnection().createStatement();
-        String sql = "SELECT COUNT(*) AS count, game_date FROM games GROUP BY MONTH (game_date);";
+    public ResultSet getAllStatistic() {
+        try {
+            Statement statement = DataBase.getConnection().createStatement();
+            String sql = "SELECT COUNT(*) AS count, game_date FROM games GROUP BY MONTH (game_date);";
 
-        if (statement.executeQuery(sql) == null) {
-            getAllStatistic();
+            if (statement.executeQuery(sql) == null) {
+                getAllStatistic();
+            }
+
+            return statement.executeQuery(sql);
+
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
         }
-
-        return statement.executeQuery(sql);
+        return null;
     }
 
-    public ResultSet getMyAllStatistic(String userIdLong) throws SQLException {
+    public ResultSet getMyAllStatistic(String userIdLong) {
+        try {
+            Statement statement = DataBase.getConnection().createStatement();
+            String sql = "SELECT SUM(IF(result = 0, 1, 0)) AS TOTAL_ZEROS, " +
+                    "SUM(IF(result = 1, 1, 0)) AS TOTAL_ONES, " +
+                    "game_date " +
+                    "FROM player, games " +
+                    "WHERE player.user_id_long = '" + userIdLong + "' AND player.games_id = games.id GROUP BY MONTH (game_date);";
 
-        Statement statement = DataBase.getConnection().createStatement();
-        String sql = "SELECT SUM(IF(result = 0, 1, 0)) AS TOTAL_ZEROS, " +
-                "SUM(IF(result = 1, 1, 0)) AS TOTAL_ONES, " +
-                "game_date " +
-                "FROM player, games " +
-                "WHERE player.user_id_long = '" + userIdLong + "' AND player.games_id = games.id GROUP BY MONTH (game_date);";
+            if (statement.executeQuery(sql) == null) {
+                getMyAllStatistic(userIdLong);
+            }
+            return statement.executeQuery(sql);
 
-        if (statement.executeQuery(sql) == null) {
-            getMyAllStatistic(userIdLong);
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
         }
-
-        return statement.executeQuery(sql);
+        return null;
     }
 }

@@ -4,6 +4,7 @@ import db.DataBase;
 import jsonparser.JSONParsers;
 import messagesevents.CheckPermissions;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -21,13 +22,11 @@ public class GameHangmanListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        if (!event.isFromGuild()) return;
-
         if (event.getAuthor().isBot()) return;
 
-        if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) {
-            return;
-        }
+        if (!event.isFromType(ChannelType.TEXT)) return;
+
+        if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
 
         String message = event.getMessage().getContentRaw().trim().toLowerCase();
 

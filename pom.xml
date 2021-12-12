@@ -51,7 +51,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-alpha.1</version>
+            <version>5.0.0-alpha.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>club.minnced</groupId>
@@ -135,12 +135,6 @@
             <id>jcenter</id>
             <name>jcenter-bintray</name>
             <url>https://jcenter.bintray.com</url>
-        </repository>
-
-        <repository>
-            <id>dv8tion</id>
-            <name>m2-dv8tion</name>
-            <url>https://m2.dv8tion.net/releases</url>
         </repository>
 
     </repositories>

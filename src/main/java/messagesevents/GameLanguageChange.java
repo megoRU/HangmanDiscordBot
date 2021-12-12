@@ -5,6 +5,7 @@ import hangman.HangmanRegistry;
 import hangman.ReactionsButton;
 import jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
@@ -21,11 +22,9 @@ public class GameLanguageChange extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
 
-        if (!event.isFromGuild()) return;
+        if (!event.isFromType(ChannelType.TEXT)) return;
 
-        if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) {
-            return;
-        }
+        if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
 
         String message = event.getMessage().getContentRaw().toLowerCase().trim();
         String[] messages = message.split(" ", 2);

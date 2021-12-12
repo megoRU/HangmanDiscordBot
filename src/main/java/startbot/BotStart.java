@@ -8,6 +8,7 @@ import jsonparser.ParserClass;
 import messagesevents.*;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -125,31 +126,36 @@ public class BotStart {
 
 //        jda.updateCommands().queue();
 
-        for (int i = 0; i < BotStart.getShardManager().getShards().size(); i++) {
-            BotStart.getShardManager().getShards().get(i).getGuilds().forEach(guild -> guild.updateCommands().queue());
-        }
+//        for (int i = 0; i < BotStart.getShardManager().getShards().size(); i++) {
+//            BotStart.getShardManager().getShards().get(i).getGuilds().forEach(guild -> guild.updateCommands().queue());
+//        }
 
-        Thread.sleep(4000);
-
-        for (int i = 0; i < BotStart.getShardManager().getShards().size(); i++) {
-
-            List<OptionData> options = new ArrayList<>();
-            options.add(new OptionData(OptionType.STRING, "game", "Setting the Game language")
-                    .addChoice("eng", "eng")
-                    .addChoice("rus", "rus")
-                    .setRequired(true));
-
-            options.add(new OptionData(OptionType.STRING, "bot", "Setting the bot language")
-                    .addChoice("eng", "eng")
-                    .addChoice("rus", "rus")
-                    .setRequired(true));
-
-            BotStart.getShardManager().getShards().get(i).getGuilds().forEach(guild -> {
-                guild.upsertCommand("language", "Setting language").addOptions(options).queue();
-                guild.upsertCommand("hg-start", "Start the game").queue();
-                guild.upsertCommand("hg-stop", "Stop the game").queue();
-            });
-        }
+//        List<OptionData> options = new ArrayList<>();
+//
+//        options.add(new OptionData(OptionType.STRING, "game", "Setting the Game language")
+//                .addChoice("eng", "eng")
+//                .addChoice("rus", "rus")
+//                .setRequired(true));
+//
+//        options.add(new OptionData(OptionType.STRING, "bot", "Setting the bot language")
+//                .addChoice("eng", "eng")
+//                .addChoice("rus", "rus")
+//                .setRequired(true));
+//
+//        try {
+//        shardManager.getShards().forEach(g -> g.updateCommands().queue());
+//
+//        Thread.sleep(4000);
+//
+//        shardManager.getShards().forEach(g -> {
+//                g.upsertCommand("language", "Setting language").addOptions(options).queue();
+//                g.upsertCommand("hg-start", "Start the game").queue();
+//                g.upsertCommand("hg-stop", "Stop the game").queue();
+//        });
+//
+//        } catch (ErrorResponseException e) {
+//            System.out.println("Скорее всего гильдия не дала разрешений на SlashCommands");
+//        }
 
 
 

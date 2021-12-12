@@ -2,6 +2,7 @@ package messagesevents;
 
 import db.DataBase;
 import jsonparser.JSONParsers;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -20,10 +21,8 @@ public class DeleteAllMyData extends ListenerAdapter {
         if (event.getAuthor().isBot()) return;
 
         try {
-            if (event.isFromGuild()) {
-                if (CheckPermissions.isHasPermissionToWrite(event.getTextChannel())) {
-                    return;
-                }
+            if (event.isFromType(ChannelType.TEXT)) {
+                if (CheckPermissions.isHasPermissionToWrite(event.getTextChannel())) return;
             }
 
             buildMessage(event, event.getMessage().getContentRaw(), event.getAuthor().getId());
