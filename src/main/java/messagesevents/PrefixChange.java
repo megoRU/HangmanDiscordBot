@@ -16,7 +16,6 @@ public class PrefixChange extends ListenerAdapter {
     private static final String PREFIX_RESET = "*prefix reset";
     private final JSONParsers jsonParsers = new JSONParsers();
 
-    @SneakyThrows
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;

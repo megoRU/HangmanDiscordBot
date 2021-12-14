@@ -111,9 +111,13 @@ public class DataBase {
     }
 
     //Удаление префикса
-    public void removePrefixFromDB(String serverId) throws SQLException {
-        String sql = "DELETE FROM prefixs WHERE serverId='" + serverId + "'";
-        getConnection().prepareStatement(sql).execute();
+    public void removePrefixFromDB(String serverId) {
+        try {
+            String sql = "DELETE FROM prefixs WHERE serverId='" + serverId + "'";
+            getConnection().prepareStatement(sql).execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     //Добавляем в Бд данные о результате игры
