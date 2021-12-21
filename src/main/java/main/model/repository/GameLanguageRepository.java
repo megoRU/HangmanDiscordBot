@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 public interface GameLanguageRepository extends CrudRepository<GameLanguage, String> {
 
@@ -15,4 +17,8 @@ public interface GameLanguageRepository extends CrudRepository<GameLanguage, Str
     @Modifying
     @Query(value = "DELETE FROM GameLanguage gm WHERE gm.userIdLong = :userIdLong")
     void deleteGameLanguage(@Param("userIdLong") String userIdLong);
+
+
+    @Query(value = "SELECT gl FROM GameLanguage gl")
+    List<GameLanguage> getGameLanguages();
 }

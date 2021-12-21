@@ -2,9 +2,11 @@ package main.hangman;
 
 import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
-import main.jsonparser.JSONParsers;
 import main.eventlisteners.CheckPermissions;
+import main.jsonparser.JSONParsers;
+import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
+import main.model.repository.PlayerRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Emoji;
@@ -12,6 +14,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
+
 @AllArgsConstructor
 public class GameHangmanListener extends ListenerAdapter {
 
@@ -21,6 +24,8 @@ public class GameHangmanListener extends ListenerAdapter {
     private static final String HG_ONE_LETTER_ENG = "[A-Za-z]";
     private static final JSONParsers jsonParsers = new JSONParsers();
     private final HangmanGameRepository hangmanGameRepository;
+    private final GamesRepository gamesRepository;
+    private final PlayerRepository playerRepository;
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
@@ -89,10 +94,7 @@ public class GameHangmanListener extends ListenerAdapter {
                                 event.getAuthor().getId()).replaceAll("\\{0}", prefix))
                         .setActionRow(Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play again"))
                         .queue();
-
-                //TODO: Сделать через репозитории
-//                DataBase.getInstance().deleteActiveGame(String.valueOf(userIdLong));
-
+                hangmanGameRepository.deleteActiveGame(userIdLong);
                 return;
             }
 
@@ -105,7 +107,7 @@ public class GameHangmanListener extends ListenerAdapter {
 
             if (!HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 event.getChannel().sendTyping().queue();
-                HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getAuthor().getId(), event.getGuild().getId(), event.getChannel().getIdLong(), hangmanGameRepository));
+                HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getAuthor().getId(), event.getGuild().getId(), event.getChannel().getIdLong(), hangmanGameRepository, gamesRepository, playerRepository));
                 HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getTextChannel(), event.getAuthor().getAvatarUrl(), event.getAuthor().getName());
             }
         }

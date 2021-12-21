@@ -6,7 +6,11 @@ import main.config.BotStartConfig;
 import main.jsonparser.JSONGameParsers;
 import main.jsonparser.JSONParsers;
 import main.model.entity.ActiveHangman;
+import main.model.entity.Game;
+import main.model.entity.Player;
+import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
+import main.model.repository.PlayerRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
@@ -21,9 +25,8 @@ import org.json.JSONObject;
 import java.awt.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
+import java.sql.Timestamp;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -34,6 +37,8 @@ import java.util.TimerTask;
 public class Hangman implements HangmanHelper {
 
     private final HangmanGameRepository hangmanGameRepository;
+    private final GamesRepository gamesRepository;
+    private final PlayerRepository playerRepository;
     private static final String URL_RU = "http://45.140.167.181:8085/api/russian";
     private static final String URL_EN = "http://45.140.167.181:8085/api/english";
     private static final String HANGMAN_URL = "https://megoru.ru/hangman2/";
@@ -55,8 +60,13 @@ public class Hangman implements HangmanHelper {
     private int hangmanErrors = -1;
     private int idGame;
 
-    public Hangman(String userId, String guildId, Long channelId, HangmanGameRepository hangmanGameRepository) {
+    public Hangman(String userId, String guildId, Long channelId,
+                   HangmanGameRepository hangmanGameRepository,
+                   GamesRepository gamesRepository,
+                   PlayerRepository playerRepository) {
         this.hangmanGameRepository = hangmanGameRepository;
+        this.gamesRepository = gamesRepository;
+        this.playerRepository = playerRepository;
         this.userId = userId;
         this.guildId = guildId;
         this.channelId = channelId;
@@ -150,6 +160,7 @@ public class Hangman implements HangmanHelper {
                                         HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId),
                                                 message.getId());
 
+
                                         ActiveHangman activeHangman = new ActiveHangman();
                                         activeHangman.setUserIdLong(Long.valueOf(userId));
                                         activeHangman.setMessageIdLong(Long.valueOf(message.getId()));
@@ -159,6 +170,12 @@ public class Hangman implements HangmanHelper {
                                         activeHangman.setCurrentHiddenWord(WORD_HIDDEN);
                                         activeHangman.setGuesses(guesses.toString());
                                         activeHangman.setHangmanErrors(hangmanErrors);
+
+                                        ZonedDateTime now = ZonedDateTime.of(LocalDateTime.now(), ZoneOffset.UTC);
+                                        activeHangman.setGameCreatedTime(new Timestamp(Timestamp.valueOf(now.toLocalDateTime()).getTime()));
+
+                                        hangmanGameRepository.save(activeHangman);
+
                                     }
                             ));
         } catch (Exception e) {
@@ -238,6 +255,11 @@ public class Hangman implements HangmanHelper {
                         activeHangman.setCurrentHiddenWord(WORD_HIDDEN);
                         activeHangman.setGuesses(guesses.toString());
                         activeHangman.setHangmanErrors(hangmanErrors);
+
+                        ZonedDateTime now = ZonedDateTime.of(LocalDateTime.now(), ZoneOffset.UTC);
+                        activeHangman.setGameCreatedTime(new Timestamp(Timestamp.valueOf(now.toLocalDateTime()).getTime()));
+
+                        hangmanGameRepository.save(activeHangman);
                     }
             );
         } catch (Exception e) {
@@ -250,7 +272,7 @@ public class Hangman implements HangmanHelper {
         try {
             if ((getGuesses().toString().length() > countUsedLetters) && HangmanRegistry.getInstance().hasHangman(Long.parseLong(userId))) {
                 countUsedLetters = getGuesses().toString().length();
-                hangmanGameRepository.updateGame(userId, currentHiddenWord, guesses.toString(), hangmanErrors);
+                hangmanGameRepository.updateGame(Long.valueOf(userId), currentHiddenWord, guesses.toString(), hangmanErrors);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -421,12 +443,24 @@ public class Hangman implements HangmanHelper {
     private void resultGame(boolean resultBool) {
         try {
             idGame = HangmanRegistry.getInstance().getIdGame();
-            //TODO: Сделать через репозитории
-//
-//            DataBase.getInstance().addResultGame(idGame, resultBool);
-//            DataBase.getInstance().addResultPlayer(Long.parseLong(userId), idGame);
-//            DataBase.getInstance().deleteActiveGame(userId);
 
+            ZonedDateTime now = ZonedDateTime.of(LocalDateTime.now(), ZoneOffset.UTC);
+            Timestamp timestamp = Timestamp.valueOf(now.toLocalDateTime());
+
+            Game game = new Game();
+            game.setId(idGame);
+            game.setResult(resultBool);
+            game.setGameDate(new Timestamp(timestamp.getTime()));
+
+            Player player = new Player();
+            player.setId(idGame);
+            player.setUserIdLong(Long.valueOf(userId));
+            player.setGames_id(game);
+
+            gamesRepository.save(game);
+            playerRepository.save(player);
+
+            hangmanGameRepository.deleteActiveGame(Long.valueOf(userId));
         } catch (Exception e) {
             e.printStackTrace();
         }

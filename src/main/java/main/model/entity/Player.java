@@ -16,6 +16,9 @@ import javax.persistence.*;
 public class Player {
 
     @Id
+    @Column(nullable = false)
+    private Integer id;
+
     @Column(name="user_id_long", nullable = false)
     private Long userIdLong;
 

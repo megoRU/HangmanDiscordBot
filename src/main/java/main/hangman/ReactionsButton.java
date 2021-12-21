@@ -7,7 +7,9 @@ import main.eventlisteners.CheckPermissions;
 import main.eventlisteners.GameLanguageChange;
 import main.eventlisteners.MessageInfoHelp;
 import main.model.repository.GameLanguageRepository;
+import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
+import main.model.repository.PlayerRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -30,6 +32,8 @@ public class ReactionsButton extends ListenerAdapter {
     private final JSONParsers jsonParsers = new JSONParsers();
     private final GameLanguageRepository gameLanguageRepository;
     private final HangmanGameRepository hangmanGameRepository;
+    private final GamesRepository gamesRepository;
+    private final PlayerRepository playerRepository;
 
     @Override
     public void onButtonClick(@NotNull ButtonClickEvent event) {
@@ -107,7 +111,7 @@ public class ReactionsButton extends ListenerAdapter {
             if (Objects.equals(event.getButton().getId(), BUTTON_START_NEW_GAME) && !HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 event.deferEdit().queue();
                 event.getChannel().sendTyping().queue();
-                HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getTextChannel().getIdLong(), hangmanGameRepository));
+                HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getTextChannel().getIdLong(), hangmanGameRepository, gamesRepository, playerRepository));
                 HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getTextChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
                 return;
             }

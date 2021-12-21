@@ -1,15 +1,9 @@
 package main.config;
 
-import main.eventlisteners.MessageWhenBotJoinToGuild;
-import main.hangman.GameHangmanListener;
-import main.hangman.ReactionsButton;
-import main.hangman.SlashCommand;
-import main.jsonparser.ParserClass;
 import main.eventlisteners.*;
-import main.model.repository.GameLanguageRepository;
-import main.model.repository.HangmanGameRepository;
-import main.model.repository.LanguageRepository;
-import main.model.repository.PrefixRepository;
+import main.hangman.*;
+import main.jsonparser.ParserClass;
+import main.model.repository.*;
 import main.threads.TopGG;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -25,7 +19,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 
 @Configuration
@@ -42,19 +42,25 @@ public class BotStartConfig {
     //String - userLongId
     public static final Map<String, String> mapGameLanguages = new HashMap<>();
     private static ShardManager shardManager;
+    private static int idGame;
 
     //REPOSITORY
     private final PrefixRepository prefixRepository;
     private final LanguageRepository languageRepository;
     private final GameLanguageRepository gameLanguageRepository;
     private final HangmanGameRepository hangmanGameRepository;
+    private final PlayerRepository playerRepository;
+    private final GamesRepository gamesRepository;
 
     @Autowired
-    public BotStartConfig(PrefixRepository prefixRepository, LanguageRepository languageRepository, GameLanguageRepository gameLanguageRepository, HangmanGameRepository hangmanGameRepository) {
+    public BotStartConfig(PrefixRepository prefixRepository, LanguageRepository languageRepository, GameLanguageRepository gameLanguageRepository, HangmanGameRepository hangmanGameRepository, PlayerRepository playerRepository, GamesRepository gamesRepository) {
         this.prefixRepository = prefixRepository;
         this.languageRepository = languageRepository;
         this.gameLanguageRepository = gameLanguageRepository;
         this.hangmanGameRepository = hangmanGameRepository;
+        this.playerRepository = playerRepository;
+        this.gamesRepository = gamesRepository;
+        idGame = hangmanGameRepository.getCountGames() == null ? 0 : hangmanGameRepository.getCountGames();
     }
 
     public static ShardManager getShardManager() {
@@ -64,17 +70,17 @@ public class BotStartConfig {
     @Bean
     public void startBot() throws Exception {
         //Теперь HangmanRegistry знает количество игр и может отдавать правильное значение
-//		HangmanRegistry.getInstance().getSetIdGame();
+        HangmanRegistry.getInstance().getSetIdGame();
         //Получаем все префиксы из базы данных
-//		getPrefixFromDB();
+        getPrefixFromDB();
 //		//Получаем все языки перевода
-//		getLocalizationFromDB();
+        getLocalizationFromDB();
 //		//Получаем все языки перевода для игры
-//		getGameLocalizationFromDB();
+        getGameLocalizationFromDB();
 //		//Восстанавливаем игры активные
-//		getAndSetActiveGames();
+        getAndSetActiveGames();
 //		//Устанавливаем языки
-		setLanguages();
+        setLanguages();
 
         List<GatewayIntent> intents = new ArrayList<>(
                 Arrays.asList(
@@ -102,11 +108,11 @@ public class BotStartConfig {
         builder.addEventListeners(new MessageInfoHelp());
         builder.addEventListeners(new LanguageChange(languageRepository));
         builder.addEventListeners(new GameLanguageChange(gameLanguageRepository));
-        builder.addEventListeners(new GameHangmanListener(hangmanGameRepository));
-        builder.addEventListeners(new MessageStats());
-        builder.addEventListeners(new ReactionsButton(gameLanguageRepository, hangmanGameRepository));
+        builder.addEventListeners(new GameHangmanListener(hangmanGameRepository, gamesRepository, playerRepository));
+        builder.addEventListeners(new MessageStats(gamesRepository));
+        builder.addEventListeners(new ReactionsButton(gameLanguageRepository, hangmanGameRepository, gamesRepository, playerRepository));
         builder.addEventListeners(new DeleteAllMyData());
-        builder.addEventListeners(new SlashCommand(hangmanGameRepository));
+        builder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository));
         builder.addEventListeners(new GetGlobalStatsInGraph());
         builder.setShardsTotal(TOTAL_SHARDS);
         shardManager = builder.build();
@@ -121,8 +127,6 @@ public class BotStartConfig {
                     BotStartConfig.getShardManager().getShards().get(i).getGuildCache().size() +
                     " Shard: " + i + " " + BotStartConfig.getShardManager().getStatus(i));
         }
-
-        System.out.println(hangmanGameRepository.getCountGames());
 
 
 //        Скорее всего нужно использовать такое:
@@ -204,6 +208,89 @@ public class BotStartConfig {
         }
     }
 
+    private void getPrefixFromDB() {
+        try {
+            for (int i = 0; i < prefixRepository.getPrefix().size(); i++) {
+                mapPrefix.put(
+                        prefixRepository.getPrefix().get(i).getServerId(),
+                        prefixRepository.getPrefix().get(i).getPrefix());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void getLocalizationFromDB() {
+        try {
+            for (int i = 0; i < languageRepository.getLanguages().size(); i++) {
+                mapLanguages.put(
+                        languageRepository.getLanguages().get(i).getUserIdLong(),
+                        languageRepository.getLanguages().get(i).getLanguage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void getGameLocalizationFromDB() {
+        try {
+            for (int i = 0; i < gameLanguageRepository.getGameLanguages().size(); i++) {
+                mapGameLanguages.put(
+                        gameLanguageRepository.getGameLanguages().get(i).getUserIdLong(),
+                        gameLanguageRepository.getGameLanguages().get(i).getLanguage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void getAndSetActiveGames() {
+        try {
+            for (int i = 0; i < hangmanGameRepository.getAllActiveGames().size(); i++) {
+
+                HangmanRegistry.getInstance().setHangman(
+                        hangmanGameRepository.getAllActiveGames().get(i).getUserIdLong(),
+                        new Hangman(String.valueOf(hangmanGameRepository.getAllActiveGames().get(i).getUserIdLong()),
+                                String.valueOf(hangmanGameRepository.getAllActiveGames().get(i).getGuildLongId()),
+                                hangmanGameRepository.getAllActiveGames().get(i).getChannelIdLong(),
+                                hangmanGameRepository,
+                                gamesRepository,
+                                playerRepository));
+
+                HangmanRegistry.getInstance().getMessageId().put(
+                        hangmanGameRepository.getAllActiveGames().get(i).getUserIdLong(),
+                        String.valueOf(hangmanGameRepository.getAllActiveGames().get(i).getMessageIdLong()));
+
+
+                HangmanRegistry.getInstance().getActiveHangman().get(
+                                hangmanGameRepository.getAllActiveGames().get(i).getUserIdLong())
+                        .updateVariables(
+                                hangmanGameRepository.getAllActiveGames().get(i).getGuesses(),
+                                hangmanGameRepository.getAllActiveGames().get(i).getWord(),
+                                hangmanGameRepository.getAllActiveGames().get(i).getCurrentHiddenWord(),
+                                hangmanGameRepository.getAllActiveGames().get(i).getHangmanErrors());
+
+                HangmanRegistry.getInstance().getActiveHangman().get(hangmanGameRepository.getAllActiveGames().get(i).getUserIdLong()).autoInsert();
+
+
+                LocalDateTime game_created_time = hangmanGameRepository.getAllActiveGames().get(i).getGameCreatedTime().toInstant().atZone(ZoneOffset.UTC).toLocalDateTime();
+
+
+                HangmanRegistry.getInstance().getTimeCreatedGame().put(
+                        hangmanGameRepository.getAllActiveGames().get(i).getUserIdLong(), game_created_time);
+
+
+                Instant specificTime = Instant.ofEpochMilli(game_created_time.toInstant(ZoneOffset.UTC).toEpochMilli());
+
+                HangmanRegistry.getInstance().getEndAutoDelete().put(
+                        hangmanGameRepository.getAllActiveGames().get(i).getUserIdLong(),
+                        specificTime.plusSeconds(600L).toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static Map<String, String> getMapPrefix() {
         return mapPrefix;
     }
@@ -218,5 +305,9 @@ public class BotStartConfig {
 
     public static Map<String, String> getSecretCode() {
         return secretCode;
+    }
+
+    public static int getIdGame() {
+        return idGame;
     }
 }

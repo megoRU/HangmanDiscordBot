@@ -1,5 +1,6 @@
 package main.hangman;
 
+import main.config.BotStartConfig;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,9 +37,8 @@ public class HangmanRegistry {
     }
 
     private synchronized void setIdGame() {
-        //TODO: Сделать через репозитории
-
-//        idGame = DataBase.getInstance().getCountGames();
+        idGame = BotStartConfig.getIdGame();
+        System.out.println(idGame);
     }
 
     public synchronized int getIdGame() {

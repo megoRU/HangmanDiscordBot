@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.jsonparser.JSONParsers;
 import main.eventlisteners.CheckPermissions;
+import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
+import main.model.repository.PlayerRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -14,8 +16,11 @@ import org.jetbrains.annotations.NotNull;
 
 @AllArgsConstructor
 public class SlashCommand extends ListenerAdapter {
+
     private final JSONParsers jsonParsers = new JSONParsers();
     private final HangmanGameRepository hangmanGameRepository;
+    private final GamesRepository gamesRepository;
+    private final PlayerRepository playerRepository;
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
@@ -62,7 +67,7 @@ public class SlashCommand extends ListenerAdapter {
                             .queue();
                     //Если всё хорошо, создаем игру
                 } else {
-                    HangmanRegistry.getInstance().setHangman(event.getUser().getIdLong(), new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getChannel().getIdLong(), hangmanGameRepository));
+                    HangmanRegistry.getInstance().setHangman(event.getUser().getIdLong(), new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getChannel().getIdLong(), hangmanGameRepository, gamesRepository, playerRepository));
                     HangmanRegistry.getInstance().getActiveHangman().get(event.getUser().getIdLong()).startGame(event);
                 }
                 return;
