@@ -4,6 +4,7 @@ import main.eventlisteners.*;
 import main.hangman.*;
 import main.jsonparser.ParserClass;
 import main.model.repository.*;
+import main.threads.EngGameByTime;
 import main.threads.TopGG;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -113,11 +114,11 @@ public class BotStartConfig {
         builder.addEventListeners(new ReactionsButton(gameLanguageRepository, hangmanGameRepository, gamesRepository, playerRepository));
         builder.addEventListeners(new DeleteAllMyData());
         builder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository));
-        builder.addEventListeners(new GetGlobalStatsInGraph());
+        builder.addEventListeners(new GetGlobalStatsInGraph(gamesRepository));
         builder.setShardsTotal(TOTAL_SHARDS);
         shardManager = builder.build();
 
-//        Thread.sleep(15000);
+        Thread.sleep(1000);
         for (int i = 0; i < TOTAL_SHARDS; i++) {
             shardManager.getShards().get(i).awaitReady();
         }
@@ -127,6 +128,10 @@ public class BotStartConfig {
                     BotStartConfig.getShardManager().getShards().get(i).getGuildCache().size() +
                     " Shard: " + i + " " + BotStartConfig.getShardManager().getStatus(i));
         }
+
+//        new TopGG().runTask();
+        new EngGameByTime(hangmanGameRepository).runTask();
+        System.out.println("00:54");
 
 
 //        Скорее всего нужно использовать такое:

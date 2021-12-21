@@ -1,20 +1,21 @@
 package main.statistic;
 
-import main.config.BotStartConfig;
-import main.jsonparser.JSONParsers;
-import main.eventlisteners.SenderMessage;
-
 import io.quickchart.QuickChart;
 import lombok.Getter;
+import main.config.BotStartConfig;
+import main.eventlisteners.SenderMessage;
+import main.jsonparser.JSONParsers;
+import main.model.repository.GamesRepository;
+import main.model.repository.impl.StatisticGlobal;
+import main.model.repository.impl.StatisticMy;
 import net.dv8tion.jda.api.EmbedBuilder;
 
-import java.sql.ResultSet;
+import java.util.List;
 
 @Getter
 public class CreatorGraph implements SenderMessage {
 
     private static final JSONParsers jsonParsers = new JSONParsers();
-    private ResultSet resultSet;
     private final String guildIdLong;
     private final String textChannelIdLong;
     private final String userIdLong;
@@ -23,14 +24,17 @@ public class CreatorGraph implements SenderMessage {
     private final StringBuilder date = new StringBuilder();
     private final StringBuilder columnFirst = new StringBuilder();
     private final StringBuilder columnSecond = new StringBuilder();
+    private final GamesRepository gamesRepository;
 
-    public CreatorGraph(ResultSet resultSet, String guildIdLong, String textChannelIdLong, String userIdLong, String userName, String userUrl) {
-        this.resultSet = resultSet;
+    public CreatorGraph(GamesRepository gamesRepository, String guildIdLong,
+                        String textChannelIdLong, String userIdLong,
+                        String userName, String userUrl) {
         this.guildIdLong = guildIdLong;
         this.textChannelIdLong = textChannelIdLong;
         this.userIdLong = userIdLong;
         this.userName = userName;
         this.userAvatarUrl = userUrl;
+        this.gamesRepository = gamesRepository;
     }
 
     public void createGraph(Statistic statistic) {
@@ -40,26 +44,22 @@ public class CreatorGraph implements SenderMessage {
             chart.setWidth(800);
             chart.setHeight(400);
 
-            if (resultSet == null) {
-                //TODO: Сделать через репозитории
-
-//                resultSet = DataBase.getInstance().getAllStatistic();
-            }
-
             switch (statistic) {
                 case GLOBAL -> {
-                    while (resultSet.next()) {
-                        date.append(date.length() == 0 ? "" : ",").append("'").append(resultSet.getString("game_date"), 0, 10).append("'");
-                        columnFirst.append(columnFirst.length() == 0 ? "" : ",").append("'").append(resultSet.getString("count")).append("'");
-                    }
+                    List<StatisticGlobal> statisticList = gamesRepository.getAllStatistic();
+                    statisticList.forEach(statisticGlobal -> {
+                        date.append(date.length() == 0 ? "" : ",").append("'").append(statisticGlobal.getGameDate(), 0, 10).append("'");
+                        columnFirst.append(columnFirst.length() == 0 ? "" : ",").append("'").append(statisticGlobal.getCount()).append("'");
+                    });
                     setImage(chart, statistic).getShortUrl();
                 }
                 case MY -> {
-                    while (resultSet.next()) {
-                        date.append(date.length() == 0 ? "" : ",").append("'").append(resultSet.getString("game_date"), 0, 10).append("'");
-                        columnFirst.append(columnFirst.length() == 0 ? "" : ",").append("'").append(resultSet.getString("TOTAL_ONES")).append("'");
-                        columnSecond.append(columnSecond.length() == 0 ? "" : ",").append("'").append(resultSet.getString("TOTAL_ZEROS")).append("'");
-                    }
+                    List<StatisticMy> statisticList = gamesRepository.getAllMyStatistic(userIdLong);
+                    statisticList.forEach(statisticMy -> {
+                        date.append(date.length() == 0 ? "" : ",").append("'").append(statisticMy.getGameDate(), 0, 10).append("'");
+                        columnFirst.append(columnFirst.length() == 0 ? "" : ",").append("'").append(statisticMy.getTOTAL_ONES()).append("'");
+                        columnSecond.append(columnSecond.length() == 0 ? "" : ",").append("'").append(statisticMy.getTOTAL_ZEROS()).append("'");
+                    });
                     setImage(chart, statistic).getShortUrl();
                 }
 

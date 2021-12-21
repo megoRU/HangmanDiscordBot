@@ -1,15 +1,21 @@
 package main.eventlisteners;
 
+import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
+import main.model.repository.GamesRepository;
+import main.statistic.CreatorGraph;
+import main.statistic.Statistic;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+@AllArgsConstructor
 public class GetGlobalStatsInGraph extends ListenerAdapter {
 
     private static final String ALL_STATS = "!hg allstats";
     private static final String MY_STATS = "!hg mystats";
+    private final GamesRepository gamesRepository;
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
@@ -32,33 +38,27 @@ public class GetGlobalStatsInGraph extends ListenerAdapter {
         if (message.equals(prefix)) {
             event.getMessage().getTextChannel().sendTyping().queue();
 
-            //TODO: Сделать через репозитории
-
-//            CreatorGraph creatorGraph = new CreatorGraph(
-//                    DataBase.getInstance().getAllStatistic(),
-//                    event.getGuild().getId(),
-//                    event.getMessage().getTextChannel().getId(),
-//                    event.getAuthor().getId(),
-//                    event.getAuthor().getName(),
-//                    event.getAuthor().getAvatarUrl());
-//            creatorGraph.createGraph(Statistic.GLOBAL);
-
-
+            CreatorGraph creatorGraph = new CreatorGraph(
+                    gamesRepository,
+                    event.getGuild().getId(),
+                    event.getMessage().getTextChannel().getId(),
+                    event.getAuthor().getId(),
+                    event.getAuthor().getName(),
+                    event.getAuthor().getAvatarUrl());
+            creatorGraph.createGraph(Statistic.GLOBAL);
         }
 
         if (message.equals(prefix2)) {
             event.getMessage().getTextChannel().sendTyping().queue();
-            //TODO: Сделать через репозитории
 
-
-//            CreatorGraph creatorGraph = new CreatorGraph(
-//                    DataBase.getInstance().getMyAllStatistic(event.getAuthor().getId()),
-//                    event.getGuild().getId(),
-//                    event.getMessage().getTextChannel().getId(),
-//                    event.getAuthor().getId(),
-//                    event.getAuthor().getName(),
-//                    event.getAuthor().getAvatarUrl());
-//            creatorGraph.createGraph(Statistic.MY);
+            CreatorGraph creatorGraph = new CreatorGraph(
+                    gamesRepository,
+                    event.getGuild().getId(),
+                    event.getMessage().getTextChannel().getId(),
+                    event.getAuthor().getId(),
+                    event.getAuthor().getName(),
+                    event.getAuthor().getAvatarUrl());
+            creatorGraph.createGraph(Statistic.MY);
         }
 
     }

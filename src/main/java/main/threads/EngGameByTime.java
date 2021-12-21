@@ -1,6 +1,8 @@
 package main.threads;
 
+import lombok.AllArgsConstructor;
 import main.hangman.HangmanRegistry;
+import main.model.repository.HangmanGameRepository;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -11,7 +13,10 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+@AllArgsConstructor
 public class EngGameByTime {
+
+    private final HangmanGameRepository hangmanGameRepository;
 
     public void runTask() {
         new Timer().scheduleAtFixedRate(new TimerTask() {
@@ -28,11 +33,7 @@ public class EngGameByTime {
                                 if (HangmanRegistry.getInstance().hasHangman(entry.getKey())) {
                                     HangmanRegistry.getInstance().getActiveHangman().get(entry.getKey()).stopGameByTime();
                                     HangmanRegistry.getInstance().getTimeCreatedGame().remove(entry.getKey());
-
-                                    //TODO: Сделать через репозитории
-
-//                                    DataBase.getInstance().deleteActiveGame(String.valueOf(entry.getKey()));
-
+                                    hangmanGameRepository.deleteActiveGame(entry.getKey());
                                 }
                             }
                         }
