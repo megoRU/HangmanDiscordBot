@@ -112,7 +112,7 @@ public class BotStartConfig {
         builder.addEventListeners(new GameHangmanListener(hangmanGameRepository, gamesRepository, playerRepository));
         builder.addEventListeners(new MessageStats(gamesRepository));
         builder.addEventListeners(new ReactionsButton(gameLanguageRepository, hangmanGameRepository, gamesRepository, playerRepository));
-        builder.addEventListeners(new DeleteAllMyData());
+        builder.addEventListeners(new DeleteAllMyData(gamesRepository));
         builder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository));
         builder.addEventListeners(new GetGlobalStatsInGraph(gamesRepository));
         builder.setShardsTotal(TOTAL_SHARDS);

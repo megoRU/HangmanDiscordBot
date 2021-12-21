@@ -1,7 +1,9 @@
 package main.eventlisteners;
 
+import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.jsonparser.JSONParsers;
+import main.model.repository.GamesRepository;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -9,11 +11,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
+@AllArgsConstructor
 public class DeleteAllMyData extends ListenerAdapter {
 
     private static final String DELETE = "!delete";
     private static final String DELETE_WITH_CODE = "!delete\\s.+";
     private final JSONParsers jsonParsers = new JSONParsers();
+    private final GamesRepository gamesRepository;
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
@@ -60,9 +64,7 @@ public class DeleteAllMyData extends ListenerAdapter {
             BotStartConfig.getMapGameLanguages().remove(authorId);
             BotStartConfig.getMapLanguages().remove(authorId);
 
-            //TODO: Сделать через репозитории
-
-//            DataBase.getInstance().deleteAllMyData(authorId);
+            gamesRepository.deleteAllMyData(event.getAuthor().getIdLong());
         }
     }
 }
