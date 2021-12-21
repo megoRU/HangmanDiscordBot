@@ -1,5 +1,6 @@
 package main.eventlisteners;
 
+import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.jsonparser.JSONParsers;
 import main.model.entity.Language;
@@ -9,12 +10,13 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+@AllArgsConstructor
 public class LanguageChange extends ListenerAdapter {
 
     private static final String LANG_RUS = "!lang rus";
     private static final String LANG_ENG = "!lang eng";
     private final JSONParsers jsonParsers = new JSONParsers();
-    private LanguageRepository languageRepository;
+    private final LanguageRepository languageRepository;
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
@@ -37,7 +39,7 @@ public class LanguageChange extends ListenerAdapter {
         if (message.equals(prefix_LANG_RUS) || message.equals(prefix_LANG_ENG)) {
             BotStartConfig.getMapLanguages().put(event.getAuthor().getId(), messages[1]);
 
-            languageRepository.deleteLanguage(event.getAuthor().getIdLong());
+            languageRepository.deleteLanguage(event.getAuthor().getId());
             Language languageRepo = new Language();
             languageRepo.setUserIdLong(event.getAuthor().getId());
             languageRepo.setLanguage(messages[1]);

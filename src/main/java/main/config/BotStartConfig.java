@@ -7,6 +7,7 @@ import main.hangman.SlashCommand;
 import main.jsonparser.ParserClass;
 import main.eventlisteners.*;
 import main.model.repository.GameLanguageRepository;
+import main.model.repository.HangmanGameRepository;
 import main.model.repository.LanguageRepository;
 import main.model.repository.PrefixRepository;
 import main.threads.TopGG;
@@ -46,12 +47,14 @@ public class BotStartConfig {
     private final PrefixRepository prefixRepository;
     private final LanguageRepository languageRepository;
     private final GameLanguageRepository gameLanguageRepository;
+    private final HangmanGameRepository hangmanGameRepository;
 
     @Autowired
-    public BotStartConfig(PrefixRepository prefixRepository, LanguageRepository languageRepository, GameLanguageRepository gameLanguageRepository) {
+    public BotStartConfig(PrefixRepository prefixRepository, LanguageRepository languageRepository, GameLanguageRepository gameLanguageRepository, HangmanGameRepository hangmanGameRepository) {
         this.prefixRepository = prefixRepository;
         this.languageRepository = languageRepository;
         this.gameLanguageRepository = gameLanguageRepository;
+        this.hangmanGameRepository = hangmanGameRepository;
     }
 
     public static ShardManager getShardManager() {
@@ -94,16 +97,16 @@ public class BotStartConfig {
         builder.setStatus(OnlineStatus.ONLINE);
         builder.setActivity(Activity.playing(activity + TopGG.serverCount + " guilds"));
         builder.setBulkDeleteSplittingEnabled(false);
-        builder.addEventListeners(new MessageWhenBotJoinToGuild());
+        builder.addEventListeners(new MessageWhenBotJoinToGuild(prefixRepository));
         builder.addEventListeners(new PrefixChange(prefixRepository));
         builder.addEventListeners(new MessageInfoHelp());
-        builder.addEventListeners(new LanguageChange());
-        builder.addEventListeners(new GameLanguageChange());
-        builder.addEventListeners(new GameHangmanListener());
+        builder.addEventListeners(new LanguageChange(languageRepository));
+        builder.addEventListeners(new GameLanguageChange(gameLanguageRepository));
+        builder.addEventListeners(new GameHangmanListener(hangmanGameRepository));
         builder.addEventListeners(new MessageStats());
-        builder.addEventListeners(new ReactionsButton());
+        builder.addEventListeners(new ReactionsButton(gameLanguageRepository, hangmanGameRepository));
         builder.addEventListeners(new DeleteAllMyData());
-        builder.addEventListeners(new SlashCommand());
+        builder.addEventListeners(new SlashCommand(hangmanGameRepository));
         builder.addEventListeners(new GetGlobalStatsInGraph());
         builder.setShardsTotal(TOTAL_SHARDS);
         shardManager = builder.build();
@@ -118,6 +121,8 @@ public class BotStartConfig {
                     BotStartConfig.getShardManager().getShards().get(i).getGuildCache().size() +
                     " Shard: " + i + " " + BotStartConfig.getShardManager().getStatus(i));
         }
+
+        System.out.println(hangmanGameRepository.getCountGames());
 
 
 //        Скорее всего нужно использовать такое:

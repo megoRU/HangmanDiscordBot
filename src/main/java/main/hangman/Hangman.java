@@ -1,10 +1,12 @@
 package main.hangman;
 
+import lombok.Getter;
+import lombok.Setter;
 import main.config.BotStartConfig;
 import main.jsonparser.JSONGameParsers;
 import main.jsonparser.JSONParsers;
-import lombok.Getter;
-import lombok.Setter;
+import main.model.entity.ActiveHangman;
+import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
@@ -31,6 +33,7 @@ import java.util.TimerTask;
 @Getter
 public class Hangman implements HangmanHelper {
 
+    private final HangmanGameRepository hangmanGameRepository;
     private static final String URL_RU = "http://45.140.167.181:8085/api/russian";
     private static final String URL_EN = "http://45.140.167.181:8085/api/english";
     private static final String HANGMAN_URL = "https://megoru.ru/hangman2/";
@@ -52,7 +55,8 @@ public class Hangman implements HangmanHelper {
     private int hangmanErrors = -1;
     private int idGame;
 
-    public Hangman(String userId, String guildId, Long channelId) {
+    public Hangman(String userId, String guildId, Long channelId, HangmanGameRepository hangmanGameRepository) {
+        this.hangmanGameRepository = hangmanGameRepository;
         this.userId = userId;
         this.guildId = guildId;
         this.channelId = channelId;
@@ -146,18 +150,15 @@ public class Hangman implements HangmanHelper {
                                         HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId),
                                                 message.getId());
 
-                                        //TODO: Сделать через репозитории
-
-//                                DataBase.getInstance().createGame(userId,
-//                                                message.getId(),
-//                                                String.valueOf(channelId),
-//                                                guildId,
-//                                                WORD,
-//                                                WORD_HIDDEN,
-//                                                guesses.toString(),
-//                                                String.valueOf(hangmanErrors)
-//                                        );
-
+                                        ActiveHangman activeHangman = new ActiveHangman();
+                                        activeHangman.setUserIdLong(Long.valueOf(userId));
+                                        activeHangman.setMessageIdLong(Long.valueOf(message.getId()));
+                                        activeHangman.setChannelIdLong(channelId);
+                                        activeHangman.setGuildLongId(Long.valueOf(guildId));
+                                        activeHangman.setWord(WORD);
+                                        activeHangman.setCurrentHiddenWord(WORD_HIDDEN);
+                                        activeHangman.setGuesses(guesses.toString());
+                                        activeHangman.setHangmanErrors(hangmanErrors);
                                     }
                             ));
         } catch (Exception e) {
@@ -228,21 +229,15 @@ public class Hangman implements HangmanHelper {
 
             textChannel.sendMessageEmbeds(start.build()).queue(m -> {
                         HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId), m.getId());
-
-                        //TODO: Сделать через репозитории
-
-//                DataBase.getInstance().createGame(userId,
-//                                m.getId(),
-//                                String.valueOf(channelId),
-//                                guildId,
-//                                WORD,
-//                                WORD_HIDDEN,
-//                                guesses.toString(),
-//                                String.valueOf(hangmanErrors)
-//                        );
-//
-//
-
+                        ActiveHangman activeHangman = new ActiveHangman();
+                        activeHangman.setUserIdLong(Long.valueOf(userId));
+                        activeHangman.setMessageIdLong(Long.valueOf(m.getId()));
+                        activeHangman.setChannelIdLong(channelId);
+                        activeHangman.setGuildLongId(Long.valueOf(guildId));
+                        activeHangman.setWord(WORD);
+                        activeHangman.setCurrentHiddenWord(WORD_HIDDEN);
+                        activeHangman.setGuesses(guesses.toString());
+                        activeHangman.setHangmanErrors(hangmanErrors);
                     }
             );
         } catch (Exception e) {
@@ -255,10 +250,7 @@ public class Hangman implements HangmanHelper {
         try {
             if ((getGuesses().toString().length() > countUsedLetters) && HangmanRegistry.getInstance().hasHangman(Long.parseLong(userId))) {
                 countUsedLetters = getGuesses().toString().length();
-
-                //TODO: Сделать через репозитории
-//                DataBase.getInstance().updateGame(userId, currentHiddenWord, guesses.toString(), String.valueOf(hangmanErrors));
-
+                hangmanGameRepository.updateGame(userId, currentHiddenWord, guesses.toString(), hangmanErrors);
             }
         } catch (Exception e) {
             e.printStackTrace();

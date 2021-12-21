@@ -18,7 +18,7 @@ public class PrefixChange extends ListenerAdapter {
     private static final String PREFIX = "\\*prefix\\s.";
     private static final String PREFIX_RESET = "*prefix reset";
     private final JSONParsers jsonParsers = new JSONParsers();
-    private PrefixRepository prefixRepository;
+    private final PrefixRepository prefixRepository;
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {

@@ -1,8 +1,9 @@
 package main.eventlisteners;
 
+import lombok.AllArgsConstructor;
 import main.hangman.ReactionsButton;
 import main.jsonparser.JSONParsers;
-import main.eventlisteners.CheckPermissions;
+import main.model.repository.PrefixRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -17,9 +18,11 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@AllArgsConstructor
 public class MessageWhenBotJoinToGuild extends ListenerAdapter {
 
     private static final JSONParsers jsonParsers = new JSONParsers();
+    private final PrefixRepository prefixRepository;
 
     //bot join msg
     @Override
@@ -80,9 +83,7 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
     public void onGuildLeave(@NotNull GuildLeaveEvent event) {
         try {
             System.out.println("Удаляем данные после удаления бота из Guild");
-            //TODO: Сделать через репозитории
-//            DataBase.getInstance().removePrefixFromDB(event.getGuild().getId());
-
+            prefixRepository.deletePrefix(event.getGuild().getIdLong());
         } catch (Exception e) {
             e.printStackTrace();
         }

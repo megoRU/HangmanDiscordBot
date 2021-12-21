@@ -1,5 +1,6 @@
 package main.eventlisteners;
 
+import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.hangman.HangmanRegistry;
 import main.hangman.ReactionsButton;
@@ -14,12 +15,13 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
 
+@AllArgsConstructor
 public class GameLanguageChange extends ListenerAdapter {
 
     private static final String LANG_RUS = "!game rus";
     private static final String LANG_ENG = "!game eng";
     private final JSONParsers jsonParsers = new JSONParsers();
-    private GameLanguageRepository gameLanguageRepository;
+    private final GameLanguageRepository gameLanguageRepository;
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
@@ -65,7 +67,6 @@ public class GameLanguageChange extends ListenerAdapter {
 
     public void changeGameLanguage(String message, String userIdLong) {
         BotStartConfig.getMapGameLanguages().put(userIdLong, message);
-        gameLanguageRepository.deleteGameLanguage(Long.valueOf(userIdLong));
         GameLanguage gameLanguage = new GameLanguage();
         gameLanguage.setUserIdLong(userIdLong);
         gameLanguage.setLanguage(message);

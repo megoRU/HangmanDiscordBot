@@ -1,10 +1,13 @@
 package main.hangman;
 
+import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.jsonparser.JSONParsers;
 import main.eventlisteners.CheckPermissions;
 import main.eventlisteners.GameLanguageChange;
 import main.eventlisteners.MessageInfoHelp;
+import main.model.repository.GameLanguageRepository;
+import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -13,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+@AllArgsConstructor
 public class ReactionsButton extends ListenerAdapter {
 
     public static final String BUTTON_START_NEW_GAME = "BUTTON_START_NEW_GAME";
@@ -24,6 +28,8 @@ public class ReactionsButton extends ListenerAdapter {
     public static final String BUTTON_STOP = "BUTTON_STOP";
     public static final String BUTTON_CHANGE_LANGUAGE = "BUTTON_CHANGE_LANGUAGE";
     private final JSONParsers jsonParsers = new JSONParsers();
+    private final GameLanguageRepository gameLanguageRepository;
+    private final HangmanGameRepository hangmanGameRepository;
 
     @Override
     public void onButtonClick(@NotNull ButtonClickEvent event) {
@@ -49,18 +55,18 @@ public class ReactionsButton extends ListenerAdapter {
 
             if (Objects.equals(event.getButton().getId(), BUTTON_RUS)) {
                 event.deferEdit().queue();
-                new GameLanguageChange().changeGameLanguage("rus", event.getUser().getId());
+                new GameLanguageChange(gameLanguageRepository).changeGameLanguage("rus", event.getUser().getId());
                 event.getHook().sendMessage(jsonParsers
-                                .getLocale("language_change_lang", event.getMember().getId()) + "Кириллица")
+                                .getLocale("language_change_lang", event.getMember().getId()).replaceAll("\\{0}", "Кириллица"))
                         .setEphemeral(true).queue();
                 return;
             }
 
             if (Objects.equals(event.getButton().getId(), BUTTON_ENG)) {
                 event.deferEdit().queue();
-                new GameLanguageChange().changeGameLanguage("eng", event.getUser().getId());
+                new GameLanguageChange(gameLanguageRepository).changeGameLanguage("eng", event.getUser().getId());
                 event.getHook().sendMessage(jsonParsers
-                                .getLocale("language_change_lang", event.getMember().getId()) + "Latin")
+                                .getLocale("language_change_lang", event.getMember().getId()).replaceAll("\\{0}", "Latin"))
                         .setEphemeral(true).queue();
                 return;
             }
@@ -101,7 +107,7 @@ public class ReactionsButton extends ListenerAdapter {
             if (Objects.equals(event.getButton().getId(), BUTTON_START_NEW_GAME) && !HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 event.deferEdit().queue();
                 event.getChannel().sendTyping().queue();
-                HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getTextChannel().getIdLong()));
+                HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getTextChannel().getIdLong(), hangmanGameRepository));
                 HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getTextChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
                 return;
             }
