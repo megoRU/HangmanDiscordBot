@@ -1,6 +1,6 @@
 package main.hangman;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import main.config.BotStartConfig;
 import main.eventlisteners.CheckPermissions;
 import main.jsonparser.JSONParsers;
@@ -13,8 +13,10 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Service;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Service
 public class SlashCommand extends ListenerAdapter {
 
     private final JSONParsers jsonParsers = new JSONParsers();

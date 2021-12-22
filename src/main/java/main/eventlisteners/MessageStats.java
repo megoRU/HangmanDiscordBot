@@ -10,10 +10,12 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
 
 @AllArgsConstructor
+@Service
 public class MessageStats extends ListenerAdapter {
 
     private static final String STATS = "!hg stats";

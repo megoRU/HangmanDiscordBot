@@ -9,8 +9,10 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
+@Service
 public class LanguageChange extends ListenerAdapter {
 
     private static final String LANG_RUS = "!lang rus";
@@ -56,7 +58,7 @@ public class LanguageChange extends ListenerAdapter {
 
             event.getChannel()
                     .sendMessage(jsonParsers.getLocale("language_change_lang", event.getAuthor().getId())
-                                    .replaceAll("\\{0}", language)).queue();
+                            .replaceAll("\\{0}", language)).queue();
         }
     }
 }

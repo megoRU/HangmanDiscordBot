@@ -1,18 +1,20 @@
 package main.eventlisteners;
 
 
+import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.jsonparser.JSONParsers;
 import main.model.entity.Prefix;
 import main.model.repository.PrefixRepository;
-import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
+@Service
 public class PrefixChange extends ListenerAdapter {
 
     private static final String PREFIX = "\\*prefix\\s.";

@@ -13,12 +13,14 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Service;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
+@Service
 public class MessageWhenBotJoinToGuild extends ListenerAdapter {
 
     private static final JSONParsers jsonParsers = new JSONParsers();

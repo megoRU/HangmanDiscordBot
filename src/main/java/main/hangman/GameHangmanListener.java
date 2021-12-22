@@ -14,8 +14,10 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
+@Service
 public class GameHangmanListener extends ListenerAdapter {
 
     private static final String HG = "!hg";

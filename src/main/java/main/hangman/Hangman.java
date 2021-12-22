@@ -36,14 +36,14 @@ import java.util.TimerTask;
 @Getter
 public class Hangman implements HangmanHelper {
 
-    private final HangmanGameRepository hangmanGameRepository;
-    private final GamesRepository gamesRepository;
-    private final PlayerRepository playerRepository;
     private static final String URL_RU = "http://45.140.167.181:8085/api/russian";
     private static final String URL_EN = "http://45.140.167.181:8085/api/english";
     private static final String HANGMAN_URL = "https://megoru.ru/hangman2/";
     private static final JSONGameParsers jsonGameParsers = new JSONGameParsers();
     private static final JSONParsers jsonParsers = new JSONParsers();
+    private final HangmanGameRepository hangmanGameRepository;
+    private final GamesRepository gamesRepository;
+    private final PlayerRepository playerRepository;
     private final StringBuilder guesses = new StringBuilder();
     private final List<Integer> index = new ArrayList<>();
     private final String userId;

@@ -33,7 +33,6 @@ import java.util.*;
 public class BotStartConfig {
 
     public static final String activity = "!help | ";
-    private static final Integer TOTAL_SHARDS = 1;
     //String - userLongId
     public static final Map<String, String> secretCode = new HashMap<>();
     //String - guildLongId
@@ -42,6 +41,7 @@ public class BotStartConfig {
     public static final Map<String, String> mapLanguages = new HashMap<>();
     //String - userLongId
     public static final Map<String, String> mapGameLanguages = new HashMap<>();
+    private static final Integer TOTAL_SHARDS = 1;
     private static ShardManager shardManager;
     private static int idGame;
 
@@ -66,6 +66,26 @@ public class BotStartConfig {
 
     public static ShardManager getShardManager() {
         return shardManager;
+    }
+
+    public static Map<String, String> getMapPrefix() {
+        return mapPrefix;
+    }
+
+    public static Map<String, String> getMapLanguages() {
+        return mapLanguages;
+    }
+
+    public static Map<String, String> getMapGameLanguages() {
+        return mapGameLanguages;
+    }
+
+    public static Map<String, String> getSecretCode() {
+        return secretCode;
+    }
+
+    public static int getIdGame() {
+        return idGame;
     }
 
     @Bean
@@ -294,25 +314,5 @@ public class BotStartConfig {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public static Map<String, String> getMapPrefix() {
-        return mapPrefix;
-    }
-
-    public static Map<String, String> getMapLanguages() {
-        return mapLanguages;
-    }
-
-    public static Map<String, String> getMapGameLanguages() {
-        return mapGameLanguages;
-    }
-
-    public static Map<String, String> getSecretCode() {
-        return secretCode;
-    }
-
-    public static int getIdGame() {
-        return idGame;
     }
 }

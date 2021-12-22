@@ -9,8 +9,10 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
+@Service
 public class GetGlobalStatsInGraph extends ListenerAdapter {
 
     private static final String ALL_STATS = "!hg allstats";

@@ -1,9 +1,9 @@
 package main.eventlisteners;
 
+import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.hangman.ReactionsButton;
 import main.jsonparser.JSONParsers;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Emoji;
@@ -12,10 +12,13 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@AllArgsConstructor
+@Service
 public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
 
     private static final String HELP = "!help";

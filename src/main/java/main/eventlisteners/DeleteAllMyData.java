@@ -8,10 +8,12 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @AllArgsConstructor
+@Service
 public class DeleteAllMyData extends ListenerAdapter {
 
     private static final String DELETE = "!delete";

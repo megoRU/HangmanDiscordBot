@@ -1,6 +1,6 @@
 package main.hangman;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import main.config.BotStartConfig;
 import main.eventlisteners.CheckPermissions;
 import main.eventlisteners.GameLanguageChange;
@@ -15,10 +15,12 @@ import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Service
 public class ReactionsButton extends ListenerAdapter {
 
     public static final String BUTTON_START_NEW_GAME = "BUTTON_START_NEW_GAME";
