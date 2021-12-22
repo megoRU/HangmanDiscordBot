@@ -2,11 +2,11 @@ package main.hangman;
 
 import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
-import main.jsonparser.JSONParsers;
 import main.eventlisteners.CheckPermissions;
-import main.model.repository.GamesRepository;
-import main.model.repository.HangmanGameRepository;
-import main.model.repository.PlayerRepository;
+import main.jsonparser.JSONParsers;
+import main.model.entity.GameLanguage;
+import main.model.entity.Language;
+import main.model.repository.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -21,6 +21,8 @@ public class SlashCommand extends ListenerAdapter {
     private final HangmanGameRepository hangmanGameRepository;
     private final GamesRepository gamesRepository;
     private final PlayerRepository playerRepository;
+    private final GameLanguageRepository gameLanguageRepository;
+    private final LanguageRepository languageRepository;
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
@@ -82,10 +84,7 @@ public class SlashCommand extends ListenerAdapter {
                                     event.getUser().getId()).replaceAll("\\{0}", BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null ? "!hg" : BotStartConfig.getMapPrefix().get(event.getGuild().getId())))
                             .addActionRow(Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play again"))
                             .queue();
-                    //TODO: Сделать через репозитории
-
-//                    DataBase.getInstance().deleteActiveGame(event.getUser().getId());
-
+                    hangmanGameRepository.deleteActiveGame(event.getUser().getIdLong());
                     //Если игрок не играет, а хочет завершить игру, то нужно ему это прислать уведомление, что он сейчас не играет
                 } else {
                     event.reply(jsonParsers.getLocale("Hangman_You_Are_Not_Play", event.getUser().getId()))
@@ -119,13 +118,15 @@ public class SlashCommand extends ListenerAdapter {
 
                         .addActionRow(Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play again"))
                         .queue();
+                GameLanguage gameLanguage = new GameLanguage();
+                gameLanguage.setUserIdLong(event.getUser().getId());
+                gameLanguage.setLanguage(event.getOptions().get(0).getAsString());
+                gameLanguageRepository.save(gameLanguage);
 
-                //TODO: Сделать через репозитории
-
-
-//                DataBase.getInstance().addGameLanguageToDB(event.getUser().getId(), event.getOptions().get(0).getAsString());
-//                DataBase.getInstance().addLanguageToDB(event.getUser().getId(), event.getOptions().get(1).getAsString());
-
+                Language language = new Language();
+                language.setUserIdLong(event.getUser().getId());
+                language.setLanguage(event.getOptions().get(1).getAsString());
+                languageRepository.save(language);
             }
         } catch (Exception e) {
             System.out.println("Unknown interaction");

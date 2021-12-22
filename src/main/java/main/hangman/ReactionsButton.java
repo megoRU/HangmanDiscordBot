@@ -2,14 +2,14 @@ package main.hangman;
 
 import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
-import main.jsonparser.JSONParsers;
 import main.eventlisteners.CheckPermissions;
 import main.eventlisteners.GameLanguageChange;
 import main.eventlisteners.MessageInfoHelp;
-import main.model.repository.GameLanguageRepository;
-import main.model.repository.GamesRepository;
-import main.model.repository.HangmanGameRepository;
-import main.model.repository.PlayerRepository;
+import main.eventlisteners.MessageStats;
+import main.jsonparser.JSONParsers;
+import main.model.entity.GameLanguage;
+import main.model.entity.Language;
+import main.model.repository.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -31,6 +31,7 @@ public class ReactionsButton extends ListenerAdapter {
     public static final String BUTTON_CHANGE_LANGUAGE = "BUTTON_CHANGE_LANGUAGE";
     private final JSONParsers jsonParsers = new JSONParsers();
     private final GameLanguageRepository gameLanguageRepository;
+    private final LanguageRepository languageRepository;
     private final HangmanGameRepository hangmanGameRepository;
     private final GamesRepository gamesRepository;
     private final PlayerRepository playerRepository;
@@ -85,8 +86,10 @@ public class ReactionsButton extends ListenerAdapter {
                                 .getLocale("language_change_lang", event.getMember().getId())
                                 .replaceAll("\\{0}", buttonName.equals("rus") ? "Русский" : "English"))
                         .setEphemeral(true).queue();
-                //TODO: Сделать через репозитории
-//                DataBase.getInstance().addLanguageToDB(event.getMember().getId(), buttonName);
+                Language language = new Language();
+                language.setUserIdLong(event.getUser().getId());
+                language.setLanguage(buttonName);
+                languageRepository.save(language);
                 return;
             }
 
@@ -146,10 +149,7 @@ public class ReactionsButton extends ListenerAdapter {
                                     BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null ? "!hg" : BotStartConfig.getMapPrefix().get(event.getGuild().getId())))
                             .addActionRow(Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play again"))
                             .queue();
-                    //TODO: Сделать через репозитории
-
-//                    DataBase.getInstance().deleteActiveGame(event.getUser().getId());
-
+                    hangmanGameRepository.deleteActiveGame(event.getUser().getIdLong());
                     //Если нажата кнопка STOP, и игрок сейчас не играет, присылаем в час уведомление
                 } else {
                     event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_You_Are_Not_Play", event.getUser().getId()))
@@ -169,21 +169,20 @@ public class ReactionsButton extends ListenerAdapter {
                                 .replaceAll("\\{0}", event.getButton().getLabel()))
                         .setEphemeral(true).queue();
 
-                //TODO: Сделать через репозитории
-//                BotStartConfig.getInstance().addGameLanguageToDB(event.getMember().getId(), buttonName);
-
+                GameLanguage gameLanguage = new GameLanguage();
+                gameLanguage.setUserIdLong(event.getUser().getId());
+                gameLanguage.setLanguage(buttonName);
+                gameLanguageRepository.save(gameLanguage);
                 return;
             }
             //Получаем статистику по нажатии на кнопку
             if (Objects.equals(event.getButton().getId(), BUTTON_MY_STATS)) {
                 event.deferEdit().queue();
-                //TODO: восстановить
-
-//                new MessageStats().sendStats(
-//                        event.getTextChannel(),
-//                        event.getMember().getUser().getAvatarUrl(),
-//                        event.getUser().getId(),
-//                        event.getMember().getUser().getName());
+                new MessageStats(gamesRepository).sendStats(
+                        event.getTextChannel(),
+                        event.getMember().getUser().getAvatarUrl(),
+                        event.getUser().getId(),
+                        event.getMember().getUser().getName());
             }
         } catch (Exception e) {
             e.printStackTrace();
