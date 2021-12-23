@@ -22,11 +22,12 @@ public class TopGG {
                             .token(Config.getTopGgApiToken())
                             .botId(Config.getBotId())
                             .build();
+                    serverCount = BotStartConfig.jda.getGuilds().size();
 
-                    serverCount = BotStartConfig.getShardManager().getGuilds().size();
+                    TOP_GG_API.setStats(serverCount);
 
-                    TOP_GG_API.setStats(BotStartConfig.getShardManager().getShards().stream().map(guild -> guild.getGuilds().size()).collect(Collectors.toList()));
-                    BotStartConfig.getShardManager().setActivity(Activity.playing(BotStartConfig.activity
+//                    TOP_GG_API.setStats(BotStartConfig.getShardManager().getShards().stream().map(guild -> guild.getGuilds().size()).collect(Collectors.toList()));
+                    BotStartConfig.jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity
                             + TopGG.serverCount + " guilds"));
 
                 } catch (Exception e) {

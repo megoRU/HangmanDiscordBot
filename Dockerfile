@@ -14,4 +14,4 @@ ADD . $HOME
 
 RUN ["mvn", "install"]
 
-ENTRYPOINT ["java", "-jar", "./target/HangmanDiscordBot-1.0-SNAPSHOT-jar-with-dependencies.jar"]
+ENTRYPOINT ["java", "-jar", "./target/hangman.discord.bot-0.0.1-SNAPSHOT.jar"]

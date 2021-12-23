@@ -8,7 +8,7 @@ public class CheckPermissions {
 
     public static boolean isHasPermissionToWrite(final TextChannel textChannel) {
         try {
-            if (BotStartConfig.getShardManager()
+            if (BotStartConfig.jda
                     .getGuildById(textChannel.getGuild().getId())
                     .getSelfMember()
                     .hasPermission(textChannel, Permission.MESSAGE_SEND)) {
@@ -24,7 +24,7 @@ public class CheckPermissions {
 
     public static boolean isHasPermissionsWriteAndEmbedLinks(final TextChannel textChannel) {
         try {
-            if (BotStartConfig.getShardManager()
+            if (BotStartConfig.jda
                     .getGuildById(textChannel.getGuild().getId())
                     .getSelfMember()
                     .hasPermission(textChannel, Permission.MESSAGE_SEND, Permission.MESSAGE_EMBED_LINKS)) {

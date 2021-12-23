@@ -6,8 +6,12 @@ import main.jsonparser.ParserClass;
 import main.model.repository.*;
 import main.threads.EngGameByTime;
 import main.threads.TopGG;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
@@ -41,9 +45,11 @@ public class BotStartConfig {
     public static final Map<String, String> mapLanguages = new HashMap<>();
     //String - userLongId
     public static final Map<String, String> mapGameLanguages = new HashMap<>();
-    private static final Integer TOTAL_SHARDS = 1;
+    private static final Integer TOTAL_SHARDS = 4;
     private static ShardManager shardManager;
     private static int idGame;
+    public static JDA jda;
+    private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
 
     //REPOSITORY
     private final PrefixRepository prefixRepository;
@@ -111,47 +117,62 @@ public class BotStartConfig {
                         GatewayIntent.DIRECT_MESSAGES,
                         GatewayIntent.DIRECT_MESSAGE_TYPING));
 
-        DefaultShardManagerBuilder builder = DefaultShardManagerBuilder.create(Config.getTOKEN(), intents);
+//        DefaultShardManagerBuilder builder = DefaultShardManagerBuilder.create(Config.getTOKEN(), intents);
 
-        builder.disableCache(
+        jdaBuilder.disableCache(
                 CacheFlag.CLIENT_STATUS,
                 CacheFlag.ACTIVITY,
                 CacheFlag.MEMBER_OVERRIDES,
                 CacheFlag.VOICE_STATE,
                 CacheFlag.ONLINE_STATUS);
 
-        builder.setAutoReconnect(true);
-        builder.setStatus(OnlineStatus.ONLINE);
-        builder.setActivity(Activity.playing(activity + TopGG.serverCount + " guilds"));
-        builder.setBulkDeleteSplittingEnabled(false);
-        builder.addEventListeners(new MessageWhenBotJoinToGuild(prefixRepository));
-        builder.addEventListeners(new PrefixChange(prefixRepository));
-        builder.addEventListeners(new MessageInfoHelp());
-        builder.addEventListeners(new LanguageChange(languageRepository));
-        builder.addEventListeners(new GameLanguageChange(gameLanguageRepository));
-        builder.addEventListeners(new GameHangmanListener(hangmanGameRepository, gamesRepository, playerRepository));
-        builder.addEventListeners(new MessageStats(gamesRepository));
-        builder.addEventListeners(new ReactionsButton(gameLanguageRepository, languageRepository, hangmanGameRepository, gamesRepository, playerRepository));
-        builder.addEventListeners(new DeleteAllMyData(gamesRepository));
-        builder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository, gameLanguageRepository, languageRepository));
-        builder.addEventListeners(new GetGlobalStatsInGraph(gamesRepository));
-        builder.setShardsTotal(TOTAL_SHARDS);
-        shardManager = builder.build();
+       jdaBuilder.setAutoReconnect(true);
+       jdaBuilder.setStatus(OnlineStatus.ONLINE);
+       jdaBuilder.enableIntents(intents);
+       jdaBuilder.setActivity(Activity.playing(activity + TopGG.serverCount + " guilds"));
+       jdaBuilder.setBulkDeleteSplittingEnabled(false);
+       jdaBuilder.addEventListeners(new MessageWhenBotJoinToGuild(prefixRepository));
+       jdaBuilder.addEventListeners(new PrefixChange(prefixRepository));
+       jdaBuilder.addEventListeners(new MessageInfoHelp());
+       jdaBuilder.addEventListeners(new LanguageChange(languageRepository));
+       jdaBuilder.addEventListeners(new GameLanguageChange(gameLanguageRepository));
+       jdaBuilder.addEventListeners(new GameHangmanListener(hangmanGameRepository, gamesRepository, playerRepository));
+       jdaBuilder.addEventListeners(new MessageStats(gamesRepository));
+       jdaBuilder.addEventListeners(new ReactionsButton(gameLanguageRepository, languageRepository, hangmanGameRepository, gamesRepository, playerRepository));
+       jdaBuilder.addEventListeners(new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository));
+       jdaBuilder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository, gameLanguageRepository, languageRepository));
+       jdaBuilder.addEventListeners(new GetGlobalStatsInGraph(gamesRepository));
+//        builder.setShardsTotal(TOTAL_SHARDS);
+//        shardManager = builder.build();
 
-        Thread.sleep(1000);
-        for (int i = 0; i < TOTAL_SHARDS; i++) {
-            shardManager.getShards().get(i).awaitReady();
-        }
+        jda = jdaBuilder.build();
+        jda.awaitReady();
 
-        for (int i = 0; i < BotStartConfig.getShardManager().getShards().size(); i++) {
-            System.out.println("Guilds in Shard: " +
-                    BotStartConfig.getShardManager().getShards().get(i).getGuildCache().size() +
-                    " Shard: " + i + " " + BotStartConfig.getShardManager().getStatus(i));
-        }
+//        Thread.sleep(1000);
+//        for (int i = 0; i < TOTAL_SHARDS; i++) {
+//            shardManager.getShards().get(i).awaitReady();
+//        }
+//
+//        for (int i = 0; i < BotStartConfig.getShardManager().getShards().size(); i++) {
+//            System.out.println("Guilds in Shard: " +
+//                    BotStartConfig.getShardManager().getShards().get(i).getGuildCache().size() +
+//                    " Shard: " + i + " " + BotStartConfig.getShardManager().getStatus(i));
+//        }
 
-//        new TopGG().runTask();
+        new TopGG().runTask();
         new EngGameByTime(hangmanGameRepository).runTask();
         System.out.println("00:54");
+
+
+        //Удалить все команды
+//        jda.updateCommands().queue();
+
+
+
+
+
+
+
 
 
 //        Скорее всего нужно использовать такое:
@@ -173,6 +194,16 @@ public class BotStartConfig {
 //            BotStart.getShardManager().getShards().get(i).getGuilds().forEach(guild -> guild.updateCommands().queue());
 //        }
 
+
+
+
+
+
+
+
+
+
+
 //        List<OptionData> options = new ArrayList<>();
 //
 //        options.add(new OptionData(OptionType.STRING, "game", "Setting the Game language")
@@ -185,6 +216,25 @@ public class BotStartConfig {
 //                .addChoice("rus", "rus")
 //                .setRequired(true));
 //
+//
+//        jda.upsertCommand("language", "Setting language").addOptions(options).queue();
+//        jda.upsertCommand("hg", "Start the game").queue();
+//        jda.upsertCommand("stop", "Stop the game").queue();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
 //        try {
 //        shardManager.getShards().forEach(g -> g.updateCommands().queue());
 //
@@ -192,8 +242,8 @@ public class BotStartConfig {
 //
 //        shardManager.getShards().forEach(g -> {
 //                g.upsertCommand("language", "Setting language").addOptions(options).queue();
-//                g.upsertCommand("hg-start", "Start the game").queue();
-//                g.upsertCommand("hg-stop", "Stop the game").queue();
+//                g.upsertCommand("hg", "Start the game").queue();
+//                g.upsertCommand("stop", "Stop the game").queue();
 //        });
 //
 //        } catch (ErrorResponseException e) {

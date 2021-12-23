@@ -514,12 +514,12 @@ public class Hangman implements HangmanHelper {
 
     private void clearingCollections() {
         try {
-            if (BotStartConfig.getShardManager().getGuildById(guildId) != null
+            if (BotStartConfig.jda.getGuildById(guildId) != null
                     && messageList.size() > 2
                     && BotStartConfig.getShardManager()
                     .getGuildById(guildId)
                     .getSelfMember()
-                    .hasPermission(BotStartConfig.getShardManager().getGuildById(guildId).getTextChannelById(channelId), Permission.MESSAGE_MANAGE)) {
+                    .hasPermission(BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId), Permission.MESSAGE_MANAGE)) {
                 deleteUserGameMessages(guildId, channelId, messageList);
             }
 

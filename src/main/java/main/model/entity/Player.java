@@ -22,7 +22,7 @@ public class Player {
     @Column(name="user_id_long", nullable = false)
     private Long userIdLong;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "games_id")
     private Game games_id;
 }

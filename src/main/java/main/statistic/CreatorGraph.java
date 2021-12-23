@@ -75,7 +75,7 @@ public class CreatorGraph implements SenderMessage {
             globalStats.setTitle(jsonParsers.getLocale("MessageStats_All_Stats", userIdLong));
             globalStats.setImage(chart.getShortUrl());
 
-            sendMessage(globalStats, BotStartConfig.getShardManager().getTextChannelById(textChannelIdLong));
+            sendMessage(globalStats, BotStartConfig.jda.getTextChannelById(textChannelIdLong));
 
         } catch (Exception e) {
             e.printStackTrace();

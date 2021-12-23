@@ -3,7 +3,9 @@ package main.eventlisteners;
 import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.jsonparser.JSONParsers;
+import main.model.repository.GameLanguageRepository;
 import main.model.repository.GamesRepository;
+import main.model.repository.LanguageRepository;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -20,6 +22,8 @@ public class DeleteAllMyData extends ListenerAdapter {
     private static final String DELETE_WITH_CODE = "!delete\\s.+";
     private final JSONParsers jsonParsers = new JSONParsers();
     private final GamesRepository gamesRepository;
+    private final LanguageRepository languageRepository;
+    private final GameLanguageRepository gameLanguageRepository;
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
@@ -67,6 +71,8 @@ public class DeleteAllMyData extends ListenerAdapter {
             BotStartConfig.getMapLanguages().remove(authorId);
 
             gamesRepository.deleteAllMyData(event.getAuthor().getIdLong());
+            languageRepository.deleteLanguage(authorId);
+            gameLanguageRepository.deleteGameLanguage(authorId);
         }
     }
 }

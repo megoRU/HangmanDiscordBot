@@ -4,8 +4,8 @@ public class Config {
 
     private static final String DEV_BOT_TOKEN = System.getenv("DEV_TOKEN");
     private static final String PRODUCTION_BOT_TOKEN = System.getenv("PROD_TOKEN");
-    private static final String TOKEN = DEV_BOT_TOKEN;
-    private static final String HANGMAN_NAME = "DiscordBotHangmanDEV";
+    private static final String TOKEN = PRODUCTION_BOT_TOKEN;
+    private static final String HANGMAN_NAME = "DiscordBotHangman";
 
     //Данный от БД с Hangman
     private static final String HANGMAN_CONNECTION = System.getenv("DATABASE_URL") + HANGMAN_NAME + System.getenv("DATABASE_URL2"); //utf8mb4

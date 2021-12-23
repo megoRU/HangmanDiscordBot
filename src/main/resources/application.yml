@@ -1,16 +1,11 @@
 spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://45.140.167.181:3306/DiscordBotHangmanDEV2?useSSL=false&serverTimezone=UTC&characterEncoding=utf8
-    username: DiscordBotHangmanDEV2
-    password: 8Yy!j70i8Yy!j70i
+    url:
+    username:
+    password:
 
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: validate
-
-
-logging:
-  level:
-    root: INFO
+      ddl-auto: none

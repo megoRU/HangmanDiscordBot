@@ -36,7 +36,7 @@ public class SlashCommand extends ListenerAdapter {
         }
 
         try {
-            if (event.getName().equals("hg-start")) {
+            if (event.getName().equals("hg")) {
                 event.getChannel().sendTyping().queue();
                 //Проверяем установлен ли язык. Если нет - то возвращаем в чат ошибку
                 if (BotStartConfig.getMapGameLanguages().get(event.getUser().getId()) == null) {
@@ -77,7 +77,7 @@ public class SlashCommand extends ListenerAdapter {
                 return;
             }
 
-            if (event.getName().equals("hg-stop")) {
+            if (event.getName().equals("stop")) {
                 //Проверяем играет ли сейчас игрок. Если да удаляем игру.
                 if (HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
                     HangmanRegistry.getInstance().getActiveHangman().remove(event.getUser().getIdLong());
