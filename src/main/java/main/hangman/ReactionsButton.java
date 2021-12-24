@@ -103,10 +103,10 @@ public class ReactionsButton extends ListenerAdapter {
                 messageInfoHelp.buildMessage(
                         BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null ? "!" : BotStartConfig.getMapPrefix().get(event.getGuild().getId()),
                         event.getTextChannel(),
+                        null,
                         event.getUser().getAvatarUrl(),
                         event.getUser().getId(),
-                        event.getUser().getName(),
-                        event.getGuild().getId());
+                        event.getUser().getName());
                 return;
             }
 
@@ -182,6 +182,7 @@ public class ReactionsButton extends ListenerAdapter {
                 event.deferEdit().queue();
                 new MessageStats(gamesRepository).sendStats(
                         event.getTextChannel(),
+                        null,
                         event.getMember().getUser().getAvatarUrl(),
                         event.getUser().getId(),
                         event.getMember().getUser().getName());

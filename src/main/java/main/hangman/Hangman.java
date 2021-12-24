@@ -516,7 +516,7 @@ public class Hangman implements HangmanHelper {
         try {
             if (BotStartConfig.jda.getGuildById(guildId) != null
                     && messageList.size() > 2
-                    && BotStartConfig.getShardManager()
+                    && BotStartConfig.jda
                     .getGuildById(guildId)
                     .getSelfMember()
                     .hasPermission(BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId), Permission.MESSAGE_MANAGE)) {

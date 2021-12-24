@@ -9,23 +9,20 @@ import main.threads.TopGG;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
-import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.Instant;
@@ -45,8 +42,6 @@ public class BotStartConfig {
     public static final Map<String, String> mapLanguages = new HashMap<>();
     //String - userLongId
     public static final Map<String, String> mapGameLanguages = new HashMap<>();
-    private static final Integer TOTAL_SHARDS = 4;
-    private static ShardManager shardManager;
     private static int idGame;
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
@@ -70,10 +65,6 @@ public class BotStartConfig {
         idGame = hangmanGameRepository.getCountGames() == null ? 0 : hangmanGameRepository.getCountGames();
     }
 
-    public static ShardManager getShardManager() {
-        return shardManager;
-    }
-
     public static Map<String, String> getMapPrefix() {
         return mapPrefix;
     }
@@ -95,191 +86,129 @@ public class BotStartConfig {
     }
 
     @Bean
-    public void startBot() throws Exception {
-        //Теперь HangmanRegistry знает количество игр и может отдавать правильное значение
-        HangmanRegistry.getInstance().getSetIdGame();
-        //Получаем все префиксы из базы данных
-        getPrefixFromDB();
-//		//Получаем все языки перевода
-        getLocalizationFromDB();
-//		//Получаем все языки перевода для игры
-        getGameLocalizationFromDB();
-//		//Восстанавливаем игры активные
-        getAndSetActiveGames();
-//		//Устанавливаем языки
-        setLanguages();
+    public void startBot() {
+        try {
+            //Теперь HangmanRegistry знает количество игр и может отдавать правильное значение
+            HangmanRegistry.getInstance().getSetIdGame();
+            //Получаем все префиксы из базы данных
+            getPrefixFromDB();
+    		//Получаем все языки перевода
+            getLocalizationFromDB();
+    		//Получаем все языки перевода для игры
+            getGameLocalizationFromDB();
+    		//Восстанавливаем игры активные
+            getAndSetActiveGames();
+		    //Устанавливаем языки
+            setLanguages();
 
-        List<GatewayIntent> intents = new ArrayList<>(
-                Arrays.asList(
-                        GatewayIntent.GUILD_MESSAGES,
-                        GatewayIntent.GUILD_EMOJIS,
-                        GatewayIntent.GUILD_MESSAGE_REACTIONS,
-                        GatewayIntent.DIRECT_MESSAGES,
-                        GatewayIntent.DIRECT_MESSAGE_TYPING));
+            List<GatewayIntent> intents = new ArrayList<>(
+                    Arrays.asList(
+                            GatewayIntent.GUILD_MESSAGES,
+                            GatewayIntent.GUILD_EMOJIS,
+                            GatewayIntent.GUILD_MESSAGE_REACTIONS,
+                            GatewayIntent.DIRECT_MESSAGES,
+                            GatewayIntent.DIRECT_MESSAGE_TYPING));
 
-//        DefaultShardManagerBuilder builder = DefaultShardManagerBuilder.create(Config.getTOKEN(), intents);
+            jdaBuilder.disableCache(
+                    CacheFlag.CLIENT_STATUS,
+                    CacheFlag.ACTIVITY,
+                    CacheFlag.MEMBER_OVERRIDES,
+                    CacheFlag.VOICE_STATE,
+                    CacheFlag.ONLINE_STATUS);
 
-        jdaBuilder.disableCache(
-                CacheFlag.CLIENT_STATUS,
-                CacheFlag.ACTIVITY,
-                CacheFlag.MEMBER_OVERRIDES,
-                CacheFlag.VOICE_STATE,
-                CacheFlag.ONLINE_STATUS);
+            jdaBuilder.setAutoReconnect(true);
+            jdaBuilder.setStatus(OnlineStatus.ONLINE);
+            jdaBuilder.enableIntents(intents);
+            jdaBuilder.setActivity(Activity.playing(activity + TopGG.serverCount + " guilds"));
+            jdaBuilder.setBulkDeleteSplittingEnabled(false);
+            jdaBuilder.addEventListeners(new MessageWhenBotJoinToGuild(prefixRepository));
+            jdaBuilder.addEventListeners(new PrefixChange(prefixRepository));
+            jdaBuilder.addEventListeners(new MessageInfoHelp());
+            jdaBuilder.addEventListeners(new LanguageChange(languageRepository));
+            jdaBuilder.addEventListeners(new GameLanguageChange(gameLanguageRepository));
+            jdaBuilder.addEventListeners(new GameHangmanListener(hangmanGameRepository, gamesRepository, playerRepository));
+            jdaBuilder.addEventListeners(new MessageStats(gamesRepository));
+            jdaBuilder.addEventListeners(new ReactionsButton(gameLanguageRepository, languageRepository, hangmanGameRepository, gamesRepository, playerRepository));
+            jdaBuilder.addEventListeners(new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository));
+            jdaBuilder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository, gameLanguageRepository, languageRepository));
+            jdaBuilder.addEventListeners(new GetGlobalStatsInGraph(gamesRepository));
 
-       jdaBuilder.setAutoReconnect(true);
-       jdaBuilder.setStatus(OnlineStatus.ONLINE);
-       jdaBuilder.enableIntents(intents);
-       jdaBuilder.setActivity(Activity.playing(activity + TopGG.serverCount + " guilds"));
-       jdaBuilder.setBulkDeleteSplittingEnabled(false);
-       jdaBuilder.addEventListeners(new MessageWhenBotJoinToGuild(prefixRepository));
-       jdaBuilder.addEventListeners(new PrefixChange(prefixRepository));
-       jdaBuilder.addEventListeners(new MessageInfoHelp());
-       jdaBuilder.addEventListeners(new LanguageChange(languageRepository));
-       jdaBuilder.addEventListeners(new GameLanguageChange(gameLanguageRepository));
-       jdaBuilder.addEventListeners(new GameHangmanListener(hangmanGameRepository, gamesRepository, playerRepository));
-       jdaBuilder.addEventListeners(new MessageStats(gamesRepository));
-       jdaBuilder.addEventListeners(new ReactionsButton(gameLanguageRepository, languageRepository, hangmanGameRepository, gamesRepository, playerRepository));
-       jdaBuilder.addEventListeners(new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository));
-       jdaBuilder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository, gameLanguageRepository, languageRepository));
-       jdaBuilder.addEventListeners(new GetGlobalStatsInGraph(gamesRepository));
-//        builder.setShardsTotal(TOTAL_SHARDS);
-//        shardManager = builder.build();
-
-        jda = jdaBuilder.build();
-        jda.awaitReady();
-
-//        Thread.sleep(1000);
-//        for (int i = 0; i < TOTAL_SHARDS; i++) {
-//            shardManager.getShards().get(i).awaitReady();
-//        }
-//
-//        for (int i = 0; i < BotStartConfig.getShardManager().getShards().size(); i++) {
-//            System.out.println("Guilds in Shard: " +
-//                    BotStartConfig.getShardManager().getShards().get(i).getGuildCache().size() +
-//                    " Shard: " + i + " " + BotStartConfig.getShardManager().getStatus(i));
-//        }
+            jda = jdaBuilder.build();
+            jda.awaitReady();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         new TopGG().runTask();
         new EngGameByTime(hangmanGameRepository).runTask();
-        System.out.println("00:54");
+        System.out.println("01:33");
 
 
-        //Удалить все команды
-//        jda.updateCommands().queue();
+          //Удалить все команды
+        jda.updateCommands().queue();
 
+        List<OptionData> options = new ArrayList<>();
 
+        options.add(new OptionData(OptionType.STRING, "game", "Setting the Game language")
+                .addChoice("eng", "eng")
+                .addChoice("rus", "rus")
+                .setRequired(true));
 
+        options.add(new OptionData(OptionType.STRING, "bot", "Setting the bot language")
+                .addChoice("eng", "eng")
+                .addChoice("rus", "rus")
+                .setRequired(true));
 
+        System.out.println(jda.getGuilds().size());
+        jda.getGuilds().forEach(guild -> {
+            try {
+                if (guild.getSelfMember().hasPermission(Permission.MANAGE_PERMISSIONS))
+                guild.updateCommands().queue();
+            } catch (Exception e) {
+                System.out.println("В гильдии нет прав");
+            }
+        });
 
-
-
-
-
-//        Скорее всего нужно использовать такое:
-
-//        for (int i = 0; i < BotStart.getShardManager().getShards().size(); i++) {
-//            BotStart.getShardManager().getShards().get(i).updateCommands().queue();
-//        }
-
-
-//        Уже не поддерживается
-
-//        jda.awaitReady();
-
-//        Удалить все команды
-
-//        jda.updateCommands().queue();
-
-//        for (int i = 0; i < BotStart.getShardManager().getShards().size(); i++) {
-//            BotStart.getShardManager().getShards().get(i).getGuilds().forEach(guild -> guild.updateCommands().queue());
-//        }
-
-
-
-
-
-
-
-
-
-
-
-//        List<OptionData> options = new ArrayList<>();
-//
-//        options.add(new OptionData(OptionType.STRING, "game", "Setting the Game language")
-//                .addChoice("eng", "eng")
-//                .addChoice("rus", "rus")
-//                .setRequired(true));
-//
-//        options.add(new OptionData(OptionType.STRING, "bot", "Setting the bot language")
-//                .addChoice("eng", "eng")
-//                .addChoice("rus", "rus")
-//                .setRequired(true));
-//
-//
-//        jda.upsertCommand("language", "Setting language").addOptions(options).queue();
-//        jda.upsertCommand("hg", "Start the game").queue();
-//        jda.upsertCommand("stop", "Stop the game").queue();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//
-//        try {
-//        shardManager.getShards().forEach(g -> g.updateCommands().queue());
-//
-//        Thread.sleep(4000);
-//
-//        shardManager.getShards().forEach(g -> {
-//                g.upsertCommand("language", "Setting language").addOptions(options).queue();
-//                g.upsertCommand("hg", "Start the game").queue();
-//                g.upsertCommand("stop", "Stop the game").queue();
-//        });
-//
-//        } catch (ErrorResponseException e) {
-//            System.out.println("Скорее всего гильдия не дала разрешений на SlashCommands");
-//        }
-
-
+        jda.upsertCommand("language", "Setting language").addOptions(options).queue();
+        jda.upsertCommand("hg", "Start the game").queue();
+        jda.upsertCommand("stop", "Stop the game").queue();
+        jda.upsertCommand("help", "Bot commands").queue();
+        jda.upsertCommand("stats", "Get your statistics").queue();
+        jda.upsertCommand("mystats", "Find out the number of your wins and losses").queue();
+        jda.upsertCommand("allstats", "Find out the statistics of all the bot's games").queue();
+        jda.upsertCommand("delete", "Deleting your data").queue();
     }
 
-    private void setLanguages() throws IOException, ParseException {
+    private void setLanguages() {
+        try {
+            List<String> listLanguages = new ArrayList<>();
+            listLanguages.add("rus");
+            listLanguages.add("eng");
 
-        List<String> listLanguages = new ArrayList<>();
-        listLanguages.add("rus");
-        listLanguages.add("eng");
-
-        for (int i = 0; i < listLanguages.size(); i++) {
-            InputStream inputStream = new ClassPathResource("json/" + listLanguages.get(i) + ".json").getInputStream();
-
-
-            assert inputStream != null;
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(reader);
+            for (int i = 0; i < listLanguages.size(); i++) {
+                InputStream inputStream = new ClassPathResource("json/" + listLanguages.get(i) + ".json").getInputStream();
 
 
-            for (Object o : jsonObject.keySet()) {
-                String key = (String) o;
+                assert inputStream != null;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                JSONObject jsonObject = (JSONObject) new JSONParser().parse(reader);
 
-                if (listLanguages.get(i).equals("rus")) {
-                    ParserClass.russian.put(key, String.valueOf(jsonObject.get(key)));
-                } else {
-                    ParserClass.english.put(key, String.valueOf(jsonObject.get(key)));
+
+                for (Object o : jsonObject.keySet()) {
+                    String key = (String) o;
+
+                    if (listLanguages.get(i).equals("rus")) {
+                        ParserClass.russian.put(key, String.valueOf(jsonObject.get(key)));
+                    } else {
+                        ParserClass.english.put(key, String.valueOf(jsonObject.get(key)));
+                    }
                 }
+                reader.close();
+                inputStream.close();
+                reader.close();
             }
-            reader.close();
-            inputStream.close();
-            reader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

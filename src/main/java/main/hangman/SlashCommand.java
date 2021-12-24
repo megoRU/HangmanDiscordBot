@@ -3,10 +3,15 @@ package main.hangman;
 import lombok.RequiredArgsConstructor;
 import main.config.BotStartConfig;
 import main.eventlisteners.CheckPermissions;
+import main.eventlisteners.DeleteAllMyData;
+import main.eventlisteners.MessageInfoHelp;
+import main.eventlisteners.MessageStats;
 import main.jsonparser.JSONParsers;
 import main.model.entity.GameLanguage;
 import main.model.entity.Language;
 import main.model.repository.*;
+import main.statistic.CreatorGraph;
+import main.statistic.Statistic;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -130,6 +135,65 @@ public class SlashCommand extends ListenerAdapter {
                 language.setLanguage(event.getOptions().get(1).getAsString());
                 languageRepository.save(language);
             }
+
+            if (event.getName().equals("delete")) {
+                new DeleteAllMyData(
+                        gamesRepository,
+                        languageRepository,
+                        gameLanguageRepository).buildMessage(event.getChannel(), event.getUser());
+                return;
+            }
+
+            if (event.getName().equals("help")) {
+                new MessageInfoHelp().buildMessage(
+                        BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null ? "!" : BotStartConfig.getMapPrefix().get(event.getGuild().getId()),
+                        null,
+                        event,
+                        event.getUser().getAvatarUrl(),
+                        event.getUser().getId(),
+                        event.getUser().getName());
+                return;
+            }
+
+            if (event.getName().equals("stats")) {
+
+                new MessageStats(gamesRepository).sendStats(
+                        null,
+                        event,
+                        event.getUser().getAvatarUrl(),
+                        event.getUser().getId(),
+                        event.getUser().getName());
+
+                return;
+            }
+
+            if (event.getName().equals("allstats")) {
+
+                CreatorGraph creatorGraph = new CreatorGraph(
+                        gamesRepository,
+                        event.getGuild().getId(),
+                        event.getTextChannel().getId(),
+                        event.getUser().getId(),
+                        event.getUser().getName(),
+                        event.getUser().getAvatarUrl(),
+                        event);
+                creatorGraph.createGraph(Statistic.GLOBAL);
+
+                return;
+            }
+
+            if (event.getName().equals("mystats")) {
+                CreatorGraph creatorGraph = new CreatorGraph(
+                        gamesRepository,
+                        event.getGuild().getId(),
+                        event.getTextChannel().getId(),
+                        event.getUser().getId(),
+                        event.getUser().getName(),
+                        event.getUser().getAvatarUrl(),
+                        event);
+                creatorGraph.createGraph(Statistic.MY);
+            }
+
         } catch (Exception e) {
             System.out.println("Unknown interaction");
         }

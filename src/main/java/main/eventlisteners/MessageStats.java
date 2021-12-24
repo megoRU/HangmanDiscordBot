@@ -7,6 +7,7 @@ import main.model.repository.GamesRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -40,11 +41,11 @@ public class MessageStats extends ListenerAdapter {
         }
 
         if (message.equals(prefix)) {
-            sendStats(event.getTextChannel(), event.getAuthor().getAvatarUrl(), event.getAuthor().getId(), event.getAuthor().getName());
+            sendStats(event.getTextChannel(), null, event.getAuthor().getAvatarUrl(), event.getAuthor().getId(), event.getAuthor().getName());
         }
     }
 
-    public void sendStats(TextChannel textChannel, String userAvatarUrl, String userIdLong, String name) {
+    public void sendStats(TextChannel textChannel, SlashCommandEvent event, String userAvatarUrl, String userIdLong, String name) {
 
         String[] statistic = gamesRepository.getStatistic(Long.valueOf(userIdLong)).replaceAll(",", " ").split(" ");
 
@@ -88,7 +89,11 @@ public class MessageStats extends ListenerAdapter {
                             jsonParsers.getLocale("MessageStats_Game_Percentage",
                                     userIdLong).replaceAll("\\{0}", df.format(percentage)));
 
-            textChannel.sendMessageEmbeds(stats.build()).queue();
+            if (textChannel != null) {
+                textChannel.sendMessageEmbeds(stats.build()).queue();
+            } else {
+                event.replyEmbeds(stats.build()).queue();
+            }
         }
     }
 }

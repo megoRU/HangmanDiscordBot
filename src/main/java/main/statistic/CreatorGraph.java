@@ -9,6 +9,7 @@ import main.model.repository.GamesRepository;
 import main.model.repository.impl.StatisticGlobal;
 import main.model.repository.impl.StatisticMy;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class CreatorGraph implements SenderMessage {
     private final String userIdLong;
     private final String userName;
     private final String userAvatarUrl;
+    private final SlashCommandEvent slashCommandEvent;
     private final StringBuilder date = new StringBuilder();
     private final StringBuilder columnFirst = new StringBuilder();
     private final StringBuilder columnSecond = new StringBuilder();
@@ -28,13 +30,14 @@ public class CreatorGraph implements SenderMessage {
 
     public CreatorGraph(GamesRepository gamesRepository, String guildIdLong,
                         String textChannelIdLong, String userIdLong,
-                        String userName, String userUrl) {
+                        String userName, String userUrl, SlashCommandEvent slashCommandEvent) {
         this.guildIdLong = guildIdLong;
         this.textChannelIdLong = textChannelIdLong;
         this.userIdLong = userIdLong;
         this.userName = userName;
         this.userAvatarUrl = userUrl;
         this.gamesRepository = gamesRepository;
+        this.slashCommandEvent = slashCommandEvent;
     }
 
     public void createGraph(Statistic statistic) {
@@ -75,8 +78,12 @@ public class CreatorGraph implements SenderMessage {
             globalStats.setTitle(jsonParsers.getLocale("MessageStats_All_Stats", userIdLong));
             globalStats.setImage(chart.getShortUrl());
 
-            sendMessage(globalStats, BotStartConfig.jda.getTextChannelById(textChannelIdLong));
 
+            if (slashCommandEvent != null) {
+                sendMessage(globalStats, slashCommandEvent);
+            } else {
+                sendMessage(globalStats, BotStartConfig.jda.getTextChannelById(textChannelIdLong));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

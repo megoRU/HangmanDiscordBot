@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
@@ -50,15 +51,15 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
             buildMessage(
                     p,
                     event.getTextChannel(),
+                    null,
                     event.getAuthor().getAvatarUrl(),
                     event.getAuthor().getId(),
-                    event.getAuthor().getName(),
-                    event.getGuild().getId());
+                    event.getAuthor().getName());
         }
 
     }
 
-    public void buildMessage(String p, TextChannel textChannel, String avatarUrl, String userIdLong, String name, String guildLongId) {
+    public void buildMessage(String p, TextChannel textChannel, SlashCommandEvent event, String avatarUrl, String userIdLong, String name) {
 
         String avatar = null;
 
@@ -121,6 +122,10 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
                     .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
         }
 
-        sendMessage(info, textChannel, buttons);
+        if (textChannel != null) {
+            sendMessage(info, textChannel, buttons);
+        } else {
+            sendMessage(info, event, buttons);
+        }
     }
 }

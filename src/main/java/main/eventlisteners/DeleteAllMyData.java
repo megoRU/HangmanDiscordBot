@@ -7,6 +7,8 @@ import main.model.repository.GameLanguageRepository;
 import main.model.repository.GamesRepository;
 import main.model.repository.LanguageRepository;
 import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -34,45 +36,58 @@ public class DeleteAllMyData extends ListenerAdapter {
                 if (CheckPermissions.isHasPermissionToWrite(event.getTextChannel())) return;
             }
 
-            buildMessage(event, event.getMessage().getContentRaw(), event.getAuthor().getId());
+            buildMessage(event.getChannel(), event.getAuthor(), event.getMessage().getContentRaw());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void buildMessage(@NotNull MessageReceivedEvent event, String message, String authorId) {
+    public void buildMessage(@NotNull MessageChannel messageChannel, @NotNull User user) {
+        String code = UUID.randomUUID().toString().replaceAll("-", "");
+        BotStartConfig.getSecretCode().put(user.getId(), code);
+
+        messageChannel.sendMessage(jsonParsers.getLocale("restore_Data", user.getId())).queue();
+
+        user.openPrivateChannel()
+                .flatMap(channel -> channel.sendMessage(
+                        jsonParsers.getLocale("restore_Data_PM", user.getId()).replaceAll("\\{0}", code)))
+                .queue();
+    }
+
+    public void buildMessage(@NotNull MessageChannel messageChannel, @NotNull User user, String message) {
 
         String[] split = message.split(" ", 2);
 
         if (message.equals(DELETE)) {
             String code = UUID.randomUUID().toString().replaceAll("-", "");
-            BotStartConfig.getSecretCode().put(authorId, code);
+            BotStartConfig.getSecretCode().put(user.getId(), code);
 
-            event.getChannel().sendMessage(jsonParsers.getLocale("restore_Data", authorId)).queue();
+            messageChannel.sendMessage(jsonParsers.getLocale("restore_Data", user.getId())).queue();
 
-            event.getAuthor().openPrivateChannel()
+            user.openPrivateChannel()
                     .flatMap(channel -> channel.sendMessage(
-                            jsonParsers.getLocale("restore_Data_PM", authorId).replaceAll("\\{0}", code)))
+                            jsonParsers.getLocale("restore_Data_PM", user.getId()).replaceAll("\\{0}", code)))
                     .queue();
             return;
         }
 
         if (message.matches(DELETE_WITH_CODE)
-                && (BotStartConfig.getSecretCode().get(authorId) == null || !BotStartConfig.getSecretCode().get(authorId).equals(split[1]))) {
-            event.getChannel().sendMessage(jsonParsers.getLocale("restore_Data_Failure", authorId)).queue();
+                && (BotStartConfig.getSecretCode().get(user.getId()) == null || !BotStartConfig.getSecretCode().get(user.getId()).equals(split[1]))) {
+            messageChannel.sendMessage(jsonParsers.getLocale("restore_Data_Failure", user.getId())).queue();
             return;
         }
 
         if (split.length > 1 && message.matches(DELETE_WITH_CODE)
-                && BotStartConfig.getSecretCode().get(authorId) != null
-                && BotStartConfig.getSecretCode().get(authorId).equals(split[1])) {
-            event.getChannel().sendMessage(jsonParsers.getLocale("restore_Data_Success", authorId)).queue();
-            BotStartConfig.getMapGameLanguages().remove(authorId);
-            BotStartConfig.getMapLanguages().remove(authorId);
+                && BotStartConfig.getSecretCode().get(user.getId()) != null
+                && BotStartConfig.getSecretCode().get(user.getId()).equals(split[1])) {
 
-            gamesRepository.deleteAllMyData(event.getAuthor().getIdLong());
-            languageRepository.deleteLanguage(authorId);
-            gameLanguageRepository.deleteGameLanguage(authorId);
+            messageChannel.sendMessage(jsonParsers.getLocale("restore_Data_Success", user.getId())).queue();
+            BotStartConfig.getMapGameLanguages().remove(user.getId());
+            BotStartConfig.getMapLanguages().remove(user.getId());
+
+            gamesRepository.deleteAllMyData(user.getIdLong());
+            languageRepository.deleteLanguage(user.getId());
+            gameLanguageRepository.deleteGameLanguage(user.getId());
         }
     }
 }

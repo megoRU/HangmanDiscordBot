@@ -46,7 +46,8 @@ public class GetGlobalStatsInGraph extends ListenerAdapter {
                     event.getMessage().getTextChannel().getId(),
                     event.getAuthor().getId(),
                     event.getAuthor().getName(),
-                    event.getAuthor().getAvatarUrl());
+                    event.getAuthor().getAvatarUrl(),
+                    null);
             creatorGraph.createGraph(Statistic.GLOBAL);
         }
 
@@ -59,7 +60,8 @@ public class GetGlobalStatsInGraph extends ListenerAdapter {
                     event.getMessage().getTextChannel().getId(),
                     event.getAuthor().getId(),
                     event.getAuthor().getName(),
-                    event.getAuthor().getAvatarUrl());
+                    event.getAuthor().getAvatarUrl(),
+                    null);
             creatorGraph.createGraph(Statistic.MY);
         }
 
