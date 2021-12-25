@@ -141,7 +141,7 @@ public class BotStartConfig {
 
         new TopGG().runTask();
         new EngGameByTime(hangmanGameRepository).runTask();
-        System.out.println("01:33");
+        System.out.println("16:29");
 
 
           //Удалить все команды

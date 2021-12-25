@@ -74,8 +74,14 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
                     .setRequired(true));
 
             event.getGuild().upsertCommand("language", "Setting language").addOptions(options).queue();
-            event.getGuild().upsertCommand("hg-start", "Start the game").queue();
-            event.getGuild().upsertCommand("hg-stop", "Stop the game").queue();
+            event.getGuild().upsertCommand("hg", "Start the game").queue();
+            event.getGuild().upsertCommand("stop", "Stop the game").queue();
+            event.getGuild().upsertCommand("help", "Bot commands").queue();
+            event.getGuild().upsertCommand("stats", "Get your statistics").queue();
+            event.getGuild().upsertCommand("mystats", "Find out the number of your wins and losses").queue();
+            event.getGuild().upsertCommand("allstats", "Find out the statistics of all the bot's games").queue();
+            event.getGuild().upsertCommand("delete", "Deleting your data").queue();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
