@@ -4,8 +4,6 @@ import main.eventlisteners.*;
 import main.hangman.*;
 import main.jsonparser.ParserClass;
 import main.model.repository.*;
-import main.threads.EngGameByTime;
-import main.threads.TopGG;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -15,19 +13,23 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.discordbots.api.client.DiscordBotListAPI;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.chrono.ChronoLocalDateTime;
 import java.util.*;
 
 @Configuration
@@ -45,6 +47,7 @@ public class BotStartConfig {
     private static int idGame;
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
+    public static int serverCount;
 
     //REPOSITORY
     private final PrefixRepository prefixRepository;
@@ -63,26 +66,6 @@ public class BotStartConfig {
         this.playerRepository = playerRepository;
         this.gamesRepository = gamesRepository;
         idGame = hangmanGameRepository.getCountGames() == null ? 0 : hangmanGameRepository.getCountGames();
-    }
-
-    public static Map<String, String> getMapPrefix() {
-        return mapPrefix;
-    }
-
-    public static Map<String, String> getMapLanguages() {
-        return mapLanguages;
-    }
-
-    public static Map<String, String> getMapGameLanguages() {
-        return mapGameLanguages;
-    }
-
-    public static Map<String, String> getSecretCode() {
-        return secretCode;
-    }
-
-    public static int getIdGame() {
-        return idGame;
     }
 
     @Bean
@@ -119,7 +102,7 @@ public class BotStartConfig {
             jdaBuilder.setAutoReconnect(true);
             jdaBuilder.setStatus(OnlineStatus.ONLINE);
             jdaBuilder.enableIntents(intents);
-            jdaBuilder.setActivity(Activity.playing(activity + TopGG.serverCount + " guilds"));
+            jdaBuilder.setActivity(Activity.playing(activity + serverCount + " guilds"));
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
             jdaBuilder.addEventListeners(new MessageWhenBotJoinToGuild(prefixRepository));
             jdaBuilder.addEventListeners(new PrefixChange(prefixRepository));
@@ -139,7 +122,53 @@ public class BotStartConfig {
             e.printStackTrace();
         }
 
-        //Удалить все команды
+        //Обновить команды
+        //updateSlashCommands();
+        System.out.println("14:14");
+    }
+
+    @Scheduled(fixedDelay = 15000L)
+    private void engGameByTime() {
+        try {
+            Map<Long, LocalDateTime> timeCreatedGame = new HashMap<>(HangmanRegistry.getInstance().getTimeCreatedGame());
+
+            for (Map.Entry<Long, LocalDateTime> entry : timeCreatedGame.entrySet()) {
+                Instant specificTime = Instant.ofEpochMilli(Instant.now().toEpochMilli());
+
+                if (entry.getValue().isBefore(ChronoLocalDateTime.from(OffsetDateTime.parse(String.valueOf(specificTime)).minusMinutes(10L)))) {
+                    synchronized (this) {
+                        if (HangmanRegistry.getInstance().hasHangman(entry.getKey())) {
+                            HangmanRegistry.getInstance().getActiveHangman().get(entry.getKey()).stopGameByTime();
+                            HangmanRegistry.getInstance().getTimeCreatedGame().remove(entry.getKey());
+                            hangmanGameRepository.deleteActiveGame(entry.getKey());
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Thread.currentThread().interrupt();
+            e.printStackTrace();
+        }
+    }
+
+    @Scheduled(fixedDelay = 180000L)
+    private void topGG() {
+        try {
+            DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
+                    .token(Config.getTopGgApiToken())
+                    .botId(Config.getBotId())
+                    .build();
+            serverCount = BotStartConfig.jda.getGuilds().size();
+            TOP_GG_API.setStats(serverCount);
+            BotStartConfig.jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
+        } catch (Exception e) {
+            Thread.currentThread().interrupt();
+            e.printStackTrace();
+        }
+    }
+
+
+    private void updateSlashCommands() {
         jda.updateCommands().queue();
 
         jda.getGuilds().forEach(guild -> System.out.println(guild.getName() + " " + guild.getSelfMember().hasPermission(Permission.USE_APPLICATION_COMMANDS)));
@@ -175,10 +204,6 @@ public class BotStartConfig {
         } catch (Exception e) {
             System.out.println("В гильдии нет прав");
         }
-
-        new TopGG().runTask();
-        new EngGameByTime(hangmanGameRepository).runTask();
-        System.out.println("14:14");
     }
 
     private void setLanguages() {
@@ -295,5 +320,25 @@ public class BotStartConfig {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static Map<String, String> getMapPrefix() {
+        return mapPrefix;
+    }
+
+    public static Map<String, String> getMapLanguages() {
+        return mapLanguages;
+    }
+
+    public static Map<String, String> getMapGameLanguages() {
+        return mapGameLanguages;
+    }
+
+    public static Map<String, String> getSecretCode() {
+        return secretCode;
+    }
+
+    public static int getIdGame() {
+        return idGame;
     }
 }
