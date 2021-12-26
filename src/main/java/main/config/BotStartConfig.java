@@ -17,6 +17,7 @@ import org.discordbots.api.client.DiscordBotListAPI;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -33,6 +34,7 @@ import java.time.chrono.ChronoLocalDateTime;
 import java.util.*;
 
 @Configuration
+@AutoConfigureAfter
 public class BotStartConfig {
 
     public static final String activity = "!help | ";
@@ -47,7 +49,7 @@ public class BotStartConfig {
     private static int idGame;
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
-    public static int serverCount;
+    private int serverCount;
 
     //REPOSITORY
     private final PrefixRepository prefixRepository;
@@ -67,22 +69,11 @@ public class BotStartConfig {
         this.gamesRepository = gamesRepository;
         idGame = hangmanGameRepository.getCountGames() == null ? 0 : hangmanGameRepository.getCountGames();
     }
-
     @Bean
     public void startBot() {
         try {
             //Теперь HangmanRegistry знает количество игр и может отдавать правильное значение
             HangmanRegistry.getInstance().getSetIdGame();
-            //Получаем все префиксы из базы данных
-            getPrefixFromDB();
-            //Получаем все языки перевода
-            getLocalizationFromDB();
-            //Получаем все языки перевода для игры
-            getGameLocalizationFromDB();
-            //Восстанавливаем игры активные
-            getAndSetActiveGames();
-            //Устанавливаем языки
-            setLanguages();
 
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
@@ -167,7 +158,6 @@ public class BotStartConfig {
         }
     }
 
-
     private void updateSlashCommands() {
         jda.updateCommands().queue();
 
@@ -206,7 +196,8 @@ public class BotStartConfig {
         }
     }
 
-    private void setLanguages() {
+    @Bean
+    public void setLanguages() {
         try {
             List<String> listLanguages = new ArrayList<>();
             listLanguages.add("rus");
@@ -239,7 +230,8 @@ public class BotStartConfig {
         }
     }
 
-    private void getPrefixFromDB() {
+    @Bean
+    public void getPrefixFromDB() {
         try {
             for (int i = 0; i < prefixRepository.getPrefix().size(); i++) {
                 mapPrefix.put(
@@ -251,7 +243,8 @@ public class BotStartConfig {
         }
     }
 
-    private void getLocalizationFromDB() {
+    @Bean
+    public void getLocalizationFromDB() {
         try {
             for (int i = 0; i < languageRepository.getLanguages().size(); i++) {
                 mapLanguages.put(
@@ -263,7 +256,8 @@ public class BotStartConfig {
         }
     }
 
-    private void getGameLocalizationFromDB() {
+    @Bean
+    public void getGameLocalizationFromDB() {
         try {
             for (int i = 0; i < gameLanguageRepository.getGameLanguages().size(); i++) {
                 mapGameLanguages.put(
@@ -275,7 +269,8 @@ public class BotStartConfig {
         }
     }
 
-    private void getAndSetActiveGames() {
+    @Bean
+    public void getAndSetActiveGames() {
         try {
             for (int i = 0; i < hangmanGameRepository.getAllActiveGames().size(); i++) {
 
