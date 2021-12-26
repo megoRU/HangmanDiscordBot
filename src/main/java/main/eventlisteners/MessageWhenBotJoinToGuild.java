@@ -62,26 +62,28 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
         }
 
         try {
-            List<OptionData> options = new ArrayList<>();
-            options.add(new OptionData(OptionType.STRING, "game", "Setting the Game language")
-                    .addChoice("eng", "eng")
-                    .addChoice("rus", "rus")
-                    .setRequired(true));
+            if ((event.getGuild().getSelfMember().hasPermission(Permission.USE_APPLICATION_COMMANDS))) {
 
-            options.add(new OptionData(OptionType.STRING, "bot", "Setting the bot language")
-                    .addChoice("eng", "eng")
-                    .addChoice("rus", "rus")
-                    .setRequired(true));
+                List<OptionData> options = new ArrayList<>();
+                options.add(new OptionData(OptionType.STRING, "game", "Setting the Game language")
+                        .addChoice("eng", "eng")
+                        .addChoice("rus", "rus")
+                        .setRequired(true));
 
-            event.getGuild().upsertCommand("language", "Setting language").addOptions(options).queue();
-            event.getGuild().upsertCommand("hg", "Start the game").queue();
-            event.getGuild().upsertCommand("stop", "Stop the game").queue();
-            event.getGuild().upsertCommand("help", "Bot commands").queue();
-            event.getGuild().upsertCommand("stats", "Get your statistics").queue();
-            event.getGuild().upsertCommand("mystats", "Find out the number of your wins and losses").queue();
-            event.getGuild().upsertCommand("allstats", "Find out the statistics of all the bot's games").queue();
-            event.getGuild().upsertCommand("delete", "Deleting your data").queue();
+                options.add(new OptionData(OptionType.STRING, "bot", "Setting the bot language")
+                        .addChoice("eng", "eng")
+                        .addChoice("rus", "rus")
+                        .setRequired(true));
 
+                event.getGuild().upsertCommand("language", "Setting language").addOptions(options).queue();
+                event.getGuild().upsertCommand("hg", "Start the game").queue();
+                event.getGuild().upsertCommand("stop", "Stop the game").queue();
+                event.getGuild().upsertCommand("help", "Bot commands").queue();
+                event.getGuild().upsertCommand("stats", "Get your statistics").queue();
+                event.getGuild().upsertCommand("mystats", "Find out the number of your wins and losses").queue();
+                event.getGuild().upsertCommand("allstats", "Find out the statistics of all the bot's games").queue();
+                event.getGuild().upsertCommand("delete", "Deleting your data").queue();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -91,7 +93,7 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
     public void onGuildLeave(@NotNull GuildLeaveEvent event) {
         try {
             System.out.println("Удаляем данные после удаления бота из Guild");
-            prefixRepository.deletePrefix(event.getGuild().getIdLong());
+            prefixRepository.deletePrefix(event.getGuild().getId());
         } catch (Exception e) {
             e.printStackTrace();
         }

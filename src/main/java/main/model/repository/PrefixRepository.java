@@ -16,7 +16,7 @@ public interface PrefixRepository extends CrudRepository<Prefix, Long> {
     @Transactional
     @Modifying
     @Query(value = "DELETE FROM Prefix p WHERE p.serverId = :serverId")
-    void deletePrefix(@Param("serverId") Long serverId);
+    void deletePrefix(@Param("serverId") String serverId);
 
 
     @Query(value = "SELECT p FROM Prefix p")

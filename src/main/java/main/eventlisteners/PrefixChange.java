@@ -54,7 +54,7 @@ public class PrefixChange extends ListenerAdapter {
                     .sendMessage(jsonParsers.getLocale("prefix_change_Now_Prefix", event.getGuild().getId())
                             .replaceAll("\\{0}", "\\" + messages[1])).queue();
 
-            prefixRepository.deletePrefix(event.getGuild().getIdLong());
+            prefixRepository.deletePrefix(event.getGuild().getId());
             Prefix prefix = new Prefix();
             prefix.setServerId(event.getGuild().getId());
             prefix.setPrefix(messages[1]);
@@ -65,7 +65,7 @@ public class PrefixChange extends ListenerAdapter {
 
         if (message.equals(PREFIX_RESET) && event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
             BotStartConfig.getMapPrefix().remove(event.getGuild().getId());
-            prefixRepository.deletePrefix(event.getGuild().getIdLong());
+            prefixRepository.deletePrefix(event.getGuild().getId());
             event.getChannel()
                     .sendMessage(jsonParsers.getLocale("prefix_change_Prefix_Now_Standard", event.getGuild().getId())).queue();
         }

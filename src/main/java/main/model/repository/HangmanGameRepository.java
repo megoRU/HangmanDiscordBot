@@ -28,7 +28,6 @@ public interface HangmanGameRepository extends CrudRepository<ActiveHangman, Lon
     @Query(value = "SELECT MAX(id) AS id FROM Game")
     Integer getCountGames();
 
-
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM ActiveHangman ah WHERE ah.userIdLong = :userIdLong")
@@ -37,5 +36,4 @@ public interface HangmanGameRepository extends CrudRepository<ActiveHangman, Lon
     @Query(value = "SELECT ah FROM ActiveHangman ah")
     List<ActiveHangman> getAllActiveGames();
 
-    //
 }

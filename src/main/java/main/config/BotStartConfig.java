@@ -92,13 +92,13 @@ public class BotStartConfig {
             HangmanRegistry.getInstance().getSetIdGame();
             //Получаем все префиксы из базы данных
             getPrefixFromDB();
-    		//Получаем все языки перевода
+            //Получаем все языки перевода
             getLocalizationFromDB();
-    		//Получаем все языки перевода для игры
+            //Получаем все языки перевода для игры
             getGameLocalizationFromDB();
-    		//Восстанавливаем игры активные
+            //Восстанавливаем игры активные
             getAndSetActiveGames();
-		    //Устанавливаем языки
+            //Устанавливаем языки
             setLanguages();
 
             List<GatewayIntent> intents = new ArrayList<>(
@@ -139,13 +139,10 @@ public class BotStartConfig {
             e.printStackTrace();
         }
 
-        new TopGG().runTask();
-        new EngGameByTime(hangmanGameRepository).runTask();
-        System.out.println("16:29");
-
-
-          //Удалить все команды
+        //Удалить все команды
         jda.updateCommands().queue();
+
+        jda.getGuilds().forEach(guild -> System.out.println(guild.getName() + " " + guild.getSelfMember().hasPermission(Permission.USE_APPLICATION_COMMANDS)));
 
         List<OptionData> options = new ArrayList<>();
 
@@ -160,23 +157,28 @@ public class BotStartConfig {
                 .setRequired(true));
 
         System.out.println(jda.getGuilds().size());
-        jda.getGuilds().forEach(guild -> {
-            try {
-                if (guild.getSelfMember().hasPermission(Permission.MANAGE_PERMISSIONS))
-                guild.updateCommands().queue();
-            } catch (Exception e) {
-                System.out.println("В гильдии нет прав");
+        try {
+            for (int i = 0; i < jda.getGuilds().size(); i++) {
+                if (jda.getGuilds().get(i).getSelfMember().hasPermission(Permission.MANAGE_PERMISSIONS)) {
+                    jda.getGuilds().get(i).updateCommands().queue();
+                    Thread.sleep(100);
+                    jda.getGuilds().get(i).upsertCommand("language", "Setting language").addOptions(options).queue();
+                    jda.getGuilds().get(i).upsertCommand("hg", "Start the game").queue();
+                    jda.getGuilds().get(i).upsertCommand("stop", "Stop the game").queue();
+                    jda.getGuilds().get(i).upsertCommand("help", "Bot commands").queue();
+                    jda.getGuilds().get(i).upsertCommand("stats", "Get your statistics").queue();
+                    jda.getGuilds().get(i).upsertCommand("mystats", "Find out the number of your wins and losses").queue();
+                    jda.getGuilds().get(i).upsertCommand("allstats", "Find out the statistics of all the bot's games").queue();
+                    jda.getGuilds().get(i).upsertCommand("delete", "Deleting your data").queue();
+                }
             }
-        });
+        } catch (Exception e) {
+            System.out.println("В гильдии нет прав");
+        }
 
-        jda.upsertCommand("language", "Setting language").addOptions(options).queue();
-        jda.upsertCommand("hg", "Start the game").queue();
-        jda.upsertCommand("stop", "Stop the game").queue();
-        jda.upsertCommand("help", "Bot commands").queue();
-        jda.upsertCommand("stats", "Get your statistics").queue();
-        jda.upsertCommand("mystats", "Find out the number of your wins and losses").queue();
-        jda.upsertCommand("allstats", "Find out the statistics of all the bot's games").queue();
-        jda.upsertCommand("delete", "Deleting your data").queue();
+        new TopGG().runTask();
+        new EngGameByTime(hangmanGameRepository).runTask();
+        System.out.println("14:14");
     }
 
     private void setLanguages() {

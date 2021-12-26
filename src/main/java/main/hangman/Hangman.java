@@ -197,7 +197,6 @@ public class Hangman implements HangmanHelper {
 
             WORD = null;
             clearingCollections();
-            resultGame(false);
         } catch (Exception e) {
             e.printStackTrace();
         }
