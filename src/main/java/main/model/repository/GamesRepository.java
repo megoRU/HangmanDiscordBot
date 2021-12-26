@@ -22,14 +22,14 @@ public interface GamesRepository extends CrudRepository<Game, Long> {
             "AND pl.games_id.id = g.id")
     String getStatistic(@Param("userIdLong") Long userIdLong);
 
-    @Query(value = "SELECT COUNT(*) AS count, game_date AS gameDate FROM games GROUP BY MONTH (game_date)", nativeQuery = true)
+    @Query(value = "SELECT COUNT(*) AS count, game_date AS gameDate FROM games GROUP BY MONTH (game_date) LIMIT 8", nativeQuery = true)
     List<StatisticGlobal> getAllStatistic();
 
     @Query(value = "SELECT SUM(IF(result = 0, 1, 0)) AS TOTAL_ZEROS, " +
             "SUM(IF(result = 1, 1, 0)) AS TOTAL_ONES, " +
             "game_date AS gameDate " +
             "FROM player, games " +
-            "WHERE player.user_id_long = :userIdLong AND player.games_id = games.id GROUP BY MONTH (game_date)", nativeQuery = true)
+            "WHERE player.user_id_long = :userIdLong AND player.games_id = games.id GROUP BY MONTH (game_date) LIMIT 8", nativeQuery = true)
     List<StatisticMy> getAllMyStatistic(@Param("userIdLong") String userIdLong);
 
     @Modifying
