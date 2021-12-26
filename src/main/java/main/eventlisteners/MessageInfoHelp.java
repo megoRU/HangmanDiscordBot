@@ -2,7 +2,6 @@ package main.eventlisteners;
 
 import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
-import main.hangman.ReactionsButton;
 import main.jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -15,7 +14,6 @@ import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 

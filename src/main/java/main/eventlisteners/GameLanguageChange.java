@@ -3,7 +3,6 @@ package main.eventlisteners;
 import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.hangman.HangmanRegistry;
-import main.hangman.ReactionsButton;
 import main.jsonparser.JSONParsers;
 import main.model.entity.GameLanguage;
 import main.model.repository.GameLanguageRepository;

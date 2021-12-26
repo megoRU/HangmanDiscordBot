@@ -17,7 +17,6 @@ import org.discordbots.api.client.DiscordBotListAPI;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -208,11 +207,8 @@ public class BotStartConfig {
             for (int i = 0; i < listLanguages.size(); i++) {
                 InputStream inputStream = new ClassPathResource("json/" + listLanguages.get(i) + ".json").getInputStream();
 
-
-                assert inputStream != null;
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                 JSONObject jsonObject = (JSONObject) new JSONParser().parse(reader);
-
 
                 for (Object o : jsonObject.keySet()) {
                     String key = (String) o;

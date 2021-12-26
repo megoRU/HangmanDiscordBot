@@ -1,7 +1,6 @@
 package main.eventlisteners;
 
 import lombok.AllArgsConstructor;
-import main.hangman.ReactionsButton;
 import main.jsonparser.JSONParsers;
 import main.model.repository.PrefixRepository;
 import net.dv8tion.jda.api.EmbedBuilder;

@@ -26,6 +26,8 @@ public class PrefixChange extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
 
+        if (event.getMember() == null) return;
+
         if (!event.isFromType(ChannelType.TEXT)) return;
 
         if (CheckPermissions.isHasPermissionToWrite(event.getTextChannel())) return;

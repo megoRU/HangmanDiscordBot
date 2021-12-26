@@ -1,11 +1,9 @@
-package main.hangman;
+package main.eventlisteners;
 
 import lombok.RequiredArgsConstructor;
 import main.config.BotStartConfig;
-import main.eventlisteners.CheckPermissions;
-import main.eventlisteners.DeleteAllMyData;
-import main.eventlisteners.MessageInfoHelp;
-import main.eventlisteners.MessageStats;
+import main.hangman.Hangman;
+import main.hangman.HangmanRegistry;
 import main.jsonparser.JSONParsers;
 import main.model.entity.GameLanguage;
 import main.model.entity.Language;

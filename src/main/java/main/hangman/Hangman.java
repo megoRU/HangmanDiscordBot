@@ -3,6 +3,7 @@ package main.hangman;
 import lombok.Getter;
 import lombok.Setter;
 import main.config.BotStartConfig;
+import main.eventlisteners.ReactionsButton;
 import main.jsonparser.JSONGameParsers;
 import main.jsonparser.JSONParsers;
 import main.model.entity.ActiveHangman;
@@ -126,9 +127,7 @@ public class Hangman implements HangmanHelper {
                 needSetLanguage.setColor(0x00FF00);
                 needSetLanguage.setDescription(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getId()));
 
-                event.replyEmbeds(needSetLanguage.build())
-                        .addActionRow(buttons)
-                        .queue();
+                event.replyEmbeds(needSetLanguage.build()).addActionRow(buttons).queue();
                 clearingCollections();
                 return;
             }
@@ -154,33 +153,28 @@ public class Hangman implements HangmanHelper {
             //Заполняем EmbedBuilder start
             updateEmbedBuilder(start);
 
-            event.replyEmbeds(start.build())
-                    .queue(m -> m.retrieveOriginal()
-                            .queue(message -> {
-                                        HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId),
-                                                message.getId());
-
-
-                                        ActiveHangman activeHangman = new ActiveHangman();
-                                        activeHangman.setUserIdLong(Long.valueOf(userId));
-                                        activeHangman.setMessageIdLong(Long.valueOf(message.getId()));
-                                        activeHangman.setChannelIdLong(channelId);
-                                        activeHangman.setGuildLongId(Long.valueOf(guildId));
-                                        activeHangman.setWord(WORD);
-                                        activeHangman.setCurrentHiddenWord(WORD_HIDDEN);
-                                        activeHangman.setGuesses(guesses.toString());
-                                        activeHangman.setHangmanErrors(hangmanErrors);
-
-                                        ZonedDateTime now = ZonedDateTime.of(LocalDateTime.now(), ZoneOffset.UTC);
-                                        activeHangman.setGameCreatedTime(new Timestamp(Timestamp.valueOf(now.toLocalDateTime()).getTime()));
-
-                                        hangmanGameRepository.save(activeHangman);
-
-                                    }
-                            ));
+            event.replyEmbeds(start.build()).queue(m -> m.retrieveOriginal().queue(this::createEntityInDataBase));
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void createEntityInDataBase(Message message) {
+        HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId), message.getId());
+
+        ActiveHangman activeHangman = new ActiveHangman();
+        activeHangman.setUserIdLong(Long.valueOf(userId));
+        activeHangman.setMessageIdLong(Long.valueOf(message.getId()));
+        activeHangman.setChannelIdLong(channelId);
+        activeHangman.setGuildLongId(Long.valueOf(guildId));
+        activeHangman.setWord(WORD);
+        activeHangman.setCurrentHiddenWord(WORD_HIDDEN);
+        activeHangman.setGuesses(guesses.toString());
+        activeHangman.setHangmanErrors(hangmanErrors);
+
+        ZonedDateTime now = ZonedDateTime.of(LocalDateTime.now(), ZoneOffset.UTC);
+        activeHangman.setGameCreatedTime(new Timestamp(Timestamp.valueOf(now.toLocalDateTime()).getTime()));
+        hangmanGameRepository.save(activeHangman);
     }
 
     public void stopGameByTime() {
@@ -214,9 +208,7 @@ public class Hangman implements HangmanHelper {
                 needSetLanguage.setColor(0x00FF00);
                 needSetLanguage.setDescription(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", this.userId));
 
-                textChannel.sendMessageEmbeds(needSetLanguage.build())
-                        .setActionRow(buttons)
-                        .queue();
+                textChannel.sendMessageEmbeds(needSetLanguage.build()).setActionRow(buttons).queue();
                 clearingCollections();
                 return;
             }
@@ -243,24 +235,7 @@ public class Hangman implements HangmanHelper {
             //Заполняем EmbedBuilder start
             updateEmbedBuilder(start);
 
-            textChannel.sendMessageEmbeds(start.build()).queue(m -> {
-                        HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId), m.getId());
-                        ActiveHangman activeHangman = new ActiveHangman();
-                        activeHangman.setUserIdLong(Long.valueOf(userId));
-                        activeHangman.setMessageIdLong(Long.valueOf(m.getId()));
-                        activeHangman.setChannelIdLong(channelId);
-                        activeHangman.setGuildLongId(Long.valueOf(guildId));
-                        activeHangman.setWord(WORD);
-                        activeHangman.setCurrentHiddenWord(WORD_HIDDEN);
-                        activeHangman.setGuesses(guesses.toString());
-                        activeHangman.setHangmanErrors(hangmanErrors);
-
-                        ZonedDateTime now = ZonedDateTime.of(LocalDateTime.now(), ZoneOffset.UTC);
-                        activeHangman.setGameCreatedTime(new Timestamp(Timestamp.valueOf(now.toLocalDateTime()).getTime()));
-
-                        hangmanGameRepository.save(activeHangman);
-                    }
-            );
+            textChannel.sendMessageEmbeds(start.build()).queue(this::createEntityInDataBase);
         } catch (Exception e) {
             e.printStackTrace();
         }
