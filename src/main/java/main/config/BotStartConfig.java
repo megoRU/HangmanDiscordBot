@@ -21,6 +21,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.io.BufferedReader;
@@ -34,7 +35,7 @@ import java.time.chrono.ChronoLocalDateTime;
 import java.util.*;
 
 @Configuration
-@AutoConfigureAfter
+@EnableScheduling
 public class BotStartConfig {
 
     public static final String activity = "!help | ";
@@ -69,6 +70,7 @@ public class BotStartConfig {
         this.gamesRepository = gamesRepository;
         idGame = hangmanGameRepository.getCountGames() == null ? 0 : hangmanGameRepository.getCountGames();
     }
+
     @Bean
     public void startBot() {
         try {
@@ -142,7 +144,7 @@ public class BotStartConfig {
         }
     }
 
-    @Scheduled(fixedDelay = 180000L)
+    @Scheduled(fixedDelay = 20000L)
     private void topGG() {
         try {
             DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
