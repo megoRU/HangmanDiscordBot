@@ -50,19 +50,19 @@ public class CreatorGraph implements SenderMessage {
             switch (statistic) {
                 case GLOBAL -> {
                     List<StatisticGlobal> statisticList = gamesRepository.getAllStatistic();
-                    statisticList.forEach(statisticGlobal -> {
-                        date.append(date.length() == 0 ? "" : ",").append("'").append(statisticGlobal.getGameDate(), 0, 10).append("'");
-                        columnFirst.append(columnFirst.length() == 0 ? "" : ",").append("'").append(statisticGlobal.getCount()).append("'");
-                    });
+                    for (int i = statisticList.size() - 8; i < statisticList.size(); i++) {
+                        date.append(date.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getGameDate(), 0, 7).append("-01").append("'");
+                        columnFirst.append(columnFirst.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getCount()).append("'");
+                    }
                     setImage(chart, statistic).getShortUrl();
                 }
                 case MY -> {
                     List<StatisticMy> statisticList = gamesRepository.getAllMyStatistic(userIdLong);
-                    statisticList.forEach(statisticMy -> {
-                        date.append(date.length() == 0 ? "" : ",").append("'").append(statisticMy.getGameDate(), 0, 10).append("'");
-                        columnFirst.append(columnFirst.length() == 0 ? "" : ",").append("'").append(statisticMy.getTOTAL_ONES()).append("'");
-                        columnSecond.append(columnSecond.length() == 0 ? "" : ",").append("'").append(statisticMy.getTOTAL_ZEROS()).append("'");
-                    });
+                    for (int i = statisticList.size() - 8; i < statisticList.size(); i++) {
+                        date.append(date.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getGameDate(), 0, 7).append("-01").append("'");
+                        columnFirst.append(columnFirst.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ONES()).append("'");
+                        columnSecond.append(columnSecond.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ZEROS()).append("'");
+                    }
                     setImage(chart, statistic).getShortUrl();
                 }
 

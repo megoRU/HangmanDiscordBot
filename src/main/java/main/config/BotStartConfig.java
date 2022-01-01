@@ -116,7 +116,7 @@ public class BotStartConfig {
 
         //Обновить команды
         //updateSlashCommands();
-        System.out.println("14:14");
+        System.out.println("14:04");
     }
 
     @Scheduled(fixedDelay = 15000L)
