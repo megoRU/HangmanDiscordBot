@@ -507,12 +507,17 @@ public class Hangman implements HangmanHelper {
         }
     }
 
-    private void insertButtonsToCollection() {
+    public void insertButtonsToCollection() {
+        if (!buttons.isEmpty()) {
+            buttons.clear();
+        }
+
         buttons.add(Button.secondary(ReactionsButton.BUTTON_RUS, "Кириллица")
                 .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
         buttons.add(Button.secondary(ReactionsButton.BUTTON_ENG, "Latin")
                 .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
         buttons.add(Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play"));
+
     }
 
     private void addButtonsWhenGameOver() {

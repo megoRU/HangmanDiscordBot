@@ -42,15 +42,22 @@ public class ReactionsButton extends ListenerAdapter {
             if (event.getUser().isBot()) return;
             if (event.getButton() == null) return;
             if (event.getGuild() == null || event.getMember() == null) return;
+            if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
 
-            if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) {
+            long userIdLong = event.getUser().getIdLong();
+
+            //Проверяем смену языка при активной игре. Если игра активна и идет сменя языка - запрещать
+            if (Objects.equals(event.getButton().getId(), BUTTON_CHANGE_GAME_LANGUAGE)
+                    && HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
+                event.deferEdit().queue();
+                event.getHook().sendMessage(jsonParsers
+                                .getLocale("ReactionsButton_When_Play", event.getMember().getId()))
+                        .setEphemeral(true).queue();
                 return;
             }
 
-            //Проверяем смену языка при активной игре. Если игра активна и идет сменя языка - запрещать
-            if (HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong()) &&
-                    (Objects.equals(event.getButton().getId(), BUTTON_START_NEW_GAME) ||
-                            Objects.equals(event.getButton().getId(), BUTTON_CHANGE_GAME_LANGUAGE))) {
+            if ((Objects.equals(event.getButton().getId(), BUTTON_RUS) || Objects.equals(event.getButton().getId(), BUTTON_ENG))
+                    && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 event.deferEdit().queue();
                 event.getHook().sendMessage(jsonParsers
                                 .getLocale("ReactionsButton_When_Play", event.getMember().getId()))
@@ -107,8 +114,6 @@ public class ReactionsButton extends ListenerAdapter {
                         event.getUser().getName());
                 return;
             }
-
-            long userIdLong = event.getUser().getIdLong();
 
             //Если нажата кнопка START, и нет активной игры, то создаем
             if (Objects.equals(event.getButton().getId(), BUTTON_START_NEW_GAME) && !HangmanRegistry.getInstance().hasHangman(userIdLong)) {

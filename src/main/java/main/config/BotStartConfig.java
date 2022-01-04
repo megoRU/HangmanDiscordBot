@@ -1,7 +1,9 @@
 package main.config;
 
 import main.eventlisteners.*;
-import main.hangman.*;
+import main.hangman.GameHangmanListener;
+import main.hangman.Hangman;
+import main.hangman.HangmanRegistry;
 import main.jsonparser.ParserClass;
 import main.model.repository.*;
 import net.dv8tion.jda.api.JDA;
@@ -17,6 +19,7 @@ import org.discordbots.api.client.DiscordBotListAPI;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -26,6 +29,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -59,6 +63,14 @@ public class BotStartConfig {
     private final PlayerRepository playerRepository;
     private final GamesRepository gamesRepository;
 
+    //DataBase
+    @Value("${spring.datasource.url}")
+    private String URL_CONNECTION;
+    @Value("${spring.datasource.username}")
+    private String USER_CONNECTION;
+    @Value("${spring.datasource.password}")
+    private String PASSWORD_CONNECTION;
+
     @Autowired
     public BotStartConfig(PrefixRepository prefixRepository, LanguageRepository languageRepository, GameLanguageRepository gameLanguageRepository, HangmanGameRepository hangmanGameRepository, PlayerRepository playerRepository, GamesRepository gamesRepository) {
         this.prefixRepository = prefixRepository;
@@ -75,6 +87,11 @@ public class BotStartConfig {
         try {
             //Теперь HangmanRegistry знает количество игр и может отдавать правильное значение
             HangmanRegistry.getInstance().getSetIdGame();
+            getPrefixFromDB();
+            setLanguages();
+            getLocalizationFromDB();
+            getGameLocalizationFromDB();
+            getAndSetActiveGames();
 
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
@@ -197,8 +214,7 @@ public class BotStartConfig {
         }
     }
 
-    @Bean
-    public void setLanguages() {
+    private void setLanguages() {
         try {
             List<String> listLanguages = new ArrayList<>();
             listLanguages.add("rus");
@@ -223,94 +239,117 @@ public class BotStartConfig {
                 inputStream.close();
                 reader.close();
             }
+            System.out.println("setLanguages()");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    @Bean
-    public void getPrefixFromDB() {
+    private void getPrefixFromDB() {
         try {
-            for (int i = 0; i < prefixRepository.getPrefix().size(); i++) {
-                mapPrefix.put(
-                        prefixRepository.getPrefix().get(i).getServerId(),
-                        prefixRepository.getPrefix().get(i).getPrefix());
+            Connection connection = DriverManager.getConnection(URL_CONNECTION, USER_CONNECTION, PASSWORD_CONNECTION);
+            Statement statement = connection.createStatement();
+            String sql = "SELECT * FROM prefixs";
+            ResultSet rs = statement.executeQuery(sql);
+            while (rs.next()) {
+                mapPrefix.put(rs.getString("server_id"), rs.getString("prefix"));
             }
-        } catch (Exception e) {
+            rs.close();
+            statement.close();
+            connection.close();
+            System.out.println("getPrefixFromDB()");
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    @Bean
-    public void getLocalizationFromDB() {
+    private void getLocalizationFromDB() {
         try {
-            for (int i = 0; i < languageRepository.getLanguages().size(); i++) {
-                mapLanguages.put(
-                        languageRepository.getLanguages().get(i).getUserIdLong(),
-                        languageRepository.getLanguages().get(i).getLanguage());
+            Connection connection = DriverManager.getConnection(URL_CONNECTION, USER_CONNECTION, PASSWORD_CONNECTION);
+            Statement statement = connection.createStatement();
+            String sql = "SELECT * FROM language";
+            ResultSet rs = statement.executeQuery(sql);
+
+            while (rs.next()) {
+                mapLanguages.put(rs.getString("user_id_long"), rs.getString("language"));
             }
-        } catch (Exception e) {
+
+            rs.close();
+            statement.close();
+            connection.close();
+            System.out.println("getLocalizationFromDB()");
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    @Bean
-    public void getGameLocalizationFromDB() {
+
+    private void getGameLocalizationFromDB() {
         try {
-            for (int i = 0; i < gameLanguageRepository.getGameLanguages().size(); i++) {
-                mapGameLanguages.put(
-                        gameLanguageRepository.getGameLanguages().get(i).getUserIdLong(),
-                        gameLanguageRepository.getGameLanguages().get(i).getLanguage());
+            Connection connection = DriverManager.getConnection(URL_CONNECTION, USER_CONNECTION, PASSWORD_CONNECTION);
+            Statement statement = connection.createStatement();
+            String sql = "SELECT * FROM game_language";
+            ResultSet rs = statement.executeQuery(sql);
+
+            while (rs.next()) {
+                mapGameLanguages.put(rs.getString("user_id_long"), rs.getString("language"));
             }
-        } catch (Exception e) {
+
+            rs.close();
+            statement.close();
+            connection.close();
+            System.out.println("getGameLocalizationFromDB()");
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    @Bean
-    public void getAndSetActiveGames() {
+    private void getAndSetActiveGames() {
         try {
-            for (int i = 0; i < hangmanGameRepository.getAllActiveGames().size(); i++) {
+            Connection connection = DriverManager.getConnection(URL_CONNECTION, USER_CONNECTION, PASSWORD_CONNECTION);
+            Statement statement = connection.createStatement();
+            String sql = "SELECT * FROM active_hangman";
+            ResultSet rs = statement.executeQuery(sql);
+            while (rs.next()) {
+
+                long userIdLong = rs.getLong("user_id_long");
+                String message_id_long = rs.getString("message_id_long");
+                String channelIdLong = rs.getString("channel_id_long");
+                String guildIdLong = rs.getString("guild_long_id");
+                String word = rs.getString("word");
+                String currentHiddenWord = rs.getString("current_hidden_word");
+                String guesses = rs.getString("guesses");
+                int hangmanErrors = rs.getInt("hangman_errors");
+                LocalDateTime game_created_time = rs.getTimestamp("game_created_time").toInstant().atZone(ZoneOffset.UTC).toLocalDateTime();
 
                 HangmanRegistry.getInstance().setHangman(
-                        hangmanGameRepository.getAllActiveGames().get(i).getUserIdLong(),
-                        new Hangman(String.valueOf(hangmanGameRepository.getAllActiveGames().get(i).getUserIdLong()),
-                                String.valueOf(hangmanGameRepository.getAllActiveGames().get(i).getGuildLongId()),
-                                hangmanGameRepository.getAllActiveGames().get(i).getChannelIdLong(),
-                                hangmanGameRepository,
-                                gamesRepository,
-                                playerRepository));
+                        userIdLong,
+                        new Hangman(String.valueOf(userIdLong), guildIdLong, Long.parseLong(channelIdLong),
+                        hangmanGameRepository,
+                        gamesRepository,
+                        playerRepository));
+                HangmanRegistry.getInstance().getMessageId().put(userIdLong, message_id_long);
 
-                HangmanRegistry.getInstance().getMessageId().put(
-                        hangmanGameRepository.getAllActiveGames().get(i).getUserIdLong(),
-                        String.valueOf(hangmanGameRepository.getAllActiveGames().get(i).getMessageIdLong()));
+                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong)
+                        .updateVariables(guesses, word, currentHiddenWord, hangmanErrors);
 
+                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).autoInsert();
 
-                HangmanRegistry.getInstance().getActiveHangman().get(
-                                hangmanGameRepository.getAllActiveGames().get(i).getUserIdLong())
-                        .updateVariables(
-                                hangmanGameRepository.getAllActiveGames().get(i).getGuesses(),
-                                hangmanGameRepository.getAllActiveGames().get(i).getWord(),
-                                hangmanGameRepository.getAllActiveGames().get(i).getCurrentHiddenWord(),
-                                hangmanGameRepository.getAllActiveGames().get(i).getHangmanErrors());
-
-                HangmanRegistry.getInstance().getActiveHangman().get(hangmanGameRepository.getAllActiveGames().get(i).getUserIdLong()).autoInsert();
-
-
-                LocalDateTime game_created_time = hangmanGameRepository.getAllActiveGames().get(i).getGameCreatedTime().toInstant().atZone(ZoneOffset.UTC).toLocalDateTime();
-
-
-                HangmanRegistry.getInstance().getTimeCreatedGame().put(
-                        hangmanGameRepository.getAllActiveGames().get(i).getUserIdLong(), game_created_time);
-
+                HangmanRegistry.getInstance().getTimeCreatedGame().put(userIdLong, game_created_time);
 
                 Instant specificTime = Instant.ofEpochMilli(game_created_time.toInstant(ZoneOffset.UTC).toEpochMilli());
 
                 HangmanRegistry.getInstance().getEndAutoDelete().put(
-                        hangmanGameRepository.getAllActiveGames().get(i).getUserIdLong(),
+                        userIdLong,
                         specificTime.plusSeconds(600L).toString());
+                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).insertButtonsToCollection();
+
             }
-        } catch (Exception e) {
+            rs.close();
+            statement.close();
+            connection.close();
+            System.out.println("getAndSetActiveGames()");
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
