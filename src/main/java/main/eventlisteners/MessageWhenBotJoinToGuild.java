@@ -8,8 +8,6 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -59,33 +57,6 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        try {
-            if ((event.getGuild().getSelfMember().hasPermission(Permission.USE_APPLICATION_COMMANDS))) {
-
-                List<OptionData> options = new ArrayList<>();
-                options.add(new OptionData(OptionType.STRING, "game", "Setting the Game language")
-                        .addChoice("eng", "eng")
-                        .addChoice("rus", "rus")
-                        .setRequired(true));
-
-                options.add(new OptionData(OptionType.STRING, "bot", "Setting the bot language")
-                        .addChoice("eng", "eng")
-                        .addChoice("rus", "rus")
-                        .setRequired(true));
-
-                event.getGuild().upsertCommand("language", "Setting language").addOptions(options).queue();
-                event.getGuild().upsertCommand("hg", "Start the game").queue();
-                event.getGuild().upsertCommand("stop", "Stop the game").queue();
-                event.getGuild().upsertCommand("help", "Bot commands").queue();
-                event.getGuild().upsertCommand("stats", "Get your statistics").queue();
-                event.getGuild().upsertCommand("mystats", "Find out the number of your wins and losses").queue();
-                event.getGuild().upsertCommand("allstats", "Find out the statistics of all the bot's games").queue();
-                event.getGuild().upsertCommand("delete", "Deleting your data").queue();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -96,6 +67,5 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }

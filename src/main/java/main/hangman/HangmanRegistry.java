@@ -58,10 +58,6 @@ public class HangmanRegistry {
         return messageId;
     }
 
-    public void getHangman(long userIdLong) {
-        activeHangman.get(userIdLong);
-    }
-
     public void setHangman(long userIdLong, Hangman hangman) {
         activeHangman.put(userIdLong, hangman);
     }
