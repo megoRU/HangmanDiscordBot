@@ -43,6 +43,7 @@ public class DeleteAllMyData extends ListenerAdapter {
     }
 
     public void buildMessage(@NotNull MessageChannel messageChannel, @NotNull User user) {
+
         String code = UUID.randomUUID().toString().replaceAll("-", "");
         BotStartConfig.getSecretCode().put(user.getId(), code);
 
