@@ -7,10 +7,10 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +58,7 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
 
     }
 
-    public void buildMessage(String p, TextChannel textChannel, SlashCommandEvent event, String avatarUrl, String userIdLong, String name) {
+    public void buildMessage(String p, TextChannel textChannel, SlashCommandInteractionEvent event, String avatarUrl, String userIdLong, String name) {
 
         String avatar = null;
 

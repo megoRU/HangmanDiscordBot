@@ -9,7 +9,7 @@ import main.model.repository.GamesRepository;
 import main.model.repository.impl.StatisticGlobal;
 import main.model.repository.impl.StatisticMy;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class CreatorGraph implements SenderMessage {
     private final String userIdLong;
     private final String userName;
     private final String userAvatarUrl;
-    private final SlashCommandEvent slashCommandEvent;
+    private final SlashCommandInteractionEvent slashCommandEvent;
     private final StringBuilder date = new StringBuilder();
     private final StringBuilder columnFirst = new StringBuilder();
     private final StringBuilder columnSecond = new StringBuilder();
@@ -30,7 +30,7 @@ public class CreatorGraph implements SenderMessage {
 
     public CreatorGraph(GamesRepository gamesRepository, String guildIdLong,
                         String textChannelIdLong, String userIdLong,
-                        String userName, String userUrl, SlashCommandEvent slashCommandEvent) {
+                        String userName, String userUrl, SlashCommandInteractionEvent slashCommandEvent) {
         this.guildIdLong = guildIdLong;
         this.textChannelIdLong = textChannelIdLong;
         this.userIdLong = userIdLong;

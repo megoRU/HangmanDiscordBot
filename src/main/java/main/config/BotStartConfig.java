@@ -9,12 +9,14 @@ import main.model.repository.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.apache.commons.io.IOUtils;
 import org.discordbots.api.client.DiscordBotListAPI;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -29,6 +31,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -170,6 +174,7 @@ public class BotStartConfig {
             serverCount = BotStartConfig.jda.getGuilds().size();
             TOP_GG_API.setStats(serverCount);
             BotStartConfig.jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
+            IOUtils.toString(new URL("http://195.2.81.139:3001/api/push/jjyiWxH1QR?msg=OK&ping="), StandardCharsets.UTF_8);
         } catch (Exception e) {
             Thread.currentThread().interrupt();
             e.printStackTrace();
@@ -177,40 +182,33 @@ public class BotStartConfig {
     }
 
     private void updateSlashCommands() {
-        jda.updateCommands().queue();
-
-        jda.getGuilds().forEach(guild -> System.out.println(guild.getName() + " " + guild.getSelfMember().hasPermission(Permission.USE_APPLICATION_COMMANDS)));
-
-        List<OptionData> options = new ArrayList<>();
-
-        options.add(new OptionData(OptionType.STRING, "game", "Setting the Game language")
-                .addChoice("eng", "eng")
-                .addChoice("rus", "rus")
-                .setRequired(true));
-
-        options.add(new OptionData(OptionType.STRING, "bot", "Setting the bot language")
-                .addChoice("eng", "eng")
-                .addChoice("rus", "rus")
-                .setRequired(true));
-
-        System.out.println(jda.getGuilds().size());
         try {
-            for (int i = 0; i < jda.getGuilds().size(); i++) {
-                if (jda.getGuilds().get(i).getSelfMember().hasPermission(Permission.MANAGE_PERMISSIONS)) {
-                    jda.getGuilds().get(i).updateCommands().queue();
-                    Thread.sleep(100);
-                    jda.getGuilds().get(i).upsertCommand("language", "Setting language").addOptions(options).queue();
-                    jda.getGuilds().get(i).upsertCommand("hg", "Start the game").queue();
-                    jda.getGuilds().get(i).upsertCommand("stop", "Stop the game").queue();
-                    jda.getGuilds().get(i).upsertCommand("help", "Bot commands").queue();
-                    jda.getGuilds().get(i).upsertCommand("stats", "Get your statistics").queue();
-                    jda.getGuilds().get(i).upsertCommand("mystats", "Find out the number of your wins and losses").queue();
-                    jda.getGuilds().get(i).upsertCommand("allstats", "Find out the statistics of all the bot's games").queue();
-                    jda.getGuilds().get(i).upsertCommand("delete", "Deleting your data").queue();
-                }
-            }
+            CommandListUpdateAction commands = jda.updateCommands();
+
+            List<OptionData> options = new ArrayList<>();
+
+            options.add(new OptionData(OptionType.STRING, "game", "Setting the Game language")
+                    .addChoice("eng", "eng")
+                    .addChoice("rus", "rus")
+                    .setRequired(true));
+
+            options.add(new OptionData(OptionType.STRING, "bot", "Setting the bot language")
+                    .addChoice("eng", "eng")
+                    .addChoice("rus", "rus")
+                    .setRequired(true));
+
+            commands.addCommands(Commands.slash("language", "Setting language").addOptions(options));
+            commands.addCommands(Commands.slash("hg", "Start the game"));
+            commands.addCommands(Commands.slash("stop", "Stop the game"));
+            commands.addCommands(Commands.slash("help", "Bot commands"));
+            commands.addCommands(Commands.slash("stats", "Get your statistics"));
+            commands.addCommands(Commands.slash("mystats", "Find out the number of your wins and losses"));
+            commands.addCommands(Commands.slash("allstats", "Find out the statistics of all the bot's games"));
+            commands.addCommands(Commands.slash("delete", "Deleting your data"));
+
+            commands.queue();
         } catch (Exception e) {
-            System.out.println("В гильдии нет прав");
+            e.printStackTrace();
         }
     }
 
@@ -325,9 +323,9 @@ public class BotStartConfig {
                 HangmanRegistry.getInstance().setHangman(
                         userIdLong,
                         new Hangman(String.valueOf(userIdLong), guildIdLong, Long.parseLong(channelIdLong),
-                        hangmanGameRepository,
-                        gamesRepository,
-                        playerRepository));
+                                hangmanGameRepository,
+                                gamesRepository,
+                                playerRepository));
                 HangmanRegistry.getInstance().getMessageId().put(userIdLong, message_id_long);
 
                 HangmanRegistry.getInstance().getActiveHangman().get(userIdLong)

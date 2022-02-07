@@ -7,7 +7,7 @@ import main.model.repository.GamesRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +45,7 @@ public class MessageStats extends ListenerAdapter {
         }
     }
 
-    public void sendStats(TextChannel textChannel, SlashCommandEvent event, String userAvatarUrl, String userIdLong, String name) {
+    public void sendStats(TextChannel textChannel, SlashCommandInteractionEvent event, String userAvatarUrl, String userIdLong, String name) {
 
         String[] statistic = gamesRepository.getStatistic(Long.valueOf(userIdLong)).replaceAll(",", " ").split(" ");
 

@@ -17,8 +17,8 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
@@ -37,8 +37,8 @@ import java.util.TimerTask;
 @Getter
 public class Hangman implements HangmanHelper {
 
-    private static final String URL_RU = "http://45.140.167.181:8085/api/russian";
-    private static final String URL_EN = "http://45.140.167.181:8085/api/english";
+    private static final String URL_RU = "http://195.2.81.139:8085/api/russian";
+    private static final String URL_EN = "http://195.2.81.139:8085/api/english";
     private static final String HANGMAN_URL = "https://megoru.ru/hangman2/";
     private static final JSONGameParsers jsonGameParsers = new JSONGameParsers();
     private static final JSONParsers jsonParsers = new JSONParsers();
@@ -116,7 +116,7 @@ public class Hangman implements HangmanHelper {
         start.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
     }
 
-    public void startGame(@NotNull SlashCommandEvent event) {
+    public void startGame(@NotNull SlashCommandInteractionEvent event) {
         try {
             if (BotStartConfig.getMapGameLanguages().get(getUserId()) == null) {
                 //Добавляем buttons в коллекции
