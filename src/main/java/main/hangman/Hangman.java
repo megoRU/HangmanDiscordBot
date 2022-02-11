@@ -3,7 +3,7 @@ package main.hangman;
 import lombok.Getter;
 import lombok.Setter;
 import main.config.BotStartConfig;
-import main.eventlisteners.ReactionsButton;
+import main.enums.Buttons;
 import main.jsonparser.JSONGameParsers;
 import main.jsonparser.JSONParsers;
 import main.model.entity.ActiveHangman;
@@ -27,7 +27,9 @@ import java.awt.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -93,13 +95,13 @@ public class Hangman implements HangmanHelper {
         return null;
     }
 
+    //TODO: Работает, но изменить время на Instant желательно.
     private void updateEmbedBuilder(EmbedBuilder start) {
-        Instant specificTime = Instant.ofEpochMilli(Instant.now().toEpochMilli());
+        Instant instant = Instant.now().plusSeconds(600L);
 
-        HangmanRegistry.getInstance().getTimeCreatedGame().put(Long.valueOf(userId), LocalDateTime.from(OffsetDateTime.parse(String.valueOf(specificTime))));
+        HangmanRegistry.getInstance().getTimeCreatedGame().put(Long.valueOf(userId), LocalDateTime.from(OffsetDateTime.parse(String.valueOf(instant))));
 
-        HangmanRegistry.getInstance().getEndAutoDelete().put(Long.valueOf(userId),
-                String.valueOf(OffsetDateTime.parse(String.valueOf(specificTime)).plusMinutes(10L)));
+        HangmanRegistry.getInstance().getEndAutoDelete().put(Long.valueOf(userId), String.valueOf(OffsetDateTime.parse(String.valueOf(instant))));
 
         start.setColor(0x00FF00);
         start.setTitle(jsonGameParsers.getLocale("Game_Title", userId));
@@ -112,7 +114,7 @@ public class Hangman implements HangmanHelper {
         start.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
         start.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "", false);
         start.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + WORD_HIDDEN.toUpperCase() + "`", false);
-        start.setTimestamp(OffsetDateTime.parse(String.valueOf(specificTime)).plusMinutes(10L));
+        start.setTimestamp(instant);
         start.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
     }
 
@@ -171,9 +173,7 @@ public class Hangman implements HangmanHelper {
         activeHangman.setCurrentHiddenWord(WORD_HIDDEN);
         activeHangman.setGuesses(guesses.toString());
         activeHangman.setHangmanErrors(hangmanErrors);
-
-        ZonedDateTime now = ZonedDateTime.of(LocalDateTime.now(), ZoneOffset.UTC);
-        activeHangman.setGameCreatedTime(new Timestamp(Timestamp.valueOf(now.toLocalDateTime()).getTime()));
+        activeHangman.setGameCreatedTime(new Timestamp(Instant.now().toEpochMilli()));
         hangmanGameRepository.save(activeHangman);
     }
 
@@ -418,13 +418,10 @@ public class Hangman implements HangmanHelper {
         try {
             idGame = HangmanRegistry.getInstance().getIdGame();
 
-            ZonedDateTime now = ZonedDateTime.of(LocalDateTime.now(), ZoneOffset.UTC);
-            Timestamp timestamp = Timestamp.valueOf(now.toLocalDateTime());
-
             Game game = new Game();
             game.setId(idGame);
             game.setResult(resultBool);
-            game.setGameDate(new Timestamp(timestamp.getTime()));
+            game.setGameDate(new Timestamp(Instant.now().toEpochMilli()));
 
             Player player = new Player();
             player.setId(idGame);
@@ -498,10 +495,6 @@ public class Hangman implements HangmanHelper {
             }
 
             HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
-            HangmanRegistry.getInstance().getMessageId().remove(Long.parseLong(userId));
-            HangmanRegistry.getInstance().getTimeCreatedGame().remove(Long.valueOf(userId));
-            HangmanRegistry.getInstance().getEndAutoDelete().remove(Long.valueOf(userId));
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -512,11 +505,11 @@ public class Hangman implements HangmanHelper {
             buttons.clear();
         }
 
-        buttons.add(Button.secondary(ReactionsButton.BUTTON_RUS, "Кириллица")
+        buttons.add(Button.secondary(Buttons.BUTTON_RUS.name(), "Кириллица")
                 .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
-        buttons.add(Button.secondary(ReactionsButton.BUTTON_ENG, "Latin")
+        buttons.add(Button.secondary(Buttons.BUTTON_ENG.name(), "Latin")
                 .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
-        buttons.add(Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play"));
+        buttons.add(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play"));
 
     }
 
@@ -525,17 +518,17 @@ public class Hangman implements HangmanHelper {
             buttons.clear();
         }
 
-        buttons.add(Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play again"));
+        buttons.add(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"));
 
         if (BotStartConfig.getMapGameLanguages().get(getUserId()).equals("eng")) {
-            buttons.add(Button.secondary(ReactionsButton.BUTTON_CHANGE_GAME_LANGUAGE, "Кириллица")
+            buttons.add(Button.secondary(Buttons.BUTTON_CHANGE_GAME_LANGUAGE.name(), "Кириллица")
                     .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
         } else {
-            buttons.add(Button.secondary(ReactionsButton.BUTTON_CHANGE_GAME_LANGUAGE, "Latin")
+            buttons.add(Button.secondary(Buttons.BUTTON_CHANGE_GAME_LANGUAGE.name(), "Latin")
                     .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
         }
 
-        buttons.add(Button.primary(ReactionsButton.BUTTON_MY_STATS, "My stats"));
+        buttons.add(Button.primary(Buttons.BUTTON_MY_STATS.name(), "My stats"));
     }
 
     private void addGuesses(String letter) {

@@ -2,6 +2,7 @@ package main.eventlisteners;
 
 import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
+import main.enums.Buttons;
 import main.jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -107,16 +108,16 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
 
             if (BotStartConfig.getMapLanguages().get(userIdLong).equals("eng")) {
 
-                buttons.add(Button.secondary(ReactionsButton.BUTTON_CHANGE_LANGUAGE,
+                buttons.add(Button.secondary(Buttons.BUTTON_CHANGE_LANGUAGE.name(),
                                 "Сменить язык")
                         .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
             } else {
-                buttons.add(Button.secondary(ReactionsButton.BUTTON_CHANGE_LANGUAGE,
+                buttons.add(Button.secondary(Buttons.BUTTON_CHANGE_LANGUAGE.name(),
                                 "Change language")
                         .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
             }
         } else {
-            buttons.add(Button.secondary(ReactionsButton.BUTTON_CHANGE_LANGUAGE,
+            buttons.add(Button.secondary(Buttons.BUTTON_CHANGE_LANGUAGE.name(),
                             "Сменить язык")
                     .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
         }

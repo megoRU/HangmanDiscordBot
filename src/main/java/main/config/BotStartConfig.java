@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -40,6 +39,8 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.chrono.ChronoLocalDateTime;
 import java.util.*;
+
+import static net.dv8tion.jda.api.interactions.commands.OptionType.STRING;
 
 @Configuration
 @EnableScheduling
@@ -135,20 +136,23 @@ public class BotStartConfig {
             e.printStackTrace();
         }
 
+        System.out.println(jda.retrieveCommands().complete());
+
         //Обновить команды
-        //updateSlashCommands();
-        System.out.println("14:04");
+//        updateSlashCommands(false);
+        System.out.println("00:18");
     }
 
+    //Выглядит ужасно, но работает.
     @Scheduled(fixedDelay = 15000L)
     private void engGameByTime() {
         try {
             Map<Long, LocalDateTime> timeCreatedGame = new HashMap<>(HangmanRegistry.getInstance().getTimeCreatedGame());
 
             for (Map.Entry<Long, LocalDateTime> entry : timeCreatedGame.entrySet()) {
-                Instant specificTime = Instant.ofEpochMilli(Instant.now().toEpochMilli());
+                Instant instant = Instant.ofEpochMilli(Instant.now().toEpochMilli());
 
-                if (entry.getValue().isBefore(ChronoLocalDateTime.from(OffsetDateTime.parse(String.valueOf(specificTime)).minusMinutes(10L)))) {
+                if (entry.getValue().plusMinutes(10L).isBefore(ChronoLocalDateTime.from(OffsetDateTime.parse(String.valueOf(instant))))) {
                     synchronized (this) {
                         if (HangmanRegistry.getInstance().hasHangman(entry.getKey())) {
                             HangmanRegistry.getInstance().getActiveHangman().get(entry.getKey()).stopGameByTime();
@@ -166,47 +170,55 @@ public class BotStartConfig {
 
     @Scheduled(fixedDelay = 20000L)
     private void topGG() {
-        try {
-            DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
-                    .token(Config.getTopGgApiToken())
-                    .botId(Config.getBotId())
-                    .build();
-            serverCount = BotStartConfig.jda.getGuilds().size();
-            TOP_GG_API.setStats(serverCount);
-            BotStartConfig.jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
-            IOUtils.toString(new URL("http://195.2.81.139:3001/api/push/jjyiWxH1QR?msg=OK&ping="), StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            Thread.currentThread().interrupt();
-            e.printStackTrace();
+        if (!Config.isIsDev()) {
+            try {
+                DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
+                        .token(Config.getTopGgApiToken())
+                        .botId(Config.getBotId())
+                        .build();
+                serverCount = BotStartConfig.jda.getGuilds().size();
+                TOP_GG_API.setStats(serverCount);
+                BotStartConfig.jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
+                IOUtils.toString(new URL("http://195.2.81.139:3001/api/push/jjyiWxH1QR?msg=OK&ping="), StandardCharsets.UTF_8);
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+                e.printStackTrace();
+            }
         }
     }
 
-    private void updateSlashCommands() {
+    private void updateSlashCommands(boolean isUpdateInGuilds) {
         try {
-            CommandListUpdateAction commands = jda.updateCommands();
+            if (isUpdateInGuilds) {
+                for (int i = 0; i < jda.getGuilds().size(); i++) {
+                    jda.getGuilds().get(i).updateCommands().queue();
+                }
+            } else {
+                CommandListUpdateAction commands = jda.updateCommands();
 
-            List<OptionData> options = new ArrayList<>();
+                List<OptionData> options = new ArrayList<>();
 
-            options.add(new OptionData(OptionType.STRING, "game", "Setting the Game language")
-                    .addChoice("eng", "eng")
-                    .addChoice("rus", "rus")
-                    .setRequired(true));
+                options.add(new OptionData(STRING, "game", "Setting the Game language")
+                        .addChoice("eng", "eng")
+                        .addChoice("rus", "rus")
+                        .setRequired(true));
 
-            options.add(new OptionData(OptionType.STRING, "bot", "Setting the bot language")
-                    .addChoice("eng", "eng")
-                    .addChoice("rus", "rus")
-                    .setRequired(true));
+                options.add(new OptionData(STRING, "bot", "Setting the bot language")
+                        .addChoice("eng", "eng")
+                        .addChoice("rus", "rus")
+                        .setRequired(true));
 
-            commands.addCommands(Commands.slash("language", "Setting language").addOptions(options));
-            commands.addCommands(Commands.slash("hg", "Start the game"));
-            commands.addCommands(Commands.slash("stop", "Stop the game"));
-            commands.addCommands(Commands.slash("help", "Bot commands"));
-            commands.addCommands(Commands.slash("stats", "Get your statistics"));
-            commands.addCommands(Commands.slash("mystats", "Find out the number of your wins and losses"));
-            commands.addCommands(Commands.slash("allstats", "Find out the statistics of all the bot's games"));
-            commands.addCommands(Commands.slash("delete", "Deleting your data"));
+                commands.addCommands(Commands.slash("language", "Setting language").addOptions(options));
+                commands.addCommands(Commands.slash("hg", "Start the game"));
+                commands.addCommands(Commands.slash("stop", "Stop the game"));
+                commands.addCommands(Commands.slash("help", "Bot commands"));
+                commands.addCommands(Commands.slash("stats", "Get your statistics"));
+                commands.addCommands(Commands.slash("mystats", "Find out the number of your wins and losses"));
+                commands.addCommands(Commands.slash("allstats", "Find out the statistics of all the bot's games"));
+                commands.addCommands(Commands.slash("delete", "Deleting your data"));
 
-            commands.queue();
+                commands.queue();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

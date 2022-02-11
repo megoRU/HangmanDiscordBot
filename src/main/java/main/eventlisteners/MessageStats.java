@@ -60,7 +60,11 @@ public class MessageStats extends ListenerAdapter {
                 needSetLanguage.setColor(0x00FF00);
                 needSetLanguage.setDescription(jsonParsers.getLocale("MessageStats_Zero_Divide", userIdLong));
 
-                textChannel.sendMessageEmbeds(needSetLanguage.build()).queue();
+                if (textChannel != null) {
+                    textChannel.sendMessageEmbeds(needSetLanguage.build()).queue();
+                } else {
+                    event.replyEmbeds(needSetLanguage.build()).queue();
+                }
                 return;
             }
 

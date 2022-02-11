@@ -1,6 +1,7 @@
 package main.eventlisteners;
 
 import lombok.AllArgsConstructor;
+import main.enums.Buttons;
 import main.jsonparser.JSONParsers;
 import main.model.repository.PrefixRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -48,7 +49,7 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
 
                 List<Button> buttons = new ArrayList<>();
 
-                buttons.add(Button.success(ReactionsButton.BUTTON_HELP, jsonParsers.getLocale("button_Help", event.getGuild().getId())));
+                buttons.add(Button.success(Buttons.BUTTON_HELP.name(), jsonParsers.getLocale("button_Help", event.getGuild().getId())));
                 buttons.add(Button.link("https://discord.gg/UrWG3R683d", "Support"));
 
                 event.getGuild().getDefaultChannel().sendMessageEmbeds(welcome.build()).setActionRow(buttons).queue();

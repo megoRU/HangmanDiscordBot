@@ -2,6 +2,7 @@ package main.eventlisteners;
 
 import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
+import main.enums.Buttons;
 import main.hangman.HangmanRegistry;
 import main.jsonparser.JSONParsers;
 import main.model.entity.GameLanguage;
@@ -51,7 +52,7 @@ public class GameLanguageChange extends ListenerAdapter {
                 whenPlay.setDescription(jsonParsers.getLocale("ReactionsButton_When_Play", event.getAuthor().getId()));
 
                 event.getChannel().sendMessageEmbeds(whenPlay.build())
-                        .setActionRow(Button.danger(ReactionsButton.BUTTON_STOP, "Stop game"))
+                        .setActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game"))
                         .queue();
             } else {
                 BotStartConfig.getMapGameLanguages().put(event.getAuthor().getId(), messages[1]);

@@ -2,8 +2,8 @@ package main.hangman;
 
 import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
+import main.enums.Buttons;
 import main.eventlisteners.CheckPermissions;
-import main.eventlisteners.ReactionsButton;
 import main.jsonparser.JSONParsers;
 import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
@@ -64,12 +64,12 @@ public class GameHangmanListener extends ListenerAdapter {
 
                 event.getChannel().sendMessageEmbeds(needSetLanguage.build())
                         .setActionRow(
-                                Button.secondary(ReactionsButton.BUTTON_RUS, "Кириллица")
+                                Button.secondary(Buttons.BUTTON_RUS.name(), "Кириллица")
                                         .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")),
 
-                                Button.secondary(ReactionsButton.BUTTON_ENG, "Latin")
+                                Button.secondary(Buttons.BUTTON_ENG.name(), "Latin")
                                         .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")),
-                                Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play"))
+                                Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play"))
                         .queue();
 
                 return;
@@ -85,17 +85,17 @@ public class GameHangmanListener extends ListenerAdapter {
                         event.getAuthor().getId()).replaceAll("\\{0}", prefix));
 
                 event.getChannel().sendMessageEmbeds(youPlay.build())
-                        .setActionRow(Button.danger(ReactionsButton.BUTTON_STOP, "Stop game"))
+                        .setActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game"))
                         .queue();
                 return;
             }
 
             if (message.equals(prefix2) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                HangmanRegistry.getInstance().getActiveHangman().remove(userIdLong);
+                HangmanRegistry.getInstance().removeHangman(userIdLong);
 
                 event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_Eng_game",
                                 event.getAuthor().getId()).replaceAll("\\{0}", prefix))
-                        .setActionRow(Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play again"))
+                        .setActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
                         .queue();
                 hangmanGameRepository.deleteActiveGame(userIdLong);
                 return;
@@ -103,7 +103,7 @@ public class GameHangmanListener extends ListenerAdapter {
 
             if (message.equals(prefix2) && !HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_You_Are_Not_Play", event.getAuthor().getId()))
-                        .setActionRow(Button.success(ReactionsButton.BUTTON_START_NEW_GAME, "Play again"))
+                        .setActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
                         .queue();
                 return;
             }
