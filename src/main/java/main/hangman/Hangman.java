@@ -39,9 +39,7 @@ import java.util.TimerTask;
 @Getter
 public class Hangman implements HangmanHelper {
 
-    private static final String URL_RU = "http://195.2.81.139:8085/api/russian";
-    private static final String URL = "http://localhost:8085/api/word";
-    private static final String URL_EN = "http://195.2.81.139:8085/api/english";
+    private static final String URL = "http://195.2.81.139:8085/api/word";
     private static final String HANGMAN_URL = "https://megoru.ru/hangman2/";
     private static final JSONGameParsers jsonGameParsers = new JSONGameParsers();
     private static final JSONParsers jsonParsers = new JSONParsers();
@@ -101,7 +99,7 @@ public class Hangman implements HangmanHelper {
     private void updateEmbedBuilder(EmbedBuilder start) {
         Instant instant = Instant.now().plusSeconds(600L);
 
-        HangmanRegistry.getInstance().getTimeCreatedGame().put(Long.valueOf(userId), LocalDateTime.from(OffsetDateTime.parse(String.valueOf(instant))));
+        HangmanRegistry.getInstance().getTimeCreatedGame().put(Long.valueOf(userId), LocalDateTime.from(OffsetDateTime.parse(String.valueOf(Instant.now()))));
 
         HangmanRegistry.getInstance().getEndAutoDelete().put(Long.valueOf(userId), String.valueOf(OffsetDateTime.parse(String.valueOf(instant))));
 

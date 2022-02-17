@@ -140,7 +140,7 @@ public class BotStartConfig {
 
         //Обновить команды
 //        updateSlashCommands(false);
-        System.out.println("00:18");
+        System.out.println("01:13");
     }
 
     //Выглядит ужасно, но работает.
@@ -347,11 +347,11 @@ public class BotStartConfig {
 
                 HangmanRegistry.getInstance().getTimeCreatedGame().put(userIdLong, game_created_time);
 
-                Instant specificTime = Instant.ofEpochMilli(game_created_time.toInstant(ZoneOffset.UTC).toEpochMilli());
+                Instant specificTime = Instant.ofEpochMilli(game_created_time.toInstant(ZoneOffset.UTC).toEpochMilli()).plusSeconds(600L);
 
                 HangmanRegistry.getInstance().getEndAutoDelete().put(
                         userIdLong,
-                        specificTime.plusSeconds(600L).toString());
+                        specificTime.toString());
                 HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).insertButtonsToCollection();
 
             }
