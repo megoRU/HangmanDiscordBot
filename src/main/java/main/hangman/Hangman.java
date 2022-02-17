@@ -19,13 +19,13 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
 
 import java.awt.*;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -40,6 +40,7 @@ import java.util.TimerTask;
 public class Hangman implements HangmanHelper {
 
     private static final String URL_RU = "http://195.2.81.139:8085/api/russian";
+    private static final String URL = "http://localhost:8085/api/word";
     private static final String URL_EN = "http://195.2.81.139:8085/api/english";
     private static final String HANGMAN_URL = "https://megoru.ru/hangman2/";
     private static final JSONGameParsers jsonGameParsers = new JSONGameParsers();
@@ -78,16 +79,17 @@ public class Hangman implements HangmanHelper {
 
     private String getWord() {
         try {
-            switch (BotStartConfig.getMapGameLanguages().get(getUserId())) {
-                case "rus" -> {
-                    JSONObject json = new JSONObject(IOUtils.toString(new URL(URL_RU), StandardCharsets.UTF_8));
-                    return String.valueOf(json.getString("word"));
-                }
-                case "eng" -> {
-                    JSONObject json = new JSONObject(IOUtils.toString(new URL(URL_EN), StandardCharsets.UTF_8));
-                    return String.valueOf(json.getString("word"));
-                }
-            }
+            long time = System.currentTimeMillis();
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(URL))
+                    .POST(HttpRequest.BodyPublishers.ofString(new language(BotStartConfig.getMapGameLanguages().get(getUserId())).toString()))
+                    .header("Content-Type", "application/json")
+                    .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(System.currentTimeMillis() - time + " ms getWord()");
+
+            return response.body();
         } catch (Exception e) {
             System.out.println("Скорее всего API не работает");
             e.printStackTrace();
