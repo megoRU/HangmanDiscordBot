@@ -9,7 +9,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      #     Build JAR:
       - uses: actions/checkout@v1
       - name: set up JDK 15
         uses: actions/setup-java@v1
@@ -18,7 +17,6 @@ jobs:
       - name: Maven Package
         run: mvn -B clean compile package -DskipTests
 
-      #     Build Docker image:
        - name: Build and tag image
         run: |
              docker build -t megoru/hangman .
@@ -28,6 +26,5 @@ jobs:
           with:
             username: ${{ secrets.DOCKER_LOGIN }}
             password: ${{ secrets.DOCKER_PASSWORD }}
-      #     Publish image to github package repository:
       - name: Publish image
         run: docker push megoru/hangman
