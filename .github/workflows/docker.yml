@@ -6,29 +6,15 @@ on:
       - 'main'
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
 
-  build_docker_image:
-    runs-on: ubuntu-18.04
+
     steps:
-
-      #     Build JAR:
-      - uses: actions/checkout@v1
-      - name: set up JDK 15
-        uses: actions/setup-java@v1
-        with:
-          java-version: 1.15
-      - name: Maven Package
-        run: mvn -B clean compile package -DskipTests
-
       #     Build Docker image:
       - name: Build and tag image
-        run: |
-          docker build -t megoru/hangman .
-
-      -steps:
-        - shell: bash
-          env:
-            LOGIN: ${{ secrets.DOCKER_LOGIN }}
-            PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          run: |
-            docker login -u "$LOGIN" -p "$PASSWORD"
+      run: |
+      docker build -t megoru/hangman .
+      - uses: actions/checkout@v1
+      - name: Login to DockerHub Registry
+        run: echo ${{ secrets.DOCKER_LOGIN }} | docker login -u ${{ secrets.DOCKER_PASSWORD }} --password-stdin
