@@ -26,4 +26,8 @@ jobs:
           docker build -t megoru/hangman .
 
       - name: Docker login
-        run: docker login -u ${{secrets.DOCKER_LOGIN}} -p ${{secrets.DOCKER_PASSWORD}}
+        with: # Set the secret as an input
+          env:
+            LOGIN: ${{ secrets.DOCKER_LOGIN }}
+            PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: docker login -u $LOGIN -p $PASSWORD
