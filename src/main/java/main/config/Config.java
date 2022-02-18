@@ -4,7 +4,7 @@ public class Config {
 
     private static final String DEV_BOT_TOKEN = System.getenv("DEV_TOKEN");
     private static final String PRODUCTION_BOT_TOKEN = System.getenv("PROD_TOKEN");
-    private static final String TOKEN = DEV_BOT_TOKEN;
+    private static final String TOKEN = PRODUCTION_BOT_TOKEN;
 
     private static final String TOP_GG_API_TOKEN = System.getenv("TOP_GG_API_TOKEN");
     private static final String BOT_ID = "845974873682608129"; //megoDev: 780145910764142613 //giveaway: 808277484524011531
