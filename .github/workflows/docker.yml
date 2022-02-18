@@ -11,7 +11,6 @@ jobs:
 
 
     steps:
-      #     Build Docker image:
       - name: Build and tag image
       run: |
       docker build -t megoru/hangman .
