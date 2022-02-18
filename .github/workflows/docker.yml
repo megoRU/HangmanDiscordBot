@@ -30,5 +30,26 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_LOGIN }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+      #     Push image to Docker Hub:
       - name: Publish image
         run: docker push megoru/hangman
+      #     Push docker-compose pull command
+      - name: docker-compose pull
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+           command: docker-compose pull
+           host: ${{ secrets.HOST }}
+           username: root
+           password: ${{ secrets.SSH_PASWORD }}
+      #     Wait 60 seconds
+      - name: Sleep for 60 seconds
+        run: sleep 60s
+        shell: bash
+      #     Push docker-compose up -d command
+      - name: docker-compose up -d
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+           command: docker-compose up -d
+           host: ${{ secrets.HOST }}
+           username: root
+           password: ${{ secrets.SSH_PASWORD }}

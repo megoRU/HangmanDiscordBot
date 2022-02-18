@@ -140,7 +140,7 @@ public class BotStartConfig {
 
         //Обновить команды
 //        updateSlashCommands(false);
-        System.out.println("01:13");
+        System.out.println("19:09");
     }
 
     //Выглядит ужасно, но работает.
