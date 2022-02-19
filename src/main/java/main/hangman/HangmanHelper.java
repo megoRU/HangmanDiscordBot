@@ -36,14 +36,4 @@ public interface HangmanHelper {
         }
     }
 
-    default void deleteUserGameMessages(String guildId, Long channelId, List<Message> messageList) {
-        try {
-            BotStartConfig.jda
-                    .getGuildById(guildId)
-                    .getTextChannelById(channelId)
-                    .deleteMessages(messageList).queue();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

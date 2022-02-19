@@ -30,10 +30,8 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 @Setter
 @Getter
@@ -51,8 +49,8 @@ public class Hangman implements HangmanHelper {
     private final String userId;
     private final String guildId;
     private final Long channelId;
-    private final List<Message> messageList = new ArrayList<>(20);
     private final List<Button> buttons = new ArrayList<>();
+    private final Queue<Message> messageList = new ArrayDeque<>();
     private int countUsedLetters;
     private String WORD = null;
     private char[] wordToChar;
@@ -72,7 +70,6 @@ public class Hangman implements HangmanHelper {
         this.userId = userId;
         this.guildId = guildId;
         this.channelId = channelId;
-        autoInsert();
     }
 
     private String getWord() {
@@ -97,6 +94,8 @@ public class Hangman implements HangmanHelper {
 
     //TODO: Работает, но изменить время на Instant желательно.
     private void updateEmbedBuilder(EmbedBuilder start) {
+        autoInsert();
+
         Instant instant = Instant.now().plusSeconds(600L);
 
         HangmanRegistry.getInstance().getTimeCreatedGame().put(Long.valueOf(userId), LocalDateTime.from(OffsetDateTime.parse(String.valueOf(Instant.now()))));
@@ -264,6 +263,19 @@ public class Hangman implements HangmanHelper {
                     Thread.currentThread().interrupt();
                     e.printStackTrace();
                 }
+                try {
+                    if (BotStartConfig.jda
+                            .getGuildById(guildId)
+                            .getSelfMember()
+                            .hasPermission(BotStartConfig.jda.getTextChannelById(channelId), Permission.MESSAGE_MANAGE) && !messageList.isEmpty()) {
+                        List<Message> temp = new ArrayList<>(messageList);
+                        BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessages(messageList).queue();
+                        messageList.removeAll(temp);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
         }, 1, 5000);
     }
@@ -485,15 +497,6 @@ public class Hangman implements HangmanHelper {
 
     private void clearingCollections() {
         try {
-            if (BotStartConfig.jda.getGuildById(guildId) != null
-                    && messageList.size() > 2
-                    && BotStartConfig.jda
-                    .getGuildById(guildId)
-                    .getSelfMember()
-                    .hasPermission(BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId), Permission.MESSAGE_MANAGE)) {
-                deleteUserGameMessages(guildId, channelId, messageList);
-            }
-
             HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
         } catch (Exception e) {
             e.printStackTrace();

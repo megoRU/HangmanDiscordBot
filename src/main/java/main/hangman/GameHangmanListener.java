@@ -9,6 +9,7 @@ import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
 import main.model.repository.PlayerRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
