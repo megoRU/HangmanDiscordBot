@@ -9,6 +9,7 @@ import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
 import main.model.repository.PlayerRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -51,6 +52,11 @@ public class GameHangmanListener extends ListenerAdapter {
         long userIdLong = event.getAuthor().getIdLong();
         if ((message.matches(HG_ONE_LETTER) || message.matches(HG_ONE_LETTER_ENG)) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
             HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).logic(message, event.getMessage());
+
+            if (event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_MANAGE)) {
+                event.getMessage().delete().queue();
+            }
+
             return;
         }
 

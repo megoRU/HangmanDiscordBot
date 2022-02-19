@@ -13,7 +13,6 @@ import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
 import main.model.repository.PlayerRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -51,7 +50,6 @@ public class Hangman implements HangmanHelper {
     private final String userId;
     private final String guildId;
     private final Long channelId;
-    private final List<Message> messageList = new ArrayList<>(20);
     private final List<Button> buttons = new ArrayList<>();
     private int countUsedLetters;
     private String WORD = null;
@@ -269,7 +267,6 @@ public class Hangman implements HangmanHelper {
     }
 
     public void logic(String inputs, Message messages) {
-        messageList.add(messages);
         try {
             if (WORD == null) {
                 addButtonsWhenGameOver();
@@ -485,15 +482,6 @@ public class Hangman implements HangmanHelper {
 
     private void clearingCollections() {
         try {
-            if (BotStartConfig.jda.getGuildById(guildId) != null
-                    && messageList.size() > 2
-                    && BotStartConfig.jda
-                    .getGuildById(guildId)
-                    .getSelfMember()
-                    .hasPermission(BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId), Permission.MESSAGE_MANAGE)) {
-                deleteUserGameMessages(guildId, channelId, messageList);
-            }
-
             HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
         } catch (Exception e) {
             e.printStackTrace();
