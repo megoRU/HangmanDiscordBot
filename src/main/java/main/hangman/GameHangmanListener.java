@@ -52,11 +52,6 @@ public class GameHangmanListener extends ListenerAdapter {
         long userIdLong = event.getAuthor().getIdLong();
         if ((message.matches(HG_ONE_LETTER) || message.matches(HG_ONE_LETTER_ENG)) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
             HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).logic(message, event.getMessage());
-
-            if (event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_MANAGE)) {
-                event.getMessage().delete().queue();
-            }
-
             return;
         }
 
