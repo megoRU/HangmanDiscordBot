@@ -17,7 +17,6 @@ import java.util.List;
 public class CreatorGraph implements SenderMessage {
 
     private static final JSONParsers jsonParsers = new JSONParsers();
-    private final String guildIdLong;
     private final String textChannelIdLong;
     private final String userIdLong;
     private final String userName;
@@ -28,10 +27,9 @@ public class CreatorGraph implements SenderMessage {
     private final StringBuilder columnSecond = new StringBuilder();
     private final GamesRepository gamesRepository;
 
-    public CreatorGraph(GamesRepository gamesRepository, String guildIdLong,
+    public CreatorGraph(GamesRepository gamesRepository,
                         String textChannelIdLong, String userIdLong,
                         String userName, String userUrl, SlashCommandInteractionEvent slashCommandEvent) {
-        this.guildIdLong = guildIdLong;
         this.textChannelIdLong = textChannelIdLong;
         this.userIdLong = userIdLong;
         this.userName = userName;
@@ -58,10 +56,18 @@ public class CreatorGraph implements SenderMessage {
                 }
                 case MY -> {
                     List<StatisticMy> statisticList = gamesRepository.getAllMyStatistic(userIdLong);
-                    for (int i = statisticList.size() - 8; i < statisticList.size(); i++) {
-                        date.append(date.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getGameDate(), 0, 7).append("-01").append("'");
-                        columnFirst.append(columnFirst.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ONES()).append("'");
-                        columnSecond.append(columnSecond.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ZEROS()).append("'");
+                    if (statisticList.size() > 8) {
+                        for (int i = statisticList.size() - 8; i < statisticList.size(); i++) {
+                            date.append(date.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getGameDate(), 0, 7).append("-01").append("'");
+                            columnFirst.append(columnFirst.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ONES()).append("'");
+                            columnSecond.append(columnSecond.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ZEROS()).append("'");
+                        }
+                    } else {
+                        for (int i = 0; i < statisticList.size(); i++) {
+                            date.append(date.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getGameDate(), 0, 7).append("-01").append("'");
+                            columnFirst.append(columnFirst.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ONES()).append("'");
+                            columnSecond.append(columnSecond.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ZEROS()).append("'");
+                        }
                     }
                     setImage(chart, statistic).getShortUrl();
                 }
@@ -81,8 +87,16 @@ public class CreatorGraph implements SenderMessage {
 
             if (slashCommandEvent != null) {
                 sendMessage(globalStats, slashCommandEvent);
-            } else {
+                return;
+            }
+
+            if (BotStartConfig.jda.getTextChannelById(textChannelIdLong) != null) {
                 sendMessage(globalStats, BotStartConfig.jda.getTextChannelById(textChannelIdLong));
+                return;
+            }
+
+            if (BotStartConfig.jda.getPrivateChannelById(textChannelIdLong) != null) {
+                sendMessage(globalStats, BotStartConfig.jda.getPrivateChannelById(textChannelIdLong));
             }
         } catch (Exception e) {
             e.printStackTrace();

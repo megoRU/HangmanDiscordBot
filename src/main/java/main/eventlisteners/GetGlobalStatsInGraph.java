@@ -42,7 +42,6 @@ public class GetGlobalStatsInGraph extends ListenerAdapter {
 
             CreatorGraph creatorGraph = new CreatorGraph(
                     gamesRepository,
-                    event.getGuild().getId(),
                     event.getMessage().getTextChannel().getId(),
                     event.getAuthor().getId(),
                     event.getAuthor().getName(),
@@ -56,7 +55,6 @@ public class GetGlobalStatsInGraph extends ListenerAdapter {
 
             CreatorGraph creatorGraph = new CreatorGraph(
                     gamesRepository,
-                    event.getGuild().getId(),
                     event.getMessage().getTextChannel().getId(),
                     event.getAuthor().getId(),
                     event.getAuthor().getName(),
