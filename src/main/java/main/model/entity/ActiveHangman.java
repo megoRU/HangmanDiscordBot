@@ -29,7 +29,7 @@ public class ActiveHangman {
     @Column(name = "channel_id_long", nullable = false)
     private Long channelIdLong;
 
-    @Column(name = "guild_long_id", nullable = false)
+    @Column(name = "guild_long_id")
     private Long guildLongId;
 
     @Column(name = "word")

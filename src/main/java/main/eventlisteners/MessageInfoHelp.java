@@ -73,6 +73,11 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
         EmbedBuilder info = new EmbedBuilder();
         info.setColor(0xa224db);
         info.setAuthor(name, null, avatar);
+        info.addField("Warning", "On May 1, 2022, the bot will work only in private messages. " +
+                "\nDiscord refused to provide Message Content.\n" +
+                "From May 1, 2022, if the game is created through the guild, " +
+                "\nthe bot will send a private message with game.", false);
+
         info.addField(jsonParsers.getLocale("messages_events_Prefix", userIdLong),
                 jsonParsers.getLocale("messages_events_Changes_Prefix", userIdLong) +
                         jsonParsers.getLocale("messages_events_Reset_Prefix", userIdLong), false);

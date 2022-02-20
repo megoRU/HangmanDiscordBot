@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -168,7 +169,7 @@ public class Hangman implements HangmanHelper {
         activeHangman.setUserIdLong(Long.valueOf(userId));
         activeHangman.setMessageIdLong(Long.valueOf(message.getId()));
         activeHangman.setChannelIdLong(channelId);
-        activeHangman.setGuildLongId(Long.valueOf(guildId));
+        activeHangman.setGuildLongId(guildId != null ? Long.valueOf(guildId) : null);
         activeHangman.setWord(WORD);
         activeHangman.setCurrentHiddenWord(WORD_HIDDEN);
         activeHangman.setGuesses(guesses.toString());
@@ -187,8 +188,12 @@ public class Hangman implements HangmanHelper {
             info.setTitle(jsonGameParsers.getLocale("gameOver", userId));
             info.setDescription(jsonGameParsers.getLocale("timeIsOver", userId));
             info.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
-            editMessageWithButtons(info, guildId, Long.parseLong(userId), channelId, buttons);
 
+            if (guildId != null) {
+                editMessageWithButtons(info, guildId, Long.parseLong(userId), channelId, buttons);
+            } else {
+                editMessageWithButtons(info, Long.parseLong(userId), channelId, buttons);
+            }
             WORD = null;
             clearingCollections();
         } catch (Exception e) {
@@ -197,7 +202,7 @@ public class Hangman implements HangmanHelper {
 
     }
 
-    public void startGame(TextChannel textChannel, String avatarUrl, String userName) {
+    public void startGame(MessageChannel textChannel, String avatarUrl, String userName) {
         try {
             if (BotStartConfig.getMapGameLanguages().get(getUserId()) == null) {
                 //Добавляем buttons в коллекции
@@ -265,16 +270,18 @@ public class Hangman implements HangmanHelper {
                     e.printStackTrace();
                 }
                 try {
-                    if (BotStartConfig.jda
-                            .getGuildById(guildId)
-                            .getSelfMember()
-                            .hasPermission(BotStartConfig.jda.getTextChannelById(channelId), Permission.MESSAGE_MANAGE) && !messageList.isEmpty()) {
-                        if (messageList.size() == 1) {
-                            BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessageById(messageList.poll().getId()).queue();
-                        } else {
-                            List<Message> temp = new ArrayList<>(messageList);
-                            BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessages(messageList).queue();
-                            messageList.removeAll(temp);
+                    if (guildId != null) {
+                        if (BotStartConfig.jda
+                                .getGuildById(guildId)
+                                .getSelfMember()
+                                .hasPermission(BotStartConfig.jda.getTextChannelById(channelId), Permission.MESSAGE_MANAGE) && !messageList.isEmpty()) {
+                            if (messageList.size() == 1) {
+                                BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessageById(messageList.poll().getId()).queue();
+                            } else {
+                                List<Message> temp = new ArrayList<>(messageList);
+                                BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessages(messageList).queue();
+                                messageList.removeAll(temp);
+                            }
                         }
                     }
                 } catch (Exception e) {
@@ -282,7 +289,7 @@ public class Hangman implements HangmanHelper {
                 }
 
             }
-        }, 1, 5000);
+        }, 7000, 5000);
     }
 
     public void logic(String inputs, Message messages) {
@@ -325,7 +332,11 @@ public class Hangman implements HangmanHelper {
                     info.setTimestamp(OffsetDateTime.parse(String.valueOf(HangmanRegistry.getInstance().getEndAutoDelete().get(Long.parseLong(userId)))));
                     info.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
 
-                    editMessage(info, guildId, Long.parseLong(userId), this.channelId);
+                    if (guildId != null) {
+                        editMessage(info, guildId, Long.parseLong(userId), this.channelId);
+                    } else {
+                        editMessage(info, Long.parseLong(userId), this.channelId);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -350,7 +361,11 @@ public class Hangman implements HangmanHelper {
                         win.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
                         win.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + result.toUpperCase() + "`", false);
 
-                        editMessageWithButtons(win, guildId, Long.parseLong(userId), channelId, buttons);
+                        if (guildId != null) {
+                            editMessageWithButtons(win, guildId, Long.parseLong(userId), channelId, buttons);
+                        } else {
+                            editMessageWithButtons(win, Long.parseLong(userId), channelId, buttons);
+                        }
 
                         WORD = null;
                         clearingCollections();
@@ -375,7 +390,11 @@ public class Hangman implements HangmanHelper {
                     info.setTimestamp(OffsetDateTime.parse(String.valueOf(HangmanRegistry.getInstance().getEndAutoDelete().get(Long.parseLong(userId)))));
                     info.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
 
-                    editMessage(info, guildId, Long.parseLong(userId), channelId);
+                    if (guildId != null) {
+                        editMessage(info, guildId, Long.parseLong(userId), this.channelId);
+                    } else {
+                        editMessage(info, Long.parseLong(userId), this.channelId);
+                    }
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -398,7 +417,11 @@ public class Hangman implements HangmanHelper {
                         info.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
                         info.addField(jsonGameParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase() + "`", false);
 
-                        editMessageWithButtons(info, guildId, Long.parseLong(userId), channelId, buttons);
+                        if (guildId != null) {
+                            editMessageWithButtons(info, guildId, Long.parseLong(userId), channelId, buttons);
+                        } else {
+                            editMessageWithButtons(info, Long.parseLong(userId), channelId, buttons);
+                        }
 
                         WORD = null;
                         clearingCollections();
@@ -421,8 +444,11 @@ public class Hangman implements HangmanHelper {
                         wordNotFound.setTimestamp(OffsetDateTime.parse(String.valueOf(HangmanRegistry.getInstance().getEndAutoDelete().get(Long.parseLong(userId)))));
                         wordNotFound.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
 
-
-                        editMessage(wordNotFound, guildId, Long.parseLong(userId), channelId);
+                        if (guildId != null) {
+                            editMessage(wordNotFound, guildId, Long.parseLong(userId), this.channelId);
+                        } else {
+                            editMessage(wordNotFound, Long.parseLong(userId), this.channelId);
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

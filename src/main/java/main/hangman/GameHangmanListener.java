@@ -35,24 +35,22 @@ public class GameHangmanListener extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
 
-        if (!event.isFromType(ChannelType.TEXT)) return;
-
-        if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
+        if (event.isFromGuild() && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
 
         String message = event.getMessage().getContentRaw().trim().toLowerCase();
 
         String prefix = HG;
         String prefix2 = HG_STOP;
-
-        if (BotStartConfig.getMapPrefix().containsKey(event.getGuild().getId())) {
-            prefix = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "hg";
-            prefix2 = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "hg stop";
-        }
-
         long userIdLong = event.getAuthor().getIdLong();
+
         if ((message.matches(HG_ONE_LETTER) || message.matches(HG_ONE_LETTER_ENG)) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
             HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).logic(message, event.getMessage());
             return;
+        }
+
+        if (event.isFromGuild() && BotStartConfig.getMapPrefix().containsKey(event.getGuild().getId())) {
+            prefix = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "hg";
+            prefix2 = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "hg stop";
         }
 
         if (message.equals(prefix) || message.equals(prefix2)) {

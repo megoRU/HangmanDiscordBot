@@ -33,15 +33,8 @@ public class SlashCommand extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (event.getUser().isBot()) return;
-        if (!event.isFromGuild()) {
-            EmbedBuilder fromGuild = new EmbedBuilder();
-            fromGuild.setColor(0x00FF00);
-            fromGuild.setDescription("The bot supports `/slash commands` only in guilds!");
-            event.replyEmbeds(fromGuild.build()).queue();
-            return;
-        }
 
-        if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) {
+        if (event.isFromGuild() && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) {
             return;
         }
 
@@ -72,16 +65,39 @@ public class SlashCommand extends ListenerAdapter {
 
                     youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
                     youPlay.setColor(0x00FF00);
-                    youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play",
-                            event.getUser().getId()).replaceAll("\\{0}", BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null
-                            ? "!hg" : BotStartConfig.getMapPrefix().get(event.getGuild().getId())));
+
+                    if (event.isFromGuild()) {
+                        youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play",
+                                event.getUser().getId()).replaceAll("\\{0}", BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null
+                                ? "!hg" : BotStartConfig.getMapPrefix().get(event.getGuild().getId())));
+                    } else {
+                        youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play",
+                                event.getUser().getId()).replaceAll("\\{0}", "/hg"));
+                    }
 
                     event.replyEmbeds(youPlay.build())
                             .addActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game"))
                             .queue();
                     //Если всё хорошо, создаем игру
                 } else {
-                    HangmanRegistry.getInstance().setHangman(event.getUser().getIdLong(), new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getChannel().getIdLong(), hangmanGameRepository, gamesRepository, playerRepository));
+                    if (event.isFromGuild()) {
+                        HangmanRegistry.getInstance().setHangman(event.getUser().getIdLong(),
+                                new Hangman(event.getUser().getId(),
+                                        event.getGuild().getId(),
+                                        event.getChannel().getIdLong(),
+                                        hangmanGameRepository,
+                                        gamesRepository,
+                                        playerRepository));
+                    } else {
+                        HangmanRegistry.getInstance().setHangman(event.getUser().getIdLong(),
+                                new Hangman(event.getUser().getId(),
+                                        null,
+                                        event.getChannel().getIdLong(),
+                                        hangmanGameRepository,
+                                        gamesRepository,
+                                        playerRepository));
+
+                    }
                     HangmanRegistry.getInstance().getActiveHangman().get(event.getUser().getIdLong()).startGame(event);
                 }
                 return;
@@ -91,11 +107,19 @@ public class SlashCommand extends ListenerAdapter {
                 //Проверяем играет ли сейчас игрок. Если да удаляем игру.
                 if (HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
                     HangmanRegistry.getInstance().getActiveHangman().remove(event.getUser().getIdLong());
+                    //TODO: убрать 1 мая 2022
+                    if (event.isFromGuild()) {
+                        event.reply(jsonParsers.getLocale("Hangman_Eng_game",
+                                        event.getUser().getId()).replaceAll("\\{0}", BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null ? "!hg" : BotStartConfig.getMapPrefix().get(event.getGuild().getId())))
+                                .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
+                                .queue();
+                    } else {
+                        event.reply(jsonParsers.getLocale("Hangman_Eng_game",
+                                        event.getUser().getId()).replaceAll("\\{0}", "/hg" ))
+                                .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
+                                .queue();
+                    }
 
-                    event.reply(jsonParsers.getLocale("Hangman_Eng_game",
-                                    event.getUser().getId()).replaceAll("\\{0}", BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null ? "!hg" : BotStartConfig.getMapPrefix().get(event.getGuild().getId())))
-                            .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
-                            .queue();
                     hangmanGameRepository.deleteActiveGame(event.getUser().getIdLong());
                     //Если игрок не играет, а хочет завершить игру, то нужно ему это прислать уведомление, что он сейчас не играет
                 } else {
@@ -149,13 +173,18 @@ public class SlashCommand extends ListenerAdapter {
             }
 
             if (event.getName().equals("help")) {
-                new MessageInfoHelp().buildMessage(
-                        BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null ? "!" : BotStartConfig.getMapPrefix().get(event.getGuild().getId()),
-                        null,
-                        event,
-                        event.getUser().getAvatarUrl(),
-                        event.getUser().getId(),
-                        event.getUser().getName());
+                //TODO: убрать 1 мая 2022
+                if (event.isFromGuild()) {
+                    new MessageInfoHelp().buildMessage(
+                            BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null ? "!" : BotStartConfig.getMapPrefix().get(event.getGuild().getId()),
+                            null,
+                            event,
+                            event.getUser().getAvatarUrl(),
+                            event.getUser().getId(),
+                            event.getUser().getName());
+                } else {
+                    event.reply("Deprecated in Private Messages").queue();
+                }
                 return;
             }
 
@@ -175,8 +204,7 @@ public class SlashCommand extends ListenerAdapter {
 
                 CreatorGraph creatorGraph = new CreatorGraph(
                         gamesRepository,
-                        event.getGuild().getId(),
-                        event.getTextChannel().getId(),
+                        event.getChannel().getId(),
                         event.getUser().getId(),
                         event.getUser().getName(),
                         event.getUser().getAvatarUrl(),
@@ -189,8 +217,7 @@ public class SlashCommand extends ListenerAdapter {
             if (event.getName().equals("mystats")) {
                 CreatorGraph creatorGraph = new CreatorGraph(
                         gamesRepository,
-                        event.getGuild().getId(),
-                        event.getTextChannel().getId(),
+                        event.getChannel().getId(),
                         event.getUser().getId(),
                         event.getUser().getName(),
                         event.getUser().getAvatarUrl(),
