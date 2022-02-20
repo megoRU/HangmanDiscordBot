@@ -30,8 +30,9 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.*;
 import java.util.List;
+import java.util.Queue;
+import java.util.*;
 
 @Setter
 @Getter
@@ -268,9 +269,13 @@ public class Hangman implements HangmanHelper {
                             .getGuildById(guildId)
                             .getSelfMember()
                             .hasPermission(BotStartConfig.jda.getTextChannelById(channelId), Permission.MESSAGE_MANAGE) && !messageList.isEmpty()) {
-                        List<Message> temp = new ArrayList<>(messageList);
-                        BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessages(messageList).queue();
-                        messageList.removeAll(temp);
+                        if (messageList.size() == 1) {
+                            BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessageById(messageList.poll().getId()).queue();
+                        } else {
+                            List<Message> temp = new ArrayList<>(messageList);
+                            BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessages(messageList).queue();
+                            messageList.removeAll(temp);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
