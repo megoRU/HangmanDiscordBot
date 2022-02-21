@@ -48,7 +48,7 @@ public class CreatorGraph implements SenderMessage {
             switch (statistic) {
                 case GLOBAL -> {
                     List<StatisticGlobal> statisticList = gamesRepository.getAllStatistic();
-                    for (int i = statisticList.size() - 8; i < statisticList.size(); i++) {
+                    for (int i = statisticList.size() - 1; i >= 0; i--) {
                         date.append(date.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getGameDate(), 0, 7).append("-01").append("'");
                         columnFirst.append(columnFirst.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getCount()).append("'");
                     }
@@ -56,18 +56,10 @@ public class CreatorGraph implements SenderMessage {
                 }
                 case MY -> {
                     List<StatisticMy> statisticList = gamesRepository.getAllMyStatistic(userIdLong);
-                    if (statisticList.size() > 8) {
-                        for (int i = statisticList.size() - 8; i < statisticList.size(); i++) {
-                            date.append(date.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getGameDate(), 0, 7).append("-01").append("'");
-                            columnFirst.append(columnFirst.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ONES()).append("'");
-                            columnSecond.append(columnSecond.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ZEROS()).append("'");
-                        }
-                    } else {
-                        for (int i = 0; i < statisticList.size(); i++) {
-                            date.append(date.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getGameDate(), 0, 7).append("-01").append("'");
-                            columnFirst.append(columnFirst.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ONES()).append("'");
-                            columnSecond.append(columnSecond.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ZEROS()).append("'");
-                        }
+                    for (int i = statisticList.size() - 1; i >= 0; i--) {
+                        date.append(date.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getGameDate(), 0, 7).append("-01").append("'");
+                        columnFirst.append(columnFirst.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ONES()).append("'");
+                        columnSecond.append(columnSecond.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ZEROS()).append("'");
                     }
                     setImage(chart, statistic).getShortUrl();
                 }
