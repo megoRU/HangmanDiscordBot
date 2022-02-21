@@ -265,29 +265,35 @@ public class Hangman implements HangmanHelper {
                 try {
                     if (HangmanRegistry.getInstance().hasHangman(Long.parseLong(userId))) {
                         executeInsert();
-                        if (guildId != null) {
-                            if (BotStartConfig.jda
-                                    .getGuildById(guildId)
-                                    .getSelfMember()
-                                    .hasPermission(BotStartConfig.jda.getTextChannelById(channelId), Permission.MESSAGE_MANAGE) && !messageList.isEmpty()) {
-                                if (messageList.size() == 1) {
-                                    BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessageById(messageList.poll().getId()).queue();
-                                } else {
-                                    List<Message> temp = new ArrayList<>(messageList);
-                                    BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessages(messageList).queue();
-                                    messageList.removeAll(temp);
-                                }
-                            }
-                        }
+                        deleteMessages();
                     } else {
+                        deleteMessages();
                         Thread.currentThread().interrupt();
                     }
                 } catch (Exception e) {
+                    deleteMessages();
                     e.printStackTrace();
                     Thread.currentThread().interrupt();
                 }
             }
         }, 7000, 5000);
+    }
+
+    private void deleteMessages() {
+        if (guildId != null) {
+            if (BotStartConfig.jda
+                    .getGuildById(guildId)
+                    .getSelfMember()
+                    .hasPermission(BotStartConfig.jda.getTextChannelById(channelId), Permission.MESSAGE_MANAGE) && !messageList.isEmpty()) {
+                if (messageList.size() == 1) {
+                    BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessageById(messageList.poll().getId()).queue();
+                } else {
+                    List<Message> temp = new ArrayList<>(messageList);
+                    BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessages(messageList).queue();
+                    messageList.removeAll(temp);
+                }
+            }
+        }
     }
 
     public void logic(String inputs, Message messages) {
