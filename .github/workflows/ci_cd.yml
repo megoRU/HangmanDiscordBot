@@ -7,7 +7,7 @@ on:
 
 jobs:
 
-  build_docker_image:
+  build:
     runs-on: ubuntu-20.04
     steps:
 
