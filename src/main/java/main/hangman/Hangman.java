@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
@@ -264,30 +263,29 @@ public class Hangman implements HangmanHelper {
         new Timer().scheduleAtFixedRate(new TimerTask() {
             public void run() throws NullPointerException {
                 try {
-                    executeInsert();
-                } catch (Exception e) {
-                    Thread.currentThread().interrupt();
-                    e.printStackTrace();
-                }
-                try {
-                    if (guildId != null) {
-                        if (BotStartConfig.jda
-                                .getGuildById(guildId)
-                                .getSelfMember()
-                                .hasPermission(BotStartConfig.jda.getTextChannelById(channelId), Permission.MESSAGE_MANAGE) && !messageList.isEmpty()) {
-                            if (messageList.size() == 1) {
-                                BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessageById(messageList.poll().getId()).queue();
-                            } else {
-                                List<Message> temp = new ArrayList<>(messageList);
-                                BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessages(messageList).queue();
-                                messageList.removeAll(temp);
+                    if (HangmanRegistry.getInstance().hasHangman(Long.parseLong(userId))) {
+                        executeInsert();
+                        if (guildId != null) {
+                            if (BotStartConfig.jda
+                                    .getGuildById(guildId)
+                                    .getSelfMember()
+                                    .hasPermission(BotStartConfig.jda.getTextChannelById(channelId), Permission.MESSAGE_MANAGE) && !messageList.isEmpty()) {
+                                if (messageList.size() == 1) {
+                                    BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessageById(messageList.poll().getId()).queue();
+                                } else {
+                                    List<Message> temp = new ArrayList<>(messageList);
+                                    BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessages(messageList).queue();
+                                    messageList.removeAll(temp);
+                                }
                             }
                         }
+                    } else {
+                        Thread.currentThread().interrupt();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Thread.currentThread().interrupt();
                 }
-
             }
         }, 7000, 5000);
     }
