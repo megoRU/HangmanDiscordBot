@@ -108,9 +108,25 @@ public class GameHangmanListener extends ListenerAdapter {
             }
 
             if (!HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                event.getChannel().sendTyping().queue();
-                HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getAuthor().getId(), event.getGuild().getId(), event.getChannel().getIdLong(), hangmanGameRepository, gamesRepository, playerRepository));
-                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getTextChannel(), event.getAuthor().getAvatarUrl(), event.getAuthor().getName());
+                if (event.isFromGuild()) {
+                    HangmanRegistry.getInstance().setHangman(event.getAuthor().getIdLong(),
+                            new Hangman(event.getAuthor().getId(),
+                                    event.getGuild().getId(),
+                                    event.getChannel().getIdLong(),
+                                    hangmanGameRepository,
+                                    gamesRepository,
+                                    playerRepository));
+                } else {
+                    HangmanRegistry.getInstance().setHangman(event.getAuthor().getIdLong(),
+                            new Hangman(event.getAuthor().getId(),
+                                    null,
+                                    event.getChannel().getIdLong(),
+                                    hangmanGameRepository,
+                                    gamesRepository,
+                                    playerRepository));
+
+                }
+                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel(), event.getAuthor().getAvatarUrl(), event.getAuthor().getName());
             }
         }
     }
