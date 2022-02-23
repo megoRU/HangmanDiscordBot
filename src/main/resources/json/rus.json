@@ -1,7 +1,7 @@
 {
   "messages_events_Prefix": "Префикс:",
-  "messages_events_Changes_Prefix": "`*prefix <символ>` - Изменяет префикс.\n",
-  "messages_events_Reset_Prefix": "`*prefix reset` - Сбрасывает префикс.",
+  "messages_events_Changes_Prefix": "`!prefix <символ>` - Изменяет префикс. Без <>\n",
+  "messages_events_Reset_Prefix": "`!prefix reset` - Сбрасывает префикс.",
   "messages_events_Language_Title": "Изменение языка:",
   "messages_events_Language": "lang rus` - Выбор языка для Бота: `(rus|eng)`\n",
   "messages_events_Language_Reset": "lang reset` - Сбросить язык на: `ENG`\n",

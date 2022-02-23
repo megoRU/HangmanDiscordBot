@@ -1,7 +1,7 @@
 {
   "messages_events_Prefix": "Prefix:",
-  "messages_events_Changes_Prefix": "`*prefix <symbol>` - Changes the prefix.\n",
-  "messages_events_Reset_Prefix": "`*prefix reset` - Reset the prefix.",
+  "messages_events_Changes_Prefix": "`!prefix <symbol>` - Changes the prefix With out <>.\n",
+  "messages_events_Reset_Prefix": "`!prefix reset` - Reset the prefix.",
   "messages_events_Language_Title": "Changing the language:",
   "messages_events_Language": "lang rus` - Choosing a language for the Bot: `(rus|eng)`\n",
   "messages_events_Language_Reset": "lang reset` - Reset the language to: `ENG`\n",
