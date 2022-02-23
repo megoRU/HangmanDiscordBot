@@ -56,7 +56,7 @@
   "Hangman_Change_Language": "Change the language to: ",
   "ReactionsButton_When_Play": "During the game, you can not change the language without completing the active one.",
   "button_Help": "!help",
-  "restore_Data": "I sent you a private message with a confirmation code,\nand you will see further instructions there.",
+  "restore_Data": "I will sent you a private message with a confirmation code,\nand you will see further instructions there.",
   "restore_Data_PM": "To delete all your data that we store, write to the same chat:\n`!delete {0}`",
   "restore_Data_Success": "The code was successfully accepted.\nYour data on the server has been successfully deleted.",
   "restore_Data_Failure": "I can't find this code.\nTry writing `!delete` again in the same chat!",

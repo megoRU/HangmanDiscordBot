@@ -144,7 +144,7 @@ public class BotStartConfig {
     }
 
     //Выглядит ужасно, но работает.
-    @Scheduled(fixedDelay = 15000L)
+    @Scheduled(fixedDelay = 15000L, initialDelay = 15000L)
     private void engGameByTime() {
         try {
             Map<Long, LocalDateTime> timeCreatedGame = new HashMap<>(HangmanRegistry.getInstance().getTimeCreatedGame());

@@ -9,6 +9,7 @@ import main.model.repository.LanguageRepository;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -42,17 +43,18 @@ public class DeleteAllMyData extends ListenerAdapter {
         }
     }
 
-    public void buildMessage(@NotNull MessageChannel messageChannel, @NotNull User user) {
+    public void buildMessage(@NotNull SlashCommandInteractionEvent event, @NotNull User user) {
 
         String code = UUID.randomUUID().toString().replaceAll("-", "");
         BotStartConfig.getSecretCode().put(user.getId(), code);
 
-        messageChannel.sendMessage(jsonParsers.getLocale("restore_Data", user.getId())).queue();
+        event.reply(jsonParsers.getLocale("restore_Data", user.getId())).queue();
 
         user.openPrivateChannel()
                 .flatMap(channel -> channel.sendMessage(
                         jsonParsers.getLocale("restore_Data_PM", user.getId()).replaceAll("\\{0}", code)))
-                .queue();
+                .queue(null, (exception) -> event.getChannel().sendMessage("I couldn't send you a message to the DM." +
+                        "\nYou may have banned sending you messages\nor I am on your blacklist").queue());
     }
 
     public void buildMessage(@NotNull MessageChannel messageChannel, @NotNull User user, String message) {
