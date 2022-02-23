@@ -33,7 +33,8 @@ public class ReactionsButton extends ListenerAdapter {
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         try {
             if (event.getUser().isBot()) return;
-            if (event.isFromGuild() && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
+            if (event.isFromGuild() && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel()))
+                return;
 
             long userIdLong = event.getUser().getIdLong();
 
@@ -41,6 +42,7 @@ public class ReactionsButton extends ListenerAdapter {
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_CHANGE_GAME_LANGUAGE.name())
                     && HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
                 event.deferEdit().queue();
+                event.editButton(event.getButton().asDisabled()).queue();
                 event.getHook()
                         .sendMessage(jsonParsers.getLocale("ReactionsButton_When_Play", event.getUser().getId()))
                         .setEphemeral(true).queue();
@@ -50,6 +52,7 @@ public class ReactionsButton extends ListenerAdapter {
             if ((Objects.equals(event.getButton().getId(), Buttons.BUTTON_RUS.name()) || Objects.equals(event.getButton().getId(), Buttons.BUTTON_ENG.name()))
                     && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 event.deferEdit().queue();
+                event.editButton(event.getButton().asDisabled()).queue();
                 event.getHook().sendMessage(jsonParsers
                                 .getLocale("ReactionsButton_When_Play", event.getUser().getId()))
                         .setEphemeral(true).queue();
@@ -58,6 +61,7 @@ public class ReactionsButton extends ListenerAdapter {
 
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_RUS.name())) {
                 event.deferEdit().queue();
+                event.editButton(event.getButton().asDisabled()).queue();
                 new GameLanguageChange(gameLanguageRepository).changeGameLanguage("rus", event.getUser().getId());
                 event.getHook().sendMessage(jsonParsers
                                 .getLocale("language_change_lang", event.getUser().getId()).replaceAll("\\{0}", "Кириллица"))
@@ -67,6 +71,7 @@ public class ReactionsButton extends ListenerAdapter {
 
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_ENG.name())) {
                 event.deferEdit().queue();
+                event.editButton(event.getButton().asDisabled()).queue();
                 new GameLanguageChange(gameLanguageRepository).changeGameLanguage("eng", event.getUser().getId());
                 event.getHook().sendMessage(jsonParsers
                                 .getLocale("language_change_lang", event.getUser().getId()).replaceAll("\\{0}", "Latin"))
@@ -77,6 +82,7 @@ public class ReactionsButton extends ListenerAdapter {
             //Меняем язык на тот что был в кнопке
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_CHANGE_LANGUAGE.name())) {
                 event.deferEdit().queue();
+                event.editButton(event.getButton().asDisabled()).queue();
                 String buttonName = event.getButton().getEmoji().getName().contains("\uD83C\uDDF7\uD83C\uDDFA") ? "rus" : "eng";
                 BotStartConfig.getMapLanguages().put(event.getUser().getId(), buttonName);
 
@@ -93,6 +99,7 @@ public class ReactionsButton extends ListenerAdapter {
 
             //При нажатии на кнопку HELP, бот присылает в чат информацию
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_HELP.name())) {
+                event.editButton(event.getButton().asDisabled()).queue();
 
                 event.deferEdit().queue();
                 MessageInfoHelp messageInfoHelp = new MessageInfoHelp();
@@ -120,6 +127,7 @@ public class ReactionsButton extends ListenerAdapter {
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_START_NEW_GAME.name()) && !HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 event.deferEdit().queue();
                 event.getChannel().sendTyping().queue();
+                event.editButton(event.getButton().asDisabled()).queue();
 
                 if (event.isFromGuild()) {
                     HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getTextChannel().getIdLong(), hangmanGameRepository, gamesRepository, playerRepository));
@@ -133,6 +141,7 @@ public class ReactionsButton extends ListenerAdapter {
             //Если нажата кнопка START, и игрок сейчас играет, присылаем в час уведомление
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_START_NEW_GAME.name()) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 event.deferEdit().queue();
+                event.editButton(event.getButton().asDisabled()).queue();
 
                 EmbedBuilder youPlay = new EmbedBuilder();
                 youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
@@ -156,6 +165,7 @@ public class ReactionsButton extends ListenerAdapter {
             //Если нажата кнопка STOP, и игрок сейчас играет, завершаем
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_STOP.name())) {
                 event.deferEdit().queue();
+                event.editButton(event.getButton().asDisabled()).queue();
 
                 if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                     HangmanRegistry.getInstance().getActiveHangman().remove(event.getUser().getIdLong());
@@ -186,6 +196,9 @@ public class ReactionsButton extends ListenerAdapter {
             //Меняем язык на тот что был в кнопке
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_CHANGE_GAME_LANGUAGE.name())) {
                 event.deferEdit().queue();
+
+                event.editButton(event.getButton().asDisabled()).queue();
+
                 String buttonName = event.getButton().getEmoji().getName().contains("\uD83C\uDDF7\uD83C\uDDFA") ? "rus" : "eng";
 
                 BotStartConfig.getMapGameLanguages().put(event.getUser().getId(), buttonName);
@@ -203,6 +216,8 @@ public class ReactionsButton extends ListenerAdapter {
             //Получаем статистику по нажатии на кнопку
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_MY_STATS.name())) {
                 event.deferEdit().queue();
+                event.editButton(event.getButton().asDisabled()).queue();
+
                 new MessageStats(gamesRepository).sendStats(
                         event.getChannel(),
                         null,

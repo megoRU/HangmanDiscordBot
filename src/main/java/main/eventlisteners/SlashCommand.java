@@ -168,7 +168,7 @@ public class SlashCommand extends ListenerAdapter {
                 new DeleteAllMyData(
                         gamesRepository,
                         languageRepository,
-                        gameLanguageRepository).buildMessage(event.getChannel(), event.getUser());
+                        gameLanguageRepository).buildMessage(event, event.getUser());
                 return;
             }
 
