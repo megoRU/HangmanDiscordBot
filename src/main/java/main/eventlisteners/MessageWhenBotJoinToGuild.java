@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -47,12 +46,11 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
                 welcome.addField("Support server", ":helmet_with_cross: [Discord server](https://discord.com/invite/UrWG3R683d)\n", false);
                 welcome.addField("Vote", ":boom: [Vote for this bot](https://top.gg/bot/808277484524011531/vote)", false);
 
-                List<Button> buttons = new ArrayList<>();
-
-                buttons.add(Button.success(Buttons.BUTTON_HELP.name(), jsonParsers.getLocale("button_Help", event.getGuild().getId())));
-                buttons.add(Button.link("https://discord.gg/UrWG3R683d", "Support"));
-
-                event.getGuild().getDefaultChannel().sendMessageEmbeds(welcome.build()).setActionRow(buttons).queue();
+                event.getGuild().getDefaultChannel().sendMessageEmbeds(welcome.build())
+                        .setActionRow(
+                                List.of(Button.success(Buttons.BUTTON_HELP.name(), jsonParsers.getLocale("button_Help", event.getGuild().getId())),
+                                        Button.link("https://discord.gg/UrWG3R683d", "Support"))
+                        ).queue();
                 welcome.clear();
             }
         } catch (Exception e) {

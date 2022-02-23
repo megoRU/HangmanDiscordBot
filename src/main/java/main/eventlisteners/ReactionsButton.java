@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -33,29 +34,52 @@ public class ReactionsButton extends ListenerAdapter {
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         try {
             if (event.getUser().isBot()) return;
-            if (event.isFromGuild() && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel()))
-                return;
+            if (event.isFromGuild() && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
 
             long userIdLong = event.getUser().getIdLong();
 
-            //Проверяем смену языка при активной игре. Если игра активна и идет сменя языка - запрещать
-            if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_CHANGE_GAME_LANGUAGE.name())
-                    && HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
+            //Проверяем смену языка при активной игре. Если игра активна и идет сменя языка - запрещать.
+            //Если игры нет изменяем
+            if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_CHANGE_GAME_LANGUAGE.name())) {
                 event.deferEdit().queue();
                 event.editButton(event.getButton().asDisabled()).queue();
-                event.getHook()
-                        .sendMessage(jsonParsers.getLocale("ReactionsButton_When_Play", event.getUser().getId()))
-                        .setEphemeral(true).queue();
+
+                if (HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
+                    event.getHook()
+                            .sendMessage(jsonParsers.getLocale("ReactionsButton_When_Play", event.getUser().getId()))
+                            .setEphemeral(true).queue();
+                } else {
+                    String buttonName = event.getButton().getEmoji().getName().contains("\uD83C\uDDF7\uD83C\uDDFA") ? "rus" : "eng";
+
+                    BotStartConfig.getMapGameLanguages().put(event.getUser().getId(), buttonName);
+                    event.getHook().sendMessage(jsonParsers
+                                    .getLocale("ReactionsButton_Save", event.getUser().getId())
+                                    .replaceAll("\\{0}", event.getButton().getLabel()))
+                            .setEphemeral(true).queue();
+
+                    GameLanguage gameLanguage = new GameLanguage();
+                    gameLanguage.setUserIdLong(event.getUser().getId());
+                    gameLanguage.setLanguage(buttonName);
+                    gameLanguageRepository.save(gameLanguage);
+                }
                 return;
             }
 
-            if ((Objects.equals(event.getButton().getId(), Buttons.BUTTON_RUS.name()) || Objects.equals(event.getButton().getId(), Buttons.BUTTON_ENG.name()))
-                    && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+            if (((Objects.equals(event.getButton().getId(), Buttons.BUTTON_RUS.name())
+                    || Objects.equals(event.getButton().getId(), Buttons.BUTTON_ENG.name())
+                    || Objects.equals(event.getButton().getId(), Buttons.BUTTON_CHANGE_GAME_LANGUAGE.name()))
+                    && HangmanRegistry.getInstance().hasHangman(userIdLong))) {
                 event.deferEdit().queue();
                 event.editButton(event.getButton().asDisabled()).queue();
-                event.getHook().sendMessage(jsonParsers
-                                .getLocale("ReactionsButton_When_Play", event.getUser().getId()))
-                        .setEphemeral(true).queue();
+
+                EmbedBuilder youPlay = new EmbedBuilder();
+                youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
+                youPlay.setColor(0x00FF00);
+                youPlay.setDescription(jsonParsers.getLocale("ReactionsButton_When_Play", event.getUser().getId()));
+
+                event.getHook().sendMessageEmbeds(youPlay.build())
+                        .setEphemeral(true)
+                        .addActionRow(List.of(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game"))).queue();
                 return;
             }
 
@@ -124,41 +148,37 @@ public class ReactionsButton extends ListenerAdapter {
             }
 
             //Если нажата кнопка START, и нет активной игры, то создаем
-            if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_START_NEW_GAME.name()) && !HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                event.deferEdit().queue();
-                event.getChannel().sendTyping().queue();
-                event.editButton(event.getButton().asDisabled()).queue();
-
-                if (event.isFromGuild()) {
-                    HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getTextChannel().getIdLong(), hangmanGameRepository, gamesRepository, playerRepository));
-                } else {
-                    HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), null, event.getChannel().getIdLong(), hangmanGameRepository, gamesRepository, playerRepository));
-                }
-                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
-                return;
-            }
-
-            //Если нажата кнопка START, и игрок сейчас играет, присылаем в час уведомление
-            if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_START_NEW_GAME.name()) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+            if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_START_NEW_GAME.name())) {
                 event.deferEdit().queue();
                 event.editButton(event.getButton().asDisabled()).queue();
 
-                EmbedBuilder youPlay = new EmbedBuilder();
-                youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
-                youPlay.setColor(0x00FF00);
-                if (event.isFromGuild()) {
-                    youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play",
-                            event.getUser().getId()).replaceAll("\\{0}",
-                            BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null
-                                    ? "!hg"
-                                    : BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "hg"));
-                } else {
-                    youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play",
-                            event.getUser().getId()).replaceAll("\\{0}", "/hg"));
-                }
+                if (!HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+                    event.getChannel().sendTyping().queue();
 
-                event.getChannel().sendMessageEmbeds(youPlay.build())
-                        .setActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game")).queue();
+                    if (event.isFromGuild()) {
+                        HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getTextChannel().getIdLong(), hangmanGameRepository, gamesRepository, playerRepository));
+                    } else {
+                        HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), null, event.getChannel().getIdLong(), hangmanGameRepository, gamesRepository, playerRepository));
+                    }
+                    HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
+                } else {
+                    EmbedBuilder youPlay = new EmbedBuilder();
+                    youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
+                    youPlay.setColor(0x00FF00);
+                    if (event.isFromGuild()) {
+                        youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play",
+                                event.getUser().getId()).replaceAll("\\{0}",
+                                BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null
+                                        ? "!hg"
+                                        : BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "hg"));
+                    } else {
+                        youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play",
+                                event.getUser().getId()).replaceAll("\\{0}", "/hg"));
+                    }
+
+                    event.getChannel().sendMessageEmbeds(youPlay.build())
+                            .setActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game")).queue();
+                }
                 return;
             }
 
@@ -193,26 +213,7 @@ public class ReactionsButton extends ListenerAdapter {
                 }
                 return;
             }
-            //Меняем язык на тот что был в кнопке
-            if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_CHANGE_GAME_LANGUAGE.name())) {
-                event.deferEdit().queue();
 
-                event.editButton(event.getButton().asDisabled()).queue();
-
-                String buttonName = event.getButton().getEmoji().getName().contains("\uD83C\uDDF7\uD83C\uDDFA") ? "rus" : "eng";
-
-                BotStartConfig.getMapGameLanguages().put(event.getUser().getId(), buttonName);
-                event.getHook().sendMessage(jsonParsers
-                                .getLocale("ReactionsButton_Save", event.getUser().getId())
-                                .replaceAll("\\{0}", event.getButton().getLabel()))
-                        .setEphemeral(true).queue();
-
-                GameLanguage gameLanguage = new GameLanguage();
-                gameLanguage.setUserIdLong(event.getUser().getId());
-                gameLanguage.setLanguage(buttonName);
-                gameLanguageRepository.save(gameLanguage);
-                return;
-            }
             //Получаем статистику по нажатии на кнопку
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_MY_STATS.name())) {
                 event.deferEdit().queue();
