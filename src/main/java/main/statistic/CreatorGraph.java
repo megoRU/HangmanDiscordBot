@@ -3,6 +3,7 @@ package main.statistic;
 import io.quickchart.QuickChart;
 import lombok.Getter;
 import main.config.BotStartConfig;
+import main.enums.Statistic;
 import main.eventlisteners.SenderMessage;
 import main.jsonparser.JSONParsers;
 import main.model.repository.GamesRepository;
