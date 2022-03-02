@@ -1,15 +1,15 @@
-package main.hangman;
+package main.eventlisteners;
 
 import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.enums.Buttons;
-import main.eventlisteners.CheckPermissions;
+import main.hangman.Hangman;
+import main.hangman.HangmanRegistry;
 import main.jsonparser.JSONParsers;
 import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
 import main.model.repository.PlayerRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -35,7 +35,7 @@ public class GameHangmanListener extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
 
-        if (event.isFromGuild() && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
+        if (event.isFromType(ChannelType.TEXT) && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
 
         String message = event.getMessage().getContentRaw().trim().toLowerCase();
 
@@ -124,7 +124,6 @@ public class GameHangmanListener extends ListenerAdapter {
                                     hangmanGameRepository,
                                     gamesRepository,
                                     playerRepository));
-
                 }
                 HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel(), event.getAuthor().getAvatarUrl(), event.getAuthor().getName());
             }

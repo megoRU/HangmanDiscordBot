@@ -1,8 +1,13 @@
-package main.eventlisteners;
+package main.eventlisteners.slash;
 
 import lombok.RequiredArgsConstructor;
 import main.config.BotStartConfig;
 import main.enums.Buttons;
+import main.enums.Statistic;
+import main.eventlisteners.CheckPermissions;
+import main.eventlisteners.DeleteAllMyData;
+import main.eventlisteners.MessageInfoHelp;
+import main.eventlisteners.MessageStats;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
 import main.jsonparser.JSONParsers;
@@ -10,7 +15,6 @@ import main.model.entity.GameLanguage;
 import main.model.entity.Language;
 import main.model.repository.*;
 import main.statistic.CreatorGraph;
-import main.statistic.Statistic;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -33,10 +37,7 @@ public class SlashCommand extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (event.getUser().isBot()) return;
-
-        if (event.isFromGuild() && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) {
-            return;
-        }
+        if (event.isFromGuild() && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
 
         try {
             if (event.getName().equals("hg")) {
@@ -115,7 +116,7 @@ public class SlashCommand extends ListenerAdapter {
                                 .queue();
                     } else {
                         event.reply(jsonParsers.getLocale("Hangman_Eng_game",
-                                        event.getUser().getId()).replaceAll("\\{0}", "/hg" ))
+                                        event.getUser().getId()).replaceAll("\\{0}", "/hg"))
                                 .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
                                 .queue();
                     }

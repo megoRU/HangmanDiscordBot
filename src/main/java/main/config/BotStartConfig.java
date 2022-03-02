@@ -1,7 +1,8 @@
 package main.config;
 
 import main.eventlisteners.*;
-import main.hangman.GameHangmanListener;
+import main.eventlisteners.buttons.ButtonReactions;
+import main.eventlisteners.slash.SlashCommand;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
 import main.jsonparser.ParserClass;
@@ -125,7 +126,7 @@ public class BotStartConfig {
             jdaBuilder.addEventListeners(new GameLanguageChange(gameLanguageRepository));
             jdaBuilder.addEventListeners(new GameHangmanListener(hangmanGameRepository, gamesRepository, playerRepository));
             jdaBuilder.addEventListeners(new MessageStats(gamesRepository));
-            jdaBuilder.addEventListeners(new ReactionsButton(gameLanguageRepository, languageRepository, hangmanGameRepository, gamesRepository, playerRepository));
+            jdaBuilder.addEventListeners(new ButtonReactions(gameLanguageRepository, languageRepository, hangmanGameRepository, gamesRepository, playerRepository));
             jdaBuilder.addEventListeners(new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository));
             jdaBuilder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository, gameLanguageRepository, languageRepository));
             jdaBuilder.addEventListeners(new GetGlobalStatsInGraph(gamesRepository));

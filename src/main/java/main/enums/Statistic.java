@@ -1,4 +1,4 @@
-package main.statistic;
+package main.enums;
 
 public enum Statistic {
     MY,

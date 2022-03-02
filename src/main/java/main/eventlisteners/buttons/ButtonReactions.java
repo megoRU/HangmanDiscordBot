@@ -1,8 +1,12 @@
-package main.eventlisteners;
+package main.eventlisteners.buttons;
 
 import lombok.RequiredArgsConstructor;
 import main.config.BotStartConfig;
 import main.enums.Buttons;
+import main.eventlisteners.CheckPermissions;
+import main.eventlisteners.GameLanguageChange;
+import main.eventlisteners.MessageInfoHelp;
+import main.eventlisteners.MessageStats;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
 import main.jsonparser.JSONParsers;
@@ -21,7 +25,7 @@ import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
-public class ReactionsButton extends ListenerAdapter {
+public class ButtonReactions extends ListenerAdapter {
 
     private final JSONParsers jsonParsers = new JSONParsers();
     private final GameLanguageRepository gameLanguageRepository;

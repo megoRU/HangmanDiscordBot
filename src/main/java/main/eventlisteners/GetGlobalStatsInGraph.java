@@ -2,9 +2,9 @@ package main.eventlisteners;
 
 import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
+import main.enums.Statistic;
 import main.model.repository.GamesRepository;
 import main.statistic.CreatorGraph;
-import main.statistic.Statistic;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;

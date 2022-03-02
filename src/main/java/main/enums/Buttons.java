@@ -1,7 +1,6 @@
 package main.enums;
 
 public enum Buttons {
-
     BUTTON_START_NEW_GAME,
     BUTTON_CHANGE_GAME_LANGUAGE,
     BUTTON_MY_STATS,
@@ -11,4 +10,3 @@ public enum Buttons {
     BUTTON_STOP,
     BUTTON_CHANGE_LANGUAGE
 }
-
