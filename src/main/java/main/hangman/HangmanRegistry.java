@@ -5,6 +5,7 @@ import main.config.BotStartConfig;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class HangmanRegistry {
     //Long это UserIdLong
@@ -13,7 +14,7 @@ public class HangmanRegistry {
     private static final Map<Long, LocalDateTime> timeCreatedGame = new HashMap<>();
     private static final Map<Long, String> endAutoDelete = new HashMap<>();
     private static volatile HangmanRegistry hangmanRegistry;
-    private volatile int idGame;
+    private final AtomicInteger idGame = new AtomicInteger();
 
     private HangmanRegistry() {
     }
@@ -37,17 +38,13 @@ public class HangmanRegistry {
         return endAutoDelete;
     }
 
-    private synchronized void setIdGame() {
-        idGame = BotStartConfig.getIdGame();
+    public int getIdGame() {
+        return idGame.incrementAndGet();
+    }
+
+    public void setIdGame() {
+        idGame.set(BotStartConfig.getIdGame());
         System.out.println(idGame);
-    }
-
-    public synchronized int getIdGame() {
-        return idGame = idGame + 1;
-    }
-
-    public synchronized void getSetIdGame() {
-        setIdGame();
     }
 
     public Map<Long, Hangman> getActiveHangman() {
