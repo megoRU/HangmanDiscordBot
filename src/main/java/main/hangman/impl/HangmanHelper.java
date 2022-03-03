@@ -1,6 +1,7 @@
-package main.hangman;
+package main.hangman.impl;
 
 import main.config.BotStartConfig;
+import main.hangman.HangmanRegistry;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 

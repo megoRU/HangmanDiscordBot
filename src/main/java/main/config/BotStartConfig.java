@@ -92,7 +92,7 @@ public class BotStartConfig {
     public void startBot() {
         try {
             //Теперь HangmanRegistry знает количество игр и может отдавать правильное значение
-            HangmanRegistry.getInstance().getSetIdGame();
+            HangmanRegistry.getInstance().setIdGame();
             getPrefixFromDB();
             setLanguages();
             getLocalizationFromDB();
@@ -117,7 +117,7 @@ public class BotStartConfig {
             jdaBuilder.setAutoReconnect(true);
             jdaBuilder.setStatus(OnlineStatus.ONLINE);
             jdaBuilder.enableIntents(intents);
-            jdaBuilder.setActivity(Activity.playing(activity + serverCount + " guilds"));
+            jdaBuilder.setActivity(Activity.playing("Starting..."));
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
             jdaBuilder.addEventListeners(new MessageWhenBotJoinToGuild(prefixRepository));
             jdaBuilder.addEventListeners(new PrefixChange(prefixRepository));
@@ -353,8 +353,6 @@ public class BotStartConfig {
                 HangmanRegistry.getInstance().getEndAutoDelete().put(
                         userIdLong,
                         specificTime.toString());
-                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).insertButtonsToCollection();
-
             }
             rs.close();
             statement.close();
