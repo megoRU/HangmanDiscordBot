@@ -2,6 +2,7 @@ package main.config;
 
 import main.eventlisteners.*;
 import main.eventlisteners.buttons.ButtonReactions;
+import main.eventlisteners.game.GameHangmanListener;
 import main.eventlisteners.slash.SlashCommand;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
