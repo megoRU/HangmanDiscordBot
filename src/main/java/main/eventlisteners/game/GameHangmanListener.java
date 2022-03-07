@@ -51,7 +51,7 @@ public class GameHangmanListener extends ListenerAdapter {
         }
 
         if (message.matches(HG_ONE_WORD) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-            HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).fullWord(message, event.getMessage());
+            HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).fullWord(message.toLowerCase(), event.getMessage());
             return;
         }
 
