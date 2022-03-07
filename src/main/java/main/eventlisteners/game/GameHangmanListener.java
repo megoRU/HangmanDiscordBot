@@ -1,8 +1,9 @@
-package main.eventlisteners;
+package main.eventlisteners.game;
 
 import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.enums.Buttons;
+import main.eventlisteners.CheckPermissions;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
 import main.jsonparser.JSONParsers;
@@ -26,6 +27,7 @@ public class GameHangmanListener extends ListenerAdapter {
     private static final String HG_STOP = "!hg stop";
     private static final String HG_ONE_LETTER = "[А-ЯЁа-яё]";
     private static final String HG_ONE_LETTER_ENG = "[A-Za-z]";
+    private static final String HG_ONE_WORD = "[A-Za-zА-ЯЁа-яё]{3,24}+";
     private static final JSONParsers jsonParsers = new JSONParsers();
     private final HangmanGameRepository hangmanGameRepository;
     private final GamesRepository gamesRepository;
@@ -45,6 +47,11 @@ public class GameHangmanListener extends ListenerAdapter {
 
         if ((message.matches(HG_ONE_LETTER) || message.matches(HG_ONE_LETTER_ENG)) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
             HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).logic(message, event.getMessage());
+            return;
+        }
+
+        if (message.matches(HG_ONE_WORD) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+            HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).fullWord(message.toLowerCase(), event.getMessage());
             return;
         }
 

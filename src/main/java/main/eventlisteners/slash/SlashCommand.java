@@ -97,7 +97,6 @@ public class SlashCommand extends ListenerAdapter {
                                         hangmanGameRepository,
                                         gamesRepository,
                                         playerRepository));
-
                     }
                     HangmanRegistry.getInstance().getActiveHangman().get(event.getUser().getIdLong()).startGame(event);
                 }
@@ -139,7 +138,7 @@ public class SlashCommand extends ListenerAdapter {
                 whenPlay.setDescription(jsonParsers.getLocale("ReactionsButton_When_Play", event.getUser().getId()));
 
                 event.replyEmbeds(whenPlay.build())
-                        .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
+                        .addActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game"))
                         .queue();
                 return;
             }
