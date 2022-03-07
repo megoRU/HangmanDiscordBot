@@ -7,7 +7,7 @@ import main.jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Emoji;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -20,7 +20,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Service
-public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
+public class MessageInfoHelp extends ListenerAdapter {
 
     private static final String HELP = "!help";
     private static final String PREFIX = "!";
@@ -50,16 +50,15 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
         if (message.equals(prefix)) {
             buildMessage(
                     p,
-                    event.getTextChannel(),
+                    event.getChannel(),
                     null,
                     event.getAuthor().getAvatarUrl(),
                     event.getAuthor().getId(),
                     event.getAuthor().getName());
         }
-
     }
 
-    public void buildMessage(String p, TextChannel textChannel, SlashCommandInteractionEvent event, String avatarUrl, String userIdLong, String name) {
+    public void buildMessage(String p, MessageChannel messageChannel, SlashCommandInteractionEvent event, String avatarUrl, String userIdLong, String name) {
 
         String avatar = null;
 
@@ -127,10 +126,10 @@ public class MessageInfoHelp extends ListenerAdapter implements SenderMessage {
                     .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
         }
 
-        if (textChannel != null) {
-            sendMessage(info, textChannel, buttons);
+        if (messageChannel != null) {
+            SenderMessage.sendMessage(info, messageChannel, buttons);
         } else {
-            sendMessage(info, event, buttons);
+            SenderMessage.sendMessage(info, event, buttons);
         }
     }
 }

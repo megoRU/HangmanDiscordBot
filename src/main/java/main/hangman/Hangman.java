@@ -160,11 +160,8 @@ public class Hangman implements HangmanHelper {
             info.setDescription(jsonGameParsers.getLocale("timeIsOver", userId));
             info.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
 
-            if (guildId != null) {
-                editMessageWithButtons(info, guildId, Long.parseLong(userId), channelId, EndGameButtons.getListButtons(userId));
-            } else {
-                editMessageWithButtons(info, Long.parseLong(userId), channelId, EndGameButtons.getListButtons(userId));
-            }
+            HangmanHelper.editMessageWithButtons(info, Long.parseLong(userId), EndGameButtons.getListButtons(userId));
+
             WORD = null;
             clearingCollections();
         } catch (Exception e) {
@@ -298,11 +295,7 @@ public class Hangman implements HangmanHelper {
                     info.setTimestamp(OffsetDateTime.parse(String.valueOf(HangmanRegistry.getInstance().getEndAutoDelete().get(Long.parseLong(userId)))));
                     info.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
 
-                    if (guildId != null) {
-                        editMessage(info, guildId, Long.parseLong(userId), this.channelId);
-                    } else {
-                        editMessage(info, Long.parseLong(userId), this.channelId);
-                    }
+                    HangmanHelper.editMessage(info, Long.parseLong(userId));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -318,17 +311,14 @@ public class Hangman implements HangmanHelper {
                     try {
                         EmbedBuilder win = new EmbedBuilder();
                         win.setColor(0x00FF00);
+                        win.setTitle(jsonGameParsers.getLocale("Game_Title", userId));
                         win.setDescription(jsonGameParsers.getLocale("Game_Stop_Win", userId));
                         win.setThumbnail(GetImage.get(hangmanErrors));
                         win.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
                         win.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + guesses + "`", false);
                         win.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + result.toUpperCase() + "`", false);
 
-                        if (guildId != null) {
-                            editMessageWithButtons(win, guildId, Long.parseLong(userId), channelId, EndGameButtons.getListButtons(userId));
-                        } else {
-                            editMessageWithButtons(win, Long.parseLong(userId), channelId, EndGameButtons.getListButtons(userId));
-                        }
+                        HangmanHelper.editMessageWithButtons(win, Long.parseLong(userId), EndGameButtons.getListButtons(userId));
 
                         WORD = null;
                         clearingCollections();
@@ -353,12 +343,7 @@ public class Hangman implements HangmanHelper {
                     info.setTimestamp(OffsetDateTime.parse(String.valueOf(HangmanRegistry.getInstance().getEndAutoDelete().get(Long.parseLong(userId)))));
                     info.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
 
-                    if (guildId != null) {
-                        editMessage(info, guildId, Long.parseLong(userId), this.channelId);
-                    } else {
-                        editMessage(info, Long.parseLong(userId), this.channelId);
-                    }
-
+                    HangmanHelper.editMessage(info, Long.parseLong(userId));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -377,11 +362,7 @@ public class Hangman implements HangmanHelper {
                         info.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
                         info.addField(jsonGameParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase() + "`", false);
 
-                        if (guildId != null) {
-                            editMessageWithButtons(info, guildId, Long.parseLong(userId), channelId, EndGameButtons.getListButtons(userId));
-                        } else {
-                            editMessageWithButtons(info, Long.parseLong(userId), channelId, EndGameButtons.getListButtons(userId));
-                        }
+                        HangmanHelper.editMessageWithButtons(info, Long.parseLong(userId), EndGameButtons.getListButtons(userId));
 
                         WORD = null;
                         clearingCollections();
@@ -404,11 +385,7 @@ public class Hangman implements HangmanHelper {
                         wordNotFound.setTimestamp(OffsetDateTime.parse(String.valueOf(HangmanRegistry.getInstance().getEndAutoDelete().get(Long.parseLong(userId)))));
                         wordNotFound.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
 
-                        if (guildId != null) {
-                            editMessage(wordNotFound, guildId, Long.parseLong(userId), this.channelId);
-                        } else {
-                            editMessage(wordNotFound, Long.parseLong(userId), this.channelId);
-                        }
+                        HangmanHelper.editMessage(wordNotFound, Long.parseLong(userId));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

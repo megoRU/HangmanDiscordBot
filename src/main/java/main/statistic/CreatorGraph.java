@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import java.util.List;
 
 @Getter
-public class CreatorGraph implements SenderMessage {
+public class CreatorGraph {
 
     private static final JSONParsers jsonParsers = new JSONParsers();
     private final String textChannelIdLong;
@@ -79,17 +79,17 @@ public class CreatorGraph implements SenderMessage {
 
 
             if (slashCommandEvent != null) {
-                sendMessage(globalStats, slashCommandEvent);
+                SenderMessage.sendMessage(globalStats, slashCommandEvent, null);
                 return;
             }
 
             if (BotStartConfig.jda.getTextChannelById(textChannelIdLong) != null) {
-                sendMessage(globalStats, BotStartConfig.jda.getTextChannelById(textChannelIdLong));
+                SenderMessage.sendMessage(globalStats, BotStartConfig.jda.getTextChannelById(textChannelIdLong), null);
                 return;
             }
 
             if (BotStartConfig.jda.getPrivateChannelById(textChannelIdLong) != null) {
-                sendMessage(globalStats, BotStartConfig.jda.getPrivateChannelById(textChannelIdLong));
+                SenderMessage.sendMessage(globalStats, BotStartConfig.jda.getPrivateChannelById(textChannelIdLong), null);
             }
         } catch (Exception e) {
             e.printStackTrace();
