@@ -201,7 +201,7 @@ public class SlashCommand extends ListenerAdapter {
             }
 
             if (event.getName().equals("allstats")) {
-
+                event.deferReply().queue();
                 CreatorGraph creatorGraph = new CreatorGraph(
                         gamesRepository,
                         event.getChannel().getId(),
@@ -215,6 +215,7 @@ public class SlashCommand extends ListenerAdapter {
             }
 
             if (event.getName().equals("mystats")) {
+                event.deferReply().queue();
                 CreatorGraph creatorGraph = new CreatorGraph(
                         gamesRepository,
                         event.getChannel().getId(),

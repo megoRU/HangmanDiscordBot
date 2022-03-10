@@ -12,9 +12,9 @@ public interface SenderMessage {
     static void sendMessage(EmbedBuilder embedBuilder, SlashCommandInteractionEvent event, List<Button> buttons) {
         try {
             if (buttons == null) {
-                event.replyEmbeds(embedBuilder.build()).queue();
+                event.getHook().sendMessageEmbeds(embedBuilder.build()).queue();
             } else {
-                event.replyEmbeds(embedBuilder.build()).addActionRow(buttons).queue();
+                event.getHook().sendMessageEmbeds(embedBuilder.build()).addActionRow(buttons).queue();
             }
         } catch (Exception e) {
             e.printStackTrace();
