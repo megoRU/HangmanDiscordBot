@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.sql.Timestamp;
@@ -71,28 +72,25 @@ public class Hangman implements HangmanHelper {
     }
 
     //TODO: Работает, но изменить время на Instant желательно.
-    private void updateEmbedBuilder(EmbedBuilder start) {
+    private EmbedBuilder updateEmbedBuilder() {
         autoInsert();
 
         Instant instant = Instant.now().plusSeconds(600L);
-
         HangmanRegistry.getInstance().getTimeCreatedGame().put(Long.valueOf(userId), LocalDateTime.from(OffsetDateTime.parse(String.valueOf(Instant.now()))));
-
         HangmanRegistry.getInstance().getEndAutoDelete().put(Long.valueOf(userId), String.valueOf(OffsetDateTime.parse(String.valueOf(instant))));
 
-        start.setColor(0x00FF00);
-        start.setTitle(jsonGameParsers.getLocale("Game_Title", userId));
-
-        start.addField(jsonGameParsers.getLocale("Game_Start_How_Play", userId), jsonGameParsers.getLocale("Game_Start", userId).replaceAll("\\{0}",
-                BotStartConfig.getMapPrefix().get(guildId) == null ? "!" : BotStartConfig.getMapPrefix().get(guildId)), false);
-
-        start.setThumbnail(GetImage.get(hangmanErrors));
-        start.addField("Attention for Admins", "[Add slash commands](https://discord.com/api/oauth2/authorize?client_id=845974873682608129&scope=applications.commands%20bot)", false);
-        start.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
-        start.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "", false);
-        start.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + WORD_HIDDEN.toUpperCase() + "`", false);
-        start.setTimestamp(instant);
-        start.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
+        return embedBuilder(
+                Color.GREEN,
+                "<@" + Long.parseLong(userId) + ">",
+                jsonGameParsers.getLocale("Game_Start", userId)
+                        .replaceAll("\\{0}", BotStartConfig.getMapPrefix().get(guildId)
+                                == null
+                                ? "!"
+                                : BotStartConfig.getMapPrefix().get(guildId)),
+                false,
+                false,
+                null
+        );
     }
 
     public void startGame(@NotNull SlashCommandInteractionEvent event) {
@@ -101,7 +99,7 @@ public class Hangman implements HangmanHelper {
                 EmbedBuilder needSetLanguage = new EmbedBuilder();
 
                 needSetLanguage.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
-                needSetLanguage.setColor(0x00FF00);
+                needSetLanguage.setColor(Color.GREEN);
                 needSetLanguage.setDescription(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getId()));
 
                 event.replyEmbeds(needSetLanguage.build()).addActionRow(SetGameLanguageButtons.getList).queue();
@@ -125,48 +123,10 @@ public class Hangman implements HangmanHelper {
                 return;
             }
 
-            EmbedBuilder start = new EmbedBuilder();
-
-            //Заполняем EmbedBuilder start
-            updateEmbedBuilder(start);
-
-            event.replyEmbeds(start.build()).queue(m -> m.retrieveOriginal().queue(this::createEntityInDataBase));
+            event.replyEmbeds(updateEmbedBuilder().build()).queue(m -> m.retrieveOriginal().queue(this::createEntityInDataBase));
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void createEntityInDataBase(Message message) {
-        HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId), message.getId());
-
-        ActiveHangman activeHangman = new ActiveHangman();
-        activeHangman.setUserIdLong(Long.valueOf(userId));
-        activeHangman.setMessageIdLong(Long.valueOf(message.getId()));
-        activeHangman.setChannelIdLong(channelId);
-        activeHangman.setGuildLongId(guildId != null ? Long.valueOf(guildId) : null);
-        activeHangman.setWord(WORD);
-        activeHangman.setCurrentHiddenWord(WORD_HIDDEN);
-        activeHangman.setGuesses(getGuesses());
-        activeHangman.setHangmanErrors(hangmanErrors);
-        activeHangman.setGameCreatedTime(new Timestamp(Instant.now().toEpochMilli()));
-        hangmanGameRepository.save(activeHangman);
-    }
-
-    public void stopGameByTime() {
-        try {
-            EmbedBuilder info = new EmbedBuilder();
-            info.setColor(0x00FF00);
-            info.setTitle(jsonGameParsers.getLocale("gameOver", userId));
-            info.setDescription(jsonGameParsers.getLocale("timeIsOver", userId));
-            info.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
-
-            HangmanHelper.editMessageWithButtons(info, Long.parseLong(userId), EndGameButtons.getListButtons(userId));
-
-            clearingCollections();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
     }
 
     public void startGame(MessageChannel textChannel, String avatarUrl, String userName) {
@@ -200,12 +160,7 @@ public class Hangman implements HangmanHelper {
                 return;
             }
 
-            EmbedBuilder start = new EmbedBuilder();
-
-            //Заполняем EmbedBuilder start
-            updateEmbedBuilder(start);
-
-            textChannel.sendMessageEmbeds(start.build()).queue(this::createEntityInDataBase);
+            textChannel.sendMessageEmbeds(updateEmbedBuilder().build()).queue(this::createEntityInDataBase);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -262,29 +217,28 @@ public class Hangman implements HangmanHelper {
     public void fullWord(String inputs, Message messages) {
         messageList.add(messages);
         try {
-
             if (isLetterPresent(inputs.toUpperCase())) {
-                EmbedBuilder info = new EmbedBuilder();
-                info.setColor(0x00FF00);
-                info.setTitle(jsonGameParsers.getLocale("Game_Title", userId));
-                info.appendDescription(jsonGameParsers.getLocale("Game_You_Use_This_Word", userId));
-
-                info.setThumbnail(GetImage.get(hangmanErrors));
-                info.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
-                info.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + getGuesses() + "`", false);
-                info.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
-
-                info.setTimestamp(OffsetDateTime.parse(String.valueOf(HangmanRegistry.getInstance().getEndAutoDelete().get(Long.parseLong(userId)))));
-                info.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
-
+                EmbedBuilder info = embedBuilder(
+                        Color.GREEN,
+                        "<@" + Long.parseLong(userId) + ">",
+                        jsonGameParsers.getLocale("Game_You_Use_This_Word", userId),
+                        true,
+                        false,
+                        inputs
+                );
                 HangmanHelper.editMessage(info, Long.parseLong(userId));
                 return;
             }
 
             if (inputs.equals(WORD)) {
-                EmbedBuilder win = new EmbedBuilder();
-                extractedGameWin(win);
-                win.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + WORD.toUpperCase() + "`", false);
+                EmbedBuilder win = embedBuilder(
+                        Color.GREEN,
+                        "<@" + Long.parseLong(userId) + ">",
+                        jsonGameParsers.getLocale("Game_Stop_Win", userId),
+                        true,
+                        false,
+                        inputs
+                );
 
                 HangmanHelper.editMessageWithButtons(win, Long.parseLong(userId), EndGameButtons.getListButtons(userId));
 
@@ -293,20 +247,16 @@ public class Hangman implements HangmanHelper {
             } else {
                 hangmanErrors++;
                 if (hangmanErrors >= 8) {
-                    extractedGameLose(inputs);
+                    gameLose(inputs);
                 } else {
-                    EmbedBuilder wordNotFound = new EmbedBuilder();
-                    wordNotFound.setColor(0x00FF00);
-                    wordNotFound.setTitle(jsonGameParsers.getLocale("Game_Title", userId));
-                    wordNotFound.setDescription(jsonGameParsers.getLocale("Game_No_Such_Word", userId));
-
-                    wordNotFound.setThumbnail(GetImage.get(hangmanErrors));
-                    wordNotFound.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
-                    wordNotFound.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + getGuesses() + "`", false);
-                    wordNotFound.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
-
-                    wordNotFound.setTimestamp(OffsetDateTime.parse(String.valueOf(HangmanRegistry.getInstance().getEndAutoDelete().get(Long.parseLong(userId)))));
-                    wordNotFound.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
+                    EmbedBuilder wordNotFound = embedBuilder(
+                            Color.GREEN,
+                            "<@" + Long.parseLong(userId) + ">",
+                            jsonGameParsers.getLocale("Game_No_Such_Word", userId),
+                            true,
+                            false,
+                            inputs
+                    );
 
                     HangmanHelper.editMessage(wordNotFound, Long.parseLong(userId));
                 }
@@ -316,26 +266,15 @@ public class Hangman implements HangmanHelper {
         }
     }
 
-    private void extractedGameWin(EmbedBuilder win) {
-        win.setColor(0x00FF00);
-        win.setTitle(jsonGameParsers.getLocale("Game_Title", userId));
-        win.setDescription(jsonGameParsers.getLocale("Game_Stop_Win", userId));
-        win.setThumbnail(GetImage.get(hangmanErrors));
-        win.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
-        win.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + getGuesses() + "`", false);
-    }
-
-    private void extractedGameLose(String inputs) {
-        EmbedBuilder info = new EmbedBuilder();
-        info.setColor(0x00FF00);
-        info.setTitle(jsonGameParsers.getLocale("Game_Title", userId));
-        info.setDescription(jsonGameParsers.getLocale("Game_You_Lose", userId));
-
-        info.setThumbnail(GetImage.get(hangmanErrors));
-        info.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
-        info.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + getGuesses() + "`", false);
-        info.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
-        info.addField(jsonGameParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase() + "`", false);
+    private void gameLose(String inputs) {
+        EmbedBuilder info = embedBuilder(
+                Color.GREEN,
+                "<@" + Long.parseLong(userId) + ">",
+                jsonGameParsers.getLocale("Game_You_Lose", userId),
+                true,
+                true,
+                inputs
+        );
 
         HangmanHelper.editMessageWithButtons(info, Long.parseLong(userId), EndGameButtons.getListButtons(userId));
 
@@ -357,100 +296,118 @@ public class Hangman implements HangmanHelper {
         } catch (Exception e) {
             System.out.println("Word null");
         }
+        try {
+            if (WORD_HIDDEN.contains("_")) {
+                if (isLetterPresent(inputs.toUpperCase())) {
 
-        if (WORD_HIDDEN.contains("_")) {
-
-            if (isLetterPresent(inputs.toUpperCase())) {
-                try {
-                    EmbedBuilder info = new EmbedBuilder();
-                    info.setColor(0x00FF00);
-                    info.setTitle(jsonGameParsers.getLocale("Game_Title", userId));
-                    info.appendDescription(jsonGameParsers.getLocale("Game_You_Use_This_Letter", userId));
-
-                    info.setThumbnail(GetImage.get(hangmanErrors));
-                    info.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
-                    info.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + getGuesses() + "`", false);
-                    info.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
-
-                    info.setTimestamp(OffsetDateTime.parse(String.valueOf(HangmanRegistry.getInstance().getEndAutoDelete().get(Long.parseLong(userId)))));
-                    info.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
+                    EmbedBuilder info = embedBuilder(
+                            Color.GREEN,
+                            "<@" + Long.parseLong(userId) + ">",
+                            jsonGameParsers.getLocale("Game_You_Use_This_Letter", userId),
+                            true,
+                            false,
+                            inputs
+                    );
 
                     HangmanHelper.editMessage(info, Long.parseLong(userId));
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    return;
                 }
-                return;
-            }
 
-            if (WORD.contains(inputs)) {
-                char c = inputs.charAt(0);
-                checkLetterInWord(wordToChar, c);
-                String result = replacementLetters(WORD.indexOf(inputs));
+                if (WORD.contains(inputs)) {
+                    char c = inputs.charAt(0);
+                    checkLetterInWord(wordToChar, c);
+                    String result = replacementLetters(WORD.indexOf(inputs));
 
-                if (!result.contains("_")) {
-                    try {
-                        EmbedBuilder win = new EmbedBuilder();
-                        extractedGameWin(win);
-                        win.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + result.toUpperCase() + "`", false);
+                    //Игрок угадал все буквы
+                    if (!result.contains("_")) {
+                        EmbedBuilder win = embedBuilder(
+                                Color.GREEN,
+                                "<@" + Long.parseLong(userId) + ">",
+                                jsonGameParsers.getLocale("Game_Stop_Win", userId),
+                                true,
+                                false,
+                                result
+                        );
 
                         HangmanHelper.editMessageWithButtons(win, Long.parseLong(userId), EndGameButtons.getListButtons(userId));
 
                         clearingCollections();
                         resultGame(true);
                         return;
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
-                }
 
-                try {
-                    EmbedBuilder info = new EmbedBuilder();
-                    info.setColor(0x00FF00);
-                    info.setTitle(jsonGameParsers.getLocale("Game_Title", userId));
-                    info.setDescription(jsonGameParsers.getLocale("Game_You_Guess_Letter", userId));
-
-                    info.setThumbnail(GetImage.get(hangmanErrors));
-                    info.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
-                    info.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + getGuesses() + "`", false);
-                    info.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + result.toUpperCase() + "`", false);
-
-                    info.setTimestamp(OffsetDateTime.parse(String.valueOf(HangmanRegistry.getInstance().getEndAutoDelete().get(Long.parseLong(userId)))));
-                    info.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
+                    //Вы угадали букву!
+                    EmbedBuilder info = embedBuilder(
+                            Color.GREEN,
+                            "<@" + Long.parseLong(userId) + ">",
+                            jsonGameParsers.getLocale("Game_You_Guess_Letter", userId),
+                            true,
+                            false,
+                            inputs
+                    );
 
                     HangmanHelper.editMessage(info, Long.parseLong(userId));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else {
-                hangmanErrors++;
-                if (hangmanErrors >= 8) {
-                    try {
-                        extractedGameLose(inputs);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
                 } else {
-                    try {
-                        EmbedBuilder wordNotFound = new EmbedBuilder();
-                        wordNotFound.setColor(0x00FF00);
-                        wordNotFound.setTitle(jsonGameParsers.getLocale("Game_Title", userId));
-                        wordNotFound.setDescription(jsonGameParsers.getLocale("Game_No_Such_Letter", userId));
-
-                        wordNotFound.setThumbnail(GetImage.get(hangmanErrors));
-                        wordNotFound.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
-                        wordNotFound.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + getGuesses() + "`", false);
-                        wordNotFound.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
-
-                        wordNotFound.setTimestamp(OffsetDateTime.parse(String.valueOf(HangmanRegistry.getInstance().getEndAutoDelete().get(Long.parseLong(userId)))));
-                        wordNotFound.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
+                    hangmanErrors++;
+                    if (hangmanErrors >= 8) {
+                        gameLose(inputs);
+                    } else {
+                        EmbedBuilder wordNotFound = embedBuilder(
+                                Color.GREEN,
+                                "<@" + Long.parseLong(userId) + ">",
+                                jsonGameParsers.getLocale("Game_No_Such_Letter", userId),
+                                true,
+                                false,
+                                inputs
+                        );
 
                         HangmanHelper.editMessage(wordNotFound, Long.parseLong(userId));
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    private EmbedBuilder embedBuilder(Color color, String gamePlayer, String gameInfo, boolean gameGuesses, boolean isDefeat, @Nullable String inputs) {
+        String language = BotStartConfig.getMapGameLanguages().get(userId).equals("rus") ? "Кириллица" : "Latin";
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+
+        embedBuilder.setColor(color);
+        embedBuilder.addField(jsonGameParsers.getLocale("Game_Player", userId), gamePlayer, true);
+        embedBuilder.addField(jsonGameParsers.getLocale("Game_Language", userId), language, true);
+        embedBuilder.setThumbnail(GetImage.get(hangmanErrors));
+
+        if (gameGuesses) {
+            embedBuilder.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + getGuesses() + "`", false);
+        }
+
+        if (inputs != null && inputs.length() == 1) {
+            embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
+        }
+
+        if (inputs != null && inputs.length() >= 3) {
+            if (inputs.equals(WORD)) {
+                embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + WORD.toUpperCase().replaceAll("", " ").trim() + "`", false);
+            } else {
+                embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + currentHiddenWord.toUpperCase() + "`", false);
+            }
+        }
+
+        if (inputs == null) {
+            embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + WORD_HIDDEN.toUpperCase() + "`", false);
+        }
+
+        if (isDefeat) {
+            embedBuilder.addField(jsonGameParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase() + "`", false);
+        }
+
+        embedBuilder.addField(jsonGameParsers.getLocale("Game_Info", userId), gameInfo, false);
+
+        //embedBuilder.setTimestamp(OffsetDateTime.parse(String.valueOf(HangmanRegistry.getInstance().getEndAutoDelete().get(Long.parseLong(userId)))));
+        //embedBuilder.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
+        return embedBuilder;
     }
 
     private void resultGame(boolean resultBool) {
@@ -467,13 +424,46 @@ public class Hangman implements HangmanHelper {
             player.setUserIdLong(Long.valueOf(userId));
             player.setGames_id(game);
 
-            gamesRepository.save(game);
-            playerRepository.save(player);
+            gamesRepository.saveAndFlush(game);
+            playerRepository.saveAndFlush(player);
 
             hangmanGameRepository.deleteActiveGame(Long.valueOf(userId));
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void createEntityInDataBase(Message message) {
+        HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId), message.getId());
+
+        ActiveHangman activeHangman = new ActiveHangman();
+        activeHangman.setUserIdLong(Long.valueOf(userId));
+        activeHangman.setMessageIdLong(Long.valueOf(message.getId()));
+        activeHangman.setChannelIdLong(channelId);
+        activeHangman.setGuildLongId(guildId != null ? Long.valueOf(guildId) : null);
+        activeHangman.setWord(WORD);
+        activeHangman.setCurrentHiddenWord(WORD_HIDDEN);
+        activeHangman.setGuesses(getGuesses());
+        activeHangman.setHangmanErrors(hangmanErrors);
+        activeHangman.setGameCreatedTime(new Timestamp(Instant.now().toEpochMilli()));
+        hangmanGameRepository.saveAndFlush(activeHangman);
+    }
+
+    public void stopGameByTime() {
+        try {
+            EmbedBuilder info = new EmbedBuilder();
+            info.setColor(0x00FF00);
+            info.setTitle(jsonGameParsers.getLocale("gameOver", userId));
+            info.setDescription(jsonGameParsers.getLocale("timeIsOver", userId));
+            info.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
+
+            HangmanHelper.editMessageWithButtons(info, Long.parseLong(userId), EndGameButtons.getListButtons(userId));
+
+            clearingCollections();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     //Создает скрытую линию из длины слова
@@ -513,6 +503,7 @@ public class Hangman implements HangmanHelper {
         }
     }
 
+    //Для инъекции при восстановлении
     public void updateVariables(String guesses, String word, String currentHiddenWord, int hangmanErrors) {
         this.guesses.addAll(Arrays.asList(guesses.split(", ")));
         this.WORD = word;
@@ -551,5 +542,4 @@ public class Hangman implements HangmanHelper {
                 .replaceAll("\\[", "")
                 .replaceAll("]", "");
     }
-
 }

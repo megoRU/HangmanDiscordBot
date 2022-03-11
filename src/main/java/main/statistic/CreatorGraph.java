@@ -79,7 +79,7 @@ public class CreatorGraph {
 
 
             if (slashCommandEvent != null) {
-                SenderMessage.sendMessage(globalStats, slashCommandEvent, null);
+                SenderMessage.sendMessageHook(globalStats, slashCommandEvent, null);
                 return;
             }
 
