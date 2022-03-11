@@ -400,7 +400,7 @@ public class Hangman implements HangmanHelper {
         }
 
         if (isDefeat) {
-            embedBuilder.addField(jsonGameParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase() + "`", false);
+            embedBuilder.addField(jsonGameParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase().replaceAll("", " ").trim() + "`", false);
         }
 
         embedBuilder.addField(jsonGameParsers.getLocale("Game_Info", userId), gameInfo, false);
