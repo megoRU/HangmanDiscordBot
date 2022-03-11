@@ -9,12 +9,24 @@ import java.util.List;
 
 public interface SenderMessage {
 
-    static void sendMessage(EmbedBuilder embedBuilder, SlashCommandInteractionEvent event, List<Button> buttons) {
+    static void sendMessageHook(EmbedBuilder embedBuilder, SlashCommandInteractionEvent event, List<Button> buttons) {
         try {
             if (buttons == null) {
                 event.getHook().sendMessageEmbeds(embedBuilder.build()).queue();
             } else {
                 event.getHook().sendMessageEmbeds(embedBuilder.build()).addActionRow(buttons).queue();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void sendMessage(EmbedBuilder embedBuilder, SlashCommandInteractionEvent event, List<Button> buttons) {
+        try {
+            if (buttons == null) {
+                event.replyEmbeds(embedBuilder.build()).queue();
+            } else {
+                event.replyEmbeds(embedBuilder.build()).addActionRow(buttons).queue();
             }
         } catch (Exception e) {
             e.printStackTrace();
