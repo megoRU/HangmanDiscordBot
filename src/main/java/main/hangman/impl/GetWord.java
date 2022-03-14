@@ -9,7 +9,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public interface GetWord {
-    String URL = "http://195.2.81.139:8085/api/word";
+    String URL = "http://193.163.203.77:8085/api/word";
 
     static String get(String userIdLong) {
         try {
