@@ -28,6 +28,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Queue;
 import java.util.*;
+import java.util.logging.Logger;
 
 @Setter
 @Getter
@@ -58,6 +59,8 @@ public class Hangman implements HangmanHelper {
     private String currentHiddenWord;
 
     private int hangmanErrors = 0;
+
+    private Logger LOGGER = Logger.getLogger(Hangman.class.getName());
 
     public Hangman(String userId, String guildId, Long channelId,
                    HangmanGameRepository hangmanGameRepository,
@@ -168,14 +171,10 @@ public class Hangman implements HangmanHelper {
 
     //TODO: Возможно произойдет так что игру закончили. Удалили данные из БД и произойдет REPLACE и игра не завершится
     private void executeInsert() {
-        try {
-            if ((guesses.size() > countUsedLetters) && HangmanRegistry.getInstance().hasHangman(Long.parseLong(userId))) {
-                countUsedLetters = guesses.size();
-                hangmanGameRepository.updateGame(Long.valueOf(userId), currentHiddenWord, getGuesses(), hangmanErrors);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("По каким то причинам игры уже нет!");
+        LOGGER.info("guesses.size(): " + guesses.size() + "\ncountUsedLetters" + countUsedLetters);
+        if ((guesses.size() > countUsedLetters) && HangmanRegistry.getInstance().hasHangman(Long.parseLong(userId))) {
+            countUsedLetters = guesses.size();
+            hangmanGameRepository.updateGame(Long.valueOf(userId), currentHiddenWord, getGuesses(), hangmanErrors);
         }
     }
 
@@ -373,6 +372,13 @@ public class Hangman implements HangmanHelper {
     private EmbedBuilder embedBuilder(Color color, String gamePlayer, String gameInfo, boolean gameGuesses, boolean isDefeat, @Nullable String inputs) {
         String language = BotStartConfig.getMapGameLanguages().get(userId).equals("rus") ? "Кириллица" : "Latin";
         EmbedBuilder embedBuilder = new EmbedBuilder();
+
+        LOGGER.info("gamePlayer: " + gamePlayer
+                + "\ngameInfo: " + gameInfo
+                + "\ngameGuesses: " + gameGuesses
+                + "\nisDefeat: " + isDefeat
+                + "\ninputs: " + inputs
+                + "\nlanguage" + language);
 
         embedBuilder.setColor(color);
         embedBuilder.addField(jsonGameParsers.getLocale("Game_Player", userId), gamePlayer, true);
