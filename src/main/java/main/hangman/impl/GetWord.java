@@ -7,11 +7,19 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.logging.Logger;
 
 public interface GetWord {
+    Logger LOGGER = Logger.getLogger(GetWord.class.getName());
     String URL = "http://193.163.203.77:8085/api/word";
 
-    static String get(String userIdLong) {
+    /**
+     * @param userIdLong String user id long
+     * @return String word
+     * @throws Exception
+     */
+    static String get(String userIdLong) throws Exception {
+        String body;
         try {
             long time = System.currentTimeMillis();
             HttpClient client = HttpClient.newHttpClient();
@@ -22,11 +30,21 @@ public interface GetWord {
                     .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             System.out.println(System.currentTimeMillis() - time + " ms getWord()");
-            return response.body();
+
+            body = response.body();
+            LOGGER.info("User ID: " + userIdLong + "\nbody: " + body);
+
+            if (body == null) {
+                throw new UnsuccessfulHttpException(response.statusCode(), null);
+            }
+
+            if (response.statusCode() != 200) {
+                throw new UnsuccessfulHttpException(response.statusCode(), response.body());
+            }
         } catch (Exception e) {
-            System.out.println("Скорее всего API не работает");
             e.printStackTrace();
+            throw new Exception("Скорее всего API не работает");
         }
-        return null;
+        return body;
     }
 }
