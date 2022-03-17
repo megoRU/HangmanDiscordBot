@@ -171,7 +171,6 @@ public class Hangman implements HangmanHelper {
 
     //TODO: Возможно произойдет так что игру закончили. Удалили данные из БД и произойдет REPLACE и игра не завершится
     private void executeInsert() {
-        LOGGER.info("guesses.size(): " + guesses.size() + "\ncountUsedLetters" + countUsedLetters);
         if ((guesses.size() > countUsedLetters) && HangmanRegistry.getInstance().hasHangman(Long.parseLong(userId))) {
             countUsedLetters = guesses.size();
             hangmanGameRepository.updateGame(Long.valueOf(userId), currentHiddenWord, getGuesses(), hangmanErrors);
@@ -373,7 +372,7 @@ public class Hangman implements HangmanHelper {
         String language = BotStartConfig.getMapGameLanguages().get(userId).equals("rus") ? "Кириллица" : "Latin";
         EmbedBuilder embedBuilder = new EmbedBuilder();
 
-        LOGGER.info("gamePlayer: " + gamePlayer
+        LOGGER.info("\ngamePlayer: " + gamePlayer
                 + "\ngameInfo: " + gameInfo
                 + "\ngameGuesses: " + gameGuesses
                 + "\nisDefeat: " + isDefeat
