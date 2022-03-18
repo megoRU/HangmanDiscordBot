@@ -204,9 +204,16 @@ public class Hangman implements HangmanHelper {
                     .getSelfMember()
                     .hasPermission(BotStartConfig.jda.getTextChannelById(channelId), Permission.MESSAGE_MANAGE) && !messageList.isEmpty()) {
                 if (messageList.size() > 1) {
-                    List<Message> temp = new ArrayList<>(messageList);
+                    List<Message> temp = new ArrayList<>();
+
+                    for (int i = 0; i < messageList.size(); i++) {
+                        temp.add(messageList.poll());
+                    }
                     BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessages(messageList).queue();
-                    messageList.removeAll(temp);
+                    for (Message message : temp) {
+                        messageList.remove(message);
+                    }
+
                 }
             }
         }
@@ -369,47 +376,52 @@ public class Hangman implements HangmanHelper {
     }
 
     private EmbedBuilder embedBuilder(Color color, String gamePlayer, String gameInfo, boolean gameGuesses, boolean isDefeat, @Nullable String inputs) {
-        String language = BotStartConfig.getMapGameLanguages().get(userId).equals("rus") ? "Кириллица" : "Latin";
-        EmbedBuilder embedBuilder = new EmbedBuilder();
+        EmbedBuilder embedBuilder = null;
+        try {
+           String language = BotStartConfig.getMapGameLanguages().get(userId).equals("rus") ? "Кириллица" : "Latin";
+           embedBuilder = new EmbedBuilder();
 
-        LOGGER.info("\ngamePlayer: " + gamePlayer
-                + "\ngameInfo: " + gameInfo
-                + "\ngameGuesses: " + gameGuesses
-                + "\nisDefeat: " + isDefeat
-                + "\ninputs: " + inputs
-                + "\nlanguage" + language);
+           LOGGER.info("\ngamePlayer: " + gamePlayer
+                   + "\ngameInfo: " + gameInfo
+                   + "\ngameGuesses: " + gameGuesses
+                   + "\nisDefeat: " + isDefeat
+                   + "\ninputs: " + inputs
+                   + "\nlanguage " + language);
 
-        embedBuilder.setColor(color);
-        embedBuilder.addField(jsonGameParsers.getLocale("Game_Player", userId), gamePlayer, true);
-        embedBuilder.addField(jsonGameParsers.getLocale("Game_Language", userId), language, true);
-        embedBuilder.setThumbnail(GetImage.get(hangmanErrors));
+           embedBuilder.setColor(color);
+           embedBuilder.addField(jsonGameParsers.getLocale("Game_Player", userId), gamePlayer, true);
+           embedBuilder.addField(jsonGameParsers.getLocale("Game_Language", userId), language, true);
+           embedBuilder.setThumbnail(GetImage.get(hangmanErrors));
 
-        if (gameGuesses) {
-            embedBuilder.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + getGuesses() + "`", false);
-        }
+           if (gameGuesses) {
+               embedBuilder.addField(jsonGameParsers.getLocale("Game_Guesses", userId), "`" + getGuesses() + "`", false);
+           }
 
-        if (inputs != null && inputs.length() == 1) {
-            embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
-        }
+           if (inputs != null && inputs.length() == 1) {
+               embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
+           }
 
-        if (inputs != null && inputs.length() >= 3) {
-            if (inputs.equals(WORD)) {
-                embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + WORD.toUpperCase().replaceAll("", " ").trim() + "`", false);
-            } else {
-                embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + currentHiddenWord.toUpperCase() + "`", false);
-            }
-        }
+           if (inputs != null && inputs.length() >= 3) {
+               if (inputs.equals(WORD)) {
+                   embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + WORD.toUpperCase().replaceAll("", " ").trim() + "`", false);
+               } else {
+                   embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + currentHiddenWord.toUpperCase() + "`", false);
+               }
+           }
 
-        if (inputs == null) {
-            embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + WORD_HIDDEN.toUpperCase() + "`", false);
-        }
+           if (inputs == null) {
+               embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + WORD_HIDDEN.toUpperCase() + "`", false);
+           }
 
-        if (isDefeat) {
-            embedBuilder.addField(jsonGameParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase().replaceAll("", " ").trim() + "`", false);
-        }
+           if (isDefeat) {
+               embedBuilder.addField(jsonGameParsers.getLocale("Game_Word_That_Was", userId), "`" + WORD.toUpperCase().replaceAll("", " ").trim() + "`", false);
+           }
 
-        embedBuilder.addField(jsonGameParsers.getLocale("Game_Info", userId), gameInfo, false);
+           embedBuilder.addField(jsonGameParsers.getLocale("Game_Info", userId), gameInfo, false);
 
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
         //embedBuilder.setTimestamp(OffsetDateTime.parse(String.valueOf(HangmanRegistry.getInstance().getEndAutoDelete().get(Long.parseLong(userId)))));
         //embedBuilder.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
         return embedBuilder;
