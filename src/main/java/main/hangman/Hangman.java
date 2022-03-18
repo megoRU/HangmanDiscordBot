@@ -209,7 +209,7 @@ public class Hangman implements HangmanHelper {
                     for (int i = 0; i < messageList.size(); i++) {
                         temp.add(messageList.poll());
                     }
-                    BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessages(messageList).queue();
+                    BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessages(temp).queue();
                     for (Message message : temp) {
                         messageList.remove(message);
                     }
