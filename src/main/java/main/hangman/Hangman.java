@@ -203,7 +203,7 @@ public class Hangman implements HangmanHelper {
                     .getGuildById(guildId)
                     .getSelfMember()
                     .hasPermission(BotStartConfig.jda.getTextChannelById(channelId), Permission.MESSAGE_MANAGE) && !messageList.isEmpty()) {
-                if (messageList.size() > 1) {
+                if (messageList.size() > 2) {
                     List<Message> temp = new ArrayList<>();
 
                     for (int i = 0; i < messageList.size(); i++) {
