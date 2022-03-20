@@ -127,9 +127,9 @@ public class ButtonReactions extends ListenerAdapter {
 
             //При нажатии на кнопку HELP, бот присылает в чат информацию
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_HELP.name())) {
+                event.deferEdit().queue(); //Можно удалить так как editButton() решает эту проблему
                 event.editButton(event.getButton().asDisabled()).queue();
 
-                event.deferEdit().queue();
                 MessageInfoHelp messageInfoHelp = new MessageInfoHelp();
                 if (event.isFromGuild()) {
                     messageInfoHelp.buildMessage(
