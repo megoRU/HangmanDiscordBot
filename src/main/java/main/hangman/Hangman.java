@@ -221,6 +221,7 @@ public class Hangman implements HangmanHelper {
 
     public void fullWord(String inputs, Message messages) {
         messageList.add(messages);
+        if (inputs.length() < WORD.length()) return;
         try {
             if (isLetterPresent(inputs.toUpperCase())) {
                 EmbedBuilder info = embedBuilder(
@@ -401,16 +402,14 @@ public class Hangman implements HangmanHelper {
                embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
            }
 
-           if (inputs != null && inputs.length() >= 3) {
+            if (inputs == null) {
+                embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + WORD_HIDDEN.toUpperCase() + "`", false);
+            } else if (inputs.length() >= 3) {
                if (inputs.equals(WORD)) {
                    embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + WORD.toUpperCase().replaceAll("", " ").trim() + "`", false);
                } else {
-                   embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + currentHiddenWord.toUpperCase() + "`", false);
+                   embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + WORD_HIDDEN.toUpperCase() + "`", false);
                }
-           }
-
-           if (inputs == null) {
-               embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + WORD_HIDDEN.toUpperCase() + "`", false);
            }
 
            if (isDefeat) {
@@ -508,6 +507,7 @@ public class Hangman implements HangmanHelper {
         }
         index.clear();
         currentHiddenWord = sb.toString();
+        WORD_HIDDEN = currentHiddenWord;
         return currentHiddenWord;
     }
 
