@@ -405,7 +405,7 @@ public class Hangman implements HangmanHelper {
                if (inputs.equals(WORD)) {
                    embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + WORD.toUpperCase().replaceAll("", " ").trim() + "`", false);
                } else {
-                   embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + currentHiddenWord.toUpperCase() + "`", false);
+                   embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + WORD_HIDDEN.toUpperCase() + "`", false);
                }
            }
 
