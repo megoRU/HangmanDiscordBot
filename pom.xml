@@ -25,6 +25,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.github.megoRU</groupId>
+			<artifactId>api.megoru.ru</artifactId>
+			<version>v1.1</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>

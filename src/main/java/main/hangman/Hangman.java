@@ -1,9 +1,15 @@
 package main.hangman;
 
+import api.megoru.ru.MegoruAPI;
+import api.megoru.ru.entity.GameWordLanguage;
+import api.megoru.ru.impl.MegoruAPIImpl;
 import lombok.Getter;
 import lombok.Setter;
 import main.config.BotStartConfig;
-import main.hangman.impl.*;
+import main.hangman.impl.EndGameButtons;
+import main.hangman.impl.GetImage;
+import main.hangman.impl.HangmanHelper;
+import main.hangman.impl.SetGameLanguageButtons;
 import main.jsonparser.JSONGameParsers;
 import main.jsonparser.JSONParsers;
 import main.model.entity.ActiveHangman;
@@ -109,7 +115,12 @@ public class Hangman implements HangmanHelper {
                 return;
             }
 
-            WORD = GetWord.get(userId);
+
+            MegoruAPI megoruAPI = new MegoruAPIImpl("this bot don`t use token");
+            GameWordLanguage gameWordLanguage = new GameWordLanguage();
+            gameWordLanguage.setLanguage(BotStartConfig.getMapGameLanguages().get(userId));
+
+            WORD = megoruAPI.getWord(gameWordLanguage).getWord();
             if (WORD != null) {
                 wordToChar = WORD.toCharArray(); // Преобразуем строку str в массив символов (char)
                 hideWord(WORD.length());
@@ -145,7 +156,11 @@ public class Hangman implements HangmanHelper {
                 return;
             }
 
-            WORD = GetWord.get(userId);
+            MegoruAPI megoruAPI = new MegoruAPIImpl("this bot don`t use token");
+            GameWordLanguage gameWordLanguage = new GameWordLanguage();
+            gameWordLanguage.setLanguage(BotStartConfig.getMapGameLanguages().get(userId));
+
+            WORD = megoruAPI.getWord(gameWordLanguage).getWord();
             if (WORD != null) {
                 wordToChar = WORD.toCharArray(); // Преобразуем строку str в массив символов (char)
                 hideWord(WORD.length());
