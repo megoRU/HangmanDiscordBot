@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>com.github.megoRU</groupId>
 			<artifactId>api.megoru.ru</artifactId>
-			<version>v1.1</version>
+			<version>v1.6</version>
 		</dependency>
 
 		<dependency>
