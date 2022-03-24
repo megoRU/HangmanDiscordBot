@@ -18,6 +18,8 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.apache.commons.io.IOUtils;
+import org.boticordjava.api.BotiCordAPI;
+import org.boticordjava.api.impl.BotiCordAPIImpl;
 import org.discordbots.api.client.DiscordBotListAPI;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -41,6 +43,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.chrono.ChronoLocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static net.dv8tion.jda.api.interactions.commands.OptionType.STRING;
 
@@ -170,7 +173,7 @@ public class BotStartConfig {
         }
     }
 
-    @Scheduled(fixedDelay = 125000L)
+    @Scheduled(fixedDelay = 140000L, initialDelay = 8000L)
     private void topGG() {
         if (!Config.isIsDev()) {
             try {
@@ -182,6 +185,11 @@ public class BotStartConfig {
                 TOP_GG_API.setStats(serverCount);
                 BotStartConfig.jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
                 IOUtils.toString(new URL("http://193.163.203.77:3001/api/push/jjyiWxH1QR?msg=OK&ping="), StandardCharsets.UTF_8);
+
+                BotiCordAPI api = new BotiCordAPIImpl(System.getenv("BOTICORD"), Config.getBotId());
+                AtomicInteger usersCount = new AtomicInteger();
+                jda.getGuilds().forEach(g -> usersCount.addAndGet(g.getMembers().size()));
+                api.setStats(serverCount, 1, usersCount.get());
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
                 e.printStackTrace();
