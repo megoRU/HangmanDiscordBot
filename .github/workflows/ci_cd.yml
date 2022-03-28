@@ -23,7 +23,7 @@ jobs:
       #     Build Docker image:
       - name: Build and tag image
         run: |
-          docker build -t megoru/hangman .
+          docker build -t megoru/hangman -m 256m .
       #     Login to Docker Hub:
       - name: Docker login
         uses: docker/login-action@v1
