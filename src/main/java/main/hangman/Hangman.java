@@ -218,20 +218,17 @@ public class Hangman implements HangmanHelper {
     }
 
     private void deleteMessages() throws InterruptedException {
-        try {
-            if (BotStartConfig.jda
-                    .getGuildById(guildId)
-                    .getSelfMember()
-                    .hasPermission(BotStartConfig.jda.getTextChannelById(channelId), Permission.MESSAGE_MANAGE) && !messageList.isEmpty()) {
-                if (messageList.size() > 2) {
-                    BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessages(messageList).queue();
-                    //Так как метод асинхронный иногда может возникать NPE
-                    Thread.sleep(3500);
-                    messageList.clear();
-                }
+        if (guildId == null) return;
+        if (BotStartConfig.jda
+                .getGuildById(guildId)
+                .getSelfMember()
+                .hasPermission(BotStartConfig.jda.getTextChannelById(channelId), Permission.MESSAGE_MANAGE) && !messageList.isEmpty()) {
+            if (messageList.size() > 2) {
+                BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessages(messageList).queue();
+                //Так как метод асинхронный иногда может возникать NPE
+                Thread.sleep(3500);
+                messageList.clear();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
