@@ -35,105 +35,110 @@ public class GameHangmanListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) return;
+        try {
+            if (event.getAuthor().isBot()) return;
 
-        if (event.isFromType(ChannelType.TEXT) && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
+            if (event.isFromType(ChannelType.TEXT) && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel()))
+                return;
 
-        String message = event.getMessage().getContentRaw().trim().toLowerCase();
+            String message = event.getMessage().getContentRaw().trim().toLowerCase();
 
-        String prefix = HG;
-        String prefix2 = HG_STOP;
-        long userIdLong = event.getAuthor().getIdLong();
+            String prefix = HG;
+            String prefix2 = HG_STOP;
+            long userIdLong = event.getAuthor().getIdLong();
 
-        if ((message.matches(HG_ONE_LETTER) || message.matches(HG_ONE_LETTER_ENG)) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-            HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).logic(message, event.getMessage());
-            return;
-        }
-
-        if (message.matches(HG_ONE_WORD) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-            HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).fullWord(message.toLowerCase(), event.getMessage());
-            return;
-        }
-
-        if (event.isFromGuild() && BotStartConfig.getMapPrefix().containsKey(event.getGuild().getId())) {
-            prefix = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "hg";
-            prefix2 = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "hg stop";
-        }
-
-        if (message.equals(prefix) || message.equals(prefix2)) {
-            if (BotStartConfig.getMapGameLanguages().get(event.getAuthor().getId()) == null) {
-                EmbedBuilder needSetLanguage = new EmbedBuilder();
-
-                needSetLanguage.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
-                needSetLanguage.setColor(0x00FF00);
-                needSetLanguage.setDescription(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getAuthor().getId()));
-
-                event.getChannel().sendMessageEmbeds(needSetLanguage.build())
-                        .setActionRow(
-                                Button.secondary(Buttons.BUTTON_RUS.name(), "Кириллица")
-                                        .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")),
-
-                                Button.secondary(Buttons.BUTTON_ENG.name(), "Latin")
-                                        .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")),
-                                Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play"))
-                        .queue();
-
+            if ((message.matches(HG_ONE_LETTER) || message.matches(HG_ONE_LETTER_ENG)) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).logic(message, event.getMessage());
                 return;
             }
 
-            if (message.equals(prefix) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                event.getChannel().sendTyping().queue();
-                EmbedBuilder youPlay = new EmbedBuilder();
-
-                youPlay.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
-                youPlay.setColor(0x00FF00);
-                youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play",
-                        event.getAuthor().getId()).replaceAll("\\{0}", prefix));
-
-                event.getChannel().sendMessageEmbeds(youPlay.build())
-                        .setActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game"))
-                        .queue();
+            if (message.matches(HG_ONE_WORD) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).fullWord(message.toLowerCase(), event.getMessage());
                 return;
             }
 
-            if (message.equals(prefix2) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                HangmanRegistry.getInstance().removeHangman(userIdLong);
-
-                event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_Eng_game",
-                                event.getAuthor().getId()).replaceAll("\\{0}", prefix))
-                        .setActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
-                        .queue();
-                hangmanGameRepository.deleteActiveGame(userIdLong);
-                return;
+            if (event.isFromGuild() && BotStartConfig.getMapPrefix().containsKey(event.getGuild().getId())) {
+                prefix = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "hg";
+                prefix2 = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "hg stop";
             }
 
-            if (message.equals(prefix2) && !HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_You_Are_Not_Play", event.getAuthor().getId()))
-                        .setActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
-                        .queue();
-                return;
-            }
+            if (message.equals(prefix) || message.equals(prefix2)) {
+                if (BotStartConfig.getMapGameLanguages().get(event.getAuthor().getId()) == null) {
+                    EmbedBuilder needSetLanguage = new EmbedBuilder();
 
-            if (!HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                if (event.isFromGuild()) {
-                    HangmanRegistry.getInstance().setHangman(event.getAuthor().getIdLong(),
-                            new Hangman(event.getAuthor().getId(),
-                                    event.getGuild().getId(),
-                                    event.getChannel().getIdLong(),
-                                    hangmanGameRepository,
-                                    gamesRepository,
-                                    playerRepository));
-                } else {
-                    HangmanRegistry.getInstance().setHangman(event.getAuthor().getIdLong(),
-                            new Hangman(event.getAuthor().getId(),
-                                    null,
-                                    event.getChannel().getIdLong(),
-                                    hangmanGameRepository,
-                                    gamesRepository,
-                                    playerRepository));
+                    needSetLanguage.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
+                    needSetLanguage.setColor(0x00FF00);
+                    needSetLanguage.setDescription(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getAuthor().getId()));
+
+                    event.getChannel().sendMessageEmbeds(needSetLanguage.build())
+                            .setActionRow(
+                                    Button.secondary(Buttons.BUTTON_RUS.name(), "Кириллица")
+                                            .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")),
+
+                                    Button.secondary(Buttons.BUTTON_ENG.name(), "Latin")
+                                            .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")),
+                                    Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play"))
+                            .queue();
+
+                    return;
                 }
-                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel(), event.getAuthor().getAvatarUrl(), event.getAuthor().getName());
+
+                if (message.equals(prefix) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+                    event.getChannel().sendTyping().queue();
+                    EmbedBuilder youPlay = new EmbedBuilder();
+
+                    youPlay.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
+                    youPlay.setColor(0x00FF00);
+                    youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play",
+                            event.getAuthor().getId()).replaceAll("\\{0}", prefix));
+
+                    event.getChannel().sendMessageEmbeds(youPlay.build())
+                            .setActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game"))
+                            .queue();
+                    return;
+                }
+
+                if (message.equals(prefix2) && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+                    HangmanRegistry.getInstance().removeHangman(userIdLong);
+
+                    event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_Eng_game",
+                                    event.getAuthor().getId()).replaceAll("\\{0}", prefix))
+                            .setActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
+                            .queue();
+                    hangmanGameRepository.deleteActiveGame(userIdLong);
+                    return;
+                }
+
+                if (message.equals(prefix2) && !HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+                    event.getChannel().sendMessage(jsonParsers.getLocale("Hangman_You_Are_Not_Play", event.getAuthor().getId()))
+                            .setActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
+                            .queue();
+                    return;
+                }
+
+                if (!HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+                    if (event.isFromGuild()) {
+                        HangmanRegistry.getInstance().setHangman(event.getAuthor().getIdLong(),
+                                new Hangman(event.getAuthor().getId(),
+                                        event.getGuild().getId(),
+                                        event.getChannel().getIdLong(),
+                                        hangmanGameRepository,
+                                        gamesRepository,
+                                        playerRepository));
+                    } else {
+                        HangmanRegistry.getInstance().setHangman(event.getAuthor().getIdLong(),
+                                new Hangman(event.getAuthor().getId(),
+                                        null,
+                                        event.getChannel().getIdLong(),
+                                        hangmanGameRepository,
+                                        gamesRepository,
+                                        playerRepository));
+                    }
+                    HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel(), event.getAuthor().getAvatarUrl(), event.getAuthor().getName());
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

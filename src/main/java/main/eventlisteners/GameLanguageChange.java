@@ -26,52 +26,60 @@ public class GameLanguageChange extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) return;
+        try {
+            if (event.getAuthor().isBot()) return;
 
-        if (!event.isFromType(ChannelType.TEXT)) return;
+            if (!event.isFromType(ChannelType.TEXT)) return;
 
-        if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
+            if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
 
-        String message = event.getMessage().getContentRaw().toLowerCase().trim();
-        String[] messages = message.split(" ", 2);
-        String prefix_LANG_RUS = LANG_RUS;
-        String prefix_LANG_ENG = LANG_ENG;
+            String message = event.getMessage().getContentRaw().toLowerCase().trim();
+            String[] messages = message.split(" ", 2);
+            String prefix_LANG_RUS = LANG_RUS;
+            String prefix_LANG_ENG = LANG_ENG;
 
 
-        if (BotStartConfig.getMapPrefix().containsKey(event.getAuthor().getId())) {
-            prefix_LANG_RUS = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "game rus";
-            prefix_LANG_ENG = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "game eng";
-        }
-
-        if (message.equals(prefix_LANG_RUS) || message.equals(prefix_LANG_ENG)) {
-            if (HangmanRegistry.getInstance().hasHangman(event.getAuthor().getIdLong())) {
-                EmbedBuilder whenPlay = new EmbedBuilder();
-
-                whenPlay.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
-                whenPlay.setColor(0x00FF00);
-                whenPlay.setDescription(jsonParsers.getLocale("ReactionsButton_When_Play", event.getAuthor().getId()));
-
-                event.getChannel().sendMessageEmbeds(whenPlay.build())
-                        .setActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game"))
-                        .queue();
-            } else {
-                BotStartConfig.getMapGameLanguages().put(event.getAuthor().getId(), messages[1]);
-
-                changeGameLanguage(messages[1], event.getAuthor().getId());
-
-                event.getChannel()
-                        .sendMessage(jsonParsers.getLocale("ReactionsButton_Save", event.getAuthor().getId())
-                                .replaceAll("\\{0}", messages[1].equals("rus") ? "Русский" : "English")).queue();
+            if (BotStartConfig.getMapPrefix().containsKey(event.getAuthor().getId())) {
+                prefix_LANG_RUS = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "game rus";
+                prefix_LANG_ENG = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "game eng";
             }
+
+            if (message.equals(prefix_LANG_RUS) || message.equals(prefix_LANG_ENG)) {
+                if (HangmanRegistry.getInstance().hasHangman(event.getAuthor().getIdLong())) {
+                    EmbedBuilder whenPlay = new EmbedBuilder();
+
+                    whenPlay.setAuthor(event.getAuthor().getName(), null, event.getAuthor().getAvatarUrl());
+                    whenPlay.setColor(0x00FF00);
+                    whenPlay.setDescription(jsonParsers.getLocale("ReactionsButton_When_Play", event.getAuthor().getId()));
+
+                    event.getChannel().sendMessageEmbeds(whenPlay.build())
+                            .setActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game"))
+                            .queue();
+                } else {
+                    BotStartConfig.getMapGameLanguages().put(event.getAuthor().getId(), messages[1]);
+
+                    changeGameLanguage(messages[1], event.getAuthor().getId());
+
+                    event.getChannel()
+                            .sendMessage(jsonParsers.getLocale("ReactionsButton_Save", event.getAuthor().getId())
+                                    .replaceAll("\\{0}", messages[1].equals("rus") ? "Русский" : "English")).queue();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     public void changeGameLanguage(String message, String userIdLong) {
-        BotStartConfig.getMapGameLanguages().put(userIdLong, message);
-        GameLanguage gameLanguage = new GameLanguage();
-        gameLanguage.setUserIdLong(userIdLong);
-        gameLanguage.setLanguage(message);
-        gameLanguageRepository.save(gameLanguage);
+        try {
+            BotStartConfig.getMapGameLanguages().put(userIdLong, message);
+            GameLanguage gameLanguage = new GameLanguage();
+            gameLanguage.setUserIdLong(userIdLong);
+            gameLanguage.setLanguage(message);
+            gameLanguageRepository.save(gameLanguage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 

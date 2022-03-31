@@ -22,43 +22,48 @@ public class LanguageChange extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) return;
+        try {
+            if (event.getAuthor().isBot()) return;
 
-        if (!event.isFromType(ChannelType.TEXT)) return;
+            if (!event.isFromType(ChannelType.TEXT)) return;
 
-        if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
+            if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
 
-        String message = event.getMessage().getContentRaw().toLowerCase().trim();
-        String[] messages = message.split(" ", 2);
-        String prefix_LANG_RUS = LANG_RUS;
-        String prefix_LANG_ENG = LANG_ENG;
+            String message = event.getMessage().getContentRaw().toLowerCase().trim();
+            String[] messages = message.split(" ", 2);
+            String prefix_LANG_RUS = LANG_RUS;
+            String prefix_LANG_ENG = LANG_ENG;
 
-        if (BotStartConfig.getMapPrefix().containsKey(event.getGuild().getId())) {
-            prefix_LANG_RUS = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "lang rus";
-            prefix_LANG_ENG = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "lang eng";
-        }
-
-        if (message.equals(prefix_LANG_RUS) || message.equals(prefix_LANG_ENG)) {
-            BotStartConfig.getMapLanguages().put(event.getAuthor().getId(), messages[1]);
-
-            languageRepository.deleteLanguage(event.getAuthor().getId());
-            Language languageRepo = new Language();
-            languageRepo.setUserIdLong(event.getAuthor().getId());
-            languageRepo.setLanguage(messages[1]);
-
-            languageRepository.save(languageRepo);
-
-            String language;
-
-            if (messages[1].equals("rus")) {
-                language = "Русский";
-            } else {
-                language = "English";
+            if (BotStartConfig.getMapPrefix().containsKey(event.getGuild().getId())) {
+                prefix_LANG_RUS = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "lang rus";
+                prefix_LANG_ENG = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "lang eng";
             }
 
-            event.getChannel()
-                    .sendMessage(jsonParsers.getLocale("language_change_lang", event.getAuthor().getId())
-                            .replaceAll("\\{0}", language)).queue();
+            if (message.equals(prefix_LANG_RUS) || message.equals(prefix_LANG_ENG)) {
+                BotStartConfig.getMapLanguages().put(event.getAuthor().getId(), messages[1]);
+
+                languageRepository.deleteLanguage(event.getAuthor().getId());
+                Language languageRepo = new Language();
+                languageRepo.setUserIdLong(event.getAuthor().getId());
+                languageRepo.setLanguage(messages[1]);
+
+                languageRepository.save(languageRepo);
+
+                String language;
+
+                if (messages[1].equals("rus")) {
+                    language = "Русский";
+                } else {
+                    language = "English";
+                }
+
+                event.getChannel()
+                        .sendMessage(jsonParsers.getLocale("language_change_lang", event.getAuthor().getId())
+                                .replaceAll("\\{0}", language)).queue();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

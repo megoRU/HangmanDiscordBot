@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Repository
+@Deprecated
 public interface PrefixRepository extends CrudRepository<Prefix, Long> {
 
     @Transactional
