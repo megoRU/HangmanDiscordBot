@@ -36,10 +36,10 @@ public class SlashCommand extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        if (event.getUser().isBot()) return;
-        if (event.isFromGuild() && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
-
         try {
+            if (event.getUser().isBot()) return;
+            if (event.isFromGuild() && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
+
             if (event.getName().equals("hg")) {
                 event.getChannel().sendTyping().queue();
                 //Проверяем установлен ли язык. Если нет - то возвращаем в чат ошибку
