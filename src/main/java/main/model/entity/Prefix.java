@@ -5,7 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Getter
 @Setter
@@ -13,6 +16,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "prefixs")
+@Deprecated
 public class Prefix {
     @Id
     @Column(name="server_id", nullable = false)

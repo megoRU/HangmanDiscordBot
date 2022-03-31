@@ -26,7 +26,6 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
     //bot join msg
     @Override
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
-
         try {
             if (event.getGuild().getDefaultChannel() == null) return;
 

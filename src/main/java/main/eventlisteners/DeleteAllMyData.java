@@ -30,9 +30,10 @@ public class DeleteAllMyData extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) return;
-
         try {
+            if (event.getAuthor().isBot()) return;
+
+
             if (event.isFromType(ChannelType.TEXT)) {
                 if (CheckPermissions.isHasPermissionToWrite(event.getTextChannel())) return;
             }
