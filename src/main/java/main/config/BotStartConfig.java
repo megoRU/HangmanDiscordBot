@@ -191,8 +191,8 @@ public class BotStartConfig {
                 jda.getGuilds().forEach(g -> usersCount.addAndGet(g.getMembers().size()));
                 api.setStats(serverCount, 1, usersCount.get());
             } catch (Exception e) {
-                Thread.currentThread().interrupt();
                 e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
     }

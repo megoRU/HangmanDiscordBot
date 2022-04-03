@@ -134,6 +134,7 @@ public class Hangman implements HangmanHelper {
 
                 event.replyEmbeds(wordIsNull.build()).queue();
                 clearingCollections();
+                e.printStackTrace();
                 return;
             }
 
@@ -227,6 +228,8 @@ public class Hangman implements HangmanHelper {
                     .getSelfMember()
                     .hasPermission(BotStartConfig.jda.getTextChannelById(channelId), Permission.MESSAGE_MANAGE) && !messageList.isEmpty()) {
                 if (messageList.size() > 2) {
+                    LOGGER.info("messageList.size(): " + messageList.size()
+                            + "\nmessageList: " + Arrays.toString(messageList.toArray()));
                     BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessages(messageList).submit().get();
                     //Так как метод асинхронный иногда может возникать NPE
                     Thread.sleep(2000);

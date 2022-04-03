@@ -14,6 +14,6 @@ public class JSONGameParsers {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "NO_FOUND_LOCALIZATION";
+        return ParserClass.getInstance().getTranslation(key, "eng");
     }
 }
