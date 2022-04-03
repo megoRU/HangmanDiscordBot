@@ -38,7 +38,7 @@ public class SlashCommand extends ListenerAdapter {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         try {
             if (event.getUser().isBot()) return;
-            if (event.isFromGuild() && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
+            if (event.getGuild() != null && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
 
             if (event.getName().equals("hg")) {
                 event.getChannel().sendTyping().queue();
@@ -67,7 +67,7 @@ public class SlashCommand extends ListenerAdapter {
                     youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
                     youPlay.setColor(0x00FF00);
 
-                    if (event.isFromGuild()) {
+                    if (event.getGuild() != null) {
                         youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play",
                                 event.getUser().getId()).replaceAll("\\{0}", BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null
                                 ? "!hg" : BotStartConfig.getMapPrefix().get(event.getGuild().getId())));
@@ -81,7 +81,7 @@ public class SlashCommand extends ListenerAdapter {
                             .queue();
                     //Если всё хорошо, создаем игру
                 } else {
-                    if (event.isFromGuild()) {
+                    if (event.getGuild() != null) {
                         HangmanRegistry.getInstance().setHangman(event.getUser().getIdLong(),
                                 new Hangman(event.getUser().getId(),
                                         event.getGuild().getId(),
@@ -174,7 +174,7 @@ public class SlashCommand extends ListenerAdapter {
 
             if (event.getName().equals("help")) {
                 //TODO: убрать 1 мая 2022
-                if (event.isFromGuild()) {
+                if (event.getGuild() != null) {
                     new MessageInfoHelp().buildMessage(
                             BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null ? "!" : BotStartConfig.getMapPrefix().get(event.getGuild().getId()),
                             null,

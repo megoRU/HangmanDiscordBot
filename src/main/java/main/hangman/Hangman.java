@@ -190,6 +190,8 @@ public class Hangman implements HangmanHelper {
         try {
             if ((guesses.size() > countUsedLetters) && HangmanRegistry.getInstance().hasHangman(Long.parseLong(userId))) {
                 countUsedLetters = guesses.size();
+                System.out.println("currentHiddenWord: " + currentHiddenWord);
+                System.out.println("getGuesses(): " + getGuesses());
                 hangmanGameRepository.updateGame(Long.valueOf(userId), currentHiddenWord, getGuesses(), hangmanErrors);
             }
         } catch (Exception e) {
