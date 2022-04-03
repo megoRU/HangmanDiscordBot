@@ -1,6 +1,6 @@
-## Giveaway Privacy Policy
+## Hangman Privacy Policy
 
-### By using the Giveaway you accept with its privacy policy.
+### By using the Hangman you accept with its privacy policy.
 
 ### 1. What does it store?
 #### Hangman stores the following:
@@ -12,7 +12,6 @@
 ##### • Discord server IDs
 ##### • User game language
 ##### • User language
-##### • Server prefix
 
 ### 2. Who can access the data?
 ##### • The Bot developer (me)
@@ -27,4 +26,4 @@
 #### Feel free to join my [Discord server](https://discord.gg/UrWG3R683d)
 
 ### Please note, that we can change this policy without any warning at any given time.
-#### **Last changed:** `13.08.2021`
+#### **Last changed:** `03.04.2022`
