@@ -223,6 +223,10 @@ public class Hangman implements HangmanHelper {
     private synchronized void deleteMessages() {
         try {
             if (guildId == null) return;
+            if (BotStartConfig.jda.getGuildById(guildId) == null) {
+                hangmanGameRepository.deleteActiveGame(Long.valueOf(userId));
+                return;
+            }
             if (BotStartConfig.jda
                     .getGuildById(guildId)
                     .getSelfMember()
