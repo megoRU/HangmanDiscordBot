@@ -17,10 +17,11 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.apache.http.HttpResponse;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.boticordjava.api.BotiCordAPI;
 import org.boticordjava.api.impl.BotiCordAPIImpl;
 import org.discordbots.api.client.DiscordBotListAPI;
@@ -177,9 +178,16 @@ public class BotStartConfig {
     @Scheduled(fixedRate = 30000)
     private void status() {
         try {
-            CloseableHttpClient httpclient = HttpClients.createDefault();
-            HttpGet httpget = new HttpGet("http://193.163.203.77:3001/api/push/jjyiWxH1QR?msg=OK&ping=");
-            HttpResponse httpresponse = httpclient.execute(httpget);
+            int timeout = 3;
+            RequestConfig config = RequestConfig.custom().
+                    setConnectTimeout(timeout * 1000).
+                    setConnectionRequestTimeout(timeout * 1000).
+                    setSocketTimeout(timeout * 1000).build();
+            CloseableHttpClient client = HttpClientBuilder.create()
+                    .setDefaultRequestConfig(config).build();
+            HttpGet request = new HttpGet("http://193.163.203.77:3001/api/push/jjyiWxH1QR?msg=OK&ping=");
+            CloseableHttpResponse execute = client.execute(request);
+            System.out.println(execute.getStatusLine().getStatusCode());
         } catch (Exception e) {
             e.printStackTrace();
         }
