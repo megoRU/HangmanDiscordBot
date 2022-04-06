@@ -173,6 +173,15 @@ public class BotStartConfig {
         }
     }
 
+    @Scheduled(fixedDelay = 30000L, initialDelay = 8000L)
+    private void status() {
+        try {
+            IOUtils.toString(new URL("http://193.163.203.77:3001/api/push/jjyiWxH1QR?msg=OK&ping="), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Scheduled(fixedDelay = 140000L, initialDelay = 8000L)
     private void topGG() {
         if (!Config.isIsDev()) {
@@ -184,7 +193,6 @@ public class BotStartConfig {
                 serverCount = BotStartConfig.jda.getGuilds().size();
                 TOP_GG_API.setStats(serverCount);
                 BotStartConfig.jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
-                IOUtils.toString(new URL("http://193.163.203.77:3001/api/push/jjyiWxH1QR?msg=OK&ping="), StandardCharsets.UTF_8);
 
                 BotiCordAPI api = new BotiCordAPIImpl(System.getenv("BOTICORD"), Config.getBotId());
                 AtomicInteger usersCount = new AtomicInteger();
