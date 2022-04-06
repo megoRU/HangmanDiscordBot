@@ -17,7 +17,10 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.boticordjava.api.BotiCordAPI;
 import org.boticordjava.api.impl.BotiCordAPIImpl;
 import org.discordbots.api.client.DiscordBotListAPI;
@@ -34,8 +37,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -173,10 +174,12 @@ public class BotStartConfig {
         }
     }
 
-    @Scheduled(fixedDelay = 30000L, initialDelay = 8000L)
+    @Scheduled(fixedRate = 60000)
     private void status() {
         try {
-            IOUtils.toString(new URL("http://193.163.203.77:3001/api/push/jjyiWxH1QR?msg=OK&ping="), StandardCharsets.UTF_8);
+            CloseableHttpClient httpclient = HttpClients.createDefault();
+            HttpGet httpget = new HttpGet("http://193.163.203.77:3001/api/push/jjyiWxH1QR?msg=OK&ping=");
+            HttpResponse httpresponse = httpclient.execute(httpget);
         } catch (Exception e) {
             e.printStackTrace();
         }
