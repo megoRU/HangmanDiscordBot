@@ -185,9 +185,9 @@ public class BotStartConfig {
                     setSocketTimeout(timeout * 1000).build();
             CloseableHttpClient client = HttpClientBuilder.create()
                     .setDefaultRequestConfig(config).build();
-            HttpGet request = new HttpGet("http://193.163.203.77:3001/api/push/jjyiWxH1QR?msg=OK&ping=");
+            HttpGet request = new HttpGet("http://193.163.203.77:3001/api/push/jjyiWxH1QR?msg=OK&ping=" + jda.getRestPing().submit().get());
             CloseableHttpResponse execute = client.execute(request);
-            System.out.println(execute.getStatusLine().getStatusCode());
+            execute.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
