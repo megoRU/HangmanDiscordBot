@@ -174,7 +174,7 @@ public class BotStartConfig {
         }
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 30000)
     private void status() {
         try {
             CloseableHttpClient httpclient = HttpClients.createDefault();
