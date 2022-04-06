@@ -53,6 +53,13 @@
 			<version>8.0.28</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.13</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.github.megoRU</groupId>
 			<artifactId>boticordjava</artifactId>
