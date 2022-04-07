@@ -23,6 +23,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.logging.Logger;
+
 @RequiredArgsConstructor
 @Service
 public class SlashCommand extends ListenerAdapter {
@@ -33,12 +35,16 @@ public class SlashCommand extends ListenerAdapter {
     private final PlayerRepository playerRepository;
     private final GameLanguageRepository gameLanguageRepository;
     private final LanguageRepository languageRepository;
+    private final static Logger LOGGER = Logger.getLogger(SlashCommand.class.getName());
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         try {
             if (event.getUser().isBot()) return;
-            if (event.getGuild() != null && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
+            if (event.getGuild() != null && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel()))
+                return;
+
+            LOGGER.info("\nSlash Command name: " + event.getName());
 
             if (event.getName().equals("hg")) {
                 event.getChannel().sendTyping().queue();
@@ -201,7 +207,10 @@ public class SlashCommand extends ListenerAdapter {
             }
 
             if (event.getName().equals("allstats")) {
-                event.deferReply().queue();
+                if (!event.isAcknowledged()) {
+                    event.deferReply().queue();
+                }
+
                 CreatorGraph creatorGraph = new CreatorGraph(
                         gamesRepository,
                         event.getChannel().getId(),
@@ -215,7 +224,10 @@ public class SlashCommand extends ListenerAdapter {
             }
 
             if (event.getName().equals("mystats")) {
-                event.deferReply().queue();
+                if (!event.isAcknowledged()) {
+                    event.deferReply().queue();
+                }
+
                 CreatorGraph creatorGraph = new CreatorGraph(
                         gamesRepository,
                         event.getChannel().getId(),
