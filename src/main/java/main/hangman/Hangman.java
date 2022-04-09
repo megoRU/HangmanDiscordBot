@@ -134,13 +134,13 @@ public class Hangman implements HangmanHelper {
 
                 event.replyEmbeds(wordIsNull.build()).queue();
                 clearingCollections();
-                e.printStackTrace();
+                LOGGER.info(e.getMessage());
                 return;
             }
 
             event.replyEmbeds(updateEmbedBuilder().build()).queue(m -> m.retrieveOriginal().queue(this::createEntityInDataBase));
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
     }
 
@@ -182,7 +182,7 @@ public class Hangman implements HangmanHelper {
 
             textChannel.sendMessageEmbeds(updateEmbedBuilder().build()).queue(this::createEntityInDataBase);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
     }
 
@@ -196,7 +196,7 @@ public class Hangman implements HangmanHelper {
                 hangmanGameRepository.updateGame(Long.valueOf(userId), currentHiddenWord, getGuesses(), hangmanErrors);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
     }
 
@@ -213,7 +213,7 @@ public class Hangman implements HangmanHelper {
                         Thread.currentThread().interrupt();
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.info(e.getMessage());
                     Thread.currentThread().interrupt();
                 }
             }
@@ -241,7 +241,7 @@ public class Hangman implements HangmanHelper {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
     }
 
@@ -294,7 +294,7 @@ public class Hangman implements HangmanHelper {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
     }
 
@@ -314,7 +314,7 @@ public class Hangman implements HangmanHelper {
             clearingCollections();
             resultGame(false);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
     }
 
@@ -402,7 +402,7 @@ public class Hangman implements HangmanHelper {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
     }
 
@@ -449,7 +449,7 @@ public class Hangman implements HangmanHelper {
             embedBuilder.addField(jsonGameParsers.getLocale("Game_Info", userId), gameInfo, false);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
         //embedBuilder.setTimestamp(OffsetDateTime.parse(String.valueOf(HangmanRegistry.getInstance().getEndAutoDelete().get(Long.parseLong(userId)))));
         //embedBuilder.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
@@ -475,7 +475,7 @@ public class Hangman implements HangmanHelper {
 
             hangmanGameRepository.deleteActiveGame(Long.valueOf(userId));
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
     }
 
@@ -495,7 +495,7 @@ public class Hangman implements HangmanHelper {
             activeHangman.setGameCreatedTime(new Timestamp(Instant.now().toEpochMilli()));
             hangmanGameRepository.saveAndFlush(activeHangman);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
     }
 
@@ -511,7 +511,7 @@ public class Hangman implements HangmanHelper {
 
             clearingCollections();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
 
     }
@@ -527,7 +527,7 @@ public class Hangman implements HangmanHelper {
             }
             WORD_HIDDEN = sb.toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
     }
 
@@ -548,7 +548,7 @@ public class Hangman implements HangmanHelper {
             currentHiddenWord = sb.toString();
             WORD_HIDDEN = currentHiddenWord;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
         return currentHiddenWord;
     }
@@ -580,7 +580,7 @@ public class Hangman implements HangmanHelper {
             WORD = null;
             HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
     }
 
