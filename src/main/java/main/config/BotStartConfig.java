@@ -175,19 +175,21 @@ public class BotStartConfig {
         }
     }
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 50000)
     private void status() {
         try {
-            int timeout = 3;
-            RequestConfig config = RequestConfig.custom().
-                    setConnectTimeout(timeout * 1000).
-                    setConnectionRequestTimeout(timeout * 1000).
-                    setSocketTimeout(timeout * 1000).build();
-            CloseableHttpClient client = HttpClientBuilder.create()
-                    .setDefaultRequestConfig(config).build();
-            HttpGet request = new HttpGet("http://193.163.203.77:3001/api/push/jjyiWxH1QR?msg=OK&ping=" + jda.getRestPing().submit().get());
-            CloseableHttpResponse execute = client.execute(request);
-            execute.close();
+            if (!Config.isIsDev()) {
+                int timeout = 3;
+                RequestConfig config = RequestConfig.custom().
+                        setConnectTimeout(timeout * 1000).
+                        setConnectionRequestTimeout(timeout * 1000).
+                        setSocketTimeout(timeout * 1000).build();
+                CloseableHttpClient client = HttpClientBuilder.create()
+                        .setDefaultRequestConfig(config).build();
+                HttpGet request = new HttpGet("http://193.163.203.77:3001/api/push/jjyiWxH1QR?msg=OK&ping=" + jda.getRestPing().submit().get());
+                CloseableHttpResponse execute = client.execute(request);
+                execute.close();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
