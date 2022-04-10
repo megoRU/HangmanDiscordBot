@@ -202,7 +202,7 @@ public class Hangman implements HangmanHelper {
 
     //Автоматически отправляет в БД данные
     public void autoInsert() {
-        new Timer().scheduleAtFixedRate(new TimerTask() {
+        new Timer(true).scheduleAtFixedRate(new TimerTask() {
             public void run() throws NullPointerException {
                 try {
                     if (HangmanRegistry.getInstance().hasHangman(Long.parseLong(userId))) {
@@ -220,7 +220,7 @@ public class Hangman implements HangmanHelper {
         }, 7000, 5000);
     }
 
-    private synchronized void deleteMessages() {
+    private void deleteMessages() {
         try {
             if (guildId == null) return;
             if (BotStartConfig.jda.getGuildById(guildId) == null) {
@@ -234,10 +234,12 @@ public class Hangman implements HangmanHelper {
                 if (messageList.size() > 2) {
                     LOGGER.info("messageList.size(): " + messageList.size()
                             + "\nmessageList: " + Arrays.toString(messageList.toArray()));
-                    BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessages(messageList).submit().get();
+
+                    List<Message> temp = new ArrayList<>(messageList);
+                    BotStartConfig.jda.getGuildById(guildId).getTextChannelById(channelId).deleteMessages(messageList).queue();
                     //Так как метод асинхронный иногда может возникать NPE
-                    Thread.sleep(2000);
-                    messageList.clear();
+                    Thread.sleep(5000);
+                    messageList.removeAll(temp);
                 }
             }
         } catch (Exception e) {
