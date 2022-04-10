@@ -1,3 +1,6 @@
+server:
+  port: 8086
+
 spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
@@ -9,4 +12,3 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: none
-    show-sql: false
