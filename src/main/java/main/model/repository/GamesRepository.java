@@ -16,13 +16,13 @@ import java.util.List;
 public interface GamesRepository extends JpaRepository<Game, Long> {
 
     @Query(value = "SELECT COUNT(g.id) AS COUNT_GAMES, " +
-            "SUM (CASE WHEN g.result = 0 THEN 1 ELSE 0 END) AS TOTAL_ZEROS, " +
-            "SUM (CASE WHEN g.result = 1 THEN 1 ELSE 0 END) AS TOTAL_ONES " +
+            "SUM (CASE WHEN g.result = false THEN 1 ELSE 0 END) AS TOTAL_ZEROS, " +
+            "SUM (CASE WHEN g.result = true THEN 1 ELSE 0 END) AS TOTAL_ONES " +
             "FROM Player pl, Game g WHERE pl.userIdLong = :userIdLong " +
             "AND pl.games_id.id = g.id")
     String getStatistic(@Param("userIdLong") Long userIdLong);
 
-    @Query(value = "SELECT COUNT(*) AS count, game_date AS gameDate FROM games GROUP BY MONTH (game_date) ORDER BY `gameDate` DESC LIMIT 8", nativeQuery = true)
+    @Query(value = "SELECT COUNT(*) AS count, game_date AS gameDate FROM games GROUP BY YEAR(game_date), MONTH(game_date) ORDER BY `gameDate` DESC LIMIT 8", nativeQuery = true)
     List<StatisticGlobal> getAllStatistic();
 
     @Query(value = "SELECT SUM(IF(result = 0, 1, 0)) AS TOTAL_ZEROS, " +
