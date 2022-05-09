@@ -28,7 +28,7 @@ public class GameHangmanListener extends ListenerAdapter {
     private static final String HG_ONE_LETTER = "[А-ЯЁа-яё]";
     private static final String HG_ONE_LETTER_ENG = "[A-Za-z]";
     private static final String HG_ONE_WORD = "[A-Za-zА-ЯЁа-яё]{3,24}+";
-    private static final JSONParsers jsonParsers = new JSONParsers();
+    private static final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final HangmanGameRepository hangmanGameRepository;
     private final GamesRepository gamesRepository;
     private final PlayerRepository playerRepository;

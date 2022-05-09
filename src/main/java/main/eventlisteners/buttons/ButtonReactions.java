@@ -27,7 +27,7 @@ import java.util.Objects;
 @Service
 public class ButtonReactions extends ListenerAdapter {
 
-    private final JSONParsers jsonParsers = new JSONParsers();
+    private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final GameLanguageRepository gameLanguageRepository;
     private final LanguageRepository languageRepository;
     private final HangmanGameRepository hangmanGameRepository;

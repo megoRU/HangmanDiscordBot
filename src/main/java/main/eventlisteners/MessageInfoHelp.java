@@ -24,7 +24,7 @@ public class MessageInfoHelp extends ListenerAdapter {
 
     private static final String HELP = "!help";
     private static final String PREFIX = "!";
-    private final JSONParsers jsonParsers = new JSONParsers();
+    private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {

@@ -19,7 +19,7 @@ public class PrefixChange extends ListenerAdapter {
 
     private static final String PREFIX = "!prefix\\s.";
     private static final String PREFIX_RESET = "!prefix reset";
-    private final JSONParsers jsonParsers = new JSONParsers();
+    private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final PrefixRepository prefixRepository;
 
     @Override

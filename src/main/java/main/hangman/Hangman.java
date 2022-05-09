@@ -10,7 +10,6 @@ import main.hangman.impl.EndGameButtons;
 import main.hangman.impl.GetImage;
 import main.hangman.impl.HangmanHelper;
 import main.hangman.impl.SetGameLanguageButtons;
-import main.jsonparser.JSONGameParsers;
 import main.jsonparser.JSONParsers;
 import main.model.entity.ActiveHangman;
 import main.model.entity.Game;
@@ -40,8 +39,8 @@ import java.util.logging.Logger;
 public class Hangman implements HangmanHelper {
 
     //Localisation
-    private static final JSONGameParsers jsonGameParsers = new JSONGameParsers();
-    private static final JSONParsers jsonParsers = new JSONParsers();
+    private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
+    private static final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
 
     //Repository
     private final HangmanGameRepository hangmanGameRepository;
@@ -567,7 +566,9 @@ public class Hangman implements HangmanHelper {
 
     //Для инъекции при восстановлении
     public void updateVariables(String guesses, String word, String currentHiddenWord, int hangmanErrors) {
-        this.guesses.addAll(Arrays.asList(guesses.split(", ")));
+        if (!guesses.equals("")) {
+            this.guesses.addAll(Arrays.asList(guesses.split(", ")));
+        }
         this.WORD = word;
         this.WORD_HIDDEN = currentHiddenWord;
         this.currentHiddenWord = currentHiddenWord;
