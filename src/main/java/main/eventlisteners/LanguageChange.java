@@ -17,7 +17,7 @@ public class LanguageChange extends ListenerAdapter {
 
     private static final String LANG_RUS = "!lang rus";
     private static final String LANG_ENG = "!lang eng";
-    private final JSONParsers jsonParsers = new JSONParsers();
+    private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final LanguageRepository languageRepository;
 
     @Override

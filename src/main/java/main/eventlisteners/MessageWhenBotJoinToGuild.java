@@ -20,7 +20,7 @@ import java.util.List;
 @Service
 public class MessageWhenBotJoinToGuild extends ListenerAdapter {
 
-    private static final JSONParsers jsonParsers = new JSONParsers();
+    private static final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final PrefixRepository prefixRepository;
 
     //bot join msg

@@ -21,7 +21,7 @@ public class GameLanguageChange extends ListenerAdapter {
 
     private static final String LANG_RUS = "!game rus";
     private static final String LANG_ENG = "!game eng";
-    private final JSONParsers jsonParsers = new JSONParsers();
+    private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final GameLanguageRepository gameLanguageRepository;
 
     @Override

@@ -17,7 +17,7 @@ import java.util.List;
 @Getter
 public class CreatorGraph {
 
-    private static final JSONParsers jsonParsers = new JSONParsers();
+    private static final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final String textChannelIdLong;
     private final String userIdLong;
     private final String userName;

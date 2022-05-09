@@ -23,7 +23,7 @@ public class DeleteAllMyData extends ListenerAdapter {
 
     private static final String DELETE = "!delete";
     private static final String DELETE_WITH_CODE = "!delete\\s.+";
-    private final JSONParsers jsonParsers = new JSONParsers();
+    private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final GamesRepository gamesRepository;
     private final LanguageRepository languageRepository;
     private final GameLanguageRepository gameLanguageRepository;

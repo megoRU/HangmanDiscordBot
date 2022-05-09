@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 @Service
 public class SlashCommand extends ListenerAdapter {
 
-    private final JSONParsers jsonParsers = new JSONParsers();
+    private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final HangmanGameRepository hangmanGameRepository;
     private final GamesRepository gamesRepository;
     private final PlayerRepository playerRepository;

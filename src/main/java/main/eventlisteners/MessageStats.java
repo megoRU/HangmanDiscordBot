@@ -21,7 +21,7 @@ public class MessageStats extends ListenerAdapter {
 
     private static final String STATS = "!hg stats";
     private static final DecimalFormat df = new DecimalFormat("##.#");
-    private final JSONParsers jsonParsers = new JSONParsers();
+    private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private GamesRepository gamesRepository;
 
     @Override
