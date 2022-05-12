@@ -20,7 +20,12 @@ This work is licensed under a [GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.
 - Maven
 
 ## Running on your server
-
+1. Move `docker-compose.yml` at the root `/root` VPS server.
+2. Fill it with your data.
+3. Import tables to your MySQL: `DiscordBotHangman_DB.sql`
+4. Launch the container: `docker-compose up -d`
+5. If you need to update the repository: `docker-compose pull`
+6. If you need to stop: `docker-compose stop`
 
 ## Copyright Notice
 

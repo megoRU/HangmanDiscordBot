@@ -174,18 +174,23 @@ public class BotStartConfig {
     private void topGG() {
         if (!Config.isIsDev()) {
             try {
-                DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
-                        .token(Config.getTopGgApiToken())
-                        .botId(Config.getBotId())
-                        .build();
-                serverCount = BotStartConfig.jda.getGuilds().size();
-                TOP_GG_API.setStats(serverCount);
-                BotStartConfig.jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
+                if (Config.getTopGgApiToken() != null && System.getenv("BOTICORD") != null) {
+                    DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
+                            .token(Config.getTopGgApiToken())
+                            .botId(Config.getBotId())
+                            .build();
+                    serverCount = BotStartConfig.jda.getGuilds().size();
+                    TOP_GG_API.setStats(serverCount);
+                    BotStartConfig.jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
 
-                BotiCordAPI api = new BotiCordAPIImpl(System.getenv("BOTICORD"), Config.getBotId());
-                AtomicInteger usersCount = new AtomicInteger();
-                jda.getGuilds().forEach(g -> usersCount.addAndGet(g.getMembers().size()));
-                api.setStats(serverCount, 1, usersCount.get());
+                    BotiCordAPI api = new BotiCordAPIImpl(System.getenv("BOTICORD"), Config.getBotId());
+                    AtomicInteger usersCount = new AtomicInteger();
+                    jda.getGuilds().forEach(g -> usersCount.addAndGet(g.getMembers().size()));
+                    api.setStats(serverCount, 1, usersCount.get());
+                } else {
+                    serverCount = BotStartConfig.jda.getGuilds().size();
+                    BotStartConfig.jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
