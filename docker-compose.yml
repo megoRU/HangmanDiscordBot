@@ -5,8 +5,9 @@ services:
     image: megoru/hangman
     restart: always
     environment:
-      PROD_TOKEN: 
-      DATABASE_URL: jdbc:mysql://your ip address:3306/
-      DATABASE_URL2: ?useSSL=false&serverTimezone=UTC&characterEncoding=utf8
-      DATABASE_PASS: 
-      TOP_GG_API_TOKEN:
+      PROD_TOKEN: YOUR_BOT_TOKEN //see https://discord.com/developers/applications
+      DATABASE_URL: jdbc:mysql:// YOUR_IP :3306/ YOUR_USER ?useSSL=false&serverTimezone=UTC&characterEncoding=utf8
+      DATABASE_PASS: YOUR_PASSWORD
+      DATABASE_USER: YOUR_USER
+
+# YOUR_IP and YOUR_USER don't forget to remove the spaces
