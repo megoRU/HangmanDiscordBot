@@ -10,6 +10,7 @@ import main.eventlisteners.MessageInfoHelp;
 import main.eventlisteners.MessageStats;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
+import main.hangman.impl.HangmanHelper;
 import main.jsonparser.JSONParsers;
 import main.model.entity.GameLanguage;
 import main.model.entity.Language;
@@ -23,6 +24,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
 import java.util.logging.Logger;
 
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ import java.util.logging.Logger;
 public class SlashCommand extends ListenerAdapter {
 
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
+    private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
     private final HangmanGameRepository hangmanGameRepository;
     private final GamesRepository gamesRepository;
     private final PlayerRepository playerRepository;
@@ -112,7 +115,6 @@ public class SlashCommand extends ListenerAdapter {
             if (event.getName().equals("stop")) {
                 //Проверяем играет ли сейчас игрок. Если да удаляем игру.
                 if (HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
-                    HangmanRegistry.getInstance().getActiveHangman().remove(event.getUser().getIdLong());
                     //TODO: убрать 1 мая 2022
                     if (event.isFromGuild()) {
                         event.reply(jsonParsers.getLocale("Hangman_Eng_game",
@@ -126,6 +128,18 @@ public class SlashCommand extends ListenerAdapter {
                                 .queue();
                     }
 
+                    var embedBuilder = HangmanRegistry.getInstance().getActiveHangman().get(event.getUser().getIdLong())
+                            .embedBuilder(Color.GREEN,
+                            "<@" + event.getUser().getIdLong() + ">",
+                            jsonGameParsers.getLocale("Hangman_Eng_game", event.getUser().getId()),
+                            false,
+                            false,
+                            null
+                    );
+
+                    HangmanHelper.editMessage(embedBuilder, event.getUser().getIdLong());
+
+                    HangmanRegistry.getInstance().getActiveHangman().remove(event.getUser().getIdLong());
                     hangmanGameRepository.deleteActiveGame(event.getUser().getIdLong());
                     //Если игрок не играет, а хочет завершить игру, то нужно ему это прислать уведомление, что он сейчас не играет
                 } else {

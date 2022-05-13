@@ -9,6 +9,7 @@ import main.eventlisteners.MessageInfoHelp;
 import main.eventlisteners.MessageStats;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
+import main.hangman.impl.HangmanHelper;
 import main.jsonparser.JSONParsers;
 import main.model.entity.GameLanguage;
 import main.model.entity.Language;
@@ -20,6 +21,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,6 +30,8 @@ import java.util.Objects;
 public class ButtonReactions extends ListenerAdapter {
 
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
+    private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
+
     private final GameLanguageRepository gameLanguageRepository;
     private final LanguageRepository languageRepository;
     private final HangmanGameRepository hangmanGameRepository;
@@ -192,7 +196,6 @@ public class ButtonReactions extends ListenerAdapter {
                 event.editButton(event.getButton().asDisabled()).queue();
 
                 if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                    HangmanRegistry.getInstance().getActiveHangman().remove(event.getUser().getIdLong());
 
                     if (event.isFromGuild()) {
                         event.getHook().sendMessage(jsonParsers.getLocale("Hangman_Eng_game",
@@ -208,6 +211,17 @@ public class ButtonReactions extends ListenerAdapter {
                                 .queue();
                     }
 
+                    var embedBuilder = HangmanRegistry.getInstance().getActiveHangman().get(event.getUser().getIdLong())
+                            .embedBuilder(Color.GREEN,
+                                    "<@" + event.getUser().getIdLong() + ">",
+                                    jsonGameParsers.getLocale("Hangman_Eng_game", event.getUser().getId()),
+                                    false,
+                                    false,
+                                    null
+                            );
+
+                    HangmanHelper.editMessage(embedBuilder, event.getUser().getIdLong());
+                    HangmanRegistry.getInstance().getActiveHangman().remove(event.getUser().getIdLong());
                     hangmanGameRepository.deleteActiveGame(event.getUser().getIdLong());
                     //Если нажата кнопка STOP, и игрок сейчас не играет, присылаем в час уведомление
                 } else {
