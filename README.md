@@ -4,6 +4,9 @@
 [![Add](https://img.shields.io/badge/invite-Hangman-blue?logo=discord)](https://top.gg/bot/845974873682608129/invite/)
 [![top](https://img.shields.io/badge/TOP.GG-pink?logo=discord)](https://top.gg/bot/845974873682608129) 
 [![Discord Bots](https://top.gg/api/widget/servers/845974873682608129.svg)](https://top.gg/bot/845974873682608129)
+[![Docker Pulls](https://badgen.net/docker/pulls/megoru/hangman?icon=docker&label=pulls)](https://hub.docker.com/r/megoru/hangman/)
+[![Docker Image Size](https://badgen.net/docker/size/megoru/hangman?icon=docker&label=image%20size)](https://hub.docker.com/r/megoru/hangman)
+
 
 ## LICENSE
 
