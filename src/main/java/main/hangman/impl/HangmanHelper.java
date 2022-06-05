@@ -11,25 +11,26 @@ public interface HangmanHelper {
 
     static void editMessage(EmbedBuilder embedBuilder, Long userIdLong) {
         try {
-            String guildId = HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).getGuildId();
-            Long channelId = HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).getChannelId();
-            String messageId = HangmanRegistry.getInstance().getMessageId().get(userIdLong);
+            if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+                String guildId = HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).getGuildId();
+                Long channelId = HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).getChannelId();
+                String messageId = HangmanRegistry.getInstance().getMessageId().get(userIdLong);
 
-            if (guildId != null) {
-                BotStartConfig
-                        .jda
-                        .getGuildById(guildId)
-                        .getTextChannelById(channelId)
-                        .editMessageEmbedsById(messageId, embedBuilder.build())
-                        .queue();
-            } else {
-                BotStartConfig
-                        .jda
-                        .getPrivateChannelById(channelId)
-                        .editMessageEmbedsById(messageId, embedBuilder.build())
-                        .queue();
+                if (guildId != null) {
+                    BotStartConfig
+                            .jda
+                            .getGuildById(guildId)
+                            .getTextChannelById(channelId)
+                            .editMessageEmbedsById(messageId, embedBuilder.build())
+                            .queue();
+                } else {
+                    BotStartConfig
+                            .jda
+                            .getPrivateChannelById(channelId)
+                            .editMessageEmbedsById(messageId, embedBuilder.build())
+                            .queue();
+                }
             }
-            embedBuilder.clear();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Скорее всего бот в чс!");
@@ -38,26 +39,28 @@ public interface HangmanHelper {
 
     static void editMessageWithButtons(EmbedBuilder embedBuilder, Long userIdLong, List<Button> buttons) {
         try {
-            String guildId = HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).getGuildId();
-            Long channelId = HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).getChannelId();
+            if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+                String guildId = HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).getGuildId();
+                Long channelId = HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).getChannelId();
+                String messageId = HangmanRegistry.getInstance().getMessageId().get(userIdLong);
 
-            if (guildId != null) {
-                BotStartConfig
-                        .jda
-                        .getGuildById(guildId)
-                        .getTextChannelById(channelId)
-                        .editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(userIdLong), embedBuilder.build())
-                        .setActionRow(buttons)
-                        .queue();
-            } else {
-                BotStartConfig
-                        .jda
-                        .getPrivateChannelById(channelId)
-                        .editMessageEmbedsById(HangmanRegistry.getInstance().getMessageId().get(userIdLong), embedBuilder.build())
-                        .setActionRow(buttons)
-                        .queue();
+                if (guildId != null) {
+                    BotStartConfig
+                            .jda
+                            .getGuildById(guildId)
+                            .getTextChannelById(channelId)
+                            .editMessageEmbedsById(messageId, embedBuilder.build())
+                            .setActionRow(buttons)
+                            .queue();
+                } else {
+                    BotStartConfig
+                            .jda
+                            .getPrivateChannelById(channelId)
+                            .editMessageEmbedsById(messageId, embedBuilder.build())
+                            .setActionRow(buttons)
+                            .queue();
+                }
             }
-            embedBuilder.clear();
         } catch (Exception e) {
             System.out.println("Скорее всего бот в чс!");
         }
