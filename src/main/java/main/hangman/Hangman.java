@@ -3,8 +3,6 @@ package main.hangman;
 import api.megoru.ru.MegoruAPI;
 import api.megoru.ru.entity.GameWordLanguage;
 import api.megoru.ru.impl.MegoruAPIImpl;
-import lombok.Getter;
-import lombok.Setter;
 import main.config.BotStartConfig;
 import main.hangman.impl.EndGameButtons;
 import main.hangman.impl.GetImage;
@@ -12,8 +10,6 @@ import main.hangman.impl.HangmanHelper;
 import main.hangman.impl.SetGameLanguageButtons;
 import main.jsonparser.JSONParsers;
 import main.model.entity.ActiveHangman;
-import main.model.entity.Game;
-import main.model.entity.Player;
 import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
 import main.model.repository.PlayerRepository;
@@ -34,13 +30,14 @@ import java.util.List;
 import java.util.*;
 import java.util.logging.Logger;
 
-@Setter
-@Getter
 public class Hangman implements HangmanHelper {
 
     //Localisation
     private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
     private static final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
+
+    //Logger
+    private final Logger LOGGER = Logger.getLogger(Hangman.class.getName());
 
     //Repository
     private final HangmanGameRepository hangmanGameRepository;
@@ -57,14 +54,11 @@ public class Hangman implements HangmanHelper {
 
     private final List<Message> messageList = new LinkedList<>();
     private int countUsedLetters;
-    private String WORD = null;
+    private String WORD;
     private char[] wordToChar;
-    private String WORD_HIDDEN = "";
+    private String WORD_HIDDEN;
     private String currentHiddenWord;
-
-    private int hangmanErrors = 0;
-
-    private Logger LOGGER = Logger.getLogger(Hangman.class.getName());
+    private int hangmanErrors;
 
     public Hangman(String userId, String guildId, Long channelId,
                    HangmanGameRepository hangmanGameRepository,
@@ -102,7 +96,7 @@ public class Hangman implements HangmanHelper {
 
     public void startGame(@NotNull SlashCommandInteractionEvent event) {
         try {
-            if (BotStartConfig.getMapGameLanguages().get(getUserId()) == null) {
+            if (BotStartConfig.getMapGameLanguages().get(userId) == null) {
                 EmbedBuilder needSetLanguage = new EmbedBuilder();
 
                 needSetLanguage.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
@@ -110,7 +104,7 @@ public class Hangman implements HangmanHelper {
                 needSetLanguage.setDescription(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getId()));
 
                 event.replyEmbeds(needSetLanguage.build()).addActionRow(SetGameLanguageButtons.getList).queue();
-                clearingCollections();
+                HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
                 return;
             }
 
@@ -132,7 +126,7 @@ public class Hangman implements HangmanHelper {
                 wordIsNull.setDescription(jsonParsers.getLocale("errors", event.getUser().getId()));
 
                 event.replyEmbeds(wordIsNull.build()).queue();
-                clearingCollections();
+                HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
                 LOGGER.info(e.getMessage());
                 return;
             }
@@ -145,7 +139,7 @@ public class Hangman implements HangmanHelper {
 
     public void startGame(MessageChannel textChannel, String avatarUrl, String userName) {
         try {
-            if (BotStartConfig.getMapGameLanguages().get(getUserId()) == null) {
+            if (BotStartConfig.getMapGameLanguages().get(userId) == null) {
                 EmbedBuilder needSetLanguage = new EmbedBuilder();
 
                 needSetLanguage.setAuthor(userName, null, avatarUrl);
@@ -153,7 +147,7 @@ public class Hangman implements HangmanHelper {
                 needSetLanguage.setDescription(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", this.userId));
 
                 textChannel.sendMessageEmbeds(needSetLanguage.build()).setActionRow(SetGameLanguageButtons.getList).queue();
-                clearingCollections();
+                HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
                 return;
             }
 
@@ -175,7 +169,7 @@ public class Hangman implements HangmanHelper {
                 wordIsNull.setDescription(jsonParsers.getLocale("errors", userId));
 
                 textChannel.sendMessageEmbeds(wordIsNull.build()).queue();
-                clearingCollections();
+                HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
                 return;
             }
 
@@ -275,8 +269,9 @@ public class Hangman implements HangmanHelper {
 
                 HangmanHelper.editMessageWithButtons(win, Long.parseLong(userId), EndGameButtons.getListButtons(userId));
 
-                clearingCollections();
-                resultGame(true);
+                ResultGame resultGame = new ResultGame(hangmanGameRepository, gamesRepository, playerRepository, userId, true);
+                resultGame.send();
+                HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
             } else {
                 hangmanErrors++;
                 if (hangmanErrors >= 8) {
@@ -312,8 +307,9 @@ public class Hangman implements HangmanHelper {
 
             HangmanHelper.editMessageWithButtons(info, Long.parseLong(userId), EndGameButtons.getListButtons(userId));
 
-            clearingCollections();
-            resultGame(false);
+            ResultGame resultGame = new ResultGame(hangmanGameRepository, gamesRepository, playerRepository, userId, false);
+            resultGame.send();
+            HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
         }
@@ -327,7 +323,7 @@ public class Hangman implements HangmanHelper {
                         .sendMessage(jsonParsers.getLocale("word_is_null", userId))
                         .setActionRow(EndGameButtons.getListButtons(userId))
                         .queue();
-                clearingCollections();
+                HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
                 return;
             }
         } catch (Exception e) {
@@ -368,8 +364,9 @@ public class Hangman implements HangmanHelper {
 
                         HangmanHelper.editMessageWithButtons(win, Long.parseLong(userId), EndGameButtons.getListButtons(userId));
 
-                        clearingCollections();
-                        resultGame(true);
+                        ResultGame resultGame = new ResultGame(hangmanGameRepository, gamesRepository, playerRepository, userId, true);
+                        resultGame.send();
+                        HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
                         return;
                     }
 
@@ -457,29 +454,6 @@ public class Hangman implements HangmanHelper {
         return embedBuilder;
     }
 
-    private void resultGame(boolean resultBool) {
-        try {
-            final int idGame = HangmanRegistry.getInstance().getIdGame();
-
-            Game game = new Game();
-            game.setId(idGame);
-            game.setResult(resultBool);
-            game.setGameDate(new Timestamp(Instant.now().toEpochMilli()));
-
-            Player player = new Player();
-            player.setId(idGame);
-            player.setUserIdLong(Long.valueOf(userId));
-            player.setGames_id(game);
-
-            gamesRepository.saveAndFlush(game);
-            playerRepository.saveAndFlush(player);
-
-            hangmanGameRepository.deleteActiveGame(Long.valueOf(userId));
-        } catch (Exception e) {
-            LOGGER.info(e.getMessage());
-        }
-    }
-
     private void createEntityInDataBase(Message message) {
         try {
             HangmanRegistry.getInstance().getMessageId().put(Long.parseLong(userId), message.getId());
@@ -491,7 +465,6 @@ public class Hangman implements HangmanHelper {
             activeHangman.setGuildLongId(guildId != null ? Long.valueOf(guildId) : null);
             activeHangman.setWord(WORD);
             activeHangman.setCurrentHiddenWord(WORD_HIDDEN);
-            activeHangman.setGuesses(getGuesses());
             activeHangman.setHangmanErrors(hangmanErrors);
             activeHangman.setGameCreatedTime(new Timestamp(Instant.now().toEpochMilli()));
             hangmanGameRepository.saveAndFlush(activeHangman);
@@ -510,7 +483,7 @@ public class Hangman implements HangmanHelper {
 
             HangmanHelper.editMessageWithButtons(info, Long.parseLong(userId), EndGameButtons.getListButtons(userId));
 
-            clearingCollections();
+            HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
         }
@@ -535,9 +508,8 @@ public class Hangman implements HangmanHelper {
     //заменяет "_" на букву которая есть в слове
     private String replacementLetters(int length) {
         try {
-            if (currentHiddenWord == null) {
-                currentHiddenWord = WORD_HIDDEN;
-            }
+            if (currentHiddenWord == null) currentHiddenWord = WORD_HIDDEN;
+
             StringBuilder sb = new StringBuilder(currentHiddenWord);
 
             for (int i = 0; i < index.size(); i++) {
@@ -545,10 +517,12 @@ public class Hangman implements HangmanHelper {
                         index.get(i) == 0 ? index.get(i) + 1 : index.get(i) * 2 + 1,
                         String.valueOf(wordToChar[length]));
             }
+
             index.clear();
             currentHiddenWord = sb.toString();
             WORD_HIDDEN = currentHiddenWord;
         } catch (Exception e) {
+            e.printStackTrace();
             LOGGER.info(e.getMessage());
         }
         return currentHiddenWord;
@@ -566,24 +540,17 @@ public class Hangman implements HangmanHelper {
 
     //Для инъекции при восстановлении
     public void updateVariables(String guesses, String word, String currentHiddenWord, int hangmanErrors) {
-        if (!guesses.equals("")) {
-            this.guesses.addAll(Arrays.asList(guesses.split(", ")));
-        }
-        this.WORD = word;
-        this.WORD_HIDDEN = currentHiddenWord;
-        this.currentHiddenWord = currentHiddenWord;
-        this.hangmanErrors = hangmanErrors;
-        this.wordToChar = word.toCharArray();
-    }
-
-    private void clearingCollections() {
-        try {
-            guesses.clear();
-            currentHiddenWord = null;
-            WORD = null;
-            HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
-        } catch (Exception e) {
-            LOGGER.info(e.getMessage());
+        if (this.guesses.isEmpty() && this.WORD == null && this.currentHiddenWord == null && this.hangmanErrors == 0) {
+            if (!guesses.equals("")) {
+                this.guesses.addAll(Arrays.asList(guesses.split(", ")));
+            }
+            this.WORD = word;
+            this.WORD_HIDDEN = currentHiddenWord;
+            this.currentHiddenWord = currentHiddenWord;
+            this.hangmanErrors = hangmanErrors;
+            this.wordToChar = word.toCharArray();
+        } else {
+            System.out.println("Вы не можете менять значения. Это нарушает инкапсуляцию!");
         }
     }
 
@@ -604,5 +571,13 @@ public class Hangman implements HangmanHelper {
                 .toString()
                 .replaceAll("\\[", "")
                 .replaceAll("]", "");
+    }
+
+    public String getGuildId() {
+        return guildId;
+    }
+
+    public Long getChannelId() {
+        return channelId;
     }
 }
