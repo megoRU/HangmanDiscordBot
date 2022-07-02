@@ -45,7 +45,6 @@ public class Hangman implements HangmanHelper {
     private final PlayerRepository playerRepository;
 
     private final Set<String> guesses = new LinkedHashSet<>();
-    private final List<Integer> index = new ArrayList<>();
 
     //User|Guild|Channel data
     private final String userId;
@@ -55,7 +54,7 @@ public class Hangman implements HangmanHelper {
     private final List<Message> messageList = new LinkedList<>();
     private int countUsedLetters;
     private String WORD;
-    private char[] wordToChar;
+    private String[] wordToChar;
     private String WORD_HIDDEN;
     private String currentHiddenWord;
     private int hangmanErrors;
@@ -115,7 +114,9 @@ public class Hangman implements HangmanHelper {
             try {
                 WORD = megoruAPI.getWord(gameWordLanguage).getWord();
                 if (WORD != null) {
-                    wordToChar = WORD.toCharArray(); // Преобразуем строку str в массив символов (char)
+
+                    wordToChar = WORD.split("");
+//                    wordToChar = WORD.toCharArray(); // Преобразуем строку str в массив символов (char)
                     hideWord(WORD.length());
                 }
             } catch (Exception e) {
@@ -158,7 +159,8 @@ public class Hangman implements HangmanHelper {
             try {
                 WORD = megoruAPI.getWord(gameWordLanguage).getWord();
                 if (WORD != null) {
-                    wordToChar = WORD.toCharArray(); // Преобразуем строку str в массив символов (char)
+
+                    wordToChar = WORD.split(""); // Преобразуем строку str в массив символов (char)
                     hideWord(WORD.length());
                 }
             } catch (Exception e) {
@@ -347,9 +349,7 @@ public class Hangman implements HangmanHelper {
                 }
 
                 if (WORD.contains(inputs)) {
-                    char c = inputs.charAt(0);
-                    checkLetterInWord(wordToChar, c);
-                    String result = replacementLetters(WORD.indexOf(inputs));
+                    String result = replacementLetters(inputs);
 
                     //Игрок угадал все буквы
                     if (!result.contains("_")) {
@@ -427,7 +427,7 @@ public class Hangman implements HangmanHelper {
             }
 
             if (inputs != null && inputs.length() == 1) {
-                embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(WORD.indexOf(inputs)).toUpperCase() + "`", false);
+                embedBuilder.addField(jsonGameParsers.getLocale("Game_Current_Word", userId), "`" + replacementLetters(inputs).toUpperCase() + "`", false);
             }
 
             if (inputs == null) {
@@ -506,19 +506,19 @@ public class Hangman implements HangmanHelper {
     }
 
     //заменяет "_" на букву которая есть в слове
-    private String replacementLetters(int length) {
+    private String replacementLetters(String letter) {
         try {
             if (currentHiddenWord == null) currentHiddenWord = WORD_HIDDEN;
 
             StringBuilder sb = new StringBuilder(currentHiddenWord);
-
-            for (int i = 0; i < index.size(); i++) {
-                sb.replace(index.get(i) == 0 ? index.get(i) : index.get(i) * 2,
-                        index.get(i) == 0 ? index.get(i) + 1 : index.get(i) * 2 + 1,
-                        String.valueOf(wordToChar[length]));
+            for (int i = 0; i < wordToChar.length; i++) {
+                if (wordToChar[i].equals(letter)) {
+                    sb.replace(
+                            i == 0 ? i : i * 2,
+                            i == 0 ? i + 1 : i * 2 + 1,
+                            String.valueOf(wordToChar[i]));
+                }
             }
-
-            index.clear();
             currentHiddenWord = sb.toString();
             WORD_HIDDEN = currentHiddenWord;
         } catch (Exception e) {
@@ -526,16 +526,6 @@ public class Hangman implements HangmanHelper {
             LOGGER.info(e.getMessage());
         }
         return currentHiddenWord;
-    }
-
-
-    //Ищет все одинаковые буквы и записывает в коллекцию
-    private void checkLetterInWord(char[] checkArray, char letter) {
-        for (int i = 0; i < checkArray.length; i++) {
-            if (checkArray[i] == letter) {
-                index.add(i);
-            }
-        }
     }
 
     //Для инъекции при восстановлении
@@ -548,7 +538,7 @@ public class Hangman implements HangmanHelper {
             this.WORD_HIDDEN = currentHiddenWord;
             this.currentHiddenWord = currentHiddenWord;
             this.hangmanErrors = hangmanErrors;
-            this.wordToChar = word.toCharArray();
+            this.wordToChar = word.split("");
         } else {
             System.out.println("Вы не можете менять значения. Это нарушает инкапсуляцию!");
         }
