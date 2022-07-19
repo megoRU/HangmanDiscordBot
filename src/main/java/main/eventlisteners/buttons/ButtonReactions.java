@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import main.config.BotStartConfig;
 import main.enums.Buttons;
 import main.eventlisteners.CheckPermissions;
-import main.eventlisteners.GameLanguageChange;
-import main.eventlisteners.MessageInfoHelp;
-import main.eventlisteners.MessageStats;
+import main.eventlisteners.buildClass.GameLanguageChange;
+import main.eventlisteners.buildClass.Help;
+import main.eventlisteners.buildClass.MessageStats;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
 import main.hangman.impl.HangmanHelper;
@@ -42,7 +42,8 @@ public class ButtonReactions extends ListenerAdapter {
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         try {
             if (event.getUser().isBot()) return;
-            if (event.isFromGuild() && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
+            if (event.isFromGuild() && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel()))
+                return;
 
             long userIdLong = event.getUser().getIdLong();
 
@@ -94,7 +95,7 @@ public class ButtonReactions extends ListenerAdapter {
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_RUS.name())) {
                 event.deferEdit().queue();
                 event.editButton(event.getButton().asDisabled()).queue();
-                new GameLanguageChange(gameLanguageRepository).changeGameLanguage("rus", event.getUser().getId());
+                new GameLanguageChange(gameLanguageRepository).set("rus", event.getUser().getId());
                 event.getHook().sendMessage(jsonParsers
                                 .getLocale("language_change_lang", event.getUser().getId()).replaceAll("\\{0}", "Кириллица"))
                         .setEphemeral(true).queue();
@@ -104,7 +105,7 @@ public class ButtonReactions extends ListenerAdapter {
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_ENG.name())) {
                 event.deferEdit().queue();
                 event.editButton(event.getButton().asDisabled()).queue();
-                new GameLanguageChange(gameLanguageRepository).changeGameLanguage("eng", event.getUser().getId());
+                new GameLanguageChange(gameLanguageRepository).set("eng", event.getUser().getId());
                 event.getHook().sendMessage(jsonParsers
                                 .getLocale("language_change_lang", event.getUser().getId()).replaceAll("\\{0}", "Latin"))
                         .setEphemeral(true).queue();
@@ -134,24 +135,13 @@ public class ButtonReactions extends ListenerAdapter {
                 event.deferEdit().queue(); //Можно удалить так как editButton() решает эту проблему
                 event.editButton(event.getButton().asDisabled()).queue();
 
-                MessageInfoHelp messageInfoHelp = new MessageInfoHelp();
-                if (event.isFromGuild()) {
-                    messageInfoHelp.buildMessage(
-                            BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null ? "!" : BotStartConfig.getMapPrefix().get(event.getGuild().getId()),
-                            event.getTextChannel(),
-                            null,
-                            event.getUser().getAvatarUrl(),
-                            event.getUser().getId(),
-                            event.getUser().getName());
-                } else {
-                    messageInfoHelp.buildMessage(
-                            "/",
-                            event.getTextChannel(),
-                            null,
-                            event.getUser().getAvatarUrl(),
-                            event.getUser().getId(),
-                            event.getUser().getName());
-                }
+                Help help = new Help();
+                help.send(
+                        event.getChannel(),
+                        null,
+                        event.getUser().getAvatarUrl(),
+                        event.getUser().getId(),
+                        event.getUser().getName());
                 return;
             }
 
@@ -173,16 +163,9 @@ public class ButtonReactions extends ListenerAdapter {
                     EmbedBuilder youPlay = new EmbedBuilder();
                     youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
                     youPlay.setColor(0x00FF00);
-                    if (event.isFromGuild()) {
-                        youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play",
-                                event.getUser().getId()).replaceAll("\\{0}",
-                                BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null
-                                        ? "!hg"
-                                        : BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "hg"));
-                    } else {
-                        youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play",
-                                event.getUser().getId()).replaceAll("\\{0}", "/hg"));
-                    }
+
+                    youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getId()));
+
 
                     event.getChannel().sendMessageEmbeds(youPlay.build())
                             .setActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game")).queue();
@@ -197,19 +180,10 @@ public class ButtonReactions extends ListenerAdapter {
 
                 if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
 
-                    if (event.isFromGuild()) {
-                        event.getHook().sendMessage(jsonParsers.getLocale("Hangman_Eng_game",
-                                        event.getUser().getId()).replaceAll("\\{0}",
-                                        BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null ? "!hg" : BotStartConfig.getMapPrefix().get(event.getGuild().getId())))
-                                .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
-                                .queue();
-                    } else {
-                        event.getHook().sendMessage(jsonParsers.getLocale("Hangman_Eng_game",
-                                        event.getUser().getId()).replaceAll("\\{0}",
-                                        "/hg"))
-                                .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
-                                .queue();
-                    }
+                    event.getHook().sendMessage(jsonParsers.getLocale("Hangman_Eng_game",
+                                    event.getUser().getId()))
+                            .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
+                            .queue();
 
                     var embedBuilder = HangmanRegistry.getInstance().getActiveHangman().get(event.getUser().getIdLong())
                             .embedBuilder(Color.GREEN,
@@ -237,7 +211,8 @@ public class ButtonReactions extends ListenerAdapter {
                 event.deferEdit().queue();
                 event.editButton(event.getButton().asDisabled()).queue();
 
-                new MessageStats(gamesRepository).sendStats(
+                MessageStats messageStats = new MessageStats(gamesRepository);
+                messageStats.sendStats(
                         event.getChannel(),
                         null,
                         event.getUser().getAvatarUrl(),

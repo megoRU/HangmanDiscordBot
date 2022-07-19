@@ -1,55 +1,24 @@
-package main.eventlisteners;
+package main.eventlisteners.buildClass;
 
 import lombok.AllArgsConstructor;
-import main.config.BotStartConfig;
 import main.jsonparser.JSONParsers;
 import main.model.repository.GamesRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
 
 @AllArgsConstructor
 @Service
-public class MessageStats extends ListenerAdapter {
+public class MessageStats {
 
-    private static final String STATS = "!hg stats";
     private static final DecimalFormat df = new DecimalFormat("##.#");
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private GamesRepository gamesRepository;
 
-    @Override
-    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        try {
-            if (event.getAuthor().isBot()) return;
-
-            if (!event.isFromType(ChannelType.TEXT)) return;
-
-            if (CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel())) return;
-
-            String message = event.getMessage().getContentRaw().trim().toLowerCase();
-
-            String prefix = STATS;
-
-            if (BotStartConfig.getMapPrefix().containsKey(event.getGuild().getId())) {
-                prefix = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "hg stats";
-            }
-
-            if (message.equals(prefix)) {
-                sendStats(event.getTextChannel(), null, event.getAuthor().getAvatarUrl(), event.getAuthor().getId(), event.getAuthor().getName());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void sendStats(MessageChannel textChannel, SlashCommandInteractionEvent event, String userAvatarUrl, String userIdLong, String name) {
+    public void sendStats(MessageChannel messageChannel, SlashCommandInteractionEvent event, String userAvatarUrl, String userIdLong, String name) {
         try {
             String[] statistic = gamesRepository.getStatistic(Long.valueOf(userIdLong)).replaceAll(",", " ").split(" ");
 
@@ -64,8 +33,8 @@ public class MessageStats extends ListenerAdapter {
                     needSetLanguage.setColor(0x00FF00);
                     needSetLanguage.setDescription(jsonParsers.getLocale("MessageStats_Zero_Divide", userIdLong));
 
-                    if (textChannel != null) {
-                        textChannel.sendMessageEmbeds(needSetLanguage.build()).queue();
+                    if (messageChannel != null) {
+                        messageChannel.sendMessageEmbeds(needSetLanguage.build()).queue();
                     } else {
                         event.replyEmbeds(needSetLanguage.build()).queue();
                     }
@@ -97,8 +66,8 @@ public class MessageStats extends ListenerAdapter {
                                 jsonParsers.getLocale("MessageStats_Game_Percentage",
                                         userIdLong).replaceAll("\\{0}", df.format(percentage)));
 
-                if (textChannel != null) {
-                    textChannel.sendMessageEmbeds(stats.build()).queue();
+                if (messageChannel != null) {
+                    messageChannel.sendMessageEmbeds(stats.build()).queue();
                 } else {
                     event.replyEmbeds(stats.build()).queue();
                 }
