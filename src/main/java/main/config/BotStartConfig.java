@@ -1,9 +1,10 @@
 package main.config;
 
 import main.eventlisteners.DeleteAllMyData;
+import main.eventlisteners.DeprecatedCommands;
+import main.eventlisteners.GameHangmanListener;
 import main.eventlisteners.MessageWhenBotJoinToGuild;
 import main.eventlisteners.buttons.ButtonReactions;
-import main.eventlisteners.game.GameHangmanListener;
 import main.eventlisteners.slash.SlashCommand;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
@@ -49,7 +50,7 @@ import static net.dv8tion.jda.api.interactions.commands.OptionType.STRING;
 @EnableScheduling
 public class BotStartConfig {
 
-    public static final String activity = "!help | ";
+    public static final String activity = "/help | ";
     //String - userLongId
     public static final Map<String, String> secretCode = new HashMap<>();
     //String - userLongId
@@ -116,8 +117,9 @@ public class BotStartConfig {
             jdaBuilder.enableIntents(intents);
             jdaBuilder.setActivity(Activity.playing("Starting..."));
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
+            jdaBuilder.addEventListeners(new DeprecatedCommands());
+            jdaBuilder.addEventListeners(new GameHangmanListener());
             jdaBuilder.addEventListeners(new MessageWhenBotJoinToGuild());
-            jdaBuilder.addEventListeners(new GameHangmanListener(hangmanGameRepository, gamesRepository, playerRepository));
             jdaBuilder.addEventListeners(new ButtonReactions(gameLanguageRepository, languageRepository, hangmanGameRepository, gamesRepository, playerRepository));
             jdaBuilder.addEventListeners(new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository));
             jdaBuilder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository, gameLanguageRepository, languageRepository));
