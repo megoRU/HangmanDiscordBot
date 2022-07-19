@@ -33,7 +33,6 @@ public class DeleteAllMyData extends ListenerAdapter {
         try {
             if (event.getAuthor().isBot()) return;
 
-
             if (event.isFromType(ChannelType.TEXT)) {
                 if (CheckPermissions.isHasPermissionToWrite(event.getTextChannel())) return;
             }

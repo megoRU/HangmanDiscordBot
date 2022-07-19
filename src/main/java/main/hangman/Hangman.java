@@ -82,11 +82,7 @@ public class Hangman implements HangmanHelper {
         return embedBuilder(
                 Color.GREEN,
                 "<@" + Long.parseLong(userId) + ">",
-                jsonGameParsers.getLocale("Game_Start", userId)
-                        .replaceAll("\\{0}", BotStartConfig.getMapPrefix().get(guildId)
-                                == null
-                                ? "!"
-                                : BotStartConfig.getMapPrefix().get(guildId)),
+                jsonGameParsers.getLocale("Game_Start", userId),
                 false,
                 false,
                 null
@@ -114,9 +110,7 @@ public class Hangman implements HangmanHelper {
             try {
                 WORD = megoruAPI.getWord(gameWordLanguage).getWord();
                 if (WORD != null) {
-
                     wordToChar = WORD.split("");
-//                    wordToChar = WORD.toCharArray(); // Преобразуем строку str в массив символов (char)
                     hideWord(WORD.length());
                 }
             } catch (Exception e) {
@@ -159,7 +153,6 @@ public class Hangman implements HangmanHelper {
             try {
                 WORD = megoruAPI.getWord(gameWordLanguage).getWord();
                 if (WORD != null) {
-
                     wordToChar = WORD.split(""); // Преобразуем строку str в массив символов (char)
                     hideWord(WORD.length());
                 }
@@ -531,7 +524,7 @@ public class Hangman implements HangmanHelper {
     //Для инъекции при восстановлении
     public void updateVariables(String guesses, String word, String currentHiddenWord, int hangmanErrors) {
         if (this.guesses.isEmpty() && this.WORD == null && this.currentHiddenWord == null && this.hangmanErrors == 0) {
-            if (!guesses.equals("")) {
+            if (guesses != null) {
                 this.guesses.addAll(Arrays.asList(guesses.split(", ")));
             }
             this.WORD = word;

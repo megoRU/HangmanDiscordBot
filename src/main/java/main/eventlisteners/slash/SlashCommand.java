@@ -6,8 +6,8 @@ import main.enums.Buttons;
 import main.enums.Statistic;
 import main.eventlisteners.CheckPermissions;
 import main.eventlisteners.DeleteAllMyData;
-import main.eventlisteners.MessageInfoHelp;
-import main.eventlisteners.MessageStats;
+import main.eventlisteners.buildClass.Help;
+import main.eventlisteners.buildClass.MessageStats;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
 import main.hangman.impl.HangmanHelper;
@@ -31,13 +31,17 @@ import java.util.logging.Logger;
 @Service
 public class SlashCommand extends ListenerAdapter {
 
+    //Language
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
+
+    //REPO
     private final HangmanGameRepository hangmanGameRepository;
     private final GamesRepository gamesRepository;
     private final PlayerRepository playerRepository;
     private final GameLanguageRepository gameLanguageRepository;
     private final LanguageRepository languageRepository;
+
     private final static Logger LOGGER = Logger.getLogger(SlashCommand.class.getName());
 
     @Override
@@ -76,14 +80,8 @@ public class SlashCommand extends ListenerAdapter {
                     youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
                     youPlay.setColor(0x00FF00);
 
-                    if (event.getGuild() != null) {
-                        youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play",
-                                event.getUser().getId()).replaceAll("\\{0}", BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null
-                                ? "!hg" : BotStartConfig.getMapPrefix().get(event.getGuild().getId())));
-                    } else {
-                        youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play",
-                                event.getUser().getId()).replaceAll("\\{0}", "/hg"));
-                    }
+                    youPlay.setDescription(jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getId()));
+
 
                     event.replyEmbeds(youPlay.build())
                             .addActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game"))
@@ -115,30 +113,21 @@ public class SlashCommand extends ListenerAdapter {
             if (event.getName().equals("stop")) {
                 //Проверяем играет ли сейчас игрок. Если да удаляем игру.
                 if (HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
-                    //TODO: убрать 1 мая 2022
-                    if (event.isFromGuild()) {
-                        event.reply(jsonParsers.getLocale("Hangman_Eng_game",
-                                        event.getUser().getId()).replaceAll("\\{0}", BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null ? "!hg" : BotStartConfig.getMapPrefix().get(event.getGuild().getId())))
-                                .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
-                                .queue();
-                    } else {
-                        event.reply(jsonParsers.getLocale("Hangman_Eng_game",
-                                        event.getUser().getId()).replaceAll("\\{0}", "/hg"))
-                                .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
-                                .queue();
-                    }
+
+                    event.reply(jsonParsers.getLocale("Hangman_Eng_game", event.getUser().getId()))
+                            .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
+                            .queue();
 
                     var embedBuilder = HangmanRegistry.getInstance().getActiveHangman().get(event.getUser().getIdLong())
                             .embedBuilder(Color.GREEN,
-                            "<@" + event.getUser().getIdLong() + ">",
-                            jsonGameParsers.getLocale("Hangman_Eng_game", event.getUser().getId()),
-                            false,
-                            false,
-                            null
-                    );
+                                    "<@" + event.getUser().getIdLong() + ">",
+                                    jsonGameParsers.getLocale("Hangman_Eng_game", event.getUser().getId()),
+                                    false,
+                                    false,
+                                    null
+                            );
 
                     HangmanHelper.editMessage(embedBuilder, event.getUser().getIdLong());
-
                     HangmanRegistry.getInstance().getActiveHangman().remove(event.getUser().getIdLong());
                     hangmanGameRepository.deleteActiveGame(event.getUser().getIdLong());
                     //Если игрок не играет, а хочет завершить игру, то нужно ему это прислать уведомление, что он сейчас не играет
@@ -185,32 +174,28 @@ public class SlashCommand extends ListenerAdapter {
             }
 
             if (event.getName().equals("delete")) {
-                new DeleteAllMyData(
+                DeleteAllMyData deleteAllMyData = new DeleteAllMyData(
                         gamesRepository,
                         languageRepository,
-                        gameLanguageRepository).buildMessage(event, event.getUser());
+                        gameLanguageRepository);
+                deleteAllMyData.buildMessage(event, event.getUser());
                 return;
             }
 
             if (event.getName().equals("help")) {
-                //TODO: убрать 1 мая 2022
-                if (event.getGuild() != null) {
-                    new MessageInfoHelp().buildMessage(
-                            BotStartConfig.getMapPrefix().get(event.getGuild().getId()) == null ? "!" : BotStartConfig.getMapPrefix().get(event.getGuild().getId()),
-                            null,
-                            event,
-                            event.getUser().getAvatarUrl(),
-                            event.getUser().getId(),
-                            event.getUser().getName());
-                } else {
-                    event.reply("Deprecated in Private Messages").queue();
-                }
+                Help help = new Help();
+                help.send(
+                        null,
+                        event,
+                        event.getUser().getAvatarUrl(),
+                        event.getUser().getId(),
+                        event.getUser().getName());
                 return;
             }
 
             if (event.getName().equals("stats")) {
-
-                new MessageStats(gamesRepository).sendStats(
+                MessageStats messageStats = new MessageStats(gamesRepository);
+                messageStats.sendStats(
                         null,
                         event,
                         event.getUser().getAvatarUrl(),
@@ -221,10 +206,6 @@ public class SlashCommand extends ListenerAdapter {
             }
 
             if (event.getName().equals("allstats")) {
-                if (!event.isAcknowledged()) {
-                    event.deferReply().queue();
-                }
-
                 CreatorGraph creatorGraph = new CreatorGraph(
                         gamesRepository,
                         event.getChannel().getId(),
@@ -233,15 +214,10 @@ public class SlashCommand extends ListenerAdapter {
                         event.getUser().getAvatarUrl(),
                         event);
                 creatorGraph.createGraph(Statistic.GLOBAL);
-
                 return;
             }
 
             if (event.getName().equals("mystats")) {
-                if (!event.isAcknowledged()) {
-                    event.deferReply().queue();
-                }
-
                 CreatorGraph creatorGraph = new CreatorGraph(
                         gamesRepository,
                         event.getChannel().getId(),

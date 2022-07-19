@@ -2,14 +2,13 @@ package main.statistic;
 
 import io.quickchart.QuickChart;
 import lombok.Getter;
-import main.config.BotStartConfig;
 import main.enums.Statistic;
-import main.eventlisteners.SenderMessage;
 import main.jsonparser.JSONParsers;
 import main.model.repository.GamesRepository;
 import main.model.repository.impl.StatisticGlobal;
 import main.model.repository.impl.StatisticMy;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.util.List;
@@ -22,7 +21,9 @@ public class CreatorGraph {
     private final String userIdLong;
     private final String userName;
     private final String userAvatarUrl;
-    private final SlashCommandInteractionEvent slashCommandEvent;
+
+    private final GenericCommandInteractionEvent genericCommandInteractionEvent;
+
     private final StringBuilder date = new StringBuilder();
     private final StringBuilder columnFirst = new StringBuilder();
     private final StringBuilder columnSecond = new StringBuilder();
@@ -30,13 +31,13 @@ public class CreatorGraph {
 
     public CreatorGraph(GamesRepository gamesRepository,
                         String textChannelIdLong, String userIdLong,
-                        String userName, String userUrl, SlashCommandInteractionEvent slashCommandEvent) {
+                        String userName, String userUrl, SlashCommandInteractionEvent genericCommandInteractionEvent) {
         this.textChannelIdLong = textChannelIdLong;
         this.userIdLong = userIdLong;
         this.userName = userName;
         this.userAvatarUrl = userUrl;
         this.gamesRepository = gamesRepository;
-        this.slashCommandEvent = slashCommandEvent;
+        this.genericCommandInteractionEvent = genericCommandInteractionEvent;
     }
 
     public void createGraph(Statistic statistic) {
@@ -78,19 +79,21 @@ public class CreatorGraph {
             globalStats.setImage(chart.getShortUrl());
 
 
-            if (slashCommandEvent != null) {
-                SenderMessage.sendMessageHook(globalStats, slashCommandEvent, null);
-                return;
-            }
+//            if (genericCommandInteractionEvent != null) {
 
-            if (BotStartConfig.jda.getTextChannelById(textChannelIdLong) != null) {
-                SenderMessage.sendMessage(globalStats, BotStartConfig.jda.getTextChannelById(textChannelIdLong), null);
-                return;
-            }
-
-            if (BotStartConfig.jda.getPrivateChannelById(textChannelIdLong) != null) {
-                SenderMessage.sendMessage(globalStats, BotStartConfig.jda.getPrivateChannelById(textChannelIdLong), null);
-            }
+            genericCommandInteractionEvent.replyEmbeds(globalStats.build()).queue();
+//                SenderMessage.sendMessageHook(globalStats, slashCommandEvent, null);
+//                return;
+//            }
+//
+//            if (BotStartConfig.jda.getTextChannelById(textChannelIdLong) != null) {
+//                SenderMessage.sendMessage(globalStats, BotStartConfig.jda.getTextChannelById(textChannelIdLong), null);
+//                return;
+//            }
+//
+//            if (BotStartConfig.jda.getPrivateChannelById(textChannelIdLong) != null) {
+//                SenderMessage.sendMessage(globalStats, BotStartConfig.jda.getPrivateChannelById(textChannelIdLong), null);
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }

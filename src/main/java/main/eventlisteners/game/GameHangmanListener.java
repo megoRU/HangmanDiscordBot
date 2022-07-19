@@ -57,11 +57,6 @@ public class GameHangmanListener extends ListenerAdapter {
                 return;
             }
 
-            if (event.isFromGuild() && BotStartConfig.getMapPrefix().containsKey(event.getGuild().getId())) {
-                prefix = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "hg";
-                prefix2 = BotStartConfig.getMapPrefix().get(event.getGuild().getId()) + "hg stop";
-            }
-
             if (message.equals(prefix) || message.equals(prefix2)) {
                 if (BotStartConfig.getMapGameLanguages().get(event.getAuthor().getId()) == null) {
                     EmbedBuilder needSetLanguage = new EmbedBuilder();

@@ -1,6 +1,7 @@
 package main.config;
 
-import main.eventlisteners.*;
+import main.eventlisteners.DeleteAllMyData;
+import main.eventlisteners.MessageWhenBotJoinToGuild;
 import main.eventlisteners.buttons.ButtonReactions;
 import main.eventlisteners.game.GameHangmanListener;
 import main.eventlisteners.slash.SlashCommand;
@@ -51,8 +52,6 @@ public class BotStartConfig {
     public static final String activity = "!help | ";
     //String - userLongId
     public static final Map<String, String> secretCode = new HashMap<>();
-    //String - guildLongId
-    public static final Map<String, String> mapPrefix = new HashMap<>();
     //String - userLongId
     public static final Map<String, String> mapLanguages = new HashMap<>();
     //String - userLongId
@@ -63,7 +62,6 @@ public class BotStartConfig {
     private int serverCount;
 
     //REPOSITORY
-    private final PrefixRepository prefixRepository;
     private final LanguageRepository languageRepository;
     private final GameLanguageRepository gameLanguageRepository;
     private final HangmanGameRepository hangmanGameRepository;
@@ -79,8 +77,9 @@ public class BotStartConfig {
     private String PASSWORD_CONNECTION;
 
     @Autowired
-    public BotStartConfig(PrefixRepository prefixRepository, LanguageRepository languageRepository, GameLanguageRepository gameLanguageRepository, HangmanGameRepository hangmanGameRepository, PlayerRepository playerRepository, GamesRepository gamesRepository) {
-        this.prefixRepository = prefixRepository;
+    public BotStartConfig(LanguageRepository languageRepository, GameLanguageRepository gameLanguageRepository,
+                          HangmanGameRepository hangmanGameRepository, PlayerRepository playerRepository,
+                          GamesRepository gamesRepository) {
         this.languageRepository = languageRepository;
         this.gameLanguageRepository = gameLanguageRepository;
         this.hangmanGameRepository = hangmanGameRepository;
@@ -94,7 +93,6 @@ public class BotStartConfig {
         try {
             //Теперь HangmanRegistry знает количество игр и может отдавать правильное значение
             HangmanRegistry.getInstance().setIdGame();
-            getPrefixFromDB();
             setLanguages();
             getLocalizationFromDB();
             getGameLocalizationFromDB();
@@ -103,8 +101,6 @@ public class BotStartConfig {
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
                             GatewayIntent.GUILD_MESSAGES,
-                            GatewayIntent.GUILD_EMOJIS,
-                            GatewayIntent.GUILD_MESSAGE_REACTIONS,
                             GatewayIntent.DIRECT_MESSAGES,
                             GatewayIntent.DIRECT_MESSAGE_TYPING));
 
@@ -120,17 +116,11 @@ public class BotStartConfig {
             jdaBuilder.enableIntents(intents);
             jdaBuilder.setActivity(Activity.playing("Starting..."));
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
-            jdaBuilder.addEventListeners(new MessageWhenBotJoinToGuild(prefixRepository));
-            jdaBuilder.addEventListeners(new PrefixChange(prefixRepository));
-            jdaBuilder.addEventListeners(new MessageInfoHelp());
-            jdaBuilder.addEventListeners(new LanguageChange(languageRepository));
-            jdaBuilder.addEventListeners(new GameLanguageChange(gameLanguageRepository));
+            jdaBuilder.addEventListeners(new MessageWhenBotJoinToGuild());
             jdaBuilder.addEventListeners(new GameHangmanListener(hangmanGameRepository, gamesRepository, playerRepository));
-            jdaBuilder.addEventListeners(new MessageStats(gamesRepository));
             jdaBuilder.addEventListeners(new ButtonReactions(gameLanguageRepository, languageRepository, hangmanGameRepository, gamesRepository, playerRepository));
             jdaBuilder.addEventListeners(new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository));
             jdaBuilder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository, gameLanguageRepository, languageRepository));
-            jdaBuilder.addEventListeners(new GetGlobalStatsInGraph(gamesRepository));
 
             jda = jdaBuilder.build();
             jda.awaitReady();
@@ -141,8 +131,39 @@ public class BotStartConfig {
         System.out.println(jda.retrieveCommands().complete());
 
         //Обновить команды
-//        updateSlashCommands(false);
-        System.out.println("19:50");
+//        updateSlashCommands();
+        System.out.println("14:16");
+    }
+
+    private void updateSlashCommands() {
+        try {
+            CommandListUpdateAction commands = jda.updateCommands();
+            List<OptionData> options = new ArrayList<>();
+
+            options.add(new OptionData(STRING, "game", "Setting the Game language")
+                    .addChoice("eng", "eng")
+                    .addChoice("rus", "rus")
+                    .setRequired(true));
+
+            options.add(new OptionData(STRING, "bot", "Setting the bot language")
+                    .addChoice("eng", "eng")
+                    .addChoice("rus", "rus")
+                    .setRequired(true));
+
+            commands.addCommands(Commands.slash("language", "Setting language").addOptions(options));
+            commands.addCommands(Commands.slash("hg", "Start the game"));
+            commands.addCommands(Commands.slash("stop", "Stop the game"));
+            commands.addCommands(Commands.slash("help", "Bot commands"));
+            commands.addCommands(Commands.slash("stats", "Get your statistics"));
+            commands.addCommands(Commands.slash("mystats", "Find out the number of your wins and losses"));
+            commands.addCommands(Commands.slash("allstats", "Find out the statistics of all the bot's games"));
+            commands.addCommands(Commands.slash("delete", "Deleting your data"));
+
+            commands.queue();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     //Выглядит ужасно, но работает.
@@ -198,43 +219,6 @@ public class BotStartConfig {
         }
     }
 
-    private void updateSlashCommands(boolean isUpdateInGuilds) {
-        try {
-            if (isUpdateInGuilds) {
-                for (int i = 0; i < jda.getGuilds().size(); i++) {
-                    jda.getGuilds().get(i).updateCommands().queue();
-                }
-            } else {
-                CommandListUpdateAction commands = jda.updateCommands();
-
-                List<OptionData> options = new ArrayList<>();
-
-                options.add(new OptionData(STRING, "game", "Setting the Game language")
-                        .addChoice("eng", "eng")
-                        .addChoice("rus", "rus")
-                        .setRequired(true));
-
-                options.add(new OptionData(STRING, "bot", "Setting the bot language")
-                        .addChoice("eng", "eng")
-                        .addChoice("rus", "rus")
-                        .setRequired(true));
-
-                commands.addCommands(Commands.slash("language", "Setting language").addOptions(options));
-                commands.addCommands(Commands.slash("hg", "Start the game"));
-                commands.addCommands(Commands.slash("stop", "Stop the game"));
-                commands.addCommands(Commands.slash("help", "Bot commands"));
-                commands.addCommands(Commands.slash("stats", "Get your statistics"));
-                commands.addCommands(Commands.slash("mystats", "Find out the number of your wins and losses"));
-                commands.addCommands(Commands.slash("allstats", "Find out the statistics of all the bot's games"));
-                commands.addCommands(Commands.slash("delete", "Deleting your data"));
-
-                commands.queue();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     private void setLanguages() {
         try {
             List<String> listLanguages = new ArrayList<>();
@@ -262,24 +246,6 @@ public class BotStartConfig {
             }
             System.out.println("setLanguages()");
         } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void getPrefixFromDB() {
-        try {
-            Connection connection = DriverManager.getConnection(URL_CONNECTION, USER_CONNECTION, PASSWORD_CONNECTION);
-            Statement statement = connection.createStatement();
-            String sql = "SELECT * FROM prefixs";
-            ResultSet rs = statement.executeQuery(sql);
-            while (rs.next()) {
-                mapPrefix.put(rs.getString("server_id"), rs.getString("prefix"));
-            }
-            rs.close();
-            statement.close();
-            connection.close();
-            System.out.println("getPrefixFromDB()");
-        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -371,10 +337,6 @@ public class BotStartConfig {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    public static Map<String, String> getMapPrefix() {
-        return mapPrefix;
     }
 
     public static Map<String, String> getMapLanguages() {

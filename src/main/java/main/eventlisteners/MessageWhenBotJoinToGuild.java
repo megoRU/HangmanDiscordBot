@@ -3,7 +3,6 @@ package main.eventlisteners;
 import lombok.AllArgsConstructor;
 import main.enums.Buttons;
 import main.jsonparser.JSONParsers;
-import main.model.repository.PrefixRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -21,7 +20,6 @@ import java.util.List;
 public class MessageWhenBotJoinToGuild extends ListenerAdapter {
 
     private static final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
-    private final PrefixRepository prefixRepository;
 
     //bot join msg
     @Override
@@ -41,9 +39,11 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
                         + event.getGuild().getSelfMember().getUser().getName() +
                         "** " + "bot to " + event.getGuild().getName() +
                         "!\n", false);
-                welcome.addField("List of commands", "Use **!help** for a list of commands.", false);
+                welcome.addField("List of commands", "Use **/help** for a list of commands.", false);
                 welcome.addField("Support server", ":helmet_with_cross: [Discord server](https://discord.com/invite/UrWG3R683d)\n", false);
-                welcome.addField("Vote", ":boom: [Vote for this bot](https://top.gg/bot/808277484524011531/vote)", false);
+                welcome.addField("Information", "We are actively writing about new updates or problems in our discord. We recommend that you follow up.", false);
+                welcome.addField("One more Thing", "If you are not satisfied with something in the bot, please let us know, we will fix it!", false);
+                welcome.addField("Vote", ":boom: [Vote for this bot](https://boticord.top/bot/845974873682608129)", false);
 
                 event.getGuild().getDefaultChannel().sendMessageEmbeds(welcome.build())
                         .setActionRow(
@@ -59,11 +59,6 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
 
     @Override
     public void onGuildLeave(@NotNull GuildLeaveEvent event) {
-        try {
-            System.out.println("Удаляем данные после удаления бота из Guild");
-            prefixRepository.deletePrefix(event.getGuild().getId());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        System.out.println("Удаляем данные после удаления бота из Guild");
     }
 }
