@@ -1,5 +1,6 @@
 package main.eventlisteners;
 
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -23,15 +24,15 @@ public class DeprecatedCommands extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
 
-        if (event.isFromGuild() && CheckPermissions.isHasPermissionToWrite(event.getTextChannel()))
+        if (event.isFromType(ChannelType.TEXT) && CheckPermissions.isHasPermissionToWrite(event.getTextChannel()))
             return;
 
         String message = event.getMessage().getContentRaw().toLowerCase().trim();
 
+        if (message.length() < 2) return;
 
         int length = message.length();
         String messageWithOutPrefix = message.substring(1, length);
-
 
         if (messageWithOutPrefix.matches(LANG_RUS)
                 || messageWithOutPrefix.matches(LANG_ENG)
