@@ -193,7 +193,7 @@ public class BotStartConfig {
         }
     }
 
-    @Scheduled(fixedDelay = 140000L, initialDelay = 8000L)
+    @Scheduled(fixedDelay = 900000L, initialDelay = 8000L)
     private void topGG() {
         if (!Config.isIsDev()) {
             try {
