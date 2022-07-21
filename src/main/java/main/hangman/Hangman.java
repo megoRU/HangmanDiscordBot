@@ -474,10 +474,13 @@ public class Hangman implements HangmanHelper {
             info.setDescription(jsonGameParsers.getLocale("timeIsOver", userId));
             info.addField(jsonGameParsers.getLocale("Game_Player", userId), "<@" + Long.parseLong(userId) + ">", false);
 
+            HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
             HangmanHelper.editMessageWithButtons(info, Long.parseLong(userId), EndGameButtons.getListButtons(userId));
 
-            HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
         } catch (Exception e) {
+            if(e.getMessage().contains("10008: Unknown Message")) {
+                return;
+            }
             LOGGER.info(e.getMessage());
         }
 
