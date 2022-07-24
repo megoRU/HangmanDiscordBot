@@ -1,7 +1,7 @@
 package main.hangman.impl;
 
 import main.enums.Buttons;
-import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.util.List;

@@ -3,7 +3,6 @@ package main.eventlisteners.buttons;
 import lombok.RequiredArgsConstructor;
 import main.config.BotStartConfig;
 import main.enums.Buttons;
-import main.eventlisteners.CheckPermissions;
 import main.eventlisteners.buildClass.GameLanguageChange;
 import main.eventlisteners.buildClass.Help;
 import main.eventlisteners.buildClass.MessageStats;
@@ -15,6 +14,7 @@ import main.model.entity.GameLanguage;
 import main.model.entity.Language;
 import main.model.repository.*;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -42,7 +42,10 @@ public class ButtonReactions extends ListenerAdapter {
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         try {
             if (event.getUser().isBot()) return;
-            if (event.isFromGuild() && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel()))
+
+            if (event.isFromGuild()
+                    && !event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_SEND)
+                    && !event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_MANAGE))
                 return;
 
             long userIdLong = event.getUser().getIdLong();
@@ -154,7 +157,7 @@ public class ButtonReactions extends ListenerAdapter {
                     event.getChannel().sendTyping().queue();
 
                     if (event.isFromGuild()) {
-                        HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getTextChannel().getIdLong(), hangmanGameRepository, gamesRepository, playerRepository));
+                        HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getGuildChannel().getIdLong(), hangmanGameRepository, gamesRepository, playerRepository));
                     } else {
                         HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), null, event.getChannel().getIdLong(), hangmanGameRepository, gamesRepository, playerRepository));
                     }

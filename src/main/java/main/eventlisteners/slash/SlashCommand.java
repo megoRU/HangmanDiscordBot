@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import main.config.BotStartConfig;
 import main.enums.Buttons;
 import main.enums.Statistic;
-import main.eventlisteners.CheckPermissions;
 import main.eventlisteners.DeleteAllMyData;
 import main.eventlisteners.buildClass.Help;
 import main.eventlisteners.buildClass.MessageStats;
@@ -17,7 +16,8 @@ import main.model.entity.Language;
 import main.model.repository.*;
 import main.statistic.CreatorGraph;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -48,7 +48,10 @@ public class SlashCommand extends ListenerAdapter {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         try {
             if (event.getUser().isBot()) return;
-            if (event.getGuild() != null && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel()))
+
+            if (event.isFromGuild()
+                    && !event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_SEND)
+                    && !event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_MANAGE))
                 return;
 
             LOGGER.info("\nSlash Command name: " + event.getName());

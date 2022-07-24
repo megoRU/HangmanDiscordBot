@@ -6,6 +6,7 @@ import main.jsonparser.JSONParsers;
 import main.model.repository.GameLanguageRepository;
 import main.model.repository.GamesRepository;
 import main.model.repository.LanguageRepository;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -33,9 +34,8 @@ public class DeleteAllMyData extends ListenerAdapter {
         try {
             if (event.getAuthor().isBot()) return;
 
-            if (event.isFromType(ChannelType.TEXT)) {
-                if (CheckPermissions.isHasPermissionToWrite(event.getTextChannel())) return;
-            }
+            if (event.isFromType(ChannelType.TEXT) && !event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_SEND))
+                return;
 
             buildMessage(event.getChannel(), event.getAuthor(), event.getMessage().getContentRaw());
         } catch (Exception e) {
@@ -53,8 +53,10 @@ public class DeleteAllMyData extends ListenerAdapter {
         user.openPrivateChannel()
                 .flatMap(channel -> channel.sendMessage(
                         jsonParsers.getLocale("restore_Data_PM", user.getId()).replaceAll("\\{0}", code)))
-                .queue(null, (exception) -> event.getChannel().sendMessage("I couldn't send you a message to the DM." +
-                        "\nYou may have banned sending you messages\nor I am on your blacklist").queue());
+                .queue(null, (exception) -> event.getChannel().sendMessage("""
+                        I couldn't send you a message to the DM.
+                        You may have banned sending you messages
+                        or I am on your blacklist""").queue());
     }
 
     public void buildMessage(@NotNull MessageChannel messageChannel, @NotNull User user, String message) {
