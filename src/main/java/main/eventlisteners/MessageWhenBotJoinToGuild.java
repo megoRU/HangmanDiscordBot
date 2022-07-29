@@ -45,7 +45,7 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
                 welcome.addField("One more Thing", "If you are not satisfied with something in the bot, please let us know, we will fix it!", false);
                 welcome.addField("Vote", ":boom: [Vote for this bot](https://boticord.top/bot/845974873682608129)", false);
 
-                event.getGuild().getDefaultChannel().sendMessageEmbeds(welcome.build())
+                event.getGuild().getDefaultChannel().asTextChannel().sendMessageEmbeds(welcome.build())
                         .setActionRow(
                                 List.of(Button.success(Buttons.BUTTON_HELP.name(), jsonParsers.getLocale("button_Help", event.getGuild().getId())),
                                         Button.link("https://discord.gg/UrWG3R683d", "Support"))

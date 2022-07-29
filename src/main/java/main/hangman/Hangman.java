@@ -314,7 +314,7 @@ public class Hangman implements HangmanHelper {
         try {
             messageList.add(messages);
             if (WORD == null) {
-                messages.getTextChannel()
+                messages.getChannel()
                         .sendMessage(jsonParsers.getLocale("word_is_null", userId))
                         .setActionRow(EndGameButtons.getListButtons(userId))
                         .queue();

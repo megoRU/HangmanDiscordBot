@@ -1,5 +1,6 @@
 package main.eventlisteners;
 
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -24,7 +25,7 @@ public class DeprecatedCommands extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
 
-        if (event.isFromType(ChannelType.TEXT) && CheckPermissions.isHasPermissionToWrite(event.getTextChannel()))
+        if (event.isFromType(ChannelType.TEXT) && !event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_SEND))
             return;
 
         String message = event.getMessage().getContentRaw().toLowerCase().trim();
