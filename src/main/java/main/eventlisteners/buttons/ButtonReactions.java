@@ -3,7 +3,6 @@ package main.eventlisteners.buttons;
 import lombok.RequiredArgsConstructor;
 import main.config.BotStartConfig;
 import main.enums.Buttons;
-import main.eventlisteners.CheckPermissions;
 import main.eventlisteners.buildClass.GameLanguageChange;
 import main.eventlisteners.buildClass.Help;
 import main.eventlisteners.buildClass.MessageStats;
@@ -12,9 +11,11 @@ import main.hangman.HangmanRegistry;
 import main.hangman.impl.HangmanHelper;
 import main.jsonparser.JSONParsers;
 import main.model.entity.GameLanguage;
+import main.model.entity.GameMode;
 import main.model.entity.Language;
 import main.model.repository.*;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -37,12 +38,16 @@ public class ButtonReactions extends ListenerAdapter {
     private final HangmanGameRepository hangmanGameRepository;
     private final GamesRepository gamesRepository;
     private final PlayerRepository playerRepository;
+    private final GameModeRepository gameModeRepository;
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         try {
             if (event.getUser().isBot()) return;
-            if (event.isFromGuild() && CheckPermissions.isHasPermissionsWriteAndEmbedLinks(event.getTextChannel()))
+
+            if (event.isFromGuild()
+                    && !event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_SEND)
+                    && !event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_MANAGE))
                 return;
 
             long userIdLong = event.getUser().getIdLong();
@@ -91,6 +96,33 @@ public class ButtonReactions extends ListenerAdapter {
                         .addActionRow(List.of(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game"))).queue();
                 return;
             }
+
+            if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_SELECT_MENU.name())
+                    || Objects.equals(event.getButton().getId(), Buttons.BUTTON_DM.name())) {
+                event.deferEdit().queue();
+                event.editButton(event.getButton().asDisabled()).queue();
+
+                if (HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
+                    event.getHook()
+                            .sendMessage(jsonParsers.getLocale("ModeButton_When_Play", event.getUser().getId()))
+                            .setEphemeral(true).queue();
+                } else {
+                    String mode = event.getButton().getLabel().equals("Guild/DM: SelectMenu") ? "select-menu" : "direct-message";
+                    BotStartConfig.getMapGameMode().put(event.getUser().getId(), mode);
+
+                    event.getHook().sendMessage(jsonParsers.getLocale("game_mode", event.getUser().getId()) +  mode)
+                            .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
+                            .setEphemeral(true)
+                            .queue();
+
+                    GameMode gameMode = new GameMode();
+                    gameMode.setUserIdLong(event.getUser().getId());
+                    gameMode.setMode(mode);
+                    gameModeRepository.save(gameMode);
+                }
+                return;
+            }
+
 
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_RUS.name())) {
                 event.deferEdit().queue();
@@ -149,12 +181,22 @@ public class ButtonReactions extends ListenerAdapter {
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_START_NEW_GAME.name())) {
                 event.deferEdit().queue();
                 event.editButton(event.getButton().asDisabled()).queue();
+                String userIdLongString = event.getUser().getId();
+
+                if (!BotStartConfig.getMapGameMode().containsKey(userIdLongString)) return;
+
+                if (event.isFromGuild() && BotStartConfig.getMapGameMode().get(userIdLongString).equals("direct-message")) {
+                    event.getHook().sendMessage(jsonParsers.getLocale("game_only_dm", event.getUser().getId()))
+                            .setEphemeral(true)
+                            .queue();
+                    return;
+                }
 
                 if (!HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                     event.getChannel().sendTyping().queue();
 
                     if (event.isFromGuild()) {
-                        HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getTextChannel().getIdLong(), hangmanGameRepository, gamesRepository, playerRepository));
+                        HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), event.getGuild().getId(), event.getGuildChannel().getIdLong(), hangmanGameRepository, gamesRepository, playerRepository));
                     } else {
                         HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getId(), null, event.getChannel().getIdLong(), hangmanGameRepository, gamesRepository, playerRepository));
                     }

@@ -22,7 +22,8 @@ WHERE player.user_id_long = '250699265389625347'
 
 
 
-#   сделано:
+#
+сделано:
 CREATE TABLE games
 (
     id        int NOT NULL AUTO_INCREMENT,
@@ -58,13 +59,18 @@ CREATE TABLE `ActiveHangman`
 CREATE TABLE `language`
 (
     `user_id_long` varchar(255) NOT NULL,
-    `language`      varchar(255) NOT NULL,
+    `language`     varchar(255) NOT NULL,
     PRIMARY KEY (user_id_long),
-    UNIQUE KEY ` user_id_long ` (user_id_long)
+    UNIQUE KEY `user_id_long` (user_id_long)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-
-
+CREATE TABLE `game_mode`
+(
+    `user_id_long` varchar(255) NOT NULL,
+    `mode`         varchar(255) NOT NULL,
+    PRIMARY KEY (user_id_long),
+    UNIQUE KEY `user_id_long` (user_id_long)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 SELECT COUNT(games_id)                             AS COUNT_GAMES,

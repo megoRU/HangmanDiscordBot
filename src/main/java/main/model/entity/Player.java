@@ -19,7 +19,7 @@ public class Player {
     @Column(nullable = false)
     private Integer id;
 
-    @Column(name="user_id_long", nullable = false)
+    @Column(name = "user_id_long", nullable = false)
     private Long userIdLong;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

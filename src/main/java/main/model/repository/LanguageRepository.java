@@ -8,8 +8,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Repository
 public interface LanguageRepository extends CrudRepository<Language, String> {
 
@@ -17,8 +15,4 @@ public interface LanguageRepository extends CrudRepository<Language, String> {
     @Modifying
     @Query(value = "DELETE FROM Language l WHERE l.userIdLong = :userIdLong")
     void deleteLanguage(@Param("userIdLong") String userIdLong);
-
-
-    @Query(value = "SELECT l FROM Language l")
-    List<Language> getLanguages();
 }
