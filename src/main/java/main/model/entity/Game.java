@@ -5,7 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.sql.Timestamp;
 
 @Getter
@@ -20,9 +23,9 @@ public class Game {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name="result", nullable = false)
+    @Column(name = "result", nullable = false)
     private Boolean result;
 
-    @Column(name="game_date", nullable = false)
+    @Column(name = "game_date", nullable = false)
     private Timestamp gameDate;
 }

@@ -23,11 +23,8 @@ public class GameHangmanListener extends ListenerAdapter {
 
             System.out.println("test");
             if (event.getAuthor().isBot()) return;
-            if (event.isFromType(ChannelType.TEXT)
-                    && !event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_SEND)
-                    && !event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_MANAGE)) {
-                return;
-            }
+
+            if (event.isFromType(ChannelType.TEXT)) return;
 
             String message = event.getMessage().getContentRaw().trim().toLowerCase();
             long userIdLong = event.getAuthor().getIdLong();
@@ -40,7 +37,7 @@ public class GameHangmanListener extends ListenerAdapter {
             }
 
             if (message.matches(HG_ONE_WORD)) {
-                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).fullWord(message.toLowerCase(), event.getMessage());
+                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).fullWord(message.toLowerCase());
             }
 
         } catch (Exception e) {

@@ -19,9 +19,9 @@ import javax.persistence.Table;
 public final class Language {
 
     @Id
-    @Column(name="user_id_long", nullable = false)
+    @Column(name = "user_id_long", nullable = false)
     private String userIdLong;
 
-    @Column(name="language", nullable = false)
+    @Column(name = "language", nullable = false)
     private String language;
 }
