@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -135,7 +136,7 @@ public class BotStartConfig {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        Message.suppressContentIntentWarning();
         System.out.println(jda.retrieveCommands().complete());
 
         //Обновить команды
