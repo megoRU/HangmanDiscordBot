@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.boticordjava.api.entity.Enums.TokenEnum;
 import org.boticordjava.api.impl.BotiCordAPI;
 import org.discordbots.api.client.DiscordBotListAPI;
 import org.json.simple.JSONObject;
@@ -205,10 +206,9 @@ public class BotStartConfig {
                     TOP_GG_API.setStats(serverCount);
                     BotStartConfig.jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
 
-
                     BotiCordAPI api = new BotiCordAPI.Builder()
+                            .tokenEnum(TokenEnum.BOT)
                             .token(System.getenv("BOTICORD"))
-                            .botId(Config.getBotId())
                             .build();
 
                     AtomicInteger usersCount = new AtomicInteger();

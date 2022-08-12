@@ -1,9 +1,9 @@
 ## Hangman Terms of Service
 
-##What do we provide?
+## What do we provide?
 We provide a hangman game service
 
-##Age restrictions
+## Age restrictions
 USA MATURE 17+ <br>
 RUSSIA 16+ <br>
 EU PEGI 16
