@@ -77,8 +77,8 @@ public class SlashCommand extends ListenerAdapter {
                                     Button.secondary(Buttons.BUTTON_ENG.name(), "Latin")
                                             .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")))
                             .addActionRow(
-                                    Button.secondary(Buttons.BUTTON_SELECT_MENU.name(), "Guild/DM: SelectMenu"),
-                                    Button.secondary(Buttons.BUTTON_DM.name(), "Only DM: One letter in chat"))
+                                    Button.danger(Buttons.BUTTON_SELECT_MENU.name(), "Guild/DM: SelectMenu"),
+                                    Button.success(Buttons.BUTTON_DM.name(), "(Recommended) Only DM: One letter in chat"))
                             .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play"))
                             .queue();
                 } else if (event.isFromGuild() && BotStartConfig.getMapGameMode().get(event.getUser().getId()).equals("direct-message")) {
