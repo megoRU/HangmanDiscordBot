@@ -5,6 +5,7 @@ import main.eventlisteners.DeprecatedCommands;
 import main.eventlisteners.GameHangmanListener;
 import main.eventlisteners.MessageWhenBotJoinToGuild;
 import main.eventlisteners.buttons.ButtonReactions;
+import main.eventlisteners.selections.SelectMenuEvent;
 import main.eventlisteners.slash.SlashCommand;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
@@ -51,12 +52,13 @@ import static net.dv8tion.jda.api.interactions.commands.OptionType.STRING;
 public class BotStartConfig {
 
     public static final String activity = "/help | ";
+
     //String - userLongId
     public static final Map<String, String> secretCode = new HashMap<>();
-    //String - userLongId
     public static final Map<String, String> mapLanguages = new HashMap<>();
-    //String - userLongId
     public static final Map<String, String> mapGameLanguages = new HashMap<>();
+    public static final Map<String, String> mapGameMode = new HashMap<>();
+
     private static int idGame;
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
@@ -68,6 +70,7 @@ public class BotStartConfig {
     private final HangmanGameRepository hangmanGameRepository;
     private final PlayerRepository playerRepository;
     private final GamesRepository gamesRepository;
+    private final GameModeRepository gameModeRepository;
 
     //DataBase
     @Value("${spring.datasource.url}")
@@ -80,12 +83,13 @@ public class BotStartConfig {
     @Autowired
     public BotStartConfig(LanguageRepository languageRepository, GameLanguageRepository gameLanguageRepository,
                           HangmanGameRepository hangmanGameRepository, PlayerRepository playerRepository,
-                          GamesRepository gamesRepository) {
+                          GamesRepository gamesRepository, GameModeRepository gameModeRepository) {
         this.languageRepository = languageRepository;
         this.gameLanguageRepository = gameLanguageRepository;
         this.hangmanGameRepository = hangmanGameRepository;
         this.playerRepository = playerRepository;
         this.gamesRepository = gamesRepository;
+        this.gameModeRepository = gameModeRepository;
         idGame = hangmanGameRepository.getCountGames() == null ? 0 : hangmanGameRepository.getCountGames();
     }
 
@@ -95,6 +99,7 @@ public class BotStartConfig {
             //Теперь HangmanRegistry знает количество игр и может отдавать правильное значение
             HangmanRegistry.getInstance().setIdGame();
             setLanguages();
+            getGameModeFromDB();
             getLocalizationFromDB();
             getGameLocalizationFromDB();
             getAndSetActiveGames();
@@ -120,9 +125,10 @@ public class BotStartConfig {
             jdaBuilder.addEventListeners(new DeprecatedCommands());
             jdaBuilder.addEventListeners(new GameHangmanListener());
             jdaBuilder.addEventListeners(new MessageWhenBotJoinToGuild());
-            jdaBuilder.addEventListeners(new ButtonReactions(gameLanguageRepository, languageRepository, hangmanGameRepository, gamesRepository, playerRepository));
-            jdaBuilder.addEventListeners(new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository));
-            jdaBuilder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository, gameLanguageRepository, languageRepository));
+            jdaBuilder.addEventListeners(new SelectMenuEvent());
+            jdaBuilder.addEventListeners(new ButtonReactions(gameLanguageRepository, languageRepository, hangmanGameRepository, gamesRepository, playerRepository, gameModeRepository));
+            jdaBuilder.addEventListeners(new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository, gameModeRepository));
+            jdaBuilder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository, gameLanguageRepository, languageRepository, gameModeRepository));
 
             jda = jdaBuilder.build();
             jda.awaitReady();
@@ -133,8 +139,8 @@ public class BotStartConfig {
         System.out.println(jda.retrieveCommands().complete());
 
         //Обновить команды
-//        updateSlashCommands();
-        System.out.println("14:16");
+        updateSlashCommands();
+        System.out.println("20:11");
     }
 
     private void updateSlashCommands() {
@@ -152,6 +158,18 @@ public class BotStartConfig {
                     .addChoice("rus", "rus")
                     .setRequired(true));
 
+            List<OptionData> word = new ArrayList<>();
+            word.add(new OptionData(STRING, "guess", "Write a word that can be")
+                    .setRequired(true)
+                    .setName("guess"));
+
+            List<OptionData> mode = new ArrayList<>();
+            mode.add(new OptionData(STRING, "mode", "Using different interaction logics.")
+                    .addChoice("direct-message", "direct-message").setDescription("The game is only in DM. Write one letter to the chat.")
+                    .addChoice("select-menu", "select-menu").setDescription("Playing in Guild/DM. Using SelectMenu.")
+                    .setRequired(true)
+                    .setName("mode"));
+
             commands.addCommands(Commands.slash("language", "Setting language").addOptions(options));
             commands.addCommands(Commands.slash("hg", "Start the game"));
             commands.addCommands(Commands.slash("stop", "Stop the game"));
@@ -160,6 +178,9 @@ public class BotStartConfig {
             commands.addCommands(Commands.slash("mystats", "Find out the number of your wins and losses"));
             commands.addCommands(Commands.slash("allstats", "Find out the statistics of all the bot's games"));
             commands.addCommands(Commands.slash("delete", "Deleting your data"));
+            commands.addCommands(Commands.slash("word", "Guess the full word").addOptions(word));
+            commands.addCommands(Commands.slash("set-game", "Using different interaction logics").addOptions(mode));
+
 
             commands.queue();
 
@@ -181,7 +202,6 @@ public class BotStartConfig {
                     synchronized (this) {
                         if (HangmanRegistry.getInstance().hasHangman(entry.getKey())) {
                             HangmanRegistry.getInstance().getActiveHangman().get(entry.getKey()).stopGameByTime();
-                            HangmanRegistry.getInstance().getTimeCreatedGame().remove(entry.getKey());
                             hangmanGameRepository.deleteActiveGame(entry.getKey());
                         }
                     }
@@ -276,6 +296,25 @@ public class BotStartConfig {
         }
     }
 
+    private void getGameModeFromDB() {
+        try {
+            Connection connection = DriverManager.getConnection(URL_CONNECTION, USER_CONNECTION, PASSWORD_CONNECTION);
+            Statement statement = connection.createStatement();
+            String sql = "SELECT * FROM game_mode";
+            ResultSet rs = statement.executeQuery(sql);
+
+            while (rs.next()) {
+                mapGameMode.put(rs.getString("user_id_long"), rs.getString("mode"));
+            }
+
+            rs.close();
+            statement.close();
+            connection.close();
+            System.out.println("getGameModeFromDB()");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     private void getGameLocalizationFromDB() {
         try {
@@ -351,6 +390,10 @@ public class BotStartConfig {
 
     public static Map<String, String> getMapGameLanguages() {
         return mapGameLanguages;
+    }
+
+    public static Map<String, String> getMapGameMode() {
+        return mapGameMode;
     }
 
     public static Map<String, String> getSecretCode() {

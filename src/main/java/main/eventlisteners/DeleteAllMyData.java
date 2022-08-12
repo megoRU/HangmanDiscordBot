@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.jsonparser.JSONParsers;
 import main.model.repository.GameLanguageRepository;
+import main.model.repository.GameModeRepository;
 import main.model.repository.GamesRepository;
 import main.model.repository.LanguageRepository;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -27,6 +28,7 @@ public class DeleteAllMyData extends ListenerAdapter {
     private final GamesRepository gamesRepository;
     private final LanguageRepository languageRepository;
     private final GameLanguageRepository gameLanguageRepository;
+    private final GameModeRepository gameModeRepository;
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
@@ -91,6 +93,7 @@ public class DeleteAllMyData extends ListenerAdapter {
             gamesRepository.deleteAllMyData(user.getIdLong());
             languageRepository.deleteLanguage(user.getId());
             gameLanguageRepository.deleteGameLanguage(user.getId());
+            gameModeRepository.deleteGameMode(user.getId());
         }
     }
 }
