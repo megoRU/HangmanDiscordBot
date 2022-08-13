@@ -53,9 +53,11 @@ public class SlashCommand extends ListenerAdapter {
             if (event.getUser().isBot()) return;
 
             if (event.isFromGuild()
-                    && !event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_SEND)
-                    && !event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_MANAGE))
+                    && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.MESSAGE_SEND)
+                    && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.MESSAGE_MANAGE)
+                    && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.VIEW_CHANNEL)) {
                 return;
+            }
 
             LOGGER.info("\nSlash Command name: " + event.getName());
 
@@ -190,7 +192,7 @@ public class SlashCommand extends ListenerAdapter {
                 String mode = event.getOption("mode", OptionMapping::getAsString);
                 BotStartConfig.getMapGameMode().put(event.getUser().getId(), mode);
 
-                event.reply(jsonParsers.getLocale("game_mode", event.getUser().getId()) +  mode)
+                event.reply(jsonParsers.getLocale("game_mode", event.getUser().getId()) + mode)
                         .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
                         .setEphemeral(true)
                         .queue();
