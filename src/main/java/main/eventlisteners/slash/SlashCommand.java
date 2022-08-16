@@ -84,9 +84,17 @@ public class SlashCommand extends ListenerAdapter {
                             .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play"))
                             .queue();
                 } else if (event.isFromGuild() && BotStartConfig.getMapGameMode().get(event.getUser().getId()).equals("direct-message")) {
-                    event.reply(jsonParsers.getLocale("game_only_dm", event.getUser().getId()))
-                            .setEphemeral(true)
-                            .queue();
+                    try {
+                        event.getUser().openPrivateChannel()
+                                .flatMap(channel -> channel.sendMessage("**Perhaps soon we will automatically create a game in DM**"))
+                                .queue();
+
+                        event.reply(jsonParsers.getLocale("game_only_dm", event.getUser().getId()))
+                                .setEphemeral(true)
+                                .queue();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     //Проверяем если игрок уже играет. То присылаем в чат уведомление
                 } else if (HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
 

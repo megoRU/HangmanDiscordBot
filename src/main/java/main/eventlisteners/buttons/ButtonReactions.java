@@ -46,9 +46,10 @@ public class ButtonReactions extends ListenerAdapter {
             if (event.getUser().isBot()) return;
 
             if (event.isFromGuild()
-                    && !event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_SEND)
-                    && !event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_MANAGE))
+                    && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.MESSAGE_SEND)
+                    && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.MESSAGE_MANAGE)) {
                 return;
+            }
 
             long userIdLong = event.getUser().getIdLong();
 
@@ -110,7 +111,7 @@ public class ButtonReactions extends ListenerAdapter {
                     String mode = event.getButton().getLabel().equals("Guild/DM: SelectMenu") ? "select-menu" : "direct-message";
                     BotStartConfig.getMapGameMode().put(event.getUser().getId(), mode);
 
-                    event.getHook().sendMessage(jsonParsers.getLocale("game_mode", event.getUser().getId()) +  mode)
+                    event.getHook().sendMessage(jsonParsers.getLocale("game_mode", event.getUser().getId()) + mode)
                             .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
                             .setEphemeral(true)
                             .queue();
