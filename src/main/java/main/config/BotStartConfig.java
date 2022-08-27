@@ -63,7 +63,6 @@ public class BotStartConfig {
     private static int idGame;
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
-    private int serverCount;
 
     //REPOSITORY
     private final LanguageRepository languageRepository;
@@ -218,27 +217,22 @@ public class BotStartConfig {
     private void topGG() {
         if (!Config.isIsDev()) {
             try {
-                if (Config.getTopGgApiToken() != null && System.getenv("BOTICORD") != null) {
-                    DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
-                            .token(Config.getTopGgApiToken())
-                            .botId(Config.getBotId())
-                            .build();
-                    serverCount = BotStartConfig.jda.getGuilds().size();
-                    TOP_GG_API.setStats(serverCount);
-                    BotStartConfig.jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
+                DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
+                        .token(Config.getTopGgApiToken())
+                        .botId(Config.getBotId())
+                        .build();
+                int serverCount = BotStartConfig.jda.getGuilds().size();
+                TOP_GG_API.setStats(serverCount);
+                BotStartConfig.jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
 
-                    BotiCordAPI api = new BotiCordAPI.Builder()
-                            .tokenEnum(TokenEnum.BOT)
-                            .token(System.getenv("BOTICORD"))
-                            .build();
+                BotiCordAPI api = new BotiCordAPI.Builder()
+                        .tokenEnum(TokenEnum.BOT)
+                        .token(System.getenv("BOTICORD"))
+                        .build();
 
-                    AtomicInteger usersCount = new AtomicInteger();
-                    jda.getGuilds().forEach(g -> usersCount.addAndGet(g.getMembers().size()));
-                    api.setStats(serverCount, 1, usersCount.get());
-                } else {
-                    serverCount = BotStartConfig.jda.getGuilds().size();
-                    BotStartConfig.jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
-                }
+                AtomicInteger usersCount = new AtomicInteger();
+                jda.getGuilds().forEach(g -> usersCount.addAndGet(g.getMembers().size()));
+                api.setStats(serverCount, 1, usersCount.get());
             } catch (Exception e) {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
@@ -372,9 +366,7 @@ public class BotStartConfig {
 
                 Instant specificTime = Instant.ofEpochMilli(game_created_time.toInstant(ZoneOffset.UTC).toEpochMilli()).plusSeconds(600L);
 
-                HangmanRegistry.getInstance().getEndAutoDelete().put(
-                        userIdLong,
-                        specificTime.toString());
+                HangmanRegistry.getInstance().getEndAutoDelete().put(userIdLong, specificTime.toString());
             }
             rs.close();
             statement.close();
