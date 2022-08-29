@@ -192,6 +192,13 @@ public class ButtonReactions extends ListenerAdapter {
                             .queue();
                     return;
                 }
+//
+//                if (!event.isFromGuild() && BotStartConfig.getMapGameMode().get(userIdLongString).equals("select-menu")) {
+//                    event.getHook().sendMessage(jsonParsers.getLocale("game_only_guild", event.getUser().getId()))
+//                            .setEphemeral(true)
+//                            .queue();
+//                    return;
+//                }
 
                 if (!HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                     event.getChannel().sendTyping().queue();
