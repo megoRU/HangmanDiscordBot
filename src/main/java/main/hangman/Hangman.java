@@ -18,7 +18,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import org.jetbrains.annotations.NotNull;
@@ -183,19 +182,13 @@ public class Hangman implements HangmanHelper {
                 needSetLanguage.setDescription(jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", userId));
 
                 textChannel.sendMessageEmbeds(needSetLanguage.build())
-                        .setActionRows(
-                                ActionRow.of(
-                                        net.dv8tion.jda.api.interactions.components.buttons.Button.secondary(Buttons.BUTTON_RUS.name(), "Кириллица")
-                                                .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")),
-                                        net.dv8tion.jda.api.interactions.components.buttons.Button.secondary(Buttons.BUTTON_ENG.name(), "Latin")
-                                                .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7"))),
-                                ActionRow.of(
-                                        net.dv8tion.jda.api.interactions.components.buttons.Button.secondary(Buttons.BUTTON_SELECT_MENU.name(), "Guild/DM: SelectMenu"),
-                                        net.dv8tion.jda.api.interactions.components.buttons.Button.secondary(Buttons.BUTTON_DM.name(), "Only DM: One letter in chat")),
-
-                                ActionRow.of(
-                                        Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play")))
-
+                        .addActionRow(
+                                Button.secondary(Buttons.BUTTON_RUS.name(), "Кириллица").withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")),
+                                Button.secondary(Buttons.BUTTON_ENG.name(), "Latin").withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")))
+                        .addActionRow(
+                                Button.danger(Buttons.BUTTON_SELECT_MENU.name(), "Guild/DM: SelectMenu"),
+                                Button.success(Buttons.BUTTON_DM.name(), "(Recommended) Only DM: One letter in chat"))
+                        .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play"))
                         .queue();
 
                 HangmanRegistry.getInstance().removeHangman(Long.parseLong(userId));
@@ -227,7 +220,8 @@ public class Hangman implements HangmanHelper {
             if (BotStartConfig.getMapGameMode().get(userId).equals("select-menu")) {
                 List<SelectMenu> selectMenuList = selectMenus();
                 textChannel.sendMessageEmbeds(updateEmbedBuilder().build())
-                        .setActionRows(ActionRow.of(selectMenuList.get(0)), ActionRow.of(selectMenuList.get(1)))
+                        .addActionRow(selectMenuList.get(0))
+                        .addActionRow(selectMenuList.get(1))
                         .queue(this::createEntityInDataBase);
             } else {
                 textChannel.sendMessageEmbeds(updateEmbedBuilder().build())
