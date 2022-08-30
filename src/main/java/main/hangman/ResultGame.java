@@ -18,14 +18,14 @@ public class ResultGame {
 
     //Data
     private final int idGame;
-    private final String userId;
+    private final long userId;
     private final boolean result;
 
 
     public ResultGame(HangmanGameRepository hangmanGameRepository,
                       GamesRepository gamesRepository,
                       PlayerRepository playerRepository,
-                      String userId,
+                      long userId,
                       boolean result) {
         this.hangmanGameRepository = hangmanGameRepository;
         this.gamesRepository = gamesRepository;
@@ -44,13 +44,13 @@ public class ResultGame {
 
             Player player = new Player();
             player.setId(idGame);
-            player.setUserIdLong(Long.valueOf(userId));
+            player.setUserIdLong(userId);
             player.setGames_id(game);
 
             gamesRepository.saveAndFlush(game);
             playerRepository.saveAndFlush(player);
 
-            hangmanGameRepository.deleteActiveGame(Long.valueOf(userId));
+            hangmanGameRepository.deleteActiveGame(userId);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -12,7 +12,7 @@ public class GameLanguageChange {
         this.gameLanguageRepository = gameLanguageRepository;
     }
 
-    public void set(String message, String userIdLong) {
+    public void set(String message, Long userIdLong) {
         try {
             BotStartConfig.getMapGameLanguages().put(userIdLong, message);
             GameLanguage gameLanguage = new GameLanguage();

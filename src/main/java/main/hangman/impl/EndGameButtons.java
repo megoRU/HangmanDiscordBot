@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface EndGameButtons {
 
-    static List<Button> getListButtons(String userIdLong) {
+    static List<Button> getListButtons(long userIdLong) {
         List<Button> buttonList = new LinkedList<>();
 
         buttonList.add(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"));

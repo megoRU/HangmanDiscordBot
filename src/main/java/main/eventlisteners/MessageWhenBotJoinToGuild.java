@@ -47,7 +47,7 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
 
                 event.getGuild().getDefaultChannel().asTextChannel().sendMessageEmbeds(welcome.build())
                         .setActionRow(
-                                List.of(Button.success(Buttons.BUTTON_HELP.name(), jsonParsers.getLocale("button_Help", event.getGuild().getId())),
+                                List.of(Button.success(Buttons.BUTTON_HELP.name(), jsonParsers.getLocale("button_Help", event.getGuild().getIdLong())),
                                         Button.link("https://discord.gg/UrWG3R683d", "Support"))
                         ).queue();
                 welcome.clear();

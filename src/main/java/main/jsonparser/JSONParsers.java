@@ -10,7 +10,7 @@ public class JSONParsers {
         this.locale = locale;
     }
 
-    public String getLocale(String key, String userIdLong) {
+    public String getLocale(String key, long userIdLong) {
         try {
             String language = "eng";
             if (locale.equals(Locale.GAME)) {

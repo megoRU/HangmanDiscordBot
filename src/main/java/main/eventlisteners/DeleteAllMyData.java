@@ -46,15 +46,17 @@ public class DeleteAllMyData extends ListenerAdapter {
     }
 
     public void buildMessage(@NotNull SlashCommandInteractionEvent event, @NotNull User user) {
-
         String code = UUID.randomUUID().toString().replaceAll("-", "");
-        BotStartConfig.getSecretCode().put(user.getId(), code);
+        BotStartConfig.getSecretCode().put(user.getIdLong(), code);
 
-        event.reply(jsonParsers.getLocale("restore_Data", user.getId())).queue();
+        String restoreData = jsonParsers.getLocale("restore_Data", user.getIdLong());
+        String restoreDataPm = String.format(jsonParsers.getLocale("restore_Data_PM", user.getIdLong()), code);
+
+        event.reply(restoreData).queue();
+
 
         user.openPrivateChannel()
-                .flatMap(channel -> channel.sendMessage(
-                        jsonParsers.getLocale("restore_Data_PM", user.getId()).replaceAll("\\{0}", code)))
+                .flatMap(channel -> channel.sendMessage(restoreDataPm))
                 .queue(null, (exception) -> event.getChannel().sendMessage("""
                         I couldn't send you a message to the DM.
                         You may have banned sending you messages
@@ -67,30 +69,37 @@ public class DeleteAllMyData extends ListenerAdapter {
 
         if (message.equals(DELETE)) {
             String code = UUID.randomUUID().toString().replaceAll("-", "");
-            BotStartConfig.getSecretCode().put(user.getId(), code);
+            BotStartConfig.getSecretCode().put(user.getIdLong(), code);
 
-            messageChannel.sendMessage(jsonParsers.getLocale("restore_Data", user.getId())).queue();
+            String restoreData = jsonParsers.getLocale("restore_Data", user.getIdLong());
+            String restoreDataPm = String.format(jsonParsers.getLocale("restore_Data_PM", user.getIdLong()), code);
+
+            messageChannel.sendMessage(restoreData).queue();
+
 
             user.openPrivateChannel()
-                    .flatMap(channel -> channel.sendMessage(
-                            jsonParsers.getLocale("restore_Data_PM", user.getId()).replaceAll("\\{0}", code)))
+                    .flatMap(channel -> channel.sendMessage(restoreDataPm))
                     .queue();
             return;
         }
 
         if (message.matches(DELETE_WITH_CODE)
-                && (BotStartConfig.getSecretCode().get(user.getId()) == null || !BotStartConfig.getSecretCode().get(user.getId()).equals(split[1]))) {
-            messageChannel.sendMessage(jsonParsers.getLocale("restore_Data_Failure", user.getId())).queue();
+                && (BotStartConfig.getSecretCode().get(user.getIdLong()) == null || !BotStartConfig.getSecretCode().get(user.getIdLong()).equals(split[1]))) {
+            String restoreDataFailure = jsonParsers.getLocale("restore_Data_Failure", user.getIdLong());
+
+            messageChannel.sendMessage(restoreDataFailure).queue();
             return;
         }
 
         if (split.length > 1 && message.matches(DELETE_WITH_CODE)
-                && BotStartConfig.getSecretCode().get(user.getId()) != null
-                && BotStartConfig.getSecretCode().get(user.getId()).equals(split[1])) {
+                && BotStartConfig.getSecretCode().get(user.getIdLong()) != null
+                && BotStartConfig.getSecretCode().get(user.getIdLong()).equals(split[1])) {
 
-            messageChannel.sendMessage(jsonParsers.getLocale("restore_Data_Success", user.getId())).queue();
-            BotStartConfig.getMapGameLanguages().remove(user.getId());
-            BotStartConfig.getMapLanguages().remove(user.getId());
+            String restoreDataSuccess = jsonParsers.getLocale("restore_Data_Success", user.getIdLong());
+
+            messageChannel.sendMessage(restoreDataSuccess).queue();
+            BotStartConfig.getMapGameLanguages().remove(user.getIdLong());
+            BotStartConfig.getMapLanguages().remove(user.getIdLong());
 
             gamesRepository.deleteAllMyData(user.getIdLong());
             languageRepository.deleteLanguage(user.getId());
