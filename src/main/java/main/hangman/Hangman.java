@@ -50,7 +50,7 @@ public class Hangman implements HangmanHelper {
     private final GamesRepository gamesRepository;
     private final PlayerRepository playerRepository;
 
-    private final Set<String> guesses = new LinkedHashSet<>();
+    private final Set<String> guesses;
 
     //User|Guild|Channel data
     private final long userId;
@@ -76,6 +76,8 @@ public class Hangman implements HangmanHelper {
         this.guildId = guildId;
         this.channelId = channelId;
         this.userIdWithDiscord = String.format("<@%s>", userId);
+        this.guesses = new LinkedHashSet<>();
+        this.currentHiddenWord = null;
     }
 
     //TODO: Работает, но изменить время на Instant желательно.
@@ -302,7 +304,7 @@ public class Hangman implements HangmanHelper {
         }
     }
 
-    public void logic(String inputs, Message messages) {
+    public synchronized void logic(String inputs, Message messages) {
         try {
             if (WORD == null) {
                 String wordIsNull = jsonParsers.getLocale("word_is_null", userId);
@@ -393,63 +395,63 @@ public class Hangman implements HangmanHelper {
     }
 
     public EmbedBuilder embedBuilder(Color color, String gameInfo, boolean gameGuesses, boolean isDefeat, @Nullable String inputs) {
-        EmbedBuilder embedBuilder = null;
-        try {
-            String language = BotStartConfig.getMapGameLanguages().get(userId).equals("rus") ? "Кириллица" : "Latin";
-            embedBuilder = new EmbedBuilder();
+        EmbedBuilder embedBuilder = new EmbedBuilder();
 
-            LOGGER.info("\ngamePlayer: " + userIdWithDiscord
-                    + "\ngameInfo: " + gameInfo
-                    + "\ngameGuesses: " + gameGuesses
-                    + "\nisDefeat: " + isDefeat
-                    + "\ninputs: " + inputs
-                    + "\nlanguage " + language);
+        String language = BotStartConfig.getMapGameLanguages().get(userId).equals("rus") ? "Кириллица" : "Latin";
 
-            String gamePlayer = jsonGameParsers.getLocale("Game_Player", userId);
-            String gameLanguage = jsonGameParsers.getLocale("Game_Language", userId);
+        LOGGER.info("\ngamePlayer: " + userIdWithDiscord
+                + "\ngameInfo: " + gameInfo
+                + "\ngameGuesses: " + gameGuesses
+                + "\nisDefeat: " + isDefeat
+                + "\ninputs: " + inputs
+                + "\nlanguage " + language);
 
-            embedBuilder.setColor(color);
-            embedBuilder.addField(gamePlayer, userIdWithDiscord, true);
-            embedBuilder.addField(gameLanguage, language, true);
-            embedBuilder.setThumbnail(GetImage.get(hangmanErrors));
+        String gamePlayer = jsonGameParsers.getLocale("Game_Player", userId);
+        String gameLanguage = jsonGameParsers.getLocale("Game_Language", userId);
 
-            if (gameGuesses) {
-                String gameGuessesL = jsonGameParsers.getLocale("Game_Guesses", userId);
-                embedBuilder.addField(gameGuessesL, "`" + getGuesses() + "`", false);
-            }
+        embedBuilder.setColor(color);
+        embedBuilder.addField(gamePlayer, userIdWithDiscord, true);
+        embedBuilder.addField(gameLanguage, language, true);
+        embedBuilder.setThumbnail(GetImage.get(hangmanErrors));
 
-            if (inputs != null && inputs.length() == 1) {
-                String gameCurrentWord = jsonGameParsers.getLocale("Game_Current_Word", userId);
-                embedBuilder.addField(gameCurrentWord, "`" + replacementLetters(inputs).toUpperCase() + "`", false);
-            }
+        if (gameGuesses) {
+            String gameGuessesL = jsonGameParsers.getLocale("Game_Guesses", userId);
+            String guesses = String.format("`%s`", getGuesses());
 
-            if (inputs == null) {
-                String gameCurrentWord = jsonGameParsers.getLocale("Game_Current_Word", userId);
-                String worldUpper = String.format("`%s`", WORD_HIDDEN.toUpperCase());
-
-                embedBuilder.addField(gameCurrentWord, worldUpper, false);
-            } else if (inputs.length() >= 3) {
-                String gameCurrentWord = jsonGameParsers.getLocale("Game_Current_Word", userId);
-                if (inputs.equals(WORD)) {
-                    String worldUpper = String.format("`%s`", WORD.toUpperCase().replaceAll("", " ").trim());
-                    embedBuilder.addField(gameCurrentWord, worldUpper, false);
-                } else {
-                    String worldUpper = String.format("`%s`", WORD_HIDDEN.toUpperCase());
-                    embedBuilder.addField(gameCurrentWord, worldUpper, false);
-                }
-            }
-
-            if (isDefeat) {
-                String gameWordThatWas = jsonGameParsers.getLocale("Game_Word_That_Was", userId);
-                String worldUpper = String.format("`%s`", WORD.toUpperCase().replaceAll("", " ").trim() + "`");
-                embedBuilder.addField(gameWordThatWas, worldUpper, false);
-            }
-            String gameInfo1 = jsonGameParsers.getLocale("Game_Info", userId);
-            embedBuilder.addField(gameInfo1, gameInfo, false);
-
-        } catch (Exception e) {
-            LOGGER.info(e.getMessage());
+            embedBuilder.addField(gameGuessesL, guesses, false);
         }
+
+        if (inputs != null && inputs.length() == 1) {
+            String gameCurrentWord = jsonGameParsers.getLocale("Game_Current_Word", userId);
+            String worldUpper = String.format("`%s`", replacementLetters(inputs).toUpperCase());
+
+            embedBuilder.addField(gameCurrentWord, worldUpper, false);
+        }
+
+        if (inputs == null) {
+            String gameCurrentWord = jsonGameParsers.getLocale("Game_Current_Word", userId);
+            String worldUpper = String.format("`%s`", WORD_HIDDEN.toUpperCase());
+
+            embedBuilder.addField(gameCurrentWord, worldUpper, false);
+        } else if (inputs.length() >= 3) {
+            String gameCurrentWord = jsonGameParsers.getLocale("Game_Current_Word", userId);
+            String worldUpper;
+            if (inputs.equals(WORD)) {
+                worldUpper = String.format("`%s`", WORD.toUpperCase().replaceAll("", " ").trim());
+            } else {
+                worldUpper = String.format("`%s`", WORD_HIDDEN.toUpperCase());
+            }
+            embedBuilder.addField(gameCurrentWord, worldUpper, false);
+        }
+
+        if (isDefeat) {
+            String gameWordThatWas = jsonGameParsers.getLocale("Game_Word_That_Was", userId);
+            String worldUpper = String.format("`%s`", WORD.toUpperCase().replaceAll("", " ").trim());
+            embedBuilder.addField(gameWordThatWas, worldUpper, false);
+        }
+        String gameInfo1 = jsonGameParsers.getLocale("Game_Info", userId);
+        embedBuilder.addField(gameInfo1, gameInfo, false);
+
         //embedBuilder.setTimestamp(OffsetDateTime.parse(String.valueOf(HangmanRegistry.getInstance().getEndAutoDelete().get(userId))));
         //embedBuilder.setFooter(jsonGameParsers.getLocale("gameOverTime", userId));
         return embedBuilder;
@@ -477,19 +479,26 @@ public class Hangman implements HangmanHelper {
 
     private void stopGameByTime() {
         try {
-            String gameOver = jsonGameParsers.getLocale("gameOver", userId);
-            String timeIsOver = jsonGameParsers.getLocale("timeIsOver", userId);
-            String gamePlayer = jsonGameParsers.getLocale("Game_Player", userId);
+            if (HangmanRegistry.getInstance().hasHangman(this.userId)) {
+                String gameOver = jsonGameParsers.getLocale("gameOver", userId);
+                String timeIsOver = jsonGameParsers.getLocale("timeIsOver", userId);
+                String gamePlayer = jsonGameParsers.getLocale("Game_Player", userId);
 
-            EmbedBuilder info = new EmbedBuilder();
-            info.setColor(0x00FF00);
-            info.setTitle(gameOver);
-            info.setDescription(timeIsOver);
-            info.addField(gamePlayer, userIdWithDiscord, false);
+                EmbedBuilder info = new EmbedBuilder();
+                info.setColor(0x00FF00);
+                info.setTitle(gameOver);
+                info.setDescription(timeIsOver);
+                info.addField(gamePlayer, userIdWithDiscord, false);
 
-            HangmanHelper.editMessageWithButtons(info, userId, EndGameButtons.getListButtons(userId));
-            HangmanRegistry.getInstance().getTimeCreatedGame().remove(userId);
-            HangmanRegistry.getInstance().removeHangman(userId);
+                HangmanHelper.editMessageWithButtons(info, userId, EndGameButtons.getListButtons(userId));
+
+                Timer timer = HangmanRegistry.getInstance().getHangmanTimer().get(this.userId);
+                if (timer != null) {
+                    timer.cancel();
+                }
+                HangmanRegistry.getInstance().getHangmanTimer().remove(userId);
+                HangmanRegistry.getInstance().removeHangman(userId);
+            }
         } catch (Exception e) {
             if (e.getMessage().contains("10008: Unknown Message")) {
                 return;
@@ -502,9 +511,9 @@ public class Hangman implements HangmanHelper {
         Timer timer = new Timer();
         StopHangmanTimer stopGiveawayByTimer = new StopHangmanTimer();
         ZonedDateTime localDateTime = ldt.atZone(ZoneId.systemDefault());
-        HangmanRegistry.getInstance().getTimeCreatedGame().put(userId, localDateTime.toLocalDateTime());
         Date date = Date.from(localDateTime.plusMinutes(10).toInstant());
         timer.schedule(stopGiveawayByTimer, date);
+        HangmanRegistry.getInstance().getHangmanTimer().put(userId, timer);
     }
 
     //Создает скрытую линию из длины слова
@@ -645,14 +654,12 @@ public class Hangman implements HangmanHelper {
         return channelId;
     }
 
-    public final class StopHangmanTimer extends TimerTask {
+    private final class StopHangmanTimer extends TimerTask {
 
         @Override
         public void run() {
             try {
-                if (HangmanRegistry.getInstance().hasHangman(userId)) {
-                    stopGameByTime();
-                }
+                stopGameByTime();
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
                 e.printStackTrace();
