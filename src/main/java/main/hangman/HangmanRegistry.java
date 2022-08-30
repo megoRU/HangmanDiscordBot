@@ -29,14 +29,9 @@ public class HangmanRegistry {
         return hangmanRegistry;
     }
 
-//    public Map<Long, LocalDateTime> getTimeCreatedGame() {
-//        return timeCreatedGame;
-//    }
-
     public Map<Long, Timer> getHangmanTimer() {
         return timeCreatedGame;
     }
-
 
     public int getIdGame() {
         return idGame.incrementAndGet();

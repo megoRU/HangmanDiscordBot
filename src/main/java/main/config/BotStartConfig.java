@@ -338,8 +338,6 @@ public class BotStartConfig {
 
                 HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).autoInsert();
 
-                HangmanRegistry.getInstance().getTimeCreatedGame().put(userIdLong, game_created_time);
-
             }
             rs.close();
             statement.close();

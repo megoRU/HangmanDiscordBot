@@ -304,7 +304,7 @@ public class Hangman implements HangmanHelper {
         }
     }
 
-    public synchronized void logic(String inputs, Message messages) {
+    public synchronized void logic(final String inputs, final Message messages) {
         try {
             if (WORD == null) {
                 String wordIsNull = jsonParsers.getLocale("word_is_null", userId);
