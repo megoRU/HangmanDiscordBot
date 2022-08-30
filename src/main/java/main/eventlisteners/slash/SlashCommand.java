@@ -89,11 +89,12 @@ public class SlashCommand extends ListenerAdapter {
                             .queue();
                 } else if (event.isFromGuild() && BotStartConfig.getMapGameMode().get(event.getUser().getIdLong()).equals("direct-message")) {
                     try {
+                        event.reply("Got your message").setEphemeral(true).queue();
                         PrivateChannel privateChannel = event.getUser().openPrivateChannel().submit().get();
 
                         Hangman hangman = new Hangman(event.getUser().getIdLong(),
                                 null,
-                                null,
+                                privateChannel.getIdLong(),
                                 hangmanGameRepository,
                                 gamesRepository,
                                 playerRepository);
@@ -101,8 +102,6 @@ public class SlashCommand extends ListenerAdapter {
                         HangmanRegistry.getInstance().setHangman(event.getUser().getIdLong(), hangman);
 
                         hangman.startGame(privateChannel, event.getUser().getAvatarUrl(), event.getUser().getName());
-
-                        event.reply("Got your message").setEphemeral(true).queue();
                     } catch (Exception e) {
                         if (e.getMessage().equals("50007: Cannot send messages to this user")) {
                             event.reply("I couldn't send a message to you in DM").queue();

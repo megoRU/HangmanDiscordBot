@@ -55,7 +55,7 @@ public class Hangman implements HangmanHelper {
     //User|Guild|Channel data
     private final long userId;
     private final Long guildId;
-    private Long channelId;
+    private final Long channelId;
     private final String userIdWithDiscord;
 
     private int countUsedLetters;
@@ -458,7 +458,6 @@ public class Hangman implements HangmanHelper {
     private void createEntityInDataBase(Message message) {
         try {
             HangmanRegistry.getInstance().getMessageId().put(userId, message.getId());
-            channelId = message.getChannel().getIdLong();
             Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now().atZone(ZoneId.systemDefault()).toLocalDateTime().plusHours(3));
 
             ActiveHangman activeHangman = new ActiveHangman();
