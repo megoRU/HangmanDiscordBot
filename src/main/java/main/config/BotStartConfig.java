@@ -1,7 +1,6 @@
 package main.config;
 
 import main.eventlisteners.DeleteAllMyData;
-import main.eventlisteners.DeprecatedCommands;
 import main.eventlisteners.GameHangmanListener;
 import main.eventlisteners.MessageWhenBotJoinToGuild;
 import main.eventlisteners.buttons.ButtonReactions;
@@ -15,7 +14,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -119,7 +117,6 @@ public class BotStartConfig {
             jdaBuilder.enableIntents(intents);
             jdaBuilder.setActivity(Activity.playing("Starting..."));
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
-            jdaBuilder.addEventListeners(new DeprecatedCommands());
             jdaBuilder.addEventListeners(new GameHangmanListener());
             jdaBuilder.addEventListeners(new MessageWhenBotJoinToGuild());
             jdaBuilder.addEventListeners(new SelectMenuEvent());
@@ -134,7 +131,6 @@ public class BotStartConfig {
         }
         getAndSetActiveGames();
 
-        Message.suppressContentIntentWarning();
         System.out.println(jda.retrieveCommands().complete());
 
         //Обновить команды
