@@ -45,9 +45,10 @@ public class ButtonReactions extends ListenerAdapter {
         try {
             if (event.getUser().isBot()) return;
 
-            if (event.isFromGuild()
+            if (event.getGuild() != null
                     && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.MESSAGE_SEND)
-                    && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.MESSAGE_MANAGE)) {
+                    && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.MESSAGE_MANAGE)
+                    && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.VIEW_CHANNEL)) {
                 return;
             }
 
@@ -203,13 +204,6 @@ public class ButtonReactions extends ListenerAdapter {
                             .queue();
                     return;
                 }
-//
-//                if (!event.isFromGuild() && BotStartConfig.getMapGameMode().get(userIdLongString).equals("select-menu")) {
-//                    event.getHook().sendMessage(jsonParsers.getLocale("game_only_guild", event.getUser().getId()))
-//                            .setEphemeral(true)
-//                            .queue();
-//                    return;
-//                }
 
                 if (!HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                     event.getChannel().sendTyping().queue();

@@ -20,7 +20,6 @@ public class GameHangmanListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         try {
-
             if (event.getAuthor().isBot()) return;
             if (event.isFromType(ChannelType.TEXT)) return;
 
@@ -39,7 +38,6 @@ public class GameHangmanListener extends ListenerAdapter {
             if (message.matches(HG_ONE_WORD)) {
                 hangman.fullWord(message.toLowerCase());
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
