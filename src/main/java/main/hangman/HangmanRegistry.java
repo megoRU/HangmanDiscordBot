@@ -2,17 +2,16 @@ package main.hangman;
 
 import main.config.BotStartConfig;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class HangmanRegistry {
     //Long это UserIdLong
     private static final Map<Long, Hangman> activeHangman = new HashMap<>();
     private static final Map<Long, String> messageId = new HashMap<>();
-    private static final Map<Long, LocalDateTime> timeCreatedGame = new HashMap<>();
-    private static final Map<Long, String> endAutoDelete = new HashMap<>();
+    private static final Map<Long, Timer> timeCreatedGame = new HashMap<>();
     private static volatile HangmanRegistry hangmanRegistry;
     private final AtomicInteger idGame = new AtomicInteger();
 
@@ -30,12 +29,8 @@ public class HangmanRegistry {
         return hangmanRegistry;
     }
 
-    public Map<Long, LocalDateTime> getTimeCreatedGame() {
+    public Map<Long, Timer> getHangmanTimer() {
         return timeCreatedGame;
-    }
-
-    public Map<Long, String> getEndAutoDelete() {
-        return endAutoDelete;
     }
 
     public int getIdGame() {

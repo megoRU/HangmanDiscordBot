@@ -1,6 +1,7 @@
 package main.eventlisteners;
 
 import lombok.AllArgsConstructor;
+import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -19,9 +20,7 @@ public class GameHangmanListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         try {
-
             if (event.getAuthor().isBot()) return;
-
             if (event.isFromType(ChannelType.TEXT)) return;
 
             String message = event.getMessage().getContentRaw().trim().toLowerCase();
@@ -29,15 +28,16 @@ public class GameHangmanListener extends ListenerAdapter {
 
             if (!HangmanRegistry.getInstance().hasHangman(userIdLong)) return;
 
+            Hangman hangman = HangmanRegistry.getInstance().getActiveHangman().get(userIdLong);
+
             if (message.matches(HG_ONE_LETTER) || message.matches(HG_ONE_LETTER_ENG)) {
-                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).logic(message, event.getMessage());
+                hangman.logic(message, event.getMessage());
                 return;
             }
 
             if (message.matches(HG_ONE_WORD)) {
-                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).fullWord(message.toLowerCase());
+                hangman.fullWord(message.toLowerCase());
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

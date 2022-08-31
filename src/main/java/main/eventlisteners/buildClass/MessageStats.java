@@ -18,20 +18,21 @@ public class MessageStats {
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private GamesRepository gamesRepository;
 
-    public void sendStats(MessageChannel messageChannel, SlashCommandInteractionEvent event, String userAvatarUrl, String userIdLong, String name) {
+    public void sendStats(MessageChannel messageChannel, SlashCommandInteractionEvent event, String userAvatarUrl, long userIdLong, String name) {
         try {
-            String[] statistic = gamesRepository.getStatistic(Long.valueOf(userIdLong)).replaceAll(",", " ").split(" ");
+            String[] statistic = gamesRepository.getStatistic(userIdLong).replaceAll(",", " ").split(" ");
 
             if (statistic.length == 3) {
                 //Формула:
                 //Количество побед / Общее количество * Максимальное количество процентов
                 if (Integer.parseInt(statistic[0]) == 0) {
+                    String messageStatsZeroDivide = jsonParsers.getLocale("MessageStats_Zero_Divide", userIdLong);
 
                     EmbedBuilder needSetLanguage = new EmbedBuilder();
 
                     needSetLanguage.setAuthor(name, null, userAvatarUrl);
                     needSetLanguage.setColor(0x00FF00);
-                    needSetLanguage.setDescription(jsonParsers.getLocale("MessageStats_Zero_Divide", userIdLong));
+                    needSetLanguage.setDescription(messageStatsZeroDivide);
 
                     if (messageChannel != null) {
                         messageChannel.sendMessageEmbeds(needSetLanguage.build()).queue();
@@ -51,20 +52,16 @@ public class MessageStats {
                     avatarUrl = userAvatarUrl;
                 }
 
+                String messageStatsYourStats = jsonParsers.getLocale("MessageStats_Your_Stats", userIdLong);
+                String messageStatsGameCount = String.format(jsonParsers.getLocale("MessageStats_Game_Count", userIdLong), statistic[0]);
+                String messageStatsGameWins = String.format(jsonParsers.getLocale("MessageStats_Game_Wins", userIdLong), statistic[2]);
+                String messageStatsGamePercentage = String.format(jsonParsers.getLocale("MessageStats_Game_Percentage", userIdLong), df.format(percentage), "%");
+
                 EmbedBuilder stats = new EmbedBuilder();
                 stats.setColor(0x00FF00);
                 stats.setAuthor(name, null, avatarUrl);
-                stats.setTitle(jsonParsers.getLocale("MessageStats_Your_Stats",
-                        userIdLong));
-                stats.setDescription(
-                        jsonParsers.getLocale("MessageStats_Game_Count",
-                                userIdLong).replaceAll("\\{0}", statistic[0]) +
-
-                                jsonParsers.getLocale("MessageStats_Game_Wins",
-                                        userIdLong).replaceAll("\\{0}", statistic[2]) +
-
-                                jsonParsers.getLocale("MessageStats_Game_Percentage",
-                                        userIdLong).replaceAll("\\{0}", df.format(percentage)));
+                stats.setTitle(messageStatsYourStats);
+                stats.setDescription(messageStatsGameCount + messageStatsGameWins + messageStatsGamePercentage);
 
                 if (messageChannel != null) {
                     messageChannel.sendMessageEmbeds(stats.build()).queue();

@@ -16,7 +16,7 @@ public class GameLanguage {
 
     @Id
     @Column(name = "user_id_long", nullable = false)
-    private String userIdLong;
+    private Long userIdLong;
 
     @Column(name = "language", nullable = false)
     private String language;

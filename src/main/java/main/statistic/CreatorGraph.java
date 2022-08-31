@@ -75,7 +75,7 @@ public class CreatorGraph {
 
             globalStats.setColor(0x00FF00);
 
-            globalStats.setTitle(jsonParsers.getLocale("MessageStats_All_Stats", userIdLong));
+            globalStats.setTitle(jsonParsers.getLocale("MessageStats_All_Stats", Long.parseLong(userIdLong)));
             globalStats.setImage(chart.getShortUrl());
 
 

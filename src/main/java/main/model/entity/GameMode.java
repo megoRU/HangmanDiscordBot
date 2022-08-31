@@ -20,7 +20,7 @@ public class GameMode {
 
     @Id
     @Column(name = "user_id_long", nullable = false)
-    private String userIdLong;
+    private Long userIdLong;
 
     @Column(name = "mode", nullable = false)
     private String mode;

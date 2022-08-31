@@ -1,7 +1,6 @@
 package main.config;
 
 import main.eventlisteners.DeleteAllMyData;
-import main.eventlisteners.DeprecatedCommands;
 import main.eventlisteners.GameHangmanListener;
 import main.eventlisteners.MessageWhenBotJoinToGuild;
 import main.eventlisteners.buttons.ButtonReactions;
@@ -15,7 +14,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -38,11 +36,8 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.*;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.chrono.ChronoLocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -55,10 +50,10 @@ public class BotStartConfig {
     public static final String activity = "/help | ";
 
     //String - userLongId
-    public static final Map<String, String> secretCode = new HashMap<>();
-    public static final Map<String, String> mapLanguages = new HashMap<>();
-    public static final Map<String, String> mapGameLanguages = new HashMap<>();
-    public static final Map<String, String> mapGameMode = new HashMap<>();
+    public static final Map<Long, String> secretCode = new HashMap<>();
+    public static final Map<Long, String> mapLanguages = new HashMap<>();
+    public static final Map<Long, String> mapGameLanguages = new HashMap<>();
+    public static final Map<Long, String> mapGameMode = new HashMap<>();
 
     private static int idGame;
     public static JDA jda;
@@ -102,11 +97,10 @@ public class BotStartConfig {
             getGameModeFromDB();
             getLocalizationFromDB();
             getGameLocalizationFromDB();
-            getAndSetActiveGames();
+
 
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
-                            GatewayIntent.GUILD_MESSAGES,
                             GatewayIntent.DIRECT_MESSAGES,
                             GatewayIntent.DIRECT_MESSAGE_TYPING));
 
@@ -122,7 +116,6 @@ public class BotStartConfig {
             jdaBuilder.enableIntents(intents);
             jdaBuilder.setActivity(Activity.playing("Starting..."));
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
-            jdaBuilder.addEventListeners(new DeprecatedCommands());
             jdaBuilder.addEventListeners(new GameHangmanListener());
             jdaBuilder.addEventListeners(new MessageWhenBotJoinToGuild());
             jdaBuilder.addEventListeners(new SelectMenuEvent());
@@ -135,7 +128,8 @@ public class BotStartConfig {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Message.suppressContentIntentWarning();
+        getAndSetActiveGames();
+
         System.out.println(jda.retrieveCommands().complete());
 
         //Обновить команды
@@ -185,30 +179,6 @@ public class BotStartConfig {
             commands.queue();
 
         } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    //Выглядит ужасно, но работает.
-    @Scheduled(fixedDelay = 15000L, initialDelay = 15000L)
-    private void engGameByTime() {
-        try {
-            Map<Long, LocalDateTime> timeCreatedGame = new HashMap<>(HangmanRegistry.getInstance().getTimeCreatedGame());
-
-            for (Map.Entry<Long, LocalDateTime> entry : timeCreatedGame.entrySet()) {
-                Instant instant = Instant.ofEpochMilli(Instant.now().toEpochMilli());
-
-                if (entry.getValue().plusMinutes(10L).isBefore(ChronoLocalDateTime.from(OffsetDateTime.parse(String.valueOf(instant))))) {
-                    synchronized (this) {
-                        if (HangmanRegistry.getInstance().hasHangman(entry.getKey())) {
-                            HangmanRegistry.getInstance().getActiveHangman().get(entry.getKey()).stopGameByTime();
-                            hangmanGameRepository.deleteActiveGame(entry.getKey());
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Thread.currentThread().interrupt();
             e.printStackTrace();
         }
     }
@@ -279,7 +249,7 @@ public class BotStartConfig {
             ResultSet rs = statement.executeQuery(sql);
 
             while (rs.next()) {
-                mapLanguages.put(rs.getString("user_id_long"), rs.getString("language"));
+                mapLanguages.put(rs.getLong("user_id_long"), rs.getString("language"));
             }
 
             rs.close();
@@ -299,7 +269,7 @@ public class BotStartConfig {
             ResultSet rs = statement.executeQuery(sql);
 
             while (rs.next()) {
-                mapGameMode.put(rs.getString("user_id_long"), rs.getString("mode"));
+                mapGameMode.put(rs.getLong("user_id_long"), rs.getString("mode"));
             }
 
             rs.close();
@@ -319,7 +289,7 @@ public class BotStartConfig {
             ResultSet rs = statement.executeQuery(sql);
 
             while (rs.next()) {
-                mapGameLanguages.put(rs.getString("user_id_long"), rs.getString("language"));
+                mapGameLanguages.put(Long.valueOf(rs.getString("user_id_long")), rs.getString("language"));
             }
 
             rs.close();
@@ -349,24 +319,25 @@ public class BotStartConfig {
                 int hangmanErrors = rs.getInt("hangman_errors");
                 LocalDateTime game_created_time = rs.getTimestamp("game_created_time").toInstant().atZone(ZoneOffset.UTC).toLocalDateTime();
 
-                HangmanRegistry.getInstance().setHangman(
+                System.out.println(game_created_time);
+
+                Hangman hangman = new Hangman(
                         userIdLong,
-                        new Hangman(String.valueOf(userIdLong), guildIdLong, Long.parseLong(channelIdLong),
-                                hangmanGameRepository,
-                                gamesRepository,
-                                playerRepository));
+                        guildIdLong == null ? null : Long.valueOf(guildIdLong),
+                        Long.parseLong(channelIdLong),
+                        hangmanGameRepository,
+                        gamesRepository,
+                        playerRepository);
+
+                HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
+
                 HangmanRegistry.getInstance().getMessageId().put(userIdLong, message_id_long);
 
                 HangmanRegistry.getInstance().getActiveHangman().get(userIdLong)
-                        .updateVariables(guesses, word, currentHiddenWord, hangmanErrors);
+                        .updateVariables(guesses, word, currentHiddenWord, hangmanErrors, game_created_time);
 
                 HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).autoInsert();
 
-                HangmanRegistry.getInstance().getTimeCreatedGame().put(userIdLong, game_created_time);
-
-                Instant specificTime = Instant.ofEpochMilli(game_created_time.toInstant(ZoneOffset.UTC).toEpochMilli()).plusSeconds(600L);
-
-                HangmanRegistry.getInstance().getEndAutoDelete().put(userIdLong, specificTime.toString());
             }
             rs.close();
             statement.close();
@@ -377,19 +348,19 @@ public class BotStartConfig {
         }
     }
 
-    public static Map<String, String> getMapLanguages() {
+    public static Map<Long, String> getMapLanguages() {
         return mapLanguages;
     }
 
-    public static Map<String, String> getMapGameLanguages() {
+    public static Map<Long, String> getMapGameLanguages() {
         return mapGameLanguages;
     }
 
-    public static Map<String, String> getMapGameMode() {
+    public static Map<Long, String> getMapGameMode() {
         return mapGameMode;
     }
 
-    public static Map<String, String> getSecretCode() {
+    public static Map<Long, String> getSecretCode() {
         return secretCode;
     }
 
