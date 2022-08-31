@@ -82,8 +82,6 @@ public class Hangman implements HangmanHelper {
 
     //TODO: Работает, но изменить время на Instant желательно.
     private EmbedBuilder updateEmbedBuilder() {
-        autoInsert();
-
         if (BotStartConfig.getMapGameMode().get(userId).equals("select-menu")) {
             String gameStart = jsonGameParsers.getLocale("Game_Start", userId);
             return embedBuilder(
@@ -170,38 +168,7 @@ public class Hangman implements HangmanHelper {
 
         //Установка авто завершения
         setAutoCancel(LocalDateTime.now());
-    }
-
-    //TODO: Возможно произойдет так что игру закончили. Удалили данные из БД и произойдет REPLACE и игра не завершится
-    private void executeInsert() {
-        try {
-            if ((guesses.size() > countUsedLetters) && HangmanRegistry.getInstance().hasHangman(userId)) {
-                countUsedLetters = guesses.size();
-                System.out.println("currentHiddenWord: " + currentHiddenWord);
-                System.out.println("getGuesses(): " + getGuesses());
-                hangmanGameRepository.updateGame(userId, currentHiddenWord, getGuesses(), hangmanErrors);
-            }
-        } catch (Exception e) {
-            LOGGER.info(e.getMessage());
-        }
-    }
-
-    //Автоматически отправляет в БД данные
-    public void autoInsert() {
-        new Timer(true).scheduleAtFixedRate(new TimerTask() {
-            public void run() throws NullPointerException {
-                try {
-                    if (HangmanRegistry.getInstance().hasHangman(userId)) {
-                        executeInsert();
-                    } else {
-                        Thread.currentThread().interrupt();
-                    }
-                } catch (Exception e) {
-                    LOGGER.info(e.getMessage());
-                    Thread.currentThread().interrupt();
-                }
-            }
-        }, 7000, 5000);
+        autoInsert();
     }
 
     public void fullWord(String inputs) {
@@ -495,10 +462,17 @@ public class Hangman implements HangmanHelper {
                 if (timer != null) {
                     timer.cancel();
                 }
+                //Удалить таймер
+                HangmanRegistry.getInstance().getHangmanTimer().get(userId).cancel();
                 HangmanRegistry.getInstance().getHangmanTimer().remove(userId);
 
                 HangmanHelper.editMessageWithButtons(info, userId, EndGameButtons.getListButtons(userId));
                 hangmanGameRepository.deleteActiveGame(userId);
+
+                //Удалить таймер
+                HangmanRegistry.getInstance().getTimeAutoUpdate().get(userId).cancel();
+                HangmanRegistry.getInstance().getTimeAutoUpdate().remove(userId);
+
                 HangmanRegistry.getInstance().removeHangman(userId);
             }
         } catch (Exception e) {
@@ -654,6 +628,46 @@ public class Hangman implements HangmanHelper {
 
     public Long getChannelId() {
         return channelId;
+    }
+
+    //TODO: Возможно произойдет так что игру закончили. Удалили данные из БД и произойдет REPLACE и игра не завершится
+    private void executeInsert() {
+        try {
+            if ((guesses.size() > countUsedLetters) && HangmanRegistry.getInstance().hasHangman(userId)) {
+                countUsedLetters = guesses.size();
+                System.out.println("currentHiddenWord: " + currentHiddenWord);
+                System.out.println("getGuesses(): " + getGuesses());
+                hangmanGameRepository.updateGame(userId, currentHiddenWord, getGuesses(), hangmanErrors);
+            }
+        } catch (Exception e) {
+            LOGGER.info(e.getMessage());
+        }
+    }
+
+    //Автоматически отправляет в БД данные
+    public void autoInsert() {
+        AutoUpdate autoUpdate = new AutoUpdate();
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(autoUpdate, 7000, 5000);
+        HangmanRegistry.getInstance().getTimeAutoUpdate().put(userId, timer);
+    }
+
+    private final class AutoUpdate extends TimerTask {
+
+        @Override
+        public void run() {
+            try {
+                if (HangmanRegistry.getInstance().hasHangman(userId)) {
+                    executeInsert();
+                } else {
+                    Thread.currentThread().interrupt();
+                }
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+                e.printStackTrace();
+            }
+        }
+
     }
 
     private final class StopHangmanTimer extends TimerTask {
