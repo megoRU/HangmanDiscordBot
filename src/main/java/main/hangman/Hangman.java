@@ -498,6 +498,7 @@ public class Hangman implements HangmanHelper {
                 HangmanRegistry.getInstance().getHangmanTimer().remove(userId);
 
                 HangmanHelper.editMessageWithButtons(info, userId, EndGameButtons.getListButtons(userId));
+                hangmanGameRepository.deleteActiveGame(userId);
                 HangmanRegistry.getInstance().removeHangman(userId);
             }
         } catch (Exception e) {
