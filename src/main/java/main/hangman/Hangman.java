@@ -490,13 +490,14 @@ public class Hangman implements HangmanHelper {
                 info.setDescription(timeIsOver);
                 info.addField(gamePlayer, userIdWithDiscord, false);
 
-                HangmanHelper.editMessageWithButtons(info, userId, EndGameButtons.getListButtons(userId));
 
                 Timer timer = HangmanRegistry.getInstance().getHangmanTimer().get(this.userId);
                 if (timer != null) {
                     timer.cancel();
                 }
                 HangmanRegistry.getInstance().getHangmanTimer().remove(userId);
+
+                HangmanHelper.editMessageWithButtons(info, userId, EndGameButtons.getListButtons(userId));
                 HangmanRegistry.getInstance().removeHangman(userId);
             }
         } catch (Exception e) {

@@ -209,11 +209,30 @@ public class ButtonReactions extends ListenerAdapter {
                     event.getChannel().sendTyping().queue();
 
                     if (event.getGuild() != null) {
-                        HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getIdLong(), event.getGuild().getIdLong(), event.getGuildChannel().getIdLong(), hangmanGameRepository, gamesRepository, playerRepository));
+                        HangmanRegistry.getInstance().setHangman(userIdLong,
+                                new Hangman(
+                                        event.getUser().getIdLong(),
+                                        event.getGuild().getIdLong(),
+                                        event.getGuildChannel().getIdLong(),
+                                        hangmanGameRepository,
+                                        gamesRepository,
+                                        playerRepository));
                     } else {
-                        HangmanRegistry.getInstance().setHangman(userIdLong, new Hangman(event.getUser().getIdLong(), null, event.getChannel().getIdLong(), hangmanGameRepository, gamesRepository, playerRepository));
+                        HangmanRegistry.getInstance().setHangman(
+                                userIdLong,
+                                new Hangman(
+                                        event.getUser().getIdLong(),
+                                        null,
+                                        event.getChannel().getIdLong(),
+                                        hangmanGameRepository,
+                                        gamesRepository,
+                                        playerRepository));
                     }
-                    HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
+                    HangmanRegistry.getInstance().getActiveHangman().get(userIdLong)
+                            .startGame(
+                                    event.getChannel(),
+                                    event.getUser().getAvatarUrl(),
+                                    event.getUser().getName());
                 } else {
                     String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
 

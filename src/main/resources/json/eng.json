@@ -66,5 +66,6 @@
   "wrongLength": "The word cannot be longer or shorter than hidden word!",
   "got_your_word": "Got your word",
   "game_mode": "Set mode: %s",
-  "game_only_dm": "You can only play DM (Use `/hg` in private messages with me)."
+  "game_only_dm": "You can only play DM (Use `/hg` in private messages with me).",
+  "create_game": "Creating game"
 }

@@ -91,8 +91,12 @@ public class SlashCommand extends ListenerAdapter {
                             .queue();
                 } else if (event.isFromGuild() && BotStartConfig.getMapGameMode().get(userIdLong).equals("direct-message")) {
                     try {
-                        event.reply("Got your message").setEphemeral(true).queue();
+                        String createGame = jsonParsers.getLocale("create_game", userIdLong);
+
+                        event.reply(createGame).setEphemeral(true).queue();
+
                         PrivateChannel privateChannel = event.getUser().openPrivateChannel().submit().get();
+
 
                         Hangman hangman = new Hangman(userIdLong,
                                 null,
