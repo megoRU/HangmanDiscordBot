@@ -12,6 +12,7 @@ public class HangmanRegistry {
     private static final Map<Long, Hangman> activeHangman = new HashMap<>();
     private static final Map<Long, String> messageId = new HashMap<>();
     private static final Map<Long, Timer> timeCreatedGame = new HashMap<>();
+    private static final Map<Long, Timer> timeAutoUpdate = new HashMap<>();
     private static volatile HangmanRegistry hangmanRegistry;
     private final AtomicInteger idGame = new AtomicInteger();
 
@@ -27,6 +28,10 @@ public class HangmanRegistry {
             }
         }
         return hangmanRegistry;
+    }
+
+    public Map<Long, Timer> getTimeAutoUpdate() {
+        return timeAutoUpdate;
     }
 
     public Map<Long, Timer> getHangmanTimer() {
