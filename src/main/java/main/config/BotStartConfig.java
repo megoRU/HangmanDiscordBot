@@ -4,7 +4,6 @@ import main.eventlisteners.DeleteAllMyData;
 import main.eventlisteners.GameHangmanListener;
 import main.eventlisteners.MessageWhenBotJoinToGuild;
 import main.eventlisteners.buttons.ButtonReactions;
-import main.eventlisteners.selections.SelectMenuEvent;
 import main.eventlisteners.slash.SlashCommand;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
@@ -53,7 +52,6 @@ public class BotStartConfig {
     public static final Map<Long, String> secretCode = new HashMap<>();
     public static final Map<Long, String> mapLanguages = new HashMap<>();
     public static final Map<Long, String> mapGameLanguages = new HashMap<>();
-    public static final Map<Long, String> mapGameMode = new HashMap<>();
 
     private static int idGame;
     public static JDA jda;
@@ -65,7 +63,6 @@ public class BotStartConfig {
     private final HangmanGameRepository hangmanGameRepository;
     private final PlayerRepository playerRepository;
     private final GamesRepository gamesRepository;
-    private final GameModeRepository gameModeRepository;
 
     //DataBase
     @Value("${spring.datasource.url}")
@@ -78,13 +75,12 @@ public class BotStartConfig {
     @Autowired
     public BotStartConfig(LanguageRepository languageRepository, GameLanguageRepository gameLanguageRepository,
                           HangmanGameRepository hangmanGameRepository, PlayerRepository playerRepository,
-                          GamesRepository gamesRepository, GameModeRepository gameModeRepository) {
+                          GamesRepository gamesRepository) {
         this.languageRepository = languageRepository;
         this.gameLanguageRepository = gameLanguageRepository;
         this.hangmanGameRepository = hangmanGameRepository;
         this.playerRepository = playerRepository;
         this.gamesRepository = gamesRepository;
-        this.gameModeRepository = gameModeRepository;
         idGame = hangmanGameRepository.getCountGames() == null ? 0 : hangmanGameRepository.getCountGames();
     }
 
@@ -94,13 +90,12 @@ public class BotStartConfig {
             //Теперь HangmanRegistry знает количество игр и может отдавать правильное значение
             HangmanRegistry.getInstance().setIdGame();
             setLanguages();
-            getGameModeFromDB();
             getLocalizationFromDB();
             getGameLocalizationFromDB();
 
-
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
+                            GatewayIntent.MESSAGE_CONTENT,
                             GatewayIntent.DIRECT_MESSAGES,
                             GatewayIntent.DIRECT_MESSAGE_TYPING));
 
@@ -118,10 +113,9 @@ public class BotStartConfig {
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
             jdaBuilder.addEventListeners(new GameHangmanListener());
             jdaBuilder.addEventListeners(new MessageWhenBotJoinToGuild());
-            jdaBuilder.addEventListeners(new SelectMenuEvent());
-            jdaBuilder.addEventListeners(new ButtonReactions(gameLanguageRepository, languageRepository, hangmanGameRepository, gamesRepository, playerRepository, gameModeRepository));
-            jdaBuilder.addEventListeners(new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository, gameModeRepository));
-            jdaBuilder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository, gameLanguageRepository, languageRepository, gameModeRepository));
+            jdaBuilder.addEventListeners(new ButtonReactions(gameLanguageRepository, languageRepository, hangmanGameRepository, gamesRepository, playerRepository));
+            jdaBuilder.addEventListeners(new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository));
+            jdaBuilder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository, gameLanguageRepository, languageRepository));
 
             jda = jdaBuilder.build();
             jda.awaitReady();
@@ -261,26 +255,6 @@ public class BotStartConfig {
         }
     }
 
-    private void getGameModeFromDB() {
-        try {
-            Connection connection = DriverManager.getConnection(URL_CONNECTION, USER_CONNECTION, PASSWORD_CONNECTION);
-            Statement statement = connection.createStatement();
-            String sql = "SELECT * FROM game_mode";
-            ResultSet rs = statement.executeQuery(sql);
-
-            while (rs.next()) {
-                mapGameMode.put(rs.getLong("user_id_long"), rs.getString("mode"));
-            }
-
-            rs.close();
-            statement.close();
-            connection.close();
-            System.out.println("getGameModeFromDB()");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void getGameLocalizationFromDB() {
         try {
             Connection connection = DriverManager.getConnection(URL_CONNECTION, USER_CONNECTION, PASSWORD_CONNECTION);
@@ -354,10 +328,6 @@ public class BotStartConfig {
 
     public static Map<Long, String> getMapGameLanguages() {
         return mapGameLanguages;
-    }
-
-    public static Map<Long, String> getMapGameMode() {
-        return mapGameMode;
     }
 
     public static Map<Long, String> getSecretCode() {

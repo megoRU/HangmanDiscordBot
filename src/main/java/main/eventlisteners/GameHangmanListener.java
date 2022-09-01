@@ -3,7 +3,6 @@ package main.eventlisteners;
 import lombok.AllArgsConstructor;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
-import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +20,6 @@ public class GameHangmanListener extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         try {
             if (event.getAuthor().isBot()) return;
-            if (event.isFromType(ChannelType.TEXT)) return;
 
             String message = event.getMessage().getContentRaw().trim().toLowerCase();
             long userIdLong = event.getAuthor().getIdLong();
