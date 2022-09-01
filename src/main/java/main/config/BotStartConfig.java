@@ -36,7 +36,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -292,9 +291,9 @@ public class BotStartConfig {
                 String currentHiddenWord = rs.getString("current_hidden_word");
                 String guesses = rs.getString("guesses");
                 int hangmanErrors = rs.getInt("hangman_errors");
-                LocalDateTime game_created_time = rs.getTimestamp("game_created_time").toInstant().atZone(ZoneOffset.UTC).toLocalDateTime();
+                LocalDateTime game_created_time = rs.getTimestamp("game_created_time").toLocalDateTime();
 
-                System.out.println(game_created_time);
+                System.out.println("game_created_time " + game_created_time);
 
                 Hangman hangman = new Hangman(
                         userIdLong,
