@@ -24,8 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.*;
 import java.util.logging.Logger;
@@ -403,7 +402,9 @@ public class Hangman implements HangmanHelper {
     private void createEntityInDataBase(Message message) {
         try {
             HangmanRegistry.getInstance().getMessageId().put(userId, message.getId());
-            Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now().atZone(ZoneId.systemDefault()).toLocalDateTime().plusHours(3));
+            Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now().atZone(ZoneOffset.UTC).toLocalDateTime());
+
+            System.out.println(timestamp);
 
             ActiveHangman activeHangman = new ActiveHangman();
             activeHangman.setUserIdLong(userId);
@@ -461,11 +462,9 @@ public class Hangman implements HangmanHelper {
     private void setAutoCancel(LocalDateTime ldt) {
         Timer timer = new Timer();
         StopHangmanTimer stopGiveawayByTimer = new StopHangmanTimer();
-        ZonedDateTime localDateTime = ldt.atZone(ZoneId.systemDefault());
-
-        Date date = Date.from(localDateTime.plusMinutes(10).toInstant());
+        Timestamp timestamp2 = Timestamp.valueOf(ldt.atZone(ZoneOffset.UTC).toLocalDateTime().plusMinutes(10));
+        Date date = new Date(timestamp2.getTime());
         timer.schedule(stopGiveawayByTimer, date);
-        System.out.println("localDateTime " + localDateTime);
         System.out.println("date " + date);
         HangmanRegistry.getInstance().getHangmanTimer().put(userId, timer);
     }
