@@ -97,7 +97,6 @@ public class SlashCommand extends ListenerAdapter {
 
                         PrivateChannel privateChannel = event.getUser().openPrivateChannel().submit().get();
 
-
                         Hangman hangman = new Hangman(userIdLong,
                                 null,
                                 privateChannel.getIdLong(),
@@ -110,7 +109,9 @@ public class SlashCommand extends ListenerAdapter {
                         hangman.startGame(privateChannel, event.getUser().getAvatarUrl(), event.getUser().getName());
                     } catch (Exception e) {
                         if (e.getMessage().equals("50007: Cannot send messages to this user")) {
-                            event.reply("I couldn't send a message to you in DM").queue();
+                            String cannotWriteDm = jsonParsers.getLocale("cannot_write_dm", userIdLong);
+
+                            event.getChannel().sendMessage(cannotWriteDm).queue();
                             HangmanRegistry.getInstance().removeHangman(userIdLong);
                         } else {
                             e.printStackTrace();

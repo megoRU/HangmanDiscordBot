@@ -14,5 +14,5 @@ public interface LanguageRepository extends CrudRepository<Language, String> {
     @Transactional
     @Modifying
     @Query(value = "DELETE FROM Language l WHERE l.userIdLong = :userIdLong")
-    void deleteLanguage(@Param("userIdLong") String userIdLong);
+    void deleteLanguage(@Param("userIdLong") Long userIdLong);
 }

@@ -12,5 +12,5 @@ public interface GameModeRepository extends JpaRepository<GameMode, Long> {
     @Transactional
     @Modifying
     @Query(value = "DELETE FROM GameMode g WHERE g.userIdLong = :userIdLong")
-    void deleteGameMode(@Param("userIdLong") String userIdLong);
+    void deleteGameMode(@Param("userIdLong") Long userIdLong);
 }

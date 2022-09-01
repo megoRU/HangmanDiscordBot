@@ -65,7 +65,9 @@
   "word_is_null": "The word that was, became null, we had to cancel the game. Start a new game\nIf the error repeats, write here: https://discord.gg/UrWG3R683d",
   "wrongLength": "The word cannot be longer or shorter than hidden word!",
   "got_your_word": "Got your word",
-  "game_mode": "Set mode: %s",
+  "game_mode": "Set mode: `%s`",
   "game_only_dm": "You can only play DM (Use `/hg` in private messages with me).",
-  "create_game": "Creating game"
+  "create_game": "Creating game",
+  "need_setup_mode": "You need setup game mode. Use `/set-game` \nOr buttons below",
+  "cannot_write_dm": "I couldn't send a message to you in DM\nUse `/hg` in DM"
 }

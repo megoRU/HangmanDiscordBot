@@ -102,9 +102,9 @@ public class DeleteAllMyData extends ListenerAdapter {
             BotStartConfig.getMapLanguages().remove(user.getIdLong());
 
             gamesRepository.deleteAllMyData(user.getIdLong());
-            languageRepository.deleteLanguage(user.getId());
-            gameLanguageRepository.deleteGameLanguage(user.getId());
-            gameModeRepository.deleteGameMode(user.getId());
+            languageRepository.deleteLanguage(user.getIdLong());
+            gameLanguageRepository.deleteGameLanguage(user.getIdLong());
+            gameModeRepository.deleteGameMode(user.getIdLong());
         }
     }
 }
