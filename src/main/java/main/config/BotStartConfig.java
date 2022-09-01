@@ -96,6 +96,7 @@ public class BotStartConfig {
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
                             GatewayIntent.GUILD_MESSAGES,
+                            GatewayIntent.MESSAGE_CONTENT,
                             GatewayIntent.DIRECT_MESSAGES,
                             GatewayIntent.DIRECT_MESSAGE_TYPING));
 
