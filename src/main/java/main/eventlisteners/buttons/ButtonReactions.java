@@ -11,12 +11,10 @@ import main.hangman.HangmanRegistry;
 import main.hangman.impl.HangmanHelper;
 import main.jsonparser.JSONParsers;
 import main.model.entity.GameLanguage;
-import main.model.entity.GameMode;
 import main.model.entity.Language;
 import main.model.repository.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -40,7 +38,6 @@ public class ButtonReactions extends ListenerAdapter {
     private final HangmanGameRepository hangmanGameRepository;
     private final GamesRepository gamesRepository;
     private final PlayerRepository playerRepository;
-    private final GameModeRepository gameModeRepository;
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
@@ -101,36 +98,6 @@ public class ButtonReactions extends ListenerAdapter {
                         .setEphemeral(true)
                         .addActionRow(List.of(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game")))
                         .queue();
-                return;
-            }
-
-            if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_SELECT_MENU.name())
-                    || Objects.equals(event.getButton().getId(), Buttons.BUTTON_DM.name())) {
-                event.deferEdit().queue();
-                event.editButton(event.getButton().asDisabled()).queue();
-
-                String modeButtonWhenPlay = jsonParsers.getLocale("ModeButton_When_Play", event.getUser().getIdLong());
-
-                if (HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
-                    event.getHook()
-                            .sendMessage(modeButtonWhenPlay)
-                            .setEphemeral(true).queue();
-                } else {
-                    String mode = event.getButton().getLabel().equals("Guild/DM: SelectMenu") ? "select-menu" : "direct-message";
-                    BotStartConfig.getMapGameMode().put(event.getUser().getIdLong(), mode);
-
-                    String gameModeL = String.format(jsonParsers.getLocale("game_mode", event.getUser().getIdLong()), mode);
-
-                    event.getHook().sendMessage(gameModeL)
-                            .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
-                            .setEphemeral(true)
-                            .queue();
-
-                    GameMode gameMode = new GameMode();
-                    gameMode.setUserIdLong(event.getUser().getIdLong());
-                    gameMode.setMode(mode);
-                    gameModeRepository.save(gameMode);
-                }
                 return;
             }
 
@@ -197,52 +164,16 @@ public class ButtonReactions extends ListenerAdapter {
                 Long userIdLongString = event.getUser().getIdLong();
                 String needSetupMode = jsonParsers.getLocale("need_setup_mode", event.getUser().getIdLong());
 
-                if (!BotStartConfig.getMapGameMode().containsKey(userIdLongString)
-                        || !BotStartConfig.getMapGameLanguages().containsKey(userIdLong)) {
+                if (!BotStartConfig.getMapGameLanguages().containsKey(userIdLong)) {
                     event.getHook().sendMessage(needSetupMode)
                             .addActionRow(
                                     Button.secondary(Buttons.BUTTON_RUS.name(), "Кириллица")
                                             .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")),
                                     Button.secondary(Buttons.BUTTON_ENG.name(), "Latin")
                                             .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")))
-                            .addActionRow(
-                                    Button.danger(Buttons.BUTTON_SELECT_MENU.name(), "Guild/DM: SelectMenu"),
-                                    Button.success(Buttons.BUTTON_DM.name(), "(Recommended) Only DM: One letter in chat"))
                             .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play"))
                             .setEphemeral(true)
                             .queue();
-                    return;
-                }
-
-                //Создать игру в DM
-                if (event.isFromGuild() && BotStartConfig.getMapGameMode().get(userIdLongString).equals("direct-message")) {
-                    try {
-                        String createGame = jsonParsers.getLocale("create_game", userIdLong);
-
-                        event.reply(createGame).setEphemeral(true).queue();
-
-                        PrivateChannel privateChannel = event.getUser().openPrivateChannel().submit().get();
-
-                        Hangman hangman = new Hangman(userIdLong,
-                                null,
-                                privateChannel.getIdLong(),
-                                hangmanGameRepository,
-                                gamesRepository,
-                                playerRepository);
-
-                        HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
-
-                        hangman.startGame(privateChannel, event.getUser().getAvatarUrl(), event.getUser().getName());
-                    } catch (Exception e) {
-                        if (e.getMessage().equals("50007: Cannot send messages to this user")) {
-                            String cannotWriteDm = jsonParsers.getLocale("cannot_write_dm", userIdLong);
-
-                            event.getChannel().sendMessage(cannotWriteDm).queue();
-                            HangmanRegistry.getInstance().removeHangman(userIdLong);
-                        } else {
-                            e.printStackTrace();
-                        }
-                    }
                     return;
                 }
 

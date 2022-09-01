@@ -82,29 +82,18 @@ public class Hangman implements HangmanHelper {
 
     //TODO: Работает, но изменить время на Instant желательно.
     private EmbedBuilder updateEmbedBuilder() {
-        if (BotStartConfig.getMapGameMode().get(userId).equals("select-menu")) {
-            String gameStart = jsonGameParsers.getLocale("Game_Start", userId);
-            return embedBuilder(
-                    Color.GREEN,
-                    gameStart,
-                    false,
-                    false,
-                    null);
-        } else {
-            String gameStart2 = jsonGameParsers.getLocale("Game_Start2", userId);
-            return embedBuilder(
-                    Color.GREEN,
-                    gameStart2,
-                    false,
-                    false,
-                    null
-            );
-        }
+        String gameStart = jsonGameParsers.getLocale("Game_Start", userId);
+        return embedBuilder(
+                Color.GREEN,
+                gameStart,
+                false,
+                false,
+                null
+        );
     }
 
     public void startGame(MessageChannel textChannel, String avatarUrl, String userName) {
-        if (BotStartConfig.getMapGameLanguages().get(userId) == null
-                || BotStartConfig.getMapGameMode().get(userId) == null) {
+        if (!BotStartConfig.getMapGameLanguages().containsKey(userId)) {
             EmbedBuilder needSetLanguage = new EmbedBuilder();
 
             String hangmanListenerNeedSetLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", userId);
@@ -117,9 +106,6 @@ public class Hangman implements HangmanHelper {
                     .addActionRow(
                             Button.secondary(Buttons.BUTTON_RUS.name(), "Кириллица").withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")),
                             Button.secondary(Buttons.BUTTON_ENG.name(), "Latin").withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")))
-                    .addActionRow(
-                            Button.danger(Buttons.BUTTON_SELECT_MENU.name(), "Guild/DM: SelectMenu"),
-                            Button.success(Buttons.BUTTON_DM.name(), "(Recommended) Only DM: One letter in chat"))
                     .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play"))
                     .queue();
 
@@ -152,17 +138,7 @@ public class Hangman implements HangmanHelper {
             return;
         }
 
-        Message message;
-        if (BotStartConfig.getMapGameMode().get(userId).equals("select-menu")) {
-            List<SelectMenu> selectMenuList = selectMenus();
-            message = textChannel.sendMessageEmbeds(updateEmbedBuilder().build())
-                    .addActionRow(selectMenuList.get(0))
-                    .addActionRow(selectMenuList.get(1))
-                    .complete();
-
-        } else {
-            message = textChannel.sendMessageEmbeds(updateEmbedBuilder().build()).complete();
-        }
+        Message message = textChannel.sendMessageEmbeds(updateEmbedBuilder().build()).complete();
 
         createEntityInDataBase(message);
 
