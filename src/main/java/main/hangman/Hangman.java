@@ -18,14 +18,12 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -201,6 +199,8 @@ public class Hangman implements HangmanHelper {
                 ResultGame resultGame = new ResultGame(hangmanGameRepository, gamesRepository, playerRepository, userId, true);
                 resultGame.send();
                 HangmanRegistry.getInstance().removeHangman(userId);
+                HangmanRegistry.getInstance().getTimeAutoUpdate().get(userId).cancel();
+                HangmanRegistry.getInstance().getHangmanTimer().get(userId).cancel();
             } else {
                 hangmanErrors++;
                 if (hangmanErrors >= 8) {
@@ -241,6 +241,8 @@ public class Hangman implements HangmanHelper {
             ResultGame resultGame = new ResultGame(hangmanGameRepository, gamesRepository, playerRepository, userId, false);
             resultGame.send();
             HangmanRegistry.getInstance().removeHangman(userId);
+            HangmanRegistry.getInstance().getTimeAutoUpdate().get(userId).cancel();
+            HangmanRegistry.getInstance().getHangmanTimer().get(userId).cancel();
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
         }
@@ -256,6 +258,8 @@ public class Hangman implements HangmanHelper {
                         .setActionRow(EndGameButtons.getListButtons(userId))
                         .queue();
                 HangmanRegistry.getInstance().removeHangman(userId);
+                HangmanRegistry.getInstance().getTimeAutoUpdate().get(userId).cancel();
+                HangmanRegistry.getInstance().getHangmanTimer().get(userId).cancel();
                 return;
             }
         } catch (Exception e) {
@@ -298,6 +302,8 @@ public class Hangman implements HangmanHelper {
                         ResultGame resultGame = new ResultGame(hangmanGameRepository, gamesRepository, playerRepository, userId, true);
                         resultGame.send();
                         HangmanRegistry.getInstance().removeHangman(userId);
+                        HangmanRegistry.getInstance().getTimeAutoUpdate().get(userId).cancel();
+                        HangmanRegistry.getInstance().getHangmanTimer().get(userId).cancel();
                         return;
                     }
                     String gameYouGuessLetter = jsonGameParsers.getLocale("Game_You_Guess_Letter", userId);
@@ -434,10 +440,6 @@ public class Hangman implements HangmanHelper {
                 info.setDescription(timeIsOver);
                 info.addField(gamePlayer, userIdWithDiscord, false);
 
-                Timer timer = HangmanRegistry.getInstance().getHangmanTimer().get(this.userId);
-                if (timer != null) {
-                    timer.cancel();
-                }
                 //Удалить таймер
                 HangmanRegistry.getInstance().getHangmanTimer().get(userId).cancel();
                 HangmanRegistry.getInstance().getHangmanTimer().remove(userId);
@@ -454,8 +456,9 @@ public class Hangman implements HangmanHelper {
         } catch (Exception e) {
             if (e.getMessage().contains("10008: Unknown Message")) {
                 return;
+            } else {
+                e.printStackTrace();
             }
-            LOGGER.info(e.getMessage());
         }
     }
 
@@ -543,62 +546,6 @@ public class Hangman implements HangmanHelper {
                 .replaceAll("]", "");
     }
 
-    private List<SelectMenu> selectMenus() {
-        if (BotStartConfig.getMapGameLanguages().get(userId).equals("eng")) {
-            final int half = ALPHABET_EN.length / 2;
-
-            SelectMenu.Builder builder = SelectMenu.create("menu:")
-                    .setPlaceholder("A-M Letters")
-                    .setRequiredRange(1, 1);
-
-            SelectMenu.Builder builder2 = SelectMenu.create("menu:2")
-                    .setPlaceholder("N-Z Letters")
-                    .setRequiredRange(1, 1);
-
-            for (int i = 0; i < ALPHABET_EN.length; i++) {
-                if (i < half) {
-                    builder.addOption(ALPHABET_EN[i], ALPHABET_EN[i].toLowerCase());
-                } else {
-                    builder2.addOption(ALPHABET_EN[i], ALPHABET_EN[i].toLowerCase());
-                }
-            }
-
-            SelectMenu menu = builder.build();
-            SelectMenu menu2 = builder2.build();
-
-            List<SelectMenu> selectMenuList = new ArrayList<>(2);
-            selectMenuList.add(menu);
-            selectMenuList.add(menu2);
-            return selectMenuList;
-        } else {
-            final int half = ALPHABET_RU.length / 2;
-
-            SelectMenu.Builder builder = SelectMenu.create("menu:")
-                    .setPlaceholder("А-О Буквы")
-                    .setRequiredRange(1, 1);
-
-            SelectMenu.Builder builder2 = SelectMenu.create("menu:2")
-                    .setPlaceholder("П-Я Буквы")
-                    .setRequiredRange(1, 1);
-
-            for (int i = 0; i < ALPHABET_RU.length; i++) {
-                if (i < half) {
-                    builder.addOption(ALPHABET_RU[i], ALPHABET_RU[i].toLowerCase());
-                } else {
-                    builder2.addOption(ALPHABET_RU[i], ALPHABET_RU[i].toLowerCase());
-                }
-            }
-
-            SelectMenu menu = builder.build();
-            SelectMenu menu2 = builder2.build();
-
-            List<SelectMenu> selectMenuList = new ArrayList<>(2);
-            selectMenuList.add(menu);
-            selectMenuList.add(menu2);
-            return selectMenuList;
-        }
-    }
-
     public Long getGuildId() {
         return guildId;
     }
@@ -652,7 +599,11 @@ public class Hangman implements HangmanHelper {
         @Override
         public void run() {
             try {
-                stopGameByTime();
+                if (HangmanRegistry.getInstance().hasHangman(userId)) {
+                    stopGameByTime();
+                } else {
+                    Thread.currentThread().interrupt();
+                }
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
                 e.printStackTrace();
