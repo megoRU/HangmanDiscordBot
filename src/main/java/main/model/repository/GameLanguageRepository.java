@@ -16,7 +16,7 @@ public interface GameLanguageRepository extends CrudRepository<GameLanguage, Str
     @Transactional
     @Modifying
     @Query(value = "DELETE FROM GameLanguage gm WHERE gm.userIdLong = :userIdLong")
-    void deleteGameLanguage(@Param("userIdLong") String userIdLong);
+    void deleteGameLanguage(@Param("userIdLong") Long userIdLong);
 
     @Query(value = "SELECT gl FROM GameLanguage gl")
     List<GameLanguage> getGameLanguages();

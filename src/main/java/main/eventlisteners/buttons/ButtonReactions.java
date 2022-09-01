@@ -16,6 +16,8 @@ import main.model.entity.Language;
 import main.model.repository.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -193,15 +195,54 @@ public class ButtonReactions extends ListenerAdapter {
                 event.deferEdit().queue();
                 event.editButton(event.getButton().asDisabled()).queue();
                 Long userIdLongString = event.getUser().getIdLong();
+                String needSetupMode = jsonParsers.getLocale("need_setup_mode", event.getUser().getIdLong());
 
-                if (!BotStartConfig.getMapGameMode().containsKey(userIdLongString)) return;
-
-                if (event.isFromGuild() && BotStartConfig.getMapGameMode().get(userIdLongString).equals("direct-message")) {
-                    String gameOnlyDm = jsonParsers.getLocale("game_only_dm", event.getUser().getIdLong());
-
-                    event.getHook().sendMessage(gameOnlyDm)
+                if (!BotStartConfig.getMapGameMode().containsKey(userIdLongString)
+                        || !BotStartConfig.getMapGameLanguages().containsKey(userIdLong)) {
+                    event.getHook().sendMessage(needSetupMode)
+                            .addActionRow(
+                                    Button.secondary(Buttons.BUTTON_RUS.name(), "Кириллица")
+                                            .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")),
+                                    Button.secondary(Buttons.BUTTON_ENG.name(), "Latin")
+                                            .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")))
+                            .addActionRow(
+                                    Button.danger(Buttons.BUTTON_SELECT_MENU.name(), "Guild/DM: SelectMenu"),
+                                    Button.success(Buttons.BUTTON_DM.name(), "(Recommended) Only DM: One letter in chat"))
+                            .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play"))
                             .setEphemeral(true)
                             .queue();
+                    return;
+                }
+
+                //Создать игру в DM
+                if (event.isFromGuild() && BotStartConfig.getMapGameMode().get(userIdLongString).equals("direct-message")) {
+                    try {
+                        String createGame = jsonParsers.getLocale("create_game", userIdLong);
+
+                        event.reply(createGame).setEphemeral(true).queue();
+
+                        PrivateChannel privateChannel = event.getUser().openPrivateChannel().submit().get();
+
+                        Hangman hangman = new Hangman(userIdLong,
+                                null,
+                                privateChannel.getIdLong(),
+                                hangmanGameRepository,
+                                gamesRepository,
+                                playerRepository);
+
+                        HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
+
+                        hangman.startGame(privateChannel, event.getUser().getAvatarUrl(), event.getUser().getName());
+                    } catch (Exception e) {
+                        if (e.getMessage().equals("50007: Cannot send messages to this user")) {
+                            String cannotWriteDm = jsonParsers.getLocale("cannot_write_dm", userIdLong);
+
+                            event.getChannel().sendMessage(cannotWriteDm).queue();
+                            HangmanRegistry.getInstance().removeHangman(userIdLong);
+                        } else {
+                            e.printStackTrace();
+                        }
+                    }
                     return;
                 }
 
