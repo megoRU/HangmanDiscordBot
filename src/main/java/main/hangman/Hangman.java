@@ -433,7 +433,6 @@ public class Hangman implements HangmanHelper {
                 info.setDescription(timeIsOver);
                 info.addField(gamePlayer, userIdWithDiscord, false);
 
-
                 Timer timer = HangmanRegistry.getInstance().getHangmanTimer().get(this.userId);
                 if (timer != null) {
                     timer.cancel();
@@ -443,12 +442,12 @@ public class Hangman implements HangmanHelper {
                 HangmanRegistry.getInstance().getHangmanTimer().remove(userId);
 
                 HangmanHelper.editMessageWithButtons(info, userId, EndGameButtons.getListButtons(userId));
-                hangmanGameRepository.deleteActiveGame(userId);
 
                 //Удалить таймер
                 HangmanRegistry.getInstance().getTimeAutoUpdate().get(userId).cancel();
                 HangmanRegistry.getInstance().getTimeAutoUpdate().remove(userId);
 
+                hangmanGameRepository.deleteActiveGame(userId);
                 HangmanRegistry.getInstance().removeHangman(userId);
             }
         } catch (Exception e) {
@@ -463,8 +462,11 @@ public class Hangman implements HangmanHelper {
         Timer timer = new Timer();
         StopHangmanTimer stopGiveawayByTimer = new StopHangmanTimer();
         ZonedDateTime localDateTime = ldt.atZone(ZoneId.systemDefault());
+
         Date date = Date.from(localDateTime.plusMinutes(10).toInstant());
         timer.schedule(stopGiveawayByTimer, date);
+        System.out.println("localDateTime " + localDateTime);
+        System.out.println("date " + date);
         HangmanRegistry.getInstance().getHangmanTimer().put(userId, timer);
     }
 
