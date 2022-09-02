@@ -2,17 +2,19 @@ package main.hangman;
 
 import main.config.BotStartConfig;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class HangmanRegistry {
     //Long это UserIdLong
-    private static final Map<Long, Hangman> activeHangman = new HashMap<>();
-    private static final Map<Long, String> messageId = new HashMap<>();
-    private static final Map<Long, Timer> timeCreatedGame = new HashMap<>();
-    private static final Map<Long, Timer> timeAutoUpdate = new HashMap<>();
+    private static final Map<Long, Hangman> activeHangman = new ConcurrentHashMap<>();
+    private static final Map<Long, String> messageId = new ConcurrentHashMap<>();
+    private static final Map<Long, Timer> timeCreatedGame = new ConcurrentHashMap<>();
+    private static final Map<Long, Timer> timeAutoUpdate = new ConcurrentHashMap<>();
+    private static final Map<Long, Timer> autoDeletingMessages = new ConcurrentHashMap<>();
+
     private static volatile HangmanRegistry hangmanRegistry;
     private final AtomicInteger idGame = new AtomicInteger();
 
@@ -29,13 +31,28 @@ public class HangmanRegistry {
         }
         return hangmanRegistry;
     }
-
-    public Map<Long, Timer> getTimeAutoUpdate() {
-        return timeAutoUpdate;
+    public Timer getAutoDeletingMessages(long userIdLong) {
+        return autoDeletingMessages.get(userIdLong);
     }
 
-    public Map<Long, Timer> getHangmanTimer() {
-        return timeCreatedGame;
+    public void setAutoDeletingMessages(long userIdLong, Timer timer) {
+        autoDeletingMessages.put(userIdLong, timer);
+    }
+
+    public Timer getTimeAutoUpdate(long userIdLong) {
+        return timeAutoUpdate.get(userIdLong);
+    }
+
+    public Timer getHangmanTimer(long userIdLong) {
+        return timeCreatedGame.get(userIdLong);
+    }
+
+    public void setHangmanTimer(long userIdLong, Timer timer) {
+        timeCreatedGame.put(userIdLong, timer);
+    }
+
+    public void setTimeAutoUpdate(long userIdLong, Timer timer) {
+        timeAutoUpdate.put(userIdLong, timer);
     }
 
     public int getIdGame() {
@@ -47,12 +64,16 @@ public class HangmanRegistry {
         System.out.println(idGame);
     }
 
-    public Map<Long, Hangman> getActiveHangman() {
-        return activeHangman;
+    public Hangman getActiveHangman(long userIdLong) {
+        return activeHangman.get(userIdLong);
     }
 
-    public Map<Long, String> getMessageId() {
-        return messageId;
+    public String getMessageId(long userIdLong) {
+        return messageId.get(userIdLong);
+    }
+
+    public void setMessageId(long userIdLong, String messageIdString) {
+        messageId.put(userIdLong, messageIdString);
     }
 
     public void setHangman(long userIdLong, Hangman hangman) {
@@ -64,6 +85,26 @@ public class HangmanRegistry {
     }
 
     public void removeHangman(long userIdLong) {
+        Timer timerAutoUpdate = timeAutoUpdate.get(userIdLong);
+        Timer timerCreatedGame = timeCreatedGame.get(userIdLong);
+        Timer autoDeletingMessage = autoDeletingMessages.get(userIdLong);
+
+        if (timerAutoUpdate != null) {
+            timerAutoUpdate.cancel();
+            timeAutoUpdate.remove(userIdLong);
+        }
+
+        if (timerCreatedGame != null) {
+            timerCreatedGame.cancel();
+            timeCreatedGame.remove(userIdLong);
+        }
+
+        if (autoDeletingMessage != null) {
+            autoDeletingMessage.cancel();
+            autoDeletingMessages.remove(userIdLong);
+        }
+
+        messageId.remove(userIdLong);
         activeHangman.remove(userIdLong);
     }
 

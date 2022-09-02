@@ -200,7 +200,7 @@ public class ButtonReactions extends ListenerAdapter {
                                         gamesRepository,
                                         playerRepository));
                     }
-                    HangmanRegistry.getInstance().getActiveHangman().get(userIdLong)
+                    HangmanRegistry.getInstance().getActiveHangman(userIdLong)
                             .startGame(
                                     event.getChannel(),
                                     event.getUser().getAvatarUrl(),
@@ -233,7 +233,7 @@ public class ButtonReactions extends ListenerAdapter {
                             .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
                             .queue();
 
-                    var embedBuilder = HangmanRegistry.getInstance().getActiveHangman().get(event.getUser().getIdLong())
+                    var embedBuilder = HangmanRegistry.getInstance().getActiveHangman(event.getUser().getIdLong())
                             .embedBuilder(Color.GREEN,
                                     hangmanEngGame1,
                                     false,
@@ -242,7 +242,7 @@ public class ButtonReactions extends ListenerAdapter {
                             );
 
                     HangmanHelper.editMessage(embedBuilder, event.getUser().getIdLong());
-                    HangmanRegistry.getInstance().getActiveHangman().remove(event.getUser().getIdLong());
+                    HangmanRegistry.getInstance().removeHangman(event.getUser().getIdLong());
                     hangmanGameRepository.deleteActiveGame(event.getUser().getIdLong());
                     //Если нажата кнопка STOP, и игрок сейчас не играет, присылаем в час уведомление
                 } else {

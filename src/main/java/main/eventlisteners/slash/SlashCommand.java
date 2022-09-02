@@ -36,6 +36,7 @@ public class SlashCommand extends ListenerAdapter {
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
 
+    private static final String HG_ONE_WORD = "[A-Za-zА-ЯЁа-яё]{3,24}+";
     //REPO
     private final HangmanGameRepository hangmanGameRepository;
     private final GamesRepository gamesRepository;
@@ -108,8 +109,6 @@ public class SlashCommand extends ListenerAdapter {
                                         gamesRepository,
                                         playerRepository));
                     } else {
-
-                        //TODO: Сделать чат
                         HangmanRegistry.getInstance().setHangman(userIdLong,
                                 hangman = new Hangman(userIdLong,
                                         null,
@@ -136,7 +135,7 @@ public class SlashCommand extends ListenerAdapter {
                             .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
                             .queue();
 
-                    var embedBuilder = HangmanRegistry.getInstance().getActiveHangman().get(userIdLong)
+                    var embedBuilder = HangmanRegistry.getInstance().getActiveHangman(userIdLong)
                             .embedBuilder(Color.GREEN,
                                     hangmanEngGame1,
                                     false,
@@ -145,7 +144,7 @@ public class SlashCommand extends ListenerAdapter {
                             );
 
                     HangmanHelper.editMessage(embedBuilder, userIdLong);
-                    HangmanRegistry.getInstance().getActiveHangman().remove(userIdLong);
+                    HangmanRegistry.getInstance().removeHangman(userIdLong);
                     hangmanGameRepository.deleteActiveGame(userIdLong);
                     //Если игрок не играет, а хочет завершить игру, то нужно ему это прислать уведомление, что он сейчас не играет
                 } else {
@@ -197,21 +196,38 @@ public class SlashCommand extends ListenerAdapter {
                 languageRepository.save(language);
             }
 
-            if (event.getName().equals("word")) {
+            if (event.getName().equals("full")) {
                 if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                     String gotYourWord = jsonParsers.getLocale("got_your_word", userIdLong);
 
-                    String word = event.getOption("guess", OptionMapping::getAsString);
+                    String word = event.getOption("word", OptionMapping::getAsString);
+                    int length = 0;
 
                     if (word != null) {
                         word.toLowerCase();
+                        length = word.length();
                     }
 
                     event.reply(gotYourWord)
                             .setEphemeral(true)
                             .queue();
 
-                    HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).fullWord(word);
+                    Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
+
+                    if (word != null && length == hangman.getLengthWord() && word.matches(HG_ONE_WORD)) {
+                        hangman.fullWord(word);
+                    } else {
+                        String wrongLengthJson = jsonGameParsers.getLocale("wrongLength", userIdLong);
+                        EmbedBuilder wrongLength = hangman.embedBuilder(
+                                Color.GREEN,
+                                wrongLengthJson,
+                                false,
+                                false,
+                                word);
+
+                        HangmanHelper.editMessage(wrongLength, userIdLong);
+                        return;
+                    }
                 } else {
                     String hangmanYouAreNotPlay = jsonParsers.getLocale("Hangman_You_Are_Not_Play", userIdLong);
 
