@@ -530,9 +530,12 @@ public class Hangman implements HangmanHelper {
 
         @Override
         public void run() {
-
             try {
-                if (guildId == null) return;
+                if (guildId == null) {
+                    HangmanRegistry.getInstance().getAutoDeletingMessages(userId).cancel();
+                    return;
+                }
+
                 Guild guildById = BotStartConfig.jda.getGuildById(guildId);
 
                 if (guildById != null) {
