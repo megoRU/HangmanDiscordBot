@@ -147,16 +147,9 @@ public class BotStartConfig {
                     .setRequired(true));
 
             List<OptionData> word = new ArrayList<>();
-            word.add(new OptionData(STRING, "guess", "Write a word that can be")
+            word.add(new OptionData(STRING, "word", "Write a word that can be")
                     .setRequired(true)
-                    .setName("guess"));
-
-            List<OptionData> mode = new ArrayList<>();
-            mode.add(new OptionData(STRING, "mode", "Using different interaction logics.")
-                    .addChoice("direct-message", "direct-message").setDescription("The game is only in DM. Write one letter to the chat.")
-                    .addChoice("select-menu", "select-menu").setDescription("Playing in Guild/DM. Using SelectMenu.")
-                    .setRequired(true)
-                    .setName("mode"));
+                    .setName("word"));
 
             commands.addCommands(Commands.slash("language", "Setting language").addOptions(options));
             commands.addCommands(Commands.slash("hg", "Start the game"));
@@ -166,9 +159,7 @@ public class BotStartConfig {
             commands.addCommands(Commands.slash("mystats", "Find out the number of your wins and losses"));
             commands.addCommands(Commands.slash("allstats", "Find out the statistics of all the bot's games"));
             commands.addCommands(Commands.slash("delete", "Deleting your data"));
-            commands.addCommands(Commands.slash("word", "Guess the full word").addOptions(word));
-            commands.addCommands(Commands.slash("set-game", "Using different interaction logics").addOptions(mode));
-
+            commands.addCommands(Commands.slash("full", "Guess the full word").addOptions(word));
 
             commands.queue();
 
@@ -293,8 +284,6 @@ public class BotStartConfig {
                 int hangmanErrors = rs.getInt("hangman_errors");
                 LocalDateTime game_created_time = rs.getTimestamp("game_created_time").toLocalDateTime();
 
-                System.out.println("game_created_time " + game_created_time);
-
                 Hangman hangman = new Hangman(
                         userIdLong,
                         guildIdLong == null ? null : Long.valueOf(guildIdLong),
@@ -305,12 +294,10 @@ public class BotStartConfig {
 
                 HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
 
-                HangmanRegistry.getInstance().getMessageId().put(userIdLong, message_id_long);
+                HangmanRegistry.getInstance().setMessageId(userIdLong, message_id_long);
 
-                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong)
+                HangmanRegistry.getInstance().getActiveHangman(userIdLong)
                         .updateVariables(guesses, word, currentHiddenWord, hangmanErrors, game_created_time);
-
-                HangmanRegistry.getInstance().getActiveHangman().get(userIdLong).autoInsert();
 
             }
             rs.close();
