@@ -142,6 +142,29 @@ public class Hangman implements HangmanHelper {
 
     public void fullWord(final String inputs) {
         try {
+            if (inputs.length() != getLengthWord()) {
+                String wrongLengthJson = jsonGameParsers.getLocale("wrongLength", userId);
+                EmbedBuilder wrongLength;
+                if (guesses.isEmpty()) {
+                    wrongLength = embedBuilder(
+                            Color.GREEN,
+                            wrongLengthJson,
+                            false,
+                            false,
+                            inputs);
+                } else {
+                    wrongLength = embedBuilder(
+                            Color.GREEN,
+                            wrongLengthJson,
+                            true,
+                            false,
+                            inputs);
+                }
+
+                HangmanHelper.editMessage(wrongLength, userId);
+                return;
+            }
+
             if (isLetterPresent(inputs)) {
                 String gameYouUseThisWord = jsonGameParsers.getLocale("Game_You_Use_This_Word", userId);
 
