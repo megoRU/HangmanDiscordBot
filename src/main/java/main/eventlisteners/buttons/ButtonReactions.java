@@ -259,13 +259,14 @@ public class ButtonReactions extends ListenerAdapter {
                 event.deferEdit().queue();
                 event.editButton(event.getButton().asDisabled()).queue();
 
-                MessageStats messageStats = new MessageStats(gamesRepository);
-                messageStats.sendStats(
-                        event.getChannel(),
-                        null,
+                MessageStats messageStats = new MessageStats(
+                        gamesRepository,
+                        event.getHook(),
                         event.getUser().getAvatarUrl(),
                         event.getUser().getIdLong(),
                         event.getUser().getName());
+
+                messageStats.sendStats();
             }
         } catch (Exception e) {
             e.printStackTrace();

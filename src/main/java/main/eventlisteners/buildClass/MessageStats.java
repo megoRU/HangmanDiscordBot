@@ -4,21 +4,22 @@ import lombok.AllArgsConstructor;
 import main.jsonparser.JSONParsers;
 import main.model.repository.GamesRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import org.springframework.stereotype.Service;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 
 import java.text.DecimalFormat;
 
 @AllArgsConstructor
-@Service
 public class MessageStats {
 
     private static final DecimalFormat df = new DecimalFormat("##.#");
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
-    private GamesRepository gamesRepository;
+    private final GamesRepository gamesRepository;
+    private final InteractionHook interactionHook;
+    private final String userAvatarUrl;
+    private final long userIdLong;
+    private final String userName;
 
-    public void sendStats(MessageChannel messageChannel, SlashCommandInteractionEvent event, String userAvatarUrl, long userIdLong, String name) {
+    public void sendStats() {
         try {
             String[] statistic = gamesRepository.getStatistic(userIdLong).replaceAll(",", " ").split(" ");
 
@@ -30,15 +31,11 @@ public class MessageStats {
 
                     EmbedBuilder needSetLanguage = new EmbedBuilder();
 
-                    needSetLanguage.setAuthor(name, null, userAvatarUrl);
+                    needSetLanguage.setAuthor(userName, null, userAvatarUrl);
                     needSetLanguage.setColor(0x00FF00);
                     needSetLanguage.setDescription(messageStatsZeroDivide);
 
-                    if (messageChannel != null) {
-                        messageChannel.sendMessageEmbeds(needSetLanguage.build()).queue();
-                    } else {
-                        event.replyEmbeds(needSetLanguage.build()).queue();
-                    }
+                    interactionHook.sendMessageEmbeds(needSetLanguage.build()).queue();
                     return;
                 }
 
@@ -59,15 +56,11 @@ public class MessageStats {
 
                 EmbedBuilder stats = new EmbedBuilder();
                 stats.setColor(0x00FF00);
-                stats.setAuthor(name, null, avatarUrl);
+                stats.setAuthor(userName, null, avatarUrl);
                 stats.setTitle(messageStatsYourStats);
                 stats.setDescription(messageStatsGameCount + messageStatsGameWins + messageStatsGamePercentage);
 
-                if (messageChannel != null) {
-                    messageChannel.sendMessageEmbeds(stats.build()).queue();
-                } else {
-                    event.replyEmbeds(stats.build()).queue();
-                }
+                interactionHook.sendMessageEmbeds(stats.build()).queue();
             }
 
         } catch (Exception e) {
