@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -22,7 +23,7 @@ public class GameHangmanListener extends ListenerAdapter {
         try {
             if (event.getAuthor().isBot()) return;
 
-            if (event.getGuild() != null
+            if (event.getChannelType().equals(ChannelType.TEXT)
                     && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.MESSAGE_SEND)
                     && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.MESSAGE_MANAGE)
                     && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.VIEW_CHANNEL)) {
