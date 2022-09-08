@@ -208,9 +208,7 @@ public class SlashCommand extends ListenerAdapter {
                         length = word.length();
                     }
 
-                    event.reply(gotYourWord)
-                            .setEphemeral(true)
-                            .queue();
+                    event.reply(gotYourWord).setEphemeral(true).queue();
 
                     Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
 
@@ -259,38 +257,30 @@ public class SlashCommand extends ListenerAdapter {
             }
 
             if (event.getName().equals("stats")) {
-                MessageStats messageStats = new MessageStats(gamesRepository);
-                messageStats.sendStats(
-                        null,
-                        event,
+                event.deferReply().queue();
+
+                MessageStats messageStats = new MessageStats(
+                        gamesRepository, event.getHook(),
                         event.getUser().getAvatarUrl(),
                         userIdLong,
                         event.getUser().getName());
 
+                messageStats.sendStats();
                 return;
             }
 
-            if (event.getName().equals("allstats")) {
-                CreatorGraph creatorGraph = new CreatorGraph(
-                        gamesRepository,
-                        event.getChannel().getId(),
-                        event.getUser().getId(),
-                        event.getUser().getName(),
-                        event.getUser().getAvatarUrl(),
-                        event);
-                creatorGraph.createGraph(Statistic.GLOBAL);
-                return;
-            }
+            if (event.getName().equals("allstats") || event.getName().equals("mystats")) {
+                event.deferReply().queue();
 
-            if (event.getName().equals("mystats")) {
                 CreatorGraph creatorGraph = new CreatorGraph(
                         gamesRepository,
-                        event.getChannel().getId(),
                         event.getUser().getId(),
-                        event.getUser().getName(),
-                        event.getUser().getAvatarUrl(),
-                        event);
-                creatorGraph.createGraph(Statistic.MY);
+                        event.getHook());
+
+                switch (event.getName()) {
+                    case "allstats" -> creatorGraph.createGraph(Statistic.GLOBAL);
+                    case "mystats" -> creatorGraph.createGraph(Statistic.MY);
+                }
             }
 
         } catch (Exception e) {

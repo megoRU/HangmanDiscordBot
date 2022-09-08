@@ -389,9 +389,6 @@ public class Hangman implements HangmanHelper {
         try {
             HangmanRegistry.getInstance().setMessageId(userId, message.getId());
             Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now().atZone(ZoneOffset.UTC).toLocalDateTime());
-
-            System.out.println(timestamp);
-
             ActiveHangman activeHangman = new ActiveHangman();
             activeHangman.setUserIdLong(userId);
             activeHangman.setMessageIdLong(message.getIdLong());

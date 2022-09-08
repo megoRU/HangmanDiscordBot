@@ -1,43 +1,32 @@
 package main.statistic;
 
 import io.quickchart.QuickChart;
-import lombok.Getter;
 import main.enums.Statistic;
 import main.jsonparser.JSONParsers;
 import main.model.repository.GamesRepository;
 import main.model.repository.impl.StatisticGlobal;
 import main.model.repository.impl.StatisticMy;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 
 import java.util.List;
 
-@Getter
 public class CreatorGraph {
 
     private static final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
-    private final String textChannelIdLong;
     private final String userIdLong;
-    private final String userName;
-    private final String userAvatarUrl;
 
-    private final GenericCommandInteractionEvent genericCommandInteractionEvent;
+    private final InteractionHook interactionHook;
 
     private final StringBuilder date = new StringBuilder();
     private final StringBuilder columnFirst = new StringBuilder();
     private final StringBuilder columnSecond = new StringBuilder();
     private final GamesRepository gamesRepository;
 
-    public CreatorGraph(GamesRepository gamesRepository,
-                        String textChannelIdLong, String userIdLong,
-                        String userName, String userUrl, SlashCommandInteractionEvent genericCommandInteractionEvent) {
-        this.textChannelIdLong = textChannelIdLong;
+    public CreatorGraph(GamesRepository gamesRepository, String userIdLong, InteractionHook interactionHook) {
         this.userIdLong = userIdLong;
-        this.userName = userName;
-        this.userAvatarUrl = userUrl;
         this.gamesRepository = gamesRepository;
-        this.genericCommandInteractionEvent = genericCommandInteractionEvent;
+        this.interactionHook = interactionHook;
     }
 
     public void createGraph(Statistic statistic) {
@@ -69,31 +58,12 @@ public class CreatorGraph {
             }
             EmbedBuilder globalStats = new EmbedBuilder();
 
-            if (statistic == Statistic.MY) {
-                globalStats.setAuthor(userName, null, userAvatarUrl);
-            }
-
             globalStats.setColor(0x00FF00);
 
             globalStats.setTitle(jsonParsers.getLocale("MessageStats_All_Stats", Long.parseLong(userIdLong)));
             globalStats.setImage(chart.getShortUrl());
 
-
-//            if (genericCommandInteractionEvent != null) {
-
-            genericCommandInteractionEvent.replyEmbeds(globalStats.build()).queue();
-//                SenderMessage.sendMessageHook(globalStats, slashCommandEvent, null);
-//                return;
-//            }
-//
-//            if (BotStartConfig.jda.getTextChannelById(textChannelIdLong) != null) {
-//                SenderMessage.sendMessage(globalStats, BotStartConfig.jda.getTextChannelById(textChannelIdLong), null);
-//                return;
-//            }
-//
-//            if (BotStartConfig.jda.getPrivateChannelById(textChannelIdLong) != null) {
-//                SenderMessage.sendMessage(globalStats, BotStartConfig.jda.getPrivateChannelById(textChannelIdLong), null);
-//            }
+            interactionHook.sendMessageEmbeds(globalStats.build()).queue();
         } catch (Exception e) {
             e.printStackTrace();
         }
