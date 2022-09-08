@@ -181,6 +181,14 @@ public class ButtonReactions extends ListenerAdapter {
                     event.getChannel().sendTyping().queue();
 
                     if (event.getGuild() != null) {
+                        boolean hasPermission = event.getGuild().getSelfMember()
+                                .hasPermission(
+                                        event.getGuildChannel(),
+                                        Permission.MESSAGE_SEND,
+                                        Permission.MESSAGE_MANAGE,
+                                        Permission.VIEW_CHANNEL);
+                        if (!hasPermission) return;
+
                         HangmanRegistry.getInstance().setHangman(userIdLong,
                                 new Hangman(
                                         event.getUser().getIdLong(),

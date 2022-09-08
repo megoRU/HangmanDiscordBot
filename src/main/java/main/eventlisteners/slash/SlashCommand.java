@@ -208,9 +208,7 @@ public class SlashCommand extends ListenerAdapter {
                         length = word.length();
                     }
 
-                    event.reply(gotYourWord)
-                            .setEphemeral(true)
-                            .queue();
+                    event.reply(gotYourWord).setEphemeral(true).queue();
 
                     Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
 
