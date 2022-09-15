@@ -50,6 +50,7 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
 		<dependency>
 			<groupId>mysql</groupId>
@@ -74,7 +75,7 @@
 		<dependency>
 			<groupId>net.dv8tion</groupId>
 			<artifactId>JDA</artifactId>
-			<version>5.0.0-alpha.18</version>
+			<version>5.0.0-alpha.19</version>
 			<exclusions>
 				<exclusion>
 					<groupId>club.minnced</groupId>
@@ -137,7 +138,6 @@
 			</plugin>
 		</plugins>
 	</build>
-
 
 	<repositories>
 
