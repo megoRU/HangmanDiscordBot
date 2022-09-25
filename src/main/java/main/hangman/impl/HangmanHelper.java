@@ -54,6 +54,7 @@ public interface HangmanHelper {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("editMessage(): " + "Скорее всего бот в чс!");
         }
     }
 
@@ -93,7 +94,7 @@ public interface HangmanHelper {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Скорее всего бот в чс!");
+            System.out.println("editMessageWithButtons(): " + "Скорее всего бот в чс!");
         }
     }
 }

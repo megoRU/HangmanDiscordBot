@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import main.config.BotStartConfig;
 import main.enums.Buttons;
 import main.enums.Statistic;
+import main.eventlisteners.ChecksClass;
 import main.eventlisteners.DeleteAllMyData;
 import main.eventlisteners.buildClass.Help;
 import main.eventlisteners.buildClass.MessageStats;
@@ -16,7 +17,6 @@ import main.model.entity.Language;
 import main.model.repository.*;
 import main.statistic.CreatorGraph;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -50,12 +50,8 @@ public class SlashCommand extends ListenerAdapter {
         try {
             if (event.getUser().isBot()) return;
 
-            if (event.getGuild() != null
-                    && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.MESSAGE_SEND)
-                    && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.MESSAGE_MANAGE)
-                    && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.VIEW_CHANNEL)) {
-                return;
-            }
+            boolean permission = ChecksClass.canSendHG(event.getChannel(), event);
+            if (!permission) return;
 
             long userIdLong = event.getUser().getIdLong();
 

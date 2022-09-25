@@ -3,6 +3,7 @@ package main.eventlisteners.buttons;
 import lombok.RequiredArgsConstructor;
 import main.config.BotStartConfig;
 import main.enums.Buttons;
+import main.eventlisteners.ChecksClass;
 import main.eventlisteners.buildClass.GameLanguageChange;
 import main.eventlisteners.buildClass.Help;
 import main.eventlisteners.buildClass.MessageStats;
@@ -44,12 +45,8 @@ public class ButtonReactions extends ListenerAdapter {
         try {
             if (event.getUser().isBot()) return;
 
-            if (event.getGuild() != null
-                    && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.MESSAGE_SEND)
-                    && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.MESSAGE_MANAGE)
-                    && !event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), Permission.VIEW_CHANNEL)) {
-                return;
-            }
+            boolean permission = ChecksClass.canSendHG(event.getChannel(), event);
+            if (!permission) return;
 
             long userIdLong = event.getUser().getIdLong();
 
@@ -161,7 +158,6 @@ public class ButtonReactions extends ListenerAdapter {
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_START_NEW_GAME.name())) {
                 event.deferEdit().queue();
                 event.editButton(event.getButton().asDisabled()).queue();
-                Long userIdLongString = event.getUser().getIdLong();
                 String needSetupMode = jsonParsers.getLocale("need_setup_mode", event.getUser().getIdLong());
 
                 if (!BotStartConfig.getMapGameLanguages().containsKey(userIdLong)) {
