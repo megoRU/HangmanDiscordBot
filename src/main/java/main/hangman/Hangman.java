@@ -421,9 +421,7 @@ public class Hangman implements HangmanHelper {
                 info.setDescription(timeIsOver);
                 info.addField(gamePlayer, userIdWithDiscord, false);
 
-
                 HangmanHelper.editMessageWithButtons(info, userId, EndGameButtons.getListButtons(userId));
-
                 hangmanGameRepository.deleteActiveGame(userId);
                 HangmanRegistry.getInstance().removeHangman(userId);
             }
