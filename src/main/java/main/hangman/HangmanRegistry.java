@@ -2,6 +2,7 @@ package main.hangman;
 
 import main.config.BotStartConfig;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,8 +72,16 @@ public class HangmanRegistry {
         return activeHangman.get(userIdLong);
     }
 
+    public String getUserConvector(long userIdLong) {
+        Hangman hangman = activeHangman.get(userIdLong);
+        if (hangman != null) return String.valueOf(hangman.getUserId());
+        return String.valueOf(userIdLong);
+    }
+
+    @Nullable
     public String getMessageId(long userIdLong) {
-        return messageId.get(userIdLong);
+        long userConvector = Long.parseLong(getUserConvector(userIdLong));
+        return messageId.get(userConvector);
     }
 
     public void setMessageId(long userIdLong, String messageIdString) {

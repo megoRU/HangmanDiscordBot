@@ -545,6 +545,10 @@ public class Hangman implements HangmanHelper {
         return secondPlayer;
     }
 
+    public long getUserId() {
+        return userId;
+    }
+
     public int getLengthWord() {
         return WORD != null ? WORD.length() : 0;
     }

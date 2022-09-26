@@ -230,14 +230,16 @@ public class ButtonReactions extends ListenerAdapter {
                 event.editButton(event.getButton().asDisabled()).queue();
 
                 if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                    String hangmanEngGame = jsonParsers.getLocale("Hangman_Eng_game", event.getUser().getIdLong());
-                    String hangmanEngGame1 = jsonGameParsers.getLocale("Hangman_Eng_game", event.getUser().getIdLong());
+                    long userConvector = Long.parseLong(HangmanRegistry.getInstance().getUserConvector(event.getUser().getIdLong()));
+
+                    String hangmanEngGame = jsonParsers.getLocale("Hangman_Eng_game", userConvector);
+                    String hangmanEngGame1 = jsonGameParsers.getLocale("Hangman_Eng_game", userConvector);
 
                     event.getHook().sendMessage(hangmanEngGame)
                             .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
                             .queue();
 
-                    var embedBuilder = HangmanRegistry.getInstance().getActiveHangman(event.getUser().getIdLong())
+                    var embedBuilder = HangmanRegistry.getInstance().getActiveHangman(userConvector)
                             .embedBuilder(Color.GREEN,
                                     hangmanEngGame1,
                                     false,
@@ -245,9 +247,9 @@ public class ButtonReactions extends ListenerAdapter {
                                     null
                             );
 
-                    HangmanHelper.editMessage(embedBuilder, event.getUser().getIdLong());
-                    HangmanRegistry.getInstance().removeHangman(event.getUser().getIdLong());
-                    hangmanGameRepository.deleteActiveGame(event.getUser().getIdLong());
+                    HangmanHelper.editMessage(embedBuilder, userConvector);
+                    HangmanRegistry.getInstance().removeHangman(userConvector);
+                    hangmanGameRepository.deleteActiveGame(userConvector);
                     //Если нажата кнопка STOP, и игрок сейчас не играет, присылаем в час уведомление
                 } else {
                     String hangmanYouAreNotPlay = jsonParsers.getLocale("Hangman_You_Are_Not_Play", event.getUser().getIdLong());
