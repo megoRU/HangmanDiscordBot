@@ -24,6 +24,7 @@
   "Game_Guesses": "Guesses",
   "Game_Current_Word": "Current word",
   "Game_Player": "Player",
+  "Game_Players": "Players",
   "Game_You_Use_This_Letter": "You have already used this letter!\n",
   "Game_You_Use_This_Word": "You have already used this word!\n",
   "Game_Have_Attempts": "You have attempts: `",

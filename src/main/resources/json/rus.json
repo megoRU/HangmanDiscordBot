@@ -24,6 +24,7 @@
   "Game_Guesses": "Догадки",
   "Game_Current_Word": "Текущее слово",
   "Game_Player": "Игрок",
+  "Game_Players": "Игроки",
   "Game_You_Use_This_Letter": "Вы уже использовали эту букву!\n",
   "Game_You_Use_This_Word": "Вы уже использовали это слово!\n",
   "Game_Have_Attempts": "У вас попыток: `",

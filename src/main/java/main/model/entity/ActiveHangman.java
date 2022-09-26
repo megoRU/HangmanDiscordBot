@@ -23,6 +23,9 @@ public class ActiveHangman {
     @Column(name = "user_id_long", nullable = false)
     private Long userIdLong;
 
+    @Column(name = "second_user_id_long")
+    private Long secondUserIdLong;
+
     @Column(name = "message_id_long", nullable = false)
     private Long messageIdLong;
 

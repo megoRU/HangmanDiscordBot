@@ -17,6 +17,7 @@ import main.model.entity.Language;
 import main.model.repository.*;
 import main.statistic.CreatorGraph;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -118,6 +119,40 @@ public class SlashCommand extends ListenerAdapter {
                     event.reply(createGame).setEphemeral(true).queue();
                     hangman.startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
                 }
+                return;
+            }
+
+            if (event.getName().equals("multi")) {
+                User user = event.getOption("user", OptionMapping::getAsUser);
+
+                if (user == null || event.getGuild() == null) {
+                    event.reply("User is `null`").setEphemeral(true).queue();
+                    return;
+                } else if (user.isBot()) {
+                    event.reply("You cannot play with bot!").setEphemeral(true).queue();
+                    return;
+                } else if (user.getIdLong() == userIdLong) {
+                    event.reply("I understand that this is a joke, but then use `/hg`").setEphemeral(true).queue();
+                    return;
+                }
+
+                Hangman hangman = new Hangman(
+                        userIdLong,
+                        user.getIdLong(),
+                        event.getGuild().getIdLong(),
+                        event.getChannel().getIdLong(),
+                        hangmanGameRepository,
+                        gamesRepository,
+                        playerRepository);
+
+                HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
+                HangmanRegistry.getInstance().setHangman(user.getIdLong(), hangman);
+
+                String createGame = jsonParsers.getLocale("create_game", userIdLong);
+
+                event.reply(createGame).setEphemeral(true).queue();
+                hangman.startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
+
                 return;
             }
 

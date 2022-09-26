@@ -40,6 +40,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static net.dv8tion.jda.api.interactions.commands.OptionType.STRING;
+import static net.dv8tion.jda.api.interactions.commands.OptionType.USER;
 
 @Configuration
 @EnableScheduling
@@ -127,7 +128,7 @@ public class BotStartConfig {
         System.out.println(jda.retrieveCommands().complete());
 
         //Обновить команды
-//        updateSlashCommands();
+        updateSlashCommands();
         System.out.println("20:11");
     }
 
@@ -151,6 +152,11 @@ public class BotStartConfig {
                     .setRequired(true)
                     .setName("word"));
 
+            List<OptionData> multi = new ArrayList<>();
+            multi.add(new OptionData(USER, "user", "@Mention player to play with him")
+                    .setRequired(true)
+                    .setName("user"));
+
             commands.addCommands(Commands.slash("language", "Setting language").addOptions(options));
             commands.addCommands(Commands.slash("hg", "Start the game"));
             commands.addCommands(Commands.slash("stop", "Stop the game"));
@@ -160,6 +166,7 @@ public class BotStartConfig {
             commands.addCommands(Commands.slash("allstats", "Find out the statistics of all the bot's games"));
             commands.addCommands(Commands.slash("delete", "Deleting your data"));
             commands.addCommands(Commands.slash("full", "Guess the full word").addOptions(word));
+            commands.addCommands(Commands.slash("multi", "Play Hangman with another player").setGuildOnly(true).addOptions(multi));
 
             commands.queue();
 
@@ -275,6 +282,7 @@ public class BotStartConfig {
             while (rs.next()) {
 
                 long userIdLong = rs.getLong("user_id_long");
+                long secondUserIdLong = rs.getLong("second_user_id_long");
                 String message_id_long = rs.getString("message_id_long");
                 String channelIdLong = rs.getString("channel_id_long");
                 String guildIdLong = rs.getString("guild_long_id");
@@ -284,15 +292,29 @@ public class BotStartConfig {
                 int hangmanErrors = rs.getInt("hangman_errors");
                 LocalDateTime game_created_time = rs.getTimestamp("game_created_time").toLocalDateTime();
 
-                Hangman hangman = new Hangman(
-                        userIdLong,
-                        guildIdLong == null ? null : Long.valueOf(guildIdLong),
-                        Long.parseLong(channelIdLong),
-                        hangmanGameRepository,
-                        gamesRepository,
-                        playerRepository);
-
-                HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
+                Hangman hangman;
+                Long hangmanGuildLong = guildIdLong == null ? null : Long.valueOf(guildIdLong);
+                if (secondUserIdLong == 0L) {
+                    hangman = new Hangman(
+                            userIdLong,
+                            hangmanGuildLong,
+                            Long.parseLong(channelIdLong),
+                            hangmanGameRepository,
+                            gamesRepository,
+                            playerRepository);
+                    HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
+                } else {
+                    hangman = new Hangman(
+                            userIdLong,
+                            secondUserIdLong,
+                            hangmanGuildLong,
+                            Long.parseLong(channelIdLong),
+                            hangmanGameRepository,
+                            gamesRepository,
+                            playerRepository);
+                    HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
+                    HangmanRegistry.getInstance().setHangman(secondUserIdLong, hangman);
+                }
 
                 HangmanRegistry.getInstance().setMessageId(userIdLong, message_id_long);
 
