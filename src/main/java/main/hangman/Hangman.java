@@ -52,6 +52,7 @@ public class Hangman implements HangmanHelper {
 
     //User|Guild|Channel data
     private final long userId;
+    private final long secondPlayer;
     private final Long guildId;
     private final Long channelId;
     private final String userIdWithDiscord;
@@ -77,6 +78,24 @@ public class Hangman implements HangmanHelper {
         this.guesses = new LinkedHashSet<>();
         this.currentHiddenWord = null;
         this.messageList = new LinkedList<>();
+        this.secondPlayer = 0L;
+    }
+
+    public Hangman(long userId, long secondPlayer, Long guildId, Long channelId,
+                   HangmanGameRepository hangmanGameRepository,
+                   GamesRepository gamesRepository,
+                   PlayerRepository playerRepository) {
+        this.hangmanGameRepository = hangmanGameRepository;
+        this.gamesRepository = gamesRepository;
+        this.playerRepository = playerRepository;
+        this.userId = userId;
+        this.guildId = guildId;
+        this.channelId = channelId;
+        this.userIdWithDiscord = String.format("<@%s>\n<@%s>", userId, secondPlayer);
+        this.guesses = new LinkedHashSet<>();
+        this.currentHiddenWord = null;
+        this.messageList = new LinkedList<>();
+        this.secondPlayer = secondPlayer;
     }
 
     public void startGame(MessageChannel textChannel, String avatarUrl, String userName) {
@@ -341,7 +360,13 @@ public class Hangman implements HangmanHelper {
                 + "\ninputs: " + inputs
                 + "\nlanguage " + language);
 
-        String gamePlayer = jsonGameParsers.getLocale("Game_Player", userId);
+        String gamePlayer;
+        if (secondPlayer == 0L) {
+            gamePlayer = jsonGameParsers.getLocale("Game_Player", userId);
+        } else {
+            gamePlayer = jsonGameParsers.getLocale("Game_Players", userId);
+        }
+
         String gameLanguage = jsonGameParsers.getLocale("Game_Language", userId);
 
         embedBuilder.setColor(color);
@@ -395,6 +420,7 @@ public class Hangman implements HangmanHelper {
             Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now().atZone(ZoneOffset.UTC).toLocalDateTime());
             ActiveHangman activeHangman = new ActiveHangman();
             activeHangman.setUserIdLong(userId);
+            activeHangman.setSecondUserIdLong(secondPlayer == 0L ? null : secondPlayer);
             activeHangman.setMessageIdLong(message.getIdLong());
             activeHangman.setChannelIdLong(message.getChannel().getIdLong());
             activeHangman.setGuildLongId(guildId);
@@ -513,6 +539,14 @@ public class Hangman implements HangmanHelper {
 
     public Long getChannelId() {
         return channelId;
+    }
+
+    public long getSecondPlayer() {
+        return secondPlayer;
+    }
+
+    public long getUserId() {
+        return userId;
     }
 
     public int getLengthWord() {

@@ -17,6 +17,7 @@ import main.model.entity.Language;
 import main.model.repository.*;
 import main.statistic.CreatorGraph;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -121,17 +122,55 @@ public class SlashCommand extends ListenerAdapter {
                 return;
             }
 
+            if (event.getName().equals("multi")) {
+                User user = event.getOption("user", OptionMapping::getAsUser);
+
+                if (user == null || event.getGuild() == null) {
+                    event.reply("User is `null`").setEphemeral(true).queue();
+                    return;
+                } else if (user.isBot()) {
+                    String playWithBot = jsonParsers.getLocale("play_with_bot", userIdLong);
+                    event.reply(playWithBot).setEphemeral(true).queue();
+                    return;
+                } else if (user.getIdLong() == userIdLong) {
+                    String playWithYourself = jsonParsers.getLocale("play_with_yourself", userIdLong);
+                    event.reply(playWithYourself).setEphemeral(true).queue();
+                    return;
+                }
+
+                Hangman hangman = new Hangman(
+                        userIdLong,
+                        user.getIdLong(),
+                        event.getGuild().getIdLong(),
+                        event.getChannel().getIdLong(),
+                        hangmanGameRepository,
+                        gamesRepository,
+                        playerRepository);
+
+                HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
+                HangmanRegistry.getInstance().setHangman(user.getIdLong(), hangman);
+
+                String createGame = jsonParsers.getLocale("create_game", userIdLong);
+
+                event.reply(createGame).setEphemeral(true).queue();
+                hangman.startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
+                return;
+            }
+
             if (event.getName().equals("stop")) {
                 //Проверяем играет ли сейчас игрок. Если да удаляем игру.
                 if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                    String hangmanEngGame = jsonParsers.getLocale("Hangman_Eng_game", userIdLong);
-                    String hangmanEngGame1 = jsonGameParsers.getLocale("Hangman_Eng_game", userIdLong);
+
+                    long userConvector = Long.parseLong(HangmanRegistry.getInstance().getUserConvector(event.getUser().getIdLong()));
+
+                    String hangmanEngGame = jsonParsers.getLocale("Hangman_Eng_game", userConvector);
+                    String hangmanEngGame1 = jsonGameParsers.getLocale("Hangman_Eng_game", userConvector);
 
                     event.reply(hangmanEngGame)
                             .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
                             .queue();
 
-                    var embedBuilder = HangmanRegistry.getInstance().getActiveHangman(userIdLong)
+                    var embedBuilder = HangmanRegistry.getInstance().getActiveHangman(userConvector)
                             .embedBuilder(Color.GREEN,
                                     hangmanEngGame1,
                                     false,
@@ -139,9 +178,9 @@ public class SlashCommand extends ListenerAdapter {
                                     null
                             );
 
-                    HangmanHelper.editMessage(embedBuilder, userIdLong);
-                    HangmanRegistry.getInstance().removeHangman(userIdLong);
-                    hangmanGameRepository.deleteActiveGame(userIdLong);
+                    HangmanHelper.editMessage(embedBuilder, userConvector);
+                    HangmanRegistry.getInstance().removeHangman(userConvector);
+                    hangmanGameRepository.deleteActiveGame(userConvector);
                     //Если игрок не играет, а хочет завершить игру, то нужно ему это прислать уведомление, что он сейчас не играет
                 } else {
                     String hangmanYouAreNotPlay = jsonParsers.getLocale("Hangman_You_Are_Not_Play", userIdLong);
