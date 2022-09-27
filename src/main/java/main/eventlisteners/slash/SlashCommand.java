@@ -160,7 +160,6 @@ public class SlashCommand extends ListenerAdapter {
             if (event.getName().equals("stop")) {
                 //Проверяем играет ли сейчас игрок. Если да удаляем игру.
                 if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-
                     long userConvector = Long.parseLong(HangmanRegistry.getInstance().getUserConvector(event.getUser().getIdLong()));
 
                     String hangmanEngGame = jsonParsers.getLocale("Hangman_Eng_game", userConvector);
