@@ -120,9 +120,8 @@ public class HangmanRegistry {
 
         Hangman hangman = activeHangman.get(userIdLong);
 
-        if (hangman.getSecondPlayer() != 0L) {
-            long userConvector = Long.parseLong(getUserConvector(userIdLong));
-            activeHangman.remove(userConvector);
+        if (hangman != null && hangman.getSecondPlayer() != 0L) {
+            activeHangman.remove(hangman.getSecondPlayer());
         }
 
         activeHangman.remove(userIdLong);
