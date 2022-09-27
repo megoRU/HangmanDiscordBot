@@ -99,10 +99,6 @@ public class HangmanRegistry {
         Timer timerCreatedGame = timeCreatedGame.get(userIdLong);
         Timer autoDeletingMessage = autoDeletingMessages.get(userIdLong);
 
-        System.out.println("timerAutoUpdate " + timerAutoUpdate);
-        System.out.println("timerCreatedGame " + timerCreatedGame);
-        System.out.println("autoDeletingMessage " + autoDeletingMessage);
-
         if (timerAutoUpdate != null) {
             timerAutoUpdate.cancel();
             timeAutoUpdate.remove(userIdLong);
