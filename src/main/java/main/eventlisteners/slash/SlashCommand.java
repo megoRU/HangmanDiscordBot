@@ -148,7 +148,7 @@ public class SlashCommand extends ListenerAdapter {
                     needSetLanguage.setColor(0x00FF00);
                     needSetLanguage.setDescription(hangmanListenerNeedSetLanguage);
 
-                    String multi = String.format("%s_%s", Buttons.BUTTON_START_NEW_GAME.name(), user.getIdLong());
+                    String multi = String.format("%s_%s_%s", Buttons.BUTTON_START_NEW_GAME.name(), userIdLong, user.getIdLong());
 
                     event.replyEmbeds(needSetLanguage.build())
                             .addActionRow(
@@ -207,7 +207,7 @@ public class SlashCommand extends ListenerAdapter {
                     String hangmanEngGame1 = jsonGameParsers.getLocale("Hangman_Eng_game", userId);
 
                     if (secondPlayer != 0L) {
-                        String multi = String.format("%s_%s", Buttons.BUTTON_START_NEW_GAME.name(), secondPlayer);
+                        String multi = String.format("%s_%s_%s", Buttons.BUTTON_START_NEW_GAME.name(), userId, secondPlayer);
                         event.reply(hangmanEngGame)
                                 .addActionRow(Button.success(multi, "Play again"))
                                 .queue();

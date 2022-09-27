@@ -157,7 +157,7 @@ public class ButtonReactions extends ListenerAdapter {
             //Если нажата кнопка START, и нет активной игры, то создаем
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_START_NEW_GAME.name())
                     || event.getButton().getId() != null
-                    && event.getButton().getId().matches("BUTTON_START_NEW_GAME_\\d+")) {
+                    && event.getButton().getId().matches("BUTTON_START_NEW_GAME_\\d+_\\d+")) {
                 event.deferEdit().queue();
                 event.editButton(event.getButton().asDisabled()).queue();
                 String needSetupMode = jsonParsers.getLocale("need_setup_mode", event.getUser().getIdLong());
@@ -186,10 +186,18 @@ public class ButtonReactions extends ListenerAdapter {
                                 Permission.VIEW_CHANNEL);
                         if (!hasPermission) return;
 
-                        boolean matches = event.getButton().getId().matches("BUTTON_START_NEW_GAME_\\d+");
+                        boolean matches = event.getButton().getId().matches("BUTTON_START_NEW_GAME_\\d+_\\d+");
 
                         if (matches) {
-                            long secondUser = Long.parseLong(event.getButton().getId().replaceAll("BUTTON_START_NEW_GAME_", ""));
+                            String[] split = event.getButton().getId().replaceAll("BUTTON_START_NEW_GAME_", "").split("_");
+
+                            long secondUser = 0L;
+
+                            for (String userId : split) {
+                                if (userIdLong != Long.parseLong(userId)) {
+                                    secondUser = Long.parseLong(userId);
+                                }
+                            }
 
                             Hangman hangman = new Hangman(
                                     event.getUser().getIdLong(),
@@ -258,7 +266,7 @@ public class ButtonReactions extends ListenerAdapter {
                     String hangmanEngGame1 = jsonGameParsers.getLocale("Hangman_Eng_game", userId);
 
                     if (secondPlayer != 0L) {
-                        String multi = String.format("%s_%s", Buttons.BUTTON_START_NEW_GAME.name(), secondPlayer);
+                        String multi = String.format("%s_%s_%s", Buttons.BUTTON_START_NEW_GAME.name(), userId, secondPlayer);
                         event.getHook().sendMessage(hangmanEngGame)
                                 .addActionRow(Button.success(multi, "Play again"))
                                 .queue();

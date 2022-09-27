@@ -31,7 +31,7 @@ public interface EndGameButtons {
     static List<Button> getListButtons(long userIdLong, long secondUser) {
         List<Button> buttonList = new LinkedList<>();
 
-        String multi = String.format("%s_%s", Buttons.BUTTON_START_NEW_GAME.name(), secondUser);
+        String multi = String.format("%s_%s_%s", Buttons.BUTTON_START_NEW_GAME.name(), userIdLong, secondUser);
 
         buttonList.add(Button.success(multi, "Play again"));
 
