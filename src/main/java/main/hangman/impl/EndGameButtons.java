@@ -27,4 +27,24 @@ public interface EndGameButtons {
 
         return buttonList;
     }
+
+    static List<Button> getListButtons(long userIdLong, long secondUser) {
+        List<Button> buttonList = new LinkedList<>();
+
+        String multi = String.format("%s_%s", Buttons.BUTTON_START_NEW_GAME.name(), secondUser);
+
+        buttonList.add(Button.success(multi, "Play again"));
+
+        if (BotStartConfig.getMapGameLanguages().get(userIdLong).equals("eng")) {
+            buttonList.add(
+                    Button.secondary(Buttons.BUTTON_CHANGE_GAME_LANGUAGE.name(), "Кириллица").withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
+        } else {
+            buttonList.add(
+                    Button.secondary(Buttons.BUTTON_CHANGE_GAME_LANGUAGE.name(), "Latin").withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
+        }
+
+        buttonList.add(Button.primary(Buttons.BUTTON_MY_STATS.name(), "My stats"));
+
+        return buttonList;
+    }
 }

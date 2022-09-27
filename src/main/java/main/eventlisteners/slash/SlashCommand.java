@@ -165,9 +165,19 @@ public class SlashCommand extends ListenerAdapter {
                     String hangmanEngGame = jsonParsers.getLocale("Hangman_Eng_game", userConvector);
                     String hangmanEngGame1 = jsonGameParsers.getLocale("Hangman_Eng_game", userConvector);
 
-                    event.reply(hangmanEngGame)
-                            .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
-                            .queue();
+                    Hangman activeHangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
+                    long secondPlayer = activeHangman.getSecondPlayer();
+
+                    if (secondPlayer != 0L) {
+                        String multi = String.format("%s_%s", Buttons.BUTTON_START_NEW_GAME.name(), secondPlayer);
+                        event.reply(hangmanEngGame)
+                                .addActionRow(Button.success(multi, "Play again"))
+                                .queue();
+                    } else {
+                        event.reply(hangmanEngGame)
+                                .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
+                                .queue();
+                    }
 
                     var embedBuilder = HangmanRegistry.getInstance().getActiveHangman(userConvector)
                             .embedBuilder(Color.GREEN,
@@ -197,7 +207,7 @@ public class SlashCommand extends ListenerAdapter {
                 EmbedBuilder whenPlay = new EmbedBuilder();
 
                 whenPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
-                whenPlay.setColor(0x00FF00);
+                whenPlay.setColor(Color.GREEN);
                 whenPlay.setDescription(reactionsButtonWhenPlay);
 
                 event.replyEmbeds(whenPlay.build())

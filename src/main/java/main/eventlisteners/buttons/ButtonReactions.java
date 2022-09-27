@@ -155,7 +155,9 @@ public class ButtonReactions extends ListenerAdapter {
             }
 
             //Если нажата кнопка START, и нет активной игры, то создаем
-            if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_START_NEW_GAME.name())) {
+            if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_START_NEW_GAME.name())
+                    || event.getButton().getId() != null
+                    && event.getButton().getId().matches("BUTTON_START_NEW_GAME_\\d+")) {
                 event.deferEdit().queue();
                 event.editButton(event.getButton().asDisabled()).queue();
                 String needSetupMode = jsonParsers.getLocale("need_setup_mode", event.getUser().getIdLong());
@@ -177,22 +179,42 @@ public class ButtonReactions extends ListenerAdapter {
                     event.getChannel().sendTyping().queue();
 
                     if (event.getGuild() != null) {
-                        boolean hasPermission = event.getGuild().getSelfMember()
-                                .hasPermission(
-                                        event.getGuildChannel(),
-                                        Permission.MESSAGE_SEND,
-                                        Permission.MESSAGE_MANAGE,
-                                        Permission.VIEW_CHANNEL);
+                        boolean hasPermission = event.getGuild().getSelfMember().hasPermission(
+                                event.getGuildChannel(),
+                                Permission.MESSAGE_SEND,
+                                Permission.MESSAGE_MANAGE,
+                                Permission.VIEW_CHANNEL);
                         if (!hasPermission) return;
 
-                        HangmanRegistry.getInstance().setHangman(userIdLong,
-                                new Hangman(
-                                        event.getUser().getIdLong(),
-                                        event.getGuild().getIdLong(),
-                                        event.getGuildChannel().getIdLong(),
-                                        hangmanGameRepository,
-                                        gamesRepository,
-                                        playerRepository));
+
+                        boolean matches = event.getButton().getId().matches("BUTTON_START_NEW_GAME_\\d+");
+
+                        if (matches) {
+                            long secondUser = Long.parseLong(event.getButton().getId().replaceAll("BUTTON_START_NEW_GAME_", ""));
+
+                            Hangman hangman = new Hangman(
+                                    event.getUser().getIdLong(),
+                                    secondUser,
+                                    event.getGuild().getIdLong(),
+                                    event.getGuildChannel().getIdLong(),
+                                    hangmanGameRepository,
+                                    gamesRepository,
+                                    playerRepository);
+
+                            HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
+                            HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
+                        } else {
+                            HangmanRegistry.getInstance().setHangman(userIdLong,
+                                    new Hangman(
+                                            event.getUser().getIdLong(),
+                                            event.getGuild().getIdLong(),
+                                            event.getGuildChannel().getIdLong(),
+                                            hangmanGameRepository,
+                                            gamesRepository,
+                                            playerRepository));
+                        }
+
+                        //DM play
                     } else {
                         HangmanRegistry.getInstance().setHangman(
                                 userIdLong,
