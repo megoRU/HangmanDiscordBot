@@ -2,12 +2,10 @@ package main.hangman;
 
 import main.config.BotStartConfig;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class HangmanRegistry {
     //Long это UserIdLong
@@ -33,6 +31,7 @@ public class HangmanRegistry {
         }
         return hangmanRegistry;
     }
+
     public Timer getAutoDeletingMessages(long userIdLong) {
         return autoDeletingMessages.get(userIdLong);
     }
@@ -67,7 +66,6 @@ public class HangmanRegistry {
     }
 
     //2 User могут иметь 1 Gift
-//    @Nullable TODO: по идеи может Hangman == null так как мы не удаляем 2 пользователя
     public Hangman getActiveHangman(long userIdLong) {
         return activeHangman.get(userIdLong);
     }
@@ -78,7 +76,6 @@ public class HangmanRegistry {
         return String.valueOf(userIdLong);
     }
 
-    @Nullable
     public String getMessageId(long userIdLong) {
         long userConvector = Long.parseLong(getUserConvector(userIdLong));
         return messageId.get(userConvector);
@@ -93,7 +90,6 @@ public class HangmanRegistry {
     }
 
     //2 User могут иметь 1 Gift
-    //TODO: по идеи может Hangman == null так как мы не удаляем 2 пользователя
     public boolean hasHangman(long userIdLong) {
         return activeHangman.containsKey(userIdLong);
     }
@@ -121,15 +117,11 @@ public class HangmanRegistry {
         Hangman hangman = activeHangman.get(userIdLong);
 
         if (hangman.getSecondPlayer() != 0L) {
-            Map<Long, Hangman> temp = new ConcurrentHashMap<>(activeHangman);
-            temp.entrySet()
-                    .stream()
-                    .filter(hangmanMap -> hangmanMap.getValue().equals(hangman))
-                    .map(hangmanMap -> activeHangman.remove(hangmanMap.getKey()))
-                    .collect(Collectors.toList());
-        } else {
-            activeHangman.remove(userIdLong);
+            long userConvector = Long.parseLong(getUserConvector(userIdLong));
+            activeHangman.remove(userConvector);
         }
+
+        activeHangman.remove(userIdLong);
         messageId.remove(userIdLong);
     }
 }

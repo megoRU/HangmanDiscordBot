@@ -242,6 +242,10 @@ public class Hangman implements HangmanHelper {
 
             ResultGame resultGame = new ResultGame(hangmanGameRepository, gamesRepository, playerRepository, userId, true);
             resultGame.send();
+
+            ResultGame resultGameSecondPlayer = new ResultGame(hangmanGameRepository, gamesRepository, playerRepository, secondPlayer, true);
+            resultGameSecondPlayer.send();
+
             HangmanRegistry.getInstance().removeHangman(userId);
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
@@ -264,6 +268,10 @@ public class Hangman implements HangmanHelper {
 
             ResultGame resultGame = new ResultGame(hangmanGameRepository, gamesRepository, playerRepository, userId, false);
             resultGame.send();
+
+            ResultGame resultGameSecondPlayer = new ResultGame(hangmanGameRepository, gamesRepository, playerRepository, secondPlayer, false);
+            resultGameSecondPlayer.send();
+
             HangmanRegistry.getInstance().removeHangman(userId);
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
