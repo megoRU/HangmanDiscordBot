@@ -238,10 +238,11 @@ public class Hangman implements HangmanHelper {
                     inputs
             );
 
-            HangmanHelper.editMessageWithButtons(win, userId, EndGameButtons.getListButtons(userId));
-
-            ResultGame resultGame = new ResultGame(hangmanGameRepository, gamesRepository, playerRepository, userId, true);
-            resultGame.send();
+            if (secondPlayer != 0L) {
+                HangmanHelper.editMessageWithButtons(win, userId, EndGameButtons.getListButtons(userId, secondPlayer));
+            } else {
+                HangmanHelper.editMessageWithButtons(win, userId, EndGameButtons.getListButtons(userId));
+            }
 
             if (secondPlayer != 0L) {
                 ResultGame resultGameSecondPlayer = new ResultGame(hangmanGameRepository, gamesRepository, playerRepository, secondPlayer, true);
@@ -266,7 +267,11 @@ public class Hangman implements HangmanHelper {
                     inputs
             );
 
-            HangmanHelper.editMessageWithButtons(info, userId, EndGameButtons.getListButtons(userId));
+            if (secondPlayer != 0L) {
+                HangmanHelper.editMessageWithButtons(info, userId, EndGameButtons.getListButtons(userId, secondPlayer));
+            } else {
+                HangmanHelper.editMessageWithButtons(info, userId, EndGameButtons.getListButtons(userId));
+            }
 
             ResultGame resultGame = new ResultGame(hangmanGameRepository, gamesRepository, playerRepository, userId, false);
             resultGame.send();
@@ -454,7 +459,7 @@ public class Hangman implements HangmanHelper {
                 String gamePlayer = jsonGameParsers.getLocale("Game_Player", userId);
 
                 EmbedBuilder info = new EmbedBuilder();
-                info.setColor(0x00FF00);
+                info.setColor(Color.GREEN);
                 info.setTitle(gameOver);
                 info.setDescription(timeIsOver);
                 info.addField(gamePlayer, userIdWithDiscord, false);
