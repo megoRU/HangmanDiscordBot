@@ -70,15 +70,8 @@ public class HangmanRegistry {
         return activeHangman.get(userIdLong);
     }
 
-    public String getUserConvector(long userIdLong) {
-        Hangman hangman = activeHangman.get(userIdLong);
-        if (hangman != null) return String.valueOf(hangman.getUserId());
-        return String.valueOf(userIdLong);
-    }
-
     public String getMessageId(long userIdLong) {
-        long userConvector = Long.parseLong(getUserConvector(userIdLong));
-        return messageId.get(userConvector);
+        return messageId.get(userIdLong);
     }
 
     public void setMessageId(long userIdLong, String messageIdString) {

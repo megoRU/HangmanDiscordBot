@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.*;
 import java.util.logging.Logger;
 
-public class Hangman implements HangmanHelper {
+public class Hangman implements HangmanHelper, HangmanBuilder {
 
     //Localisation
     private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
@@ -45,6 +45,9 @@ public class Hangman implements HangmanHelper {
     private final HangmanGameRepository hangmanGameRepository;
     private final GamesRepository gamesRepository;
     private final PlayerRepository playerRepository;
+
+    //API
+    private final MegoruAPI megoruAPI = new MegoruAPIImpl("this bot don`t use token");
 
     private final Set<String> guesses;
 
@@ -64,10 +67,10 @@ public class Hangman implements HangmanHelper {
     private String currentHiddenWord;
     private int hangmanErrors;
 
-    public Hangman(long userId, Long guildId, Long channelId,
-                   HangmanGameRepository hangmanGameRepository,
-                   GamesRepository gamesRepository,
-                   PlayerRepository playerRepository) {
+    Hangman(long userId, Long guildId, Long channelId,
+            HangmanGameRepository hangmanGameRepository,
+            GamesRepository gamesRepository,
+            PlayerRepository playerRepository) {
         this.hangmanGameRepository = hangmanGameRepository;
         this.gamesRepository = gamesRepository;
         this.playerRepository = playerRepository;
@@ -81,10 +84,10 @@ public class Hangman implements HangmanHelper {
         this.secondPlayer = 0L;
     }
 
-    public Hangman(long userId, long secondPlayer, Long guildId, Long channelId,
-                   HangmanGameRepository hangmanGameRepository,
-                   GamesRepository gamesRepository,
-                   PlayerRepository playerRepository) {
+    Hangman(long userId, long secondPlayer, Long guildId, Long channelId,
+            HangmanGameRepository hangmanGameRepository,
+            GamesRepository gamesRepository,
+            PlayerRepository playerRepository) {
         this.hangmanGameRepository = hangmanGameRepository;
         this.gamesRepository = gamesRepository;
         this.playerRepository = playerRepository;
@@ -99,7 +102,9 @@ public class Hangman implements HangmanHelper {
     }
 
     public void startGame(MessageChannel textChannel, String avatarUrl, String userName) {
-        if (!BotStartConfig.getMapGameLanguages().containsKey(userId)) {
+        String language = BotStartConfig.getMapGameLanguages().get(userId);
+
+        if (language == null) {
             EmbedBuilder needSetLanguage = new EmbedBuilder();
 
             String hangmanListenerNeedSetLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", userId);
@@ -119,9 +124,8 @@ public class Hangman implements HangmanHelper {
             return;
         }
 
-        MegoruAPI megoruAPI = new MegoruAPIImpl("this bot don`t use token");
         GameWordLanguage gameWordLanguage = new GameWordLanguage();
-        gameWordLanguage.setLanguage(BotStartConfig.getMapGameLanguages().get(userId));
+        gameWordLanguage.setLanguage(language);
 
         try {
             WORD = megoruAPI.getWord(gameWordLanguage).getWord();
@@ -198,6 +202,7 @@ public class Hangman implements HangmanHelper {
                         false,
                         inputs
                 );
+
                 HangmanHelper.editMessage(info, userId);
                 return;
             }
@@ -297,6 +302,7 @@ public class Hangman implements HangmanHelper {
                         .sendMessage(wordIsNull)
                         .setActionRow(EndGameButtons.getListButtons(userId))
                         .queue();
+
                 HangmanRegistry.getInstance().removeHangman(userId);
                 return;
             }
@@ -433,6 +439,9 @@ public class Hangman implements HangmanHelper {
 
     private void createEntityInDataBase(Message message) {
         try {
+
+            System.out.println("message " + message.getId());
+
             HangmanRegistry.getInstance().setMessageId(userId, message.getId());
             Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now().atZone(ZoneOffset.UTC).toLocalDateTime());
             ActiveHangman activeHangman = new ActiveHangman();

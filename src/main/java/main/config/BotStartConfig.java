@@ -6,6 +6,7 @@ import main.eventlisteners.MessageWhenBotJoinToGuild;
 import main.eventlisteners.buttons.ButtonReactions;
 import main.eventlisteners.slash.SlashCommand;
 import main.hangman.Hangman;
+import main.hangman.HangmanBuilder;
 import main.hangman.HangmanRegistry;
 import main.jsonparser.ParserClass;
 import main.model.repository.*;
@@ -284,7 +285,7 @@ public class BotStartConfig {
                 long userIdLong = rs.getLong("user_id_long");
                 long secondUserIdLong = rs.getLong("second_user_id_long");
                 String message_id_long = rs.getString("message_id_long");
-                String channelIdLong = rs.getString("channel_id_long");
+                Long channelIdLong = Long.parseLong(rs.getString("channel_id_long"));
                 String guildIdLong = rs.getString("guild_long_id");
                 String word = rs.getString("word");
                 String currentHiddenWord = rs.getString("current_hidden_word");
@@ -292,26 +293,23 @@ public class BotStartConfig {
                 int hangmanErrors = rs.getInt("hangman_errors");
                 LocalDateTime game_created_time = rs.getTimestamp("game_created_time").toLocalDateTime();
 
-                Hangman hangman;
                 Long hangmanGuildLong = guildIdLong == null ? null : Long.valueOf(guildIdLong);
+
+                HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder()
+                        .setUserIdLong(userIdLong)
+                        .setGuildIdLong(hangmanGuildLong)
+                        .setChannelId(channelIdLong)
+                        .setHangmanGameRepository(hangmanGameRepository)
+                        .setGamesRepository(gamesRepository)
+                        .setPlayerRepository(playerRepository);
+
                 if (secondUserIdLong == 0L) {
-                    hangman = new Hangman(
-                            userIdLong,
-                            hangmanGuildLong,
-                            Long.parseLong(channelIdLong),
-                            hangmanGameRepository,
-                            gamesRepository,
-                            playerRepository);
-                    HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
+                    HangmanRegistry.getInstance().setHangman(userIdLong, hangmanBuilder.build());
                 } else {
-                    hangman = new Hangman(
-                            userIdLong,
-                            secondUserIdLong,
-                            hangmanGuildLong,
-                            Long.parseLong(channelIdLong),
-                            hangmanGameRepository,
-                            gamesRepository,
-                            playerRepository);
+                    hangmanBuilder.setSecondUserIdLong(secondUserIdLong);
+
+                    Hangman hangman = hangmanBuilder.build();
+
                     HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
                     HangmanRegistry.getInstance().setHangman(secondUserIdLong, hangman);
                 }
