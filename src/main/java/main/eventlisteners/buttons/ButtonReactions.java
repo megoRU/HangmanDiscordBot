@@ -187,9 +187,6 @@ public class ButtonReactions extends ListenerAdapter {
                     Hangman hangman;
                     //Guild Play
                     if (event.getGuild() != null) {
-                        boolean canSendHG = ChecksClass.canSendHG(event.getChannel(), event);
-                        if (!canSendHG) return;
-
                         boolean matches = event.getButton().getId().matches("BUTTON_START_NEW_GAME_\\d+_\\d+");
 
                         hangmanBuilder.setGuildIdLong(event.getGuild().getIdLong());

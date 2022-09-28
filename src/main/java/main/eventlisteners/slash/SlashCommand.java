@@ -60,9 +60,6 @@ public class SlashCommand extends ListenerAdapter {
             LOGGER.info("\nSlash Command name: " + event.getName());
 
             if (event.getName().equals("hg")) {
-                boolean canSendHG = ChecksClass.canSendHG(event.getChannel(), event);
-                if (!canSendHG) return;
-
                 event.getChannel().sendTyping().queue();
                 //Проверяем установлен ли язык. Если нет - то возвращаем в чат ошибку
                 if (!BotStartConfig.getMapGameLanguages().containsKey(userIdLong)) {
