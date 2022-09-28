@@ -3,6 +3,8 @@ package main.hangman;
 import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
 import main.model.repository.PlayerRepository;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface HangmanBuilder {
 
@@ -29,27 +31,27 @@ public interface HangmanBuilder {
             return this;
         }
 
-        public Builder setGuildIdLong(Long guildId) {
+        public Builder setGuildIdLong(@Nullable Long guildId) {
             this.guildId = guildId;
             return this;
         }
 
-        public Builder setChannelId(Long channelId) {
+        public Builder setChannelId(@NotNull Long channelId) {
             this.channelId = channelId;
             return this;
         }
 
-        public Builder setHangmanGameRepository(HangmanGameRepository hangmanGameRepository) {
+        public Builder setHangmanGameRepository(@NotNull HangmanGameRepository hangmanGameRepository) {
             this.hangmanGameRepository = hangmanGameRepository;
             return this;
         }
 
-        public Builder setGamesRepository(GamesRepository gamesRepository) {
+        public Builder setGamesRepository(@NotNull GamesRepository gamesRepository) {
             this.gamesRepository = gamesRepository;
             return this;
         }
 
-        public Builder setPlayerRepository(PlayerRepository playerRepository) {
+        public Builder setPlayerRepository(@NotNull PlayerRepository playerRepository) {
             this.playerRepository = playerRepository;
             return this;
         }

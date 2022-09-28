@@ -16,7 +16,6 @@ import main.model.entity.GameLanguage;
 import main.model.entity.Language;
 import main.model.repository.*;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -184,21 +183,20 @@ public class ButtonReactions extends ListenerAdapter {
                             .setHangmanGameRepository(hangmanGameRepository)
                             .setGamesRepository(gamesRepository)
                             .setPlayerRepository(playerRepository);
-                    Hangman hangman;
 
+                    Hangman hangman;
+                    //Guild Play
                     if (event.getGuild() != null) {
-                        boolean hasPermission = event.getGuild().getSelfMember().hasPermission(
-                                event.getGuildChannel(),
-                                Permission.MESSAGE_SEND,
-                                Permission.MESSAGE_MANAGE,
-                                Permission.VIEW_CHANNEL);
-                        if (!hasPermission) return;
+                        boolean canSendHG = ChecksClass.canSendHG(event.getChannel(), event);
+                        if (!canSendHG) return;
 
                         boolean matches = event.getButton().getId().matches("BUTTON_START_NEW_GAME_\\d+_\\d+");
 
+                        hangmanBuilder.setGuildIdLong(event.getGuild().getIdLong());
+                        hangmanBuilder.setChannelId(event.getGuildChannel().getIdLong());
+
                         if (matches) {
                             String[] split = event.getButton().getId().replaceAll("BUTTON_START_NEW_GAME_", "").split("_");
-
                             long secondUser = 0L;
 
                             for (String userId : split) {
@@ -206,20 +204,21 @@ public class ButtonReactions extends ListenerAdapter {
                                     secondUser = Long.parseLong(userId);
                                 }
                             }
+
                             hangmanBuilder.setSecondUserIdLong(secondUser);
-                            hangmanBuilder.setGuildIdLong(event.getGuild().getIdLong());
-                            hangmanBuilder.setChannelId(event.getGuildChannel().getIdLong());
 
                             hangman = hangmanBuilder.build();
 
                             HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
                             HangmanRegistry.getInstance().setHangman(secondUser, hangman);
-                        } else {
-                            hangmanBuilder.setGuildIdLong(event.getGuild().getIdLong());
-                            hangmanBuilder.setChannelId(event.getGuildChannel().getIdLong());
 
+                            hangman.startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
+                        } else {
                             hangman = hangmanBuilder.build();
+
                             HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
+
+                            hangman.startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
                         }
                         //DM play
                     } else {
@@ -229,9 +228,8 @@ public class ButtonReactions extends ListenerAdapter {
                         hangman = hangmanBuilder.build();
 
                         HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
+                        hangman.startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
                     }
-                    //Запускаем игру
-                    hangman.startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
                 } else {
                     String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
 

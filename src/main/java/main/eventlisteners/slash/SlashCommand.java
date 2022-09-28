@@ -60,6 +60,9 @@ public class SlashCommand extends ListenerAdapter {
             LOGGER.info("\nSlash Command name: " + event.getName());
 
             if (event.getName().equals("hg")) {
+                boolean canSendHG = ChecksClass.canSendHG(event.getChannel(), event);
+                if (!canSendHG) return;
+
                 event.getChannel().sendTyping().queue();
                 //Проверяем установлен ли язык. Если нет - то возвращаем в чат ошибку
                 if (!BotStartConfig.getMapGameLanguages().containsKey(userIdLong)) {
@@ -125,6 +128,8 @@ public class SlashCommand extends ListenerAdapter {
             }
 
             if (event.getName().equals("multi")) {
+                boolean canSendHG = ChecksClass.canSendHG(event.getChannel(), event);
+                if (!canSendHG) return;
                 User user = event.getOption("user", OptionMapping::getAsUser);
 
                 if (user == null || event.getGuild() == null) {
