@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.*;
 import java.util.logging.Logger;
 
-public class Hangman implements HangmanHelper, HangmanBuilder {
+public class Hangman implements HangmanHelper {
 
     //Localisation
     private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
