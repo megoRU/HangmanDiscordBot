@@ -125,6 +125,8 @@ public class SlashCommand extends ListenerAdapter {
             }
 
             if (event.getName().equals("multi")) {
+                boolean canSendHG = ChecksClass.canSendHG(event.getChannel(), event);
+                if (!canSendHG) return;
                 User user = event.getOption("user", OptionMapping::getAsUser);
 
                 if (user == null || event.getGuild() == null) {
