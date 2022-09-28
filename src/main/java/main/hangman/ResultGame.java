@@ -50,6 +50,8 @@ public class ResultGame {
             gamesRepository.saveAndFlush(game);
             playerRepository.saveAndFlush(player);
 
+
+            System.out.println("удаляем");
             hangmanGameRepository.deleteActiveGame(userId);
         } catch (Exception e) {
             e.printStackTrace();

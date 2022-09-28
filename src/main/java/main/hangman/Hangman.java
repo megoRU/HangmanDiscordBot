@@ -249,12 +249,16 @@ public class Hangman implements HangmanHelper {
                 HangmanHelper.editMessageWithButtons(win, userId, EndGameButtons.getListButtons(userId));
             }
 
+            ResultGame resultGame = new ResultGame(hangmanGameRepository, gamesRepository, playerRepository, userId, true);
+            resultGame.send();
+
             if (secondPlayer != 0L) {
                 ResultGame resultGameSecondPlayer = new ResultGame(hangmanGameRepository, gamesRepository, playerRepository, secondPlayer, true);
                 resultGameSecondPlayer.send();
             }
 
             HangmanRegistry.getInstance().removeHangman(userId);
+
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
         }
@@ -439,9 +443,6 @@ public class Hangman implements HangmanHelper {
 
     private void createEntityInDataBase(Message message) {
         try {
-
-            System.out.println("message " + message.getId());
-
             HangmanRegistry.getInstance().setMessageId(userId, message.getId());
             Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now().atZone(ZoneOffset.UTC).toLocalDateTime());
             ActiveHangman activeHangman = new ActiveHangman();
