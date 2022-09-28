@@ -106,7 +106,7 @@ public class HangmanRegistry {
             autoDeletingMessage.cancel();
             autoDeletingMessages.remove(userIdLong);
         }
-        System.out.println();
+
         Hangman hangman = activeHangman.get(userIdLong);
 
         if (hangman != null && hangman.getSecondPlayer() != 0L) {
