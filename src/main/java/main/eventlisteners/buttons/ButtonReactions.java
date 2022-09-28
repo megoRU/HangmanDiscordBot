@@ -10,13 +10,13 @@ import main.eventlisteners.buildClass.MessageStats;
 import main.hangman.Hangman;
 import main.hangman.HangmanBuilder;
 import main.hangman.HangmanRegistry;
+import main.hangman.impl.ButtonIMpl;
 import main.hangman.impl.HangmanHelper;
 import main.jsonparser.JSONParsers;
 import main.model.entity.GameLanguage;
 import main.model.entity.Language;
 import main.model.repository.*;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
-import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -93,7 +92,7 @@ public class ButtonReactions extends ListenerAdapter {
 
                 event.getHook().sendMessageEmbeds(youPlay.build())
                         .setEphemeral(true)
-                        .addActionRow(List.of(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game")))
+                        .addActionRow(ButtonIMpl.BUTTON_STOP)
                         .queue();
                 return;
             }
@@ -117,7 +116,8 @@ public class ButtonReactions extends ListenerAdapter {
                 String languageChangeLang = String.format(jsonParsers.getLocale("language_change_lang", event.getUser().getIdLong()), "Latin");
 
                 event.getHook().sendMessage(languageChangeLang)
-                        .setEphemeral(true).queue();
+                        .setEphemeral(true)
+                        .queue();
                 return;
             }
 
@@ -164,12 +164,8 @@ public class ButtonReactions extends ListenerAdapter {
 
                 if (!BotStartConfig.getMapGameLanguages().containsKey(userIdLong)) {
                     event.getHook().sendMessage(needSetupMode)
-                            .addActionRow(
-                                    Button.secondary(Buttons.BUTTON_RUS.name(), "Кириллица")
-                                            .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")),
-                                    Button.secondary(Buttons.BUTTON_ENG.name(), "Latin")
-                                            .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")))
-                            .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play"))
+                            .addActionRow(ButtonIMpl.BUTTON_RUSSIAN, ButtonIMpl.BUTTON_ENGLISH)
+                            .addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN)
                             .setEphemeral(true)
                             .queue();
                     return;
@@ -256,13 +252,12 @@ public class ButtonReactions extends ListenerAdapter {
                     String hangmanEngGame1 = jsonGameParsers.getLocale("Hangman_Eng_game", userId);
 
                     if (secondPlayer != 0L) {
-                        String multi = String.format("%s_%s_%s", Buttons.BUTTON_START_NEW_GAME.name(), userId, secondPlayer);
                         event.getHook().sendMessage(hangmanEngGame)
-                                .addActionRow(Button.success(multi, "Play again"))
+                                .addActionRow(ButtonIMpl.getButtonPlayAgainWithUsers(userId, secondPlayer))
                                 .queue();
                     } else {
                         event.getHook().sendMessage(hangmanEngGame)
-                                .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
+                                .addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN)
                                 .queue();
                     }
 
@@ -281,7 +276,7 @@ public class ButtonReactions extends ListenerAdapter {
                 } else {
                     String hangmanYouAreNotPlay = jsonParsers.getLocale("Hangman_You_Are_Not_Play", event.getUser().getIdLong());
                     event.getChannel().sendMessage(hangmanYouAreNotPlay)
-                            .setActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
+                            .setActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN)
                             .queue();
                 }
                 return;

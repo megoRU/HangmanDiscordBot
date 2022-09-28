@@ -1,25 +1,20 @@
 package main.eventlisteners;
 
 import lombok.AllArgsConstructor;
-import main.enums.Buttons;
-import main.jsonparser.JSONParsers;
+import main.hangman.impl.ButtonIMpl;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
-import java.util.List;
 
 @AllArgsConstructor
 @Service
 public class MessageWhenBotJoinToGuild extends ListenerAdapter {
-
-    private static final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
 
     //bot join msg
     @Override
@@ -46,11 +41,8 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
                 welcome.addField("Vote", ":boom: [Vote for this bot](https://boticord.top/bot/845974873682608129)", false);
 
                 event.getGuild().getDefaultChannel().asTextChannel().sendMessageEmbeds(welcome.build())
-                        .setActionRow(
-                                List.of(Button.success(Buttons.BUTTON_HELP.name(), jsonParsers.getLocale("button_Help", event.getGuild().getIdLong())),
-                                        Button.link("https://discord.gg/UrWG3R683d", "Support"))
-                        ).queue();
-                welcome.clear();
+                        .setActionRow(ButtonIMpl.BUTTON_HELP, ButtonIMpl.BUTTON_SUPPORT)
+                        .queue();
             }
         } catch (Exception e) {
             e.printStackTrace();

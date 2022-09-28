@@ -4,10 +4,10 @@ import api.megoru.ru.MegoruAPI;
 import api.megoru.ru.entity.GameWordLanguage;
 import api.megoru.ru.impl.MegoruAPIImpl;
 import main.config.BotStartConfig;
-import main.enums.Buttons;
+import main.hangman.impl.ButtonIMpl;
 import main.hangman.impl.EndGameButtons;
-import main.hangman.impl.GetImage;
 import main.hangman.impl.HangmanHelper;
+import main.hangman.impl.ImageURL;
 import main.jsonparser.JSONParsers;
 import main.model.entity.ActiveHangman;
 import main.model.repository.GamesRepository;
@@ -20,8 +20,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -114,10 +112,8 @@ public class Hangman implements HangmanHelper {
             needSetLanguage.setDescription(hangmanListenerNeedSetLanguage);
 
             textChannel.sendMessageEmbeds(needSetLanguage.build())
-                    .addActionRow(
-                            Button.secondary(Buttons.BUTTON_RUS.name(), "Кириллица").withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")),
-                            Button.secondary(Buttons.BUTTON_ENG.name(), "Latin").withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")))
-                    .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play"))
+                    .addActionRow(ButtonIMpl.BUTTON_RUSSIAN, ButtonIMpl.BUTTON_ENGLISH)
+                    .addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN)
                     .queue();
 
             HangmanRegistry.getInstance().removeHangman(userId);
@@ -399,7 +395,7 @@ public class Hangman implements HangmanHelper {
         embedBuilder.setColor(color);
         embedBuilder.addField(gamePlayer, userIdWithDiscord, true);
         embedBuilder.addField(gameLanguage, language, true);
-        embedBuilder.setThumbnail(GetImage.get(hangmanErrors));
+        embedBuilder.setThumbnail(ImageURL.get(hangmanErrors));
 
         if (gameGuesses) {
             String gameGuessesL = jsonGameParsers.getLocale("Game_Guesses", userId);

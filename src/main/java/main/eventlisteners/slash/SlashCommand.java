@@ -2,7 +2,6 @@ package main.eventlisteners.slash;
 
 import lombok.RequiredArgsConstructor;
 import main.config.BotStartConfig;
-import main.enums.Buttons;
 import main.enums.Statistic;
 import main.eventlisteners.ChecksClass;
 import main.eventlisteners.DeleteAllMyData;
@@ -11,6 +10,7 @@ import main.eventlisteners.buildClass.MessageStats;
 import main.hangman.Hangman;
 import main.hangman.HangmanBuilder;
 import main.hangman.HangmanRegistry;
+import main.hangman.impl.ButtonIMpl;
 import main.hangman.impl.HangmanHelper;
 import main.jsonparser.JSONParsers;
 import main.model.entity.GameLanguage;
@@ -19,11 +19,9 @@ import main.model.repository.*;
 import main.statistic.CreatorGraph;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -73,12 +71,8 @@ public class SlashCommand extends ListenerAdapter {
                     needSetLanguage.setDescription(hangmanListenerNeedSetLanguage);
 
                     event.replyEmbeds(needSetLanguage.build())
-                            .addActionRow(
-                                    Button.secondary(Buttons.BUTTON_RUS.name(), "Кириллица")
-                                            .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")),
-                                    Button.secondary(Buttons.BUTTON_ENG.name(), "Latin")
-                                            .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")))
-                            .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play"))
+                            .addActionRow(ButtonIMpl.BUTTON_RUSSIAN, ButtonIMpl.BUTTON_ENGLISH)
+                            .addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN)
                             .queue();
                     return;
                     //Проверяем если игрок уже играет. То присылаем в чат уведомление
@@ -93,7 +87,7 @@ public class SlashCommand extends ListenerAdapter {
                     youPlay.setDescription(hangmanListenerYouPlay);
 
                     event.replyEmbeds(youPlay.build())
-                            .addActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game"))
+                            .addActionRow(ButtonIMpl.BUTTON_STOP)
                             .queue();
                     //Если всё хорошо, создаем игру
                 } else {
@@ -152,15 +146,9 @@ public class SlashCommand extends ListenerAdapter {
                     needSetLanguage.setColor(0x00FF00);
                     needSetLanguage.setDescription(hangmanListenerNeedSetLanguage);
 
-                    String multi = String.format("%s_%s_%s", Buttons.BUTTON_START_NEW_GAME.name(), userIdLong, user.getIdLong());
-
                     event.replyEmbeds(needSetLanguage.build())
-                            .addActionRow(
-                                    Button.secondary(Buttons.BUTTON_RUS.name(), "Кириллица")
-                                            .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")),
-                                    Button.secondary(Buttons.BUTTON_ENG.name(), "Latin")
-                                            .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")))
-                            .addActionRow(Button.success(multi, "Play"))
+                            .addActionRow(ButtonIMpl.BUTTON_RUSSIAN, ButtonIMpl.BUTTON_ENGLISH)
+                            .addActionRow(ButtonIMpl.getButtonPlayAgainWithUsers(userIdLong, user.getIdLong()))
                             .queue();
                     return;
                     //Проверяем если игрок уже играет. То присылаем в чат уведомление
@@ -175,28 +163,28 @@ public class SlashCommand extends ListenerAdapter {
                     youPlay.setDescription(hangmanListenerYouPlay);
 
                     event.replyEmbeds(youPlay.build())
-                            .addActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game"))
+                            .addActionRow(ButtonIMpl.BUTTON_STOP)
                             .queue();
                     return;
+                } else {
+                    Hangman hangman = new HangmanBuilder.Builder()
+                            .setUserIdLong(userIdLong)
+                            .setSecondUserIdLong(user.getIdLong())
+                            .setGuildIdLong(event.getGuild().getIdLong())
+                            .setChannelId(event.getChannel().getIdLong())
+                            .setHangmanGameRepository(hangmanGameRepository)
+                            .setGamesRepository(gamesRepository)
+                            .setPlayerRepository(playerRepository)
+                            .build();
+
+                    HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
+                    HangmanRegistry.getInstance().setHangman(user.getIdLong(), hangman);
+
+                    String createGame = jsonParsers.getLocale("create_game", userIdLong);
+
+                    event.reply(createGame).setEphemeral(true).queue();
+                    hangman.startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
                 }
-
-                Hangman hangman = new HangmanBuilder.Builder()
-                        .setUserIdLong(userIdLong)
-                        .setSecondUserIdLong(user.getIdLong())
-                        .setGuildIdLong(event.getGuild().getIdLong())
-                        .setChannelId(event.getChannel().getIdLong())
-                        .setHangmanGameRepository(hangmanGameRepository)
-                        .setGamesRepository(gamesRepository)
-                        .setPlayerRepository(playerRepository)
-                        .build();
-
-                HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
-                HangmanRegistry.getInstance().setHangman(user.getIdLong(), hangman);
-
-                String createGame = jsonParsers.getLocale("create_game", userIdLong);
-
-                event.reply(createGame).setEphemeral(true).queue();
-                hangman.startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
                 return;
             }
 
@@ -211,13 +199,12 @@ public class SlashCommand extends ListenerAdapter {
                     String hangmanEngGame1 = jsonGameParsers.getLocale("Hangman_Eng_game", userId);
 
                     if (secondPlayer != 0L) {
-                        String multi = String.format("%s_%s_%s", Buttons.BUTTON_START_NEW_GAME.name(), userId, secondPlayer);
                         event.reply(hangmanEngGame)
-                                .addActionRow(Button.success(multi, "Play again"))
+                                .addActionRow(ButtonIMpl.getButtonPlayAgainWithUsers(userId, secondPlayer))
                                 .queue();
                     } else {
                         event.reply(hangmanEngGame)
-                                .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
+                                .addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN)
                                 .queue();
                     }
 
@@ -237,7 +224,7 @@ public class SlashCommand extends ListenerAdapter {
                     String hangmanYouAreNotPlay = jsonParsers.getLocale("Hangman_You_Are_Not_Play", userIdLong);
 
                     event.reply(hangmanYouAreNotPlay)
-                            .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
+                            .addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN)
                             .queue();
                 }
                 return;
@@ -253,7 +240,7 @@ public class SlashCommand extends ListenerAdapter {
                 whenPlay.setDescription(reactionsButtonWhenPlay);
 
                 event.replyEmbeds(whenPlay.build())
-                        .addActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game"))
+                        .addActionRow(ButtonIMpl.BUTTON_STOP)
                         .queue();
                 return;
             }
@@ -269,7 +256,7 @@ public class SlashCommand extends ListenerAdapter {
                 String slashLanguage = String.format(jsonParsers.getLocale("slash_language", userIdLong), opOne, opTwo);
 
                 event.reply(slashLanguage)
-                        .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
+                        .addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN)
                         .queue();
                 GameLanguage gameLanguage = new GameLanguage();
                 gameLanguage.setUserIdLong(userIdLong);
@@ -316,7 +303,7 @@ public class SlashCommand extends ListenerAdapter {
                     String hangmanYouAreNotPlay = jsonParsers.getLocale("Hangman_You_Are_Not_Play", userIdLong);
 
                     event.reply(hangmanYouAreNotPlay)
-                            .addActionRow(Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again"))
+                            .addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN)
                             .queue();
                 }
                 return;
@@ -370,8 +357,8 @@ public class SlashCommand extends ListenerAdapter {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println("Unknown interaction");
+            e.printStackTrace();
         }
     }
 }
