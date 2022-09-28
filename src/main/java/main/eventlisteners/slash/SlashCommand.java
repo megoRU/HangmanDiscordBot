@@ -9,6 +9,7 @@ import main.eventlisteners.DeleteAllMyData;
 import main.eventlisteners.buildClass.Help;
 import main.eventlisteners.buildClass.MessageStats;
 import main.hangman.Hangman;
+import main.hangman.HangmanBuilder;
 import main.hangman.HangmanRegistry;
 import main.hangman.impl.HangmanHelper;
 import main.jsonparser.JSONParsers;
@@ -96,27 +97,28 @@ public class SlashCommand extends ListenerAdapter {
                             .queue();
                     //Если всё хорошо, создаем игру
                 } else {
-                    Hangman hangman;
+                    HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder()
+                            .setUserIdLong(userIdLong)
+                            .setChannelId(event.getChannel().getIdLong())
+                            .setHangmanGameRepository(hangmanGameRepository)
+                            .setGamesRepository(gamesRepository)
+                            .setPlayerRepository(playerRepository);
+
                     if (event.getGuild() != null) {
-                        HangmanRegistry.getInstance().setHangman(userIdLong,
-                                hangman = new Hangman(userIdLong,
-                                        event.getGuild().getIdLong(),
-                                        event.getChannel().getIdLong(),
-                                        hangmanGameRepository,
-                                        gamesRepository,
-                                        playerRepository));
+                        hangmanBuilder.setGuildIdLong(event.getGuild().getIdLong());
+
                     } else {
-                        HangmanRegistry.getInstance().setHangman(userIdLong,
-                                hangman = new Hangman(userIdLong,
-                                        null,
-                                        event.getChannel().getIdLong(),
-                                        hangmanGameRepository,
-                                        gamesRepository,
-                                        playerRepository));
+                        hangmanBuilder.setGuildIdLong(null);
                     }
+
                     String createGame = jsonParsers.getLocale("create_game", userIdLong);
 
                     event.reply(createGame).setEphemeral(true).queue();
+
+                    Hangman hangman = hangmanBuilder.build();
+
+                    HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
+
                     hangman.startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
                 }
                 return;
@@ -176,15 +178,15 @@ public class SlashCommand extends ListenerAdapter {
                     return;
                 }
 
-                //Если всё хорошо, создаем игру
-                Hangman hangman = new Hangman(
-                        userIdLong,
-                        user.getIdLong(),
-                        event.getGuild().getIdLong(),
-                        event.getChannel().getIdLong(),
-                        hangmanGameRepository,
-                        gamesRepository,
-                        playerRepository);
+                Hangman hangman = new HangmanBuilder.Builder()
+                        .setUserIdLong(userIdLong)
+                        .setSecondUserIdLong(user.getIdLong())
+                        .setGuildIdLong(event.getGuild().getIdLong())
+                        .setChannelId(event.getChannel().getIdLong())
+                        .setHangmanGameRepository(hangmanGameRepository)
+                        .setGamesRepository(gamesRepository)
+                        .setPlayerRepository(playerRepository)
+                        .build();
 
                 HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
                 HangmanRegistry.getInstance().setHangman(user.getIdLong(), hangman);

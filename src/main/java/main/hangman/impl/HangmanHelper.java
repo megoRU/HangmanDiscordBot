@@ -1,6 +1,7 @@
 package main.hangman.impl;
 
 import main.config.BotStartConfig;
+import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -20,9 +21,10 @@ public interface HangmanHelper {
     static void editMessage(EmbedBuilder embedBuilder, Long userIdLong) {
         try {
             if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                Long guildId = HangmanRegistry.getInstance().getActiveHangman(userIdLong).getGuildId();
-                Long channelId = HangmanRegistry.getInstance().getActiveHangman(userIdLong).getChannelId();
-                String messageId = HangmanRegistry.getInstance().getMessageId(userIdLong);
+                Hangman activeHangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
+                Long guildId = activeHangman.getGuildId();
+                Long channelId = activeHangman.getChannelId();
+                String messageId = HangmanRegistry.getInstance().getMessageId(activeHangman.getUserId());
 
                 if (guildId != null) {
                     Guild guildById = BotStartConfig.jda.getGuildById(guildId);
@@ -66,9 +68,10 @@ public interface HangmanHelper {
     static void editMessageWithButtons(EmbedBuilder embedBuilder, Long userIdLong, List<Button> buttons) {
         try {
             if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                Long guildId = HangmanRegistry.getInstance().getActiveHangman(userIdLong).getGuildId();
-                Long channelId = HangmanRegistry.getInstance().getActiveHangman(userIdLong).getChannelId();
-                String messageId = HangmanRegistry.getInstance().getMessageId(userIdLong);
+                Hangman activeHangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
+                Long guildId = activeHangman.getGuildId();
+                Long channelId = activeHangman.getChannelId();
+                String messageId = HangmanRegistry.getInstance().getMessageId(activeHangman.getUserId());
 
                 if (guildId != null) {
                     Guild guildById = BotStartConfig.jda.getGuildById(guildId);

@@ -8,6 +8,7 @@ import main.eventlisteners.buildClass.GameLanguageChange;
 import main.eventlisteners.buildClass.Help;
 import main.eventlisteners.buildClass.MessageStats;
 import main.hangman.Hangman;
+import main.hangman.HangmanBuilder;
 import main.hangman.HangmanRegistry;
 import main.hangman.impl.HangmanHelper;
 import main.jsonparser.JSONParsers;
@@ -178,6 +179,13 @@ public class ButtonReactions extends ListenerAdapter {
                 if (!HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                     event.getChannel().sendTyping().queue();
 
+                    HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder()
+                            .setUserIdLong(userIdLong)
+                            .setHangmanGameRepository(hangmanGameRepository)
+                            .setGamesRepository(gamesRepository)
+                            .setPlayerRepository(playerRepository);
+                    Hangman hangman;
+
                     if (event.getGuild() != null) {
                         boolean hasPermission = event.getGuild().getSelfMember().hasPermission(
                                 event.getGuildChannel(),
@@ -198,45 +206,32 @@ public class ButtonReactions extends ListenerAdapter {
                                     secondUser = Long.parseLong(userId);
                                 }
                             }
+                            hangmanBuilder.setSecondUserIdLong(secondUser);
+                            hangmanBuilder.setGuildIdLong(event.getGuild().getIdLong());
+                            hangmanBuilder.setChannelId(event.getGuildChannel().getIdLong());
 
-                            Hangman hangman = new Hangman(
-                                    event.getUser().getIdLong(),
-                                    secondUser,
-                                    event.getGuild().getIdLong(),
-                                    event.getGuildChannel().getIdLong(),
-                                    hangmanGameRepository,
-                                    gamesRepository,
-                                    playerRepository);
+                            hangman = hangmanBuilder.build();
 
                             HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
                             HangmanRegistry.getInstance().setHangman(secondUser, hangman);
                         } else {
-                            HangmanRegistry.getInstance().setHangman(userIdLong,
-                                    new Hangman(
-                                            event.getUser().getIdLong(),
-                                            event.getGuild().getIdLong(),
-                                            event.getGuildChannel().getIdLong(),
-                                            hangmanGameRepository,
-                                            gamesRepository,
-                                            playerRepository));
+                            hangmanBuilder.setGuildIdLong(event.getGuild().getIdLong());
+                            hangmanBuilder.setChannelId(event.getGuildChannel().getIdLong());
+
+                            hangman = hangmanBuilder.build();
+                            HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
                         }
                         //DM play
                     } else {
-                        HangmanRegistry.getInstance().setHangman(
-                                userIdLong,
-                                new Hangman(
-                                        event.getUser().getIdLong(),
-                                        null,
-                                        event.getChannel().getIdLong(),
-                                        hangmanGameRepository,
-                                        gamesRepository,
-                                        playerRepository));
+                        hangmanBuilder.setChannelId(event.getChannel().getIdLong());
+                        hangmanBuilder.setGuildIdLong(null);
+
+                        hangman = hangmanBuilder.build();
+
+                        HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
                     }
-                    HangmanRegistry.getInstance().getActiveHangman(userIdLong)
-                            .startGame(
-                                    event.getChannel(),
-                                    event.getUser().getAvatarUrl(),
-                                    event.getUser().getName());
+                    //Запускаем игру
+                    hangman.startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
                 } else {
                     String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
 
