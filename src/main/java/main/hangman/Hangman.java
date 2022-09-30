@@ -65,10 +65,13 @@ public class Hangman implements HangmanHelper {
     private String currentHiddenWord;
     private int hangmanErrors;
 
+    private volatile Status STATUS;
+
     Hangman(long userId, Long guildId, Long channelId,
             HangmanGameRepository hangmanGameRepository,
             GamesRepository gamesRepository,
             PlayerRepository playerRepository) {
+        this.STATUS = Status.STARTING;
         this.hangmanGameRepository = hangmanGameRepository;
         this.gamesRepository = gamesRepository;
         this.playerRepository = playerRepository;
@@ -86,6 +89,7 @@ public class Hangman implements HangmanHelper {
             HangmanGameRepository hangmanGameRepository,
             GamesRepository gamesRepository,
             PlayerRepository playerRepository) {
+        this.STATUS = Status.STARTING;
         this.hangmanGameRepository = hangmanGameRepository;
         this.gamesRepository = gamesRepository;
         this.playerRepository = playerRepository;
@@ -189,6 +193,9 @@ public class Hangman implements HangmanHelper {
             }
 
             if (isLetterPresent(inputs)) {
+                if (STATUS == Status.SAME_LETTER) return;
+                STATUS = Status.SAME_LETTER;
+
                 String gameYouUseThisWord = jsonGameParsers.getLocale("Game_You_Use_This_Word", userId);
 
                 EmbedBuilder info = embedBuilder(
@@ -204,12 +211,15 @@ public class Hangman implements HangmanHelper {
             }
 
             if (inputs.equals(WORD)) {
+                STATUS = Status.WIN_GAME;
                 gameWin(inputs);
             } else {
                 hangmanErrors++;
                 if (hangmanErrors >= 8) {
+                    STATUS = Status.LOSE_GAME;
                     gameLose(inputs);
                 } else {
+                    STATUS = Status.WRONG_WORD;
                     String gameNoSuchWord = jsonGameParsers.getLocale("Game_No_Such_Word", userId);
 
                     EmbedBuilder wordNotFound = embedBuilder(
@@ -313,6 +323,9 @@ public class Hangman implements HangmanHelper {
         try {
             if (WORD_HIDDEN.contains("_")) {
                 if (isLetterPresent(inputs.toUpperCase())) {
+                    if (STATUS == Status.SAME_LETTER) return;
+                    STATUS = Status.SAME_LETTER;
+
                     String gameYouUseThisLetter = jsonGameParsers.getLocale("Game_You_Use_This_Letter", userId);
 
                     EmbedBuilder info = embedBuilder(
@@ -328,9 +341,11 @@ public class Hangman implements HangmanHelper {
                 }
 
                 if (WORD.contains(inputs)) {
+                    STATUS = Status.RIGHT_LETTER;
                     String result = replacementLetters(inputs);
                     //Игрок угадал все буквы
                     if (!result.contains("_")) {
+                        STATUS = Status.WIN_GAME;
                         gameWin(inputs);
                         return;
                     }
@@ -349,8 +364,10 @@ public class Hangman implements HangmanHelper {
                 } else {
                     hangmanErrors++;
                     if (hangmanErrors >= 8) {
+                        STATUS = Status.LOSE_GAME;
                         gameLose(inputs);
                     } else {
+                        STATUS = Status.WRONG_LETTER;
                         String gameNoSuchLetter = jsonGameParsers.getLocale("Game_No_Such_Letter", userId);
 
                         EmbedBuilder wordNotFound = embedBuilder(
@@ -664,6 +681,7 @@ public class Hangman implements HangmanHelper {
         public void run() {
             try {
                 if (HangmanRegistry.getInstance().hasHangman(userId)) {
+                    STATUS = Status.TIME_OVER;
                     stopGameByTime();
                 } else {
                     Thread.currentThread().interrupt();
@@ -673,6 +691,16 @@ public class Hangman implements HangmanHelper {
                 e.printStackTrace();
             }
         }
+    }
 
+    private enum Status {
+        WRONG_LETTER,
+        SAME_LETTER,
+        RIGHT_LETTER,
+        WRONG_WORD,
+        WIN_GAME,
+        LOSE_GAME,
+        TIME_OVER,
+        STARTING
     }
 }
