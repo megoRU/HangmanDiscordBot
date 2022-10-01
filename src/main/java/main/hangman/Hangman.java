@@ -558,7 +558,7 @@ public class Hangman implements HangmanHelper {
         }
     }
 
-    private boolean isLetterPresent(final String inputs) {
+    private synchronized boolean isLetterPresent(final String inputs) {
         boolean contains = guesses.contains(inputs.toUpperCase());
         if (!contains) {
             guesses.add(inputs.toUpperCase());
