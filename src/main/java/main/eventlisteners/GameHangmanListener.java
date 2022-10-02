@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 public class GameHangmanListener extends ListenerAdapter {
 
     private static final String HG_ONE_LETTER = "[A-Za-zА-ЯЁа-яё]";
-    private static final String HG_ONE_WORD = "[A-Za-zА-ЯЁа-яё]{3,24}+";
+    private static final String HG_ONE_WORD = "[A-Za-zА-ЯЁа-яё-]{3,24}+";
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {

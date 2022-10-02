@@ -510,7 +510,11 @@ public class Hangman implements HangmanHelper {
         StringBuilder sb = new StringBuilder();
         int i = 0;
         while (i < length) {
-            sb.append(sb.length() == 0 ? "_" : " _");
+            if (Objects.equals(wordToChar[i], "-")) {
+                sb.append(" -");
+            } else {
+                sb.append(sb.length() == 0 ? "_" : " _");
+            }
             i++;
         }
         WORD_HIDDEN = sb.toString();
