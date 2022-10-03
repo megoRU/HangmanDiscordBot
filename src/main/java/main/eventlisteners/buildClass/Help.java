@@ -24,7 +24,7 @@ public class Help {
         info.setColor(0xa224db);
         info.setAuthor(name, null, avatar);
 
-        info.addField("Slash Commands", "`/hg`, `/stop`, `/language`, `/stats`, \n`/mystats`, `/allstats`, `/delete`", false);
+        info.addField("Slash Commands", "`/hg`, `/multi`, `/stop`, `/language`, `/stats`, \n`/mystats`, `/allstats`, `/delete`", false);
 
         String messagesEventsLinks = jsonParsers.getLocale("messages_events_Links", userIdLong);
         String messagesEventsSite = jsonParsers.getLocale("messages_events_Site", userIdLong);
