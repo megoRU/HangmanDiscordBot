@@ -60,7 +60,7 @@ public class Hangman implements HangmanHelper {
 
     private int countUsedLetters;
     private String WORD;
-    private String[] wordToChar;
+    private String[] WORD_OF_CHARS;
     private String WORD_HIDDEN;
     private String currentHiddenWord;
     private int hangmanErrors;
@@ -130,7 +130,7 @@ public class Hangman implements HangmanHelper {
         try {
             WORD = megoruAPI.getWord(gameWordLanguage).getWord();
             if (WORD != null) {
-                wordToChar = WORD.split(""); // Преобразуем строку str в массив символов (char)
+                WORD_OF_CHARS = WORD.split(""); // Преобразуем строку str в массив символов (char)
                 hideWord(WORD.length());
             }
         } catch (Exception e) {
@@ -510,7 +510,7 @@ public class Hangman implements HangmanHelper {
         StringBuilder sb = new StringBuilder();
         int i = 0;
         while (i < length) {
-            if (Objects.equals(wordToChar[i], "-")) {
+            if (Objects.equals(WORD_OF_CHARS[i], "-")) {
                 sb.append(" -");
             } else {
                 sb.append(sb.length() == 0 ? "_" : " _");
@@ -526,12 +526,12 @@ public class Hangman implements HangmanHelper {
             if (currentHiddenWord == null) currentHiddenWord = WORD_HIDDEN;
 
             StringBuilder sb = new StringBuilder(currentHiddenWord);
-            for (int i = 0; i < wordToChar.length; i++) {
-                if (wordToChar[i].equals(letter)) {
+            for (int i = 0; i < WORD_OF_CHARS.length; i++) {
+                if (WORD_OF_CHARS[i].equals(letter)) {
                     sb.replace(
                             i == 0 ? i : i * 2,
                             i == 0 ? i + 1 : i * 2 + 1,
-                            String.valueOf(wordToChar[i]));
+                            String.valueOf(WORD_OF_CHARS[i]));
                 }
             }
             currentHiddenWord = sb.toString();
@@ -553,7 +553,7 @@ public class Hangman implements HangmanHelper {
             this.WORD_HIDDEN = currentHiddenWord;
             this.currentHiddenWord = currentHiddenWord;
             this.hangmanErrors = hangmanErrors;
-            this.wordToChar = word.split("");
+            this.WORD_OF_CHARS = word.split("");
             setTimer(localDateTime);
             autoInsert();
             autoDeletingMessages();

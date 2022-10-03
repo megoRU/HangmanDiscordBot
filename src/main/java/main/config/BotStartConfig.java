@@ -209,8 +209,8 @@ public class BotStartConfig {
             listLanguages.add("rus");
             listLanguages.add("eng");
 
-            for (int i = 0; i < listLanguages.size(); i++) {
-                InputStream inputStream = new ClassPathResource("json/" + listLanguages.get(i) + ".json").getInputStream();
+            for (String listLanguage : listLanguages) {
+                InputStream inputStream = new ClassPathResource("json/" + listLanguage + ".json").getInputStream();
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                 JSONObject jsonObject = (JSONObject) new JSONParser().parse(reader);
@@ -218,7 +218,7 @@ public class BotStartConfig {
                 for (Object o : jsonObject.keySet()) {
                     String key = (String) o;
 
-                    if (listLanguages.get(i).equals("rus")) {
+                    if (listLanguage.equals("rus")) {
                         ParserClass.russian.put(key, String.valueOf(jsonObject.get(key)));
                     } else {
                         ParserClass.english.put(key, String.valueOf(jsonObject.get(key)));
