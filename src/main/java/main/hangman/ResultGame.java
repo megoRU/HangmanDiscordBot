@@ -21,7 +21,6 @@ public class ResultGame {
     private final long userId;
     private final boolean result;
 
-
     public ResultGame(HangmanGameRepository hangmanGameRepository,
                       GamesRepository gamesRepository,
                       PlayerRepository playerRepository,

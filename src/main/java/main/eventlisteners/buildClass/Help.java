@@ -1,11 +1,10 @@
 package main.eventlisteners.buildClass;
 
 import main.config.BotStartConfig;
-import main.enums.Buttons;
+import main.hangman.impl.ButtonIMpl;
 import main.jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
@@ -38,24 +37,18 @@ public class Help {
         info.addField(messagesEventsBotCreator, messagesEventsBotCreatorUrlSteam, false);
 
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.link("https://discord.gg/UrWG3R683d", "Support"));
+        buttons.add(ButtonIMpl.BUTTON_SUPPORT);
 
         if (BotStartConfig.getMapLanguages().get(userIdLong) != null) {
 
             if (BotStartConfig.getMapLanguages().get(userIdLong).equals("eng")) {
 
-                buttons.add(Button.secondary(Buttons.BUTTON_CHANGE_LANGUAGE.name(),
-                                "Сменить язык")
-                        .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
+                buttons.add(ButtonIMpl.BUTTON_RUSSIAN_CHANGE);
             } else {
-                buttons.add(Button.secondary(Buttons.BUTTON_CHANGE_LANGUAGE.name(),
-                                "Change language")
-                        .withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7")));
+                buttons.add(ButtonIMpl.BUTTON_ENGLISH_CHANGE);
             }
         } else {
-            buttons.add(Button.secondary(Buttons.BUTTON_CHANGE_LANGUAGE.name(),
-                            "Сменить язык")
-                    .withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA")));
+            buttons.add(ButtonIMpl.BUTTON_RUSSIAN_CHANGE);
         }
 
         if (messageChannel != null) {
