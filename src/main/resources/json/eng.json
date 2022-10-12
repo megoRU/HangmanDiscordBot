@@ -72,5 +72,6 @@
   "cannot_write_dm": "I couldn't send a message to you in DM\nUse `/hg` in DM",
   "check_permissions": "Bot don't have in <#%s>\n%s",
   "play_with_bot": "You cannot play with bot!",
-  "play_with_yourself": "I understand that this is a joke, but then use: `/hg`"
+  "play_with_yourself": "I understand that this is a joke, but then use: `/hg`",
+  "game_category": "Category saved."
 }

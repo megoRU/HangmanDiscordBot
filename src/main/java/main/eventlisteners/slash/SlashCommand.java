@@ -13,6 +13,7 @@ import main.hangman.HangmanRegistry;
 import main.hangman.impl.ButtonIMpl;
 import main.hangman.impl.HangmanHelper;
 import main.jsonparser.JSONParsers;
+import main.model.entity.Category;
 import main.model.entity.GameLanguage;
 import main.model.entity.Language;
 import main.model.repository.*;
@@ -43,6 +44,7 @@ public class SlashCommand extends ListenerAdapter {
     private final PlayerRepository playerRepository;
     private final GameLanguageRepository gameLanguageRepository;
     private final LanguageRepository languageRepository;
+    private final CategoryRepository categoryRepository;
     private final static Logger LOGGER = Logger.getLogger(SlashCommand.class.getName());
 
     @Override
@@ -115,6 +117,25 @@ public class SlashCommand extends ListenerAdapter {
 
                     hangman.startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
                 }
+                return;
+            }
+
+            if (event.getName().equals("category")) {
+                String categorySlash = event.getOption("set", OptionMapping::getAsString);
+                String gameCategory = jsonParsers.getLocale("game_category", userIdLong);
+
+                if (categorySlash != null && categorySlash.equals("all")) {
+                    BotStartConfig.mapGameCategory.remove(userIdLong);
+                    categoryRepository.deleteCategory(userIdLong);
+                    event.reply(gameCategory).setEphemeral(true).queue();
+                    return;
+                }
+                Category category = new Category();
+                category.setUserIdLong(userIdLong);
+                category.setCategory(categorySlash);
+                categoryRepository.save(category);
+                BotStartConfig.mapGameCategory.put(userIdLong, categorySlash);
+                event.reply(gameCategory).setEphemeral(true).queue();
                 return;
             }
 
