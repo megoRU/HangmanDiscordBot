@@ -45,7 +45,7 @@ public class Hangman implements HangmanHelper {
     private final PlayerRepository playerRepository;
 
     //API
-    private final MegoruAPI megoruAPI = new MegoruAPIImpl("this bot don`t use token");
+    private final MegoruAPI megoruAPI = new MegoruAPIImpl();
 
     private final Set<String> guesses;
 
@@ -512,6 +512,8 @@ public class Hangman implements HangmanHelper {
         while (i < length) {
             if (Objects.equals(WORD_OF_CHARS[i], "-")) {
                 sb.append(" -");
+            } else if (Objects.equals(WORD_OF_CHARS[i], " ")) {
+                sb.append("  ");
             } else {
                 sb.append(sb.length() == 0 ? "_" : " _");
             }
