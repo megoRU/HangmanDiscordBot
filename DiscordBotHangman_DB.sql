@@ -61,6 +61,20 @@ CREATE TABLE `game_language` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Table structure for table `category`
+--
+
+DROP TABLE IF EXISTS `category`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `category` (
+                                 `user_id_long` varchar(255) NOT NULL,
+                                 `category` varchar(255) NOT NULL,
+                                 PRIMARY KEY (`user_id_long`),
+                                 UNIQUE KEY `user_id_long` (`user_id_long`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `games`

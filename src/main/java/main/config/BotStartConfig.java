@@ -53,6 +53,7 @@ public class BotStartConfig {
     public static final Map<Long, String> secretCode = new HashMap<>();
     public static final Map<Long, String> mapLanguages = new HashMap<>();
     public static final Map<Long, String> mapGameLanguages = new HashMap<>();
+    public static final Map<Long, String> mapGameCategory = new HashMap<>();
 
     private static int idGame;
     public static JDA jda;
@@ -64,6 +65,7 @@ public class BotStartConfig {
     private final HangmanGameRepository hangmanGameRepository;
     private final PlayerRepository playerRepository;
     private final GamesRepository gamesRepository;
+    private final CategoryRepository categoryRepository;
 
     //DataBase
     @Value("${spring.datasource.url}")
@@ -76,12 +78,13 @@ public class BotStartConfig {
     @Autowired
     public BotStartConfig(LanguageRepository languageRepository, GameLanguageRepository gameLanguageRepository,
                           HangmanGameRepository hangmanGameRepository, PlayerRepository playerRepository,
-                          GamesRepository gamesRepository) {
+                          GamesRepository gamesRepository, CategoryRepository categoryRepository) {
         this.languageRepository = languageRepository;
         this.gameLanguageRepository = gameLanguageRepository;
         this.hangmanGameRepository = hangmanGameRepository;
         this.playerRepository = playerRepository;
         this.gamesRepository = gamesRepository;
+        this.categoryRepository = categoryRepository;
         idGame = hangmanGameRepository.getCountGames() == null ? 0 : hangmanGameRepository.getCountGames();
     }
 
@@ -93,6 +96,7 @@ public class BotStartConfig {
             setLanguages();
             getLocalizationFromDB();
             getGameLocalizationFromDB();
+            getCategoriesFromDB();
 
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
@@ -117,7 +121,7 @@ public class BotStartConfig {
             jdaBuilder.addEventListeners(new MessageWhenBotJoinToGuild());
             jdaBuilder.addEventListeners(new ButtonReactions(gameLanguageRepository, languageRepository, hangmanGameRepository, gamesRepository, playerRepository));
             jdaBuilder.addEventListeners(new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository));
-            jdaBuilder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository, gameLanguageRepository, languageRepository));
+            jdaBuilder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository, gameLanguageRepository, languageRepository, categoryRepository));
 
             jda = jdaBuilder.build();
             jda.awaitReady();
@@ -129,7 +133,7 @@ public class BotStartConfig {
         System.out.println(jda.retrieveCommands().complete());
 
         //Обновить команды
-//        updateSlashCommands();
+        updateSlashCommands();
         System.out.println("20:11");
     }
 
@@ -158,6 +162,15 @@ public class BotStartConfig {
                     .setRequired(true)
                     .setName("user"));
 
+            List<OptionData> category = new ArrayList<>();
+            category.add(new OptionData(STRING, "set", "Select a category")
+                    .addChoice("all", "all")
+                    .addChoice("colors", "russian_colors")
+                    .addChoice("fruits", "russian_fruits")
+                    .addChoice("flowers", "russian_flowers")
+                    .setRequired(true)
+                    .setName("set"));
+
             commands.addCommands(Commands.slash("language", "Setting language").addOptions(options));
             commands.addCommands(Commands.slash("hg", "Start the game"));
             commands.addCommands(Commands.slash("stop", "Stop the game"));
@@ -168,6 +181,7 @@ public class BotStartConfig {
             commands.addCommands(Commands.slash("delete", "Deleting your data"));
             commands.addCommands(Commands.slash("full", "Guess the full word").addOptions(word));
             commands.addCommands(Commands.slash("multi", "Play Hangman with another player").setGuildOnly(true).addOptions(multi));
+            commands.addCommands(Commands.slash("category", "Only for the Russian alphabet").addOptions(category));
 
             commands.queue();
 
@@ -249,6 +263,26 @@ public class BotStartConfig {
             statement.close();
             connection.close();
             System.out.println("getLocalizationFromDB()");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void getCategoriesFromDB() {
+        try {
+            Connection connection = DriverManager.getConnection(URL_CONNECTION, USER_CONNECTION, PASSWORD_CONNECTION);
+            Statement statement = connection.createStatement();
+            String sql = "SELECT * FROM category";
+            ResultSet rs = statement.executeQuery(sql);
+
+            while (rs.next()) {
+                mapGameCategory.put(rs.getLong("user_id_long"), rs.getString("category"));
+            }
+
+            rs.close();
+            statement.close();
+            connection.close();
+            System.out.println("getCategoriesFromDB()");
         } catch (SQLException e) {
             e.printStackTrace();
         }

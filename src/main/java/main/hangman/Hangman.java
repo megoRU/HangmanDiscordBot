@@ -1,8 +1,7 @@
 package main.hangman;
 
-import api.megoru.ru.MegoruAPI;
 import api.megoru.ru.entity.GameWordLanguage;
-import api.megoru.ru.impl.MegoruAPIImpl;
+import api.megoru.ru.impl.MegoruAPI;
 import main.config.BotStartConfig;
 import main.hangman.impl.ButtonIMpl;
 import main.hangman.impl.EndGameButtons;
@@ -45,7 +44,7 @@ public class Hangman implements HangmanHelper {
     private final PlayerRepository playerRepository;
 
     //API
-    private final MegoruAPI megoruAPI = new MegoruAPIImpl("this bot don`t use token");
+    private final MegoruAPI megoruAPI = new MegoruAPI.Builder().build();
 
     private final Set<String> guesses;
 
@@ -126,6 +125,10 @@ public class Hangman implements HangmanHelper {
 
         GameWordLanguage gameWordLanguage = new GameWordLanguage();
         gameWordLanguage.setLanguage(language);
+
+        if (BotStartConfig.getMapGameLanguages().get(userId).equals("rus")) {
+            gameWordLanguage.setCategory(BotStartConfig.mapGameCategory.get(userId));
+        }
 
         try {
             WORD = megoruAPI.getWord(gameWordLanguage).getWord();
@@ -512,6 +515,8 @@ public class Hangman implements HangmanHelper {
         while (i < length) {
             if (Objects.equals(WORD_OF_CHARS[i], "-")) {
                 sb.append(" -");
+            } else if (Objects.equals(WORD_OF_CHARS[i], " ")) {
+                sb.append("  ");
             } else {
                 sb.append(sb.length() == 0 ? "_" : " _");
             }
