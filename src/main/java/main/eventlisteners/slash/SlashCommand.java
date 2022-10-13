@@ -37,7 +37,7 @@ public class SlashCommand extends ListenerAdapter {
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
 
-    private static final String HG_ONE_WORD = "[A-Za-zА-ЯЁа-яё]{3,24}+";
+    private static final String HG_ONE_WORD = "[-A-Za-zА-ЯЁа-яё\s]{3,24}+";
     //REPO
     private final HangmanGameRepository hangmanGameRepository;
     private final GamesRepository gamesRepository;
@@ -124,7 +124,7 @@ public class SlashCommand extends ListenerAdapter {
                 String categorySlash = event.getOption("set", OptionMapping::getAsString);
                 String gameCategory = jsonParsers.getLocale("game_category", userIdLong);
 
-                if (categorySlash != null && categorySlash.equals("all")) {
+                if (categorySlash != null && categorySlash.equals("any")) {
                     BotStartConfig.mapGameCategory.remove(userIdLong);
                     categoryRepository.deleteCategory(userIdLong);
                     event.reply(gameCategory).setEphemeral(true).queue();
@@ -243,13 +243,11 @@ public class SlashCommand extends ListenerAdapter {
                     //Если игрок не играет, а хочет завершить игру, то нужно ему это прислать уведомление, что он сейчас не играет
                 } else {
                     String hangmanYouAreNotPlay = jsonParsers.getLocale("Hangman_You_Are_Not_Play", userIdLong);
-
-                    event.reply(hangmanYouAreNotPlay)
-                            .addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN)
-                            .queue();
+                    event.reply(hangmanYouAreNotPlay).addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN).queue();
                 }
                 return;
             }
+
             //Если игрок сейчас играет сменить язык не даст
             if (event.getName().equals("language") && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
                 String reactionsButtonWhenPlay = jsonParsers.getLocale("ReactionsButton_When_Play", userIdLong);
@@ -260,9 +258,7 @@ public class SlashCommand extends ListenerAdapter {
                 whenPlay.setColor(Color.GREEN);
                 whenPlay.setDescription(reactionsButtonWhenPlay);
 
-                event.replyEmbeds(whenPlay.build())
-                        .addActionRow(ButtonIMpl.BUTTON_STOP)
-                        .queue();
+                event.replyEmbeds(whenPlay.build()).addActionRow(ButtonIMpl.BUTTON_STOP).queue();
                 return;
             }
 
@@ -276,9 +272,8 @@ public class SlashCommand extends ListenerAdapter {
 
                 String slashLanguage = String.format(jsonParsers.getLocale("slash_language", userIdLong), opOne, opTwo);
 
-                event.reply(slashLanguage)
-                        .addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN)
-                        .queue();
+                event.reply(slashLanguage).addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN).queue();
+
                 GameLanguage gameLanguage = new GameLanguage();
                 gameLanguage.setUserIdLong(userIdLong);
                 gameLanguage.setLanguage(opOne);
@@ -288,6 +283,7 @@ public class SlashCommand extends ListenerAdapter {
                 language.setUserIdLong(userIdLong);
                 language.setLanguage(opTwo);
                 languageRepository.save(language);
+                return;
             }
 
             if (event.getName().equals("full")) {
@@ -322,19 +318,13 @@ public class SlashCommand extends ListenerAdapter {
                     }
                 } else {
                     String hangmanYouAreNotPlay = jsonParsers.getLocale("Hangman_You_Are_Not_Play", userIdLong);
-
-                    event.reply(hangmanYouAreNotPlay)
-                            .addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN)
-                            .queue();
+                    event.reply(hangmanYouAreNotPlay).addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN).queue();
                 }
                 return;
             }
 
             if (event.getName().equals("delete")) {
-                DeleteAllMyData deleteAllMyData = new DeleteAllMyData(
-                        gamesRepository,
-                        languageRepository,
-                        gameLanguageRepository);
+                DeleteAllMyData deleteAllMyData = new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository);
                 deleteAllMyData.buildMessage(event, event.getUser());
                 return;
             }

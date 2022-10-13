@@ -391,10 +391,24 @@ public class Hangman implements HangmanHelper {
         }
     }
 
+    private String categoryExt() {
+        String category = BotStartConfig.getMapGameCategory().get(userId);
+        String language = BotStartConfig.getMapLanguages().get(userId);
+        if (category == null) return Objects.equals(language, "eng") ? "`Any`" : "`Любая`";
+        return switch (category) {
+            case "russian_colors" -> Objects.equals(language, "eng") ? "`Colors`" : "`Цвета`";
+            case "russian_flowers" -> Objects.equals(language, "eng") ? "`Flowers`" : "`Цветы`";
+            case "russian_fruits" -> Objects.equals(language, "eng") ? "`Fruits`" : "`Фрукты`";
+            default -> Objects.equals(language, "eng") ? "`Any`" : "`Любая`";
+        };
+    }
+
     public EmbedBuilder embedBuilder(Color color, String gameInfo, boolean gameGuesses, boolean isDefeat, @Nullable String inputs) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
 
-        String language = BotStartConfig.getMapGameLanguages().get(userId).equals("rus") ? "Кириллица" : "Latin";
+        String language = BotStartConfig.getMapGameLanguages().get(userId).equals("rus")
+                ? "Кириллица\nКатег.: " + categoryExt()
+                : "Latin\nCateg.:" + categoryExt();
 
         LOGGER.info("\ngamePlayer: " + userIdWithDiscord
                 + "\ngameInfo: " + gameInfo

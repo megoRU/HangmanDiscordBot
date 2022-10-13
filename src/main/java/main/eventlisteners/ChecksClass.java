@@ -1,6 +1,5 @@
 package main.eventlisteners;
 
-import main.config.BotStartConfig;
 import main.jsonparser.JSONParsers;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -14,10 +13,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class ChecksClass {
 
     public static final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
-
-    public static boolean canSendHG(GuildChannel srcChannel) {
-        return srcChannel.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_SEND);
-    }
 
     public static boolean canSendHG(MessageChannel channelUnion, Event event) {
         if (channelUnion instanceof PrivateChannel) {
@@ -75,16 +70,6 @@ public class ChecksClass {
             }
 
             return bool;
-        }
-    }
-
-    //TODO: Я бы лучше переделал это.
-    public boolean isGuildDeleted(final long guildId) {
-        if (BotStartConfig.jda.getGuildById(guildId) != null) {
-            return false;
-        } else {
-            System.out.println("Бота нет в Guild -> Удаляем Giveaway!");
-            return true;
         }
     }
 }
