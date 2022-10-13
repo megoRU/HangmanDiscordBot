@@ -152,11 +152,6 @@ public class BotStartConfig {
                     .addChoice("rus", "rus")
                     .setRequired(true));
 
-            List<OptionData> word = new ArrayList<>();
-            word.add(new OptionData(STRING, "word", "Write a word that can be")
-                    .setRequired(true)
-                    .setName("word"));
-
             List<OptionData> multi = new ArrayList<>();
             multi.add(new OptionData(USER, "user", "@Mention player to play with him")
                     .setRequired(true)
@@ -164,7 +159,7 @@ public class BotStartConfig {
 
             List<OptionData> category = new ArrayList<>();
             category.add(new OptionData(STRING, "set", "Select a category")
-                    .addChoice("all", "all")
+                    .addChoice("any", "any")
                     .addChoice("colors", "russian_colors")
                     .addChoice("fruits", "russian_fruits")
                     .addChoice("flowers", "russian_flowers")
@@ -179,7 +174,6 @@ public class BotStartConfig {
             commands.addCommands(Commands.slash("mystats", "Find out the number of your wins and losses"));
             commands.addCommands(Commands.slash("allstats", "Find out the statistics of all the bot's games"));
             commands.addCommands(Commands.slash("delete", "Deleting your data"));
-            commands.addCommands(Commands.slash("full", "Guess the full word").addOptions(word));
             commands.addCommands(Commands.slash("multi", "Play Hangman with another player").setGuildOnly(true).addOptions(multi));
             commands.addCommands(Commands.slash("category", "Only for the Russian alphabet").addOptions(category));
 
@@ -373,6 +367,10 @@ public class BotStartConfig {
 
     public static Map<Long, String> getSecretCode() {
         return secretCode;
+    }
+
+    public static Map<Long, String> getMapGameCategory() {
+        return mapGameCategory;
     }
 
     public static int getIdGame() {
