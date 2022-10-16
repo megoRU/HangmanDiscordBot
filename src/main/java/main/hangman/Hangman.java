@@ -125,10 +125,7 @@ public class Hangman implements HangmanHelper {
 
         GameWordLanguage gameWordLanguage = new GameWordLanguage();
         gameWordLanguage.setLanguage(language);
-
-        if (BotStartConfig.getMapGameLanguages().get(userId).equals("rus")) {
-            gameWordLanguage.setCategory(BotStartConfig.mapGameCategory.get(userId));
-        }
+        gameWordLanguage.setCategory(BotStartConfig.mapGameCategory.get(userId));
 
         try {
             WORD = megoruAPI.getWord(gameWordLanguage).getWord();
