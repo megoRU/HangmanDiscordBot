@@ -393,9 +393,9 @@ public class Hangman implements HangmanHelper {
         String language = BotStartConfig.getMapLanguages().get(userId);
         if (category == null) return Objects.equals(language, "eng") ? "`Any`" : "`Любая`";
         return switch (category) {
-            case "russian_colors" -> Objects.equals(language, "eng") ? "`Colors`" : "`Цвета`";
-            case "russian_flowers" -> Objects.equals(language, "eng") ? "`Flowers`" : "`Цветы`";
-            case "russian_fruits" -> Objects.equals(language, "eng") ? "`Fruits`" : "`Фрукты`";
+            case "colors" -> Objects.equals(language, "eng") ? "`Colors`" : "`Цвета`";
+            case "flowers" -> Objects.equals(language, "eng") ? "`Flowers`" : "`Цветы`";
+            case "fruits" -> Objects.equals(language, "eng") ? "`Fruits`" : "`Фрукты`";
             default -> Objects.equals(language, "eng") ? "`Any`" : "`Любая`";
         };
     }
@@ -659,15 +659,13 @@ public class Hangman implements HangmanHelper {
                     TextChannel textChannelById = BotStartConfig.jda.getTextChannelById(channelId);
 
                     if (textChannelById != null) {
-                        if (selfMember.hasPermission(textChannelById, Permission.MESSAGE_MANAGE) && !messageList.isEmpty()) {
-                            if (messageList.size() > 2) {
-                                LOGGER.info("messageList.size(): " + messageList.size()
-                                        + "\nmessageList: " + Arrays.toString(messageList.toArray()));
-                                textChannelById.deleteMessages(messageList).submit().get();
-                                //Так как метод асинхронный иногда может возникать NPE
-                                Thread.sleep(2000);
-                                messageList.clear();
-                            }
+                        if (selfMember.hasPermission(textChannelById, Permission.MESSAGE_MANAGE) && messageList.size() > 2) {
+                            LOGGER.info("messageList.size(): " + messageList.size()
+                                    + "\nmessageList: " + Arrays.toString(messageList.toArray()));
+                            textChannelById.deleteMessages(messageList).submit().get();
+                            //Так как метод асинхронный иногда может возникать NPE
+                            Thread.sleep(2000);
+                            messageList.clear();
                         }
                     }
                 }
