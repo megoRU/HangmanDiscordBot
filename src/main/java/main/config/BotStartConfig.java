@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.boticordjava.api.entity.Enums.TokenEnum;
 import org.boticordjava.api.impl.BotiCordAPI;
+import org.boticordjava.api.io.UnsuccessfulHttpException;
 import org.discordbots.api.client.DiscordBotListAPI;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -58,6 +59,17 @@ public class BotStartConfig {
     private static int idGame;
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
+
+    //API
+    private final DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
+            .token(Config.getTopGgApiToken())
+            .botId(Config.getBotId())
+            .build();
+
+    private final BotiCordAPI api = new BotiCordAPI.Builder()
+            .tokenEnum(TokenEnum.BOT)
+            .token(System.getenv("BOTICORD"))
+            .build();
 
     //REPOSITORY
     private final LanguageRepository languageRepository;
@@ -133,7 +145,7 @@ public class BotStartConfig {
         System.out.println(jda.retrieveCommands().complete());
 
         //Обновить команды
-        updateSlashCommands();
+//        updateSlashCommands();
         System.out.println("20:11");
     }
 
@@ -188,22 +200,18 @@ public class BotStartConfig {
     private void topGG() {
         if (!Config.isIsDev()) {
             try {
-                DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
-                        .token(Config.getTopGgApiToken())
-                        .botId(Config.getBotId())
-                        .build();
                 int serverCount = BotStartConfig.jda.getGuilds().size();
                 TOP_GG_API.setStats(serverCount);
                 BotStartConfig.jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
 
-                BotiCordAPI api = new BotiCordAPI.Builder()
-                        .tokenEnum(TokenEnum.BOT)
-                        .token(System.getenv("BOTICORD"))
-                        .build();
-
                 AtomicInteger usersCount = new AtomicInteger();
                 jda.getGuilds().forEach(g -> usersCount.addAndGet(g.getMembers().size()));
-                api.setStats(serverCount, 1, usersCount.get());
+
+                try {
+                    api.setStats(serverCount, 1, usersCount.get());
+                } catch (UnsuccessfulHttpException un) {
+                    System.out.println(un.getMessage());
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
