@@ -37,7 +37,6 @@ public class SlashCommand extends ListenerAdapter {
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
 
-    private static final String HG_ONE_WORD = "[-A-Za-zА-ЯЁа-яё\s]{3,24}+";
     //REPO
     private final HangmanGameRepository hangmanGameRepository;
     private final GamesRepository gamesRepository;
@@ -59,17 +58,15 @@ public class SlashCommand extends ListenerAdapter {
 
             LOGGER.info("\nSlash Command name: " + event.getName());
 
-            if (event.getName().equals("hg")) {
+            if (event.getName().equals("hg") || event.getName().equals("multi")) {
                 event.getChannel().sendTyping().queue();
                 //Проверяем установлен ли язык. Если нет - то возвращаем в чат ошибку
                 if (!BotStartConfig.getMapGameLanguages().containsKey(userIdLong)) {
-
                     String hangmanListenerNeedSetLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", userIdLong);
 
                     EmbedBuilder needSetLanguage = new EmbedBuilder();
-
                     needSetLanguage.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
-                    needSetLanguage.setColor(0x00FF00);
+                    needSetLanguage.setColor(Color.GREEN);
                     needSetLanguage.setDescription(hangmanListenerNeedSetLanguage);
 
                     event.replyEmbeds(needSetLanguage.build())
@@ -79,18 +76,7 @@ public class SlashCommand extends ListenerAdapter {
                     return;
                     //Проверяем если игрок уже играет. То присылаем в чат уведомление
                 } else if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                    String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", userIdLong);
-
-                    EmbedBuilder youPlay = new EmbedBuilder();
-
-                    youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
-                    youPlay.setColor(0x00FF00);
-
-                    youPlay.setDescription(hangmanListenerYouPlay);
-
-                    event.replyEmbeds(youPlay.build())
-                            .addActionRow(ButtonIMpl.BUTTON_STOP)
-                            .queue();
+                    youPlayExt(event, userIdLong);
                     //Если всё хорошо, создаем игру
                 } else {
                     HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder()
@@ -98,7 +84,29 @@ public class SlashCommand extends ListenerAdapter {
                             .setChannelId(event.getChannel().getIdLong())
                             .setHangmanGameRepository(hangmanGameRepository)
                             .setGamesRepository(gamesRepository)
-                            .setPlayerRepository(playerRepository);
+                            .setPlayerRepository(playerRepository)
+                            .setUserIdLong(userIdLong);
+
+                    if (event.getName().equals("multi")) {
+                        boolean canSendHG = ChecksClass.canSendHG(event.getChannel(), event);
+                        if (!canSendHG) return;
+                        User user = event.getOption("user", OptionMapping::getAsUser);
+
+                        if (user == null || event.getGuild() == null) {
+                            event.reply("User is `null`").setEphemeral(true).queue();
+                            return;
+                        } else if (user.isBot()) {
+                            String playWithBot = jsonParsers.getLocale("play_with_bot", userIdLong);
+                            event.reply(playWithBot).setEphemeral(true).queue();
+                            return;
+                        } else if (user.getIdLong() == userIdLong) {
+                            String playWithYourself = jsonParsers.getLocale("play_with_yourself", userIdLong);
+                            event.reply(playWithYourself).setEphemeral(true).queue();
+                            return;
+                        } else {
+                            hangmanBuilder.setSecondUserIdLong(user.getIdLong());
+                        }
+                    }
 
                     if (event.getGuild() != null) {
                         hangmanBuilder.setGuildIdLong(event.getGuild().getIdLong());
@@ -108,12 +116,15 @@ public class SlashCommand extends ListenerAdapter {
                     }
 
                     String createGame = jsonParsers.getLocale("create_game", userIdLong);
-
                     event.reply(createGame).setEphemeral(true).queue();
 
                     Hangman hangman = hangmanBuilder.build();
 
+                    //Заполнение коллекции
                     HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
+                    if (hangmanBuilder.getSecondPlayer() != 0) {
+                        HangmanRegistry.getInstance().setHangman(hangmanBuilder.getSecondPlayer(), hangman);
+                    }
 
                     hangman.startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
                 }
@@ -136,76 +147,6 @@ public class SlashCommand extends ListenerAdapter {
                 categoryRepository.save(category);
                 BotStartConfig.mapGameCategory.put(userIdLong, categorySlash);
                 event.reply(gameCategory).setEphemeral(true).queue();
-                return;
-            }
-
-            if (event.getName().equals("multi")) {
-                boolean canSendHG = ChecksClass.canSendHG(event.getChannel(), event);
-                if (!canSendHG) return;
-                User user = event.getOption("user", OptionMapping::getAsUser);
-
-                if (user == null || event.getGuild() == null) {
-                    event.reply("User is `null`").setEphemeral(true).queue();
-                    return;
-                } else if (user.isBot()) {
-                    String playWithBot = jsonParsers.getLocale("play_with_bot", userIdLong);
-                    event.reply(playWithBot).setEphemeral(true).queue();
-                    return;
-                } else if (user.getIdLong() == userIdLong) {
-                    String playWithYourself = jsonParsers.getLocale("play_with_yourself", userIdLong);
-                    event.reply(playWithYourself).setEphemeral(true).queue();
-                    return;
-                }
-
-                if (!BotStartConfig.getMapGameLanguages().containsKey(userIdLong)) {
-
-                    String hangmanListenerNeedSetLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", userIdLong);
-
-                    EmbedBuilder needSetLanguage = new EmbedBuilder();
-
-                    needSetLanguage.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
-                    needSetLanguage.setColor(0x00FF00);
-                    needSetLanguage.setDescription(hangmanListenerNeedSetLanguage);
-
-                    event.replyEmbeds(needSetLanguage.build())
-                            .addActionRow(ButtonIMpl.BUTTON_RUSSIAN, ButtonIMpl.BUTTON_ENGLISH)
-                            .addActionRow(ButtonIMpl.getButtonPlayAgainWithUsers(userIdLong, user.getIdLong()))
-                            .queue();
-                    return;
-                    //Проверяем если игрок уже играет. То присылаем в чат уведомление
-                } else if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                    String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", userIdLong);
-
-                    EmbedBuilder youPlay = new EmbedBuilder();
-
-                    youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
-                    youPlay.setColor(0x00FF00);
-
-                    youPlay.setDescription(hangmanListenerYouPlay);
-
-                    event.replyEmbeds(youPlay.build())
-                            .addActionRow(ButtonIMpl.BUTTON_STOP)
-                            .queue();
-                    return;
-                } else {
-                    Hangman hangman = new HangmanBuilder.Builder()
-                            .setUserIdLong(userIdLong)
-                            .setSecondUserIdLong(user.getIdLong())
-                            .setGuildIdLong(event.getGuild().getIdLong())
-                            .setChannelId(event.getChannel().getIdLong())
-                            .setHangmanGameRepository(hangmanGameRepository)
-                            .setGamesRepository(gamesRepository)
-                            .setPlayerRepository(playerRepository)
-                            .build();
-
-                    HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
-                    HangmanRegistry.getInstance().setHangman(user.getIdLong(), hangman);
-
-                    String createGame = jsonParsers.getLocale("create_game", userIdLong);
-
-                    event.reply(createGame).setEphemeral(true).queue();
-                    hangman.startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
-                }
                 return;
             }
 
@@ -248,77 +189,41 @@ public class SlashCommand extends ListenerAdapter {
                 return;
             }
 
-            //Если игрок сейчас играет сменить язык не даст
-            if (event.getName().equals("language") && HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                String reactionsButtonWhenPlay = jsonParsers.getLocale("ReactionsButton_When_Play", userIdLong);
-
-                EmbedBuilder whenPlay = new EmbedBuilder();
-
-                whenPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
-                whenPlay.setColor(Color.GREEN);
-                whenPlay.setDescription(reactionsButtonWhenPlay);
-
-                event.replyEmbeds(whenPlay.build()).addActionRow(ButtonIMpl.BUTTON_STOP).queue();
-                return;
-            }
-
-            //0 - game | 1 - bot
-            if (event.getName().equals("language") && event.getOptions().size() == 2) {
-                String opOne = event.getOptions().get(0).getAsString();
-                String opTwo = event.getOptions().get(1).getAsString();
-
-                BotStartConfig.getMapGameLanguages().put(userIdLong, opOne);
-                BotStartConfig.getMapLanguages().put(userIdLong, opTwo);
-
-                String slashLanguage = String.format(jsonParsers.getLocale("slash_language", userIdLong), opOne, opTwo);
-
-                event.reply(slashLanguage).addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN).queue();
-
-                GameLanguage gameLanguage = new GameLanguage();
-                gameLanguage.setUserIdLong(userIdLong);
-                gameLanguage.setLanguage(opOne);
-                gameLanguageRepository.save(gameLanguage);
-
-                Language language = new Language();
-                language.setUserIdLong(userIdLong);
-                language.setLanguage(opTwo);
-                languageRepository.save(language);
-                return;
-            }
-
-            if (event.getName().equals("full")) {
+            if (event.getName().equals("language")) {
+                //Если игрок сейчас играет сменить язык не даст
                 if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                    String gotYourWord = jsonParsers.getLocale("got_your_word", userIdLong);
+                    String reactionsButtonWhenPlay = jsonParsers.getLocale("ReactionsButton_When_Play", userIdLong);
 
-                    String word = event.getOption("word", OptionMapping::getAsString);
-                    int length = 0;
+                    EmbedBuilder whenPlay = new EmbedBuilder();
 
-                    if (word != null) {
-                        word.toLowerCase();
-                        length = word.length();
-                    }
+                    whenPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
+                    whenPlay.setColor(Color.GREEN);
+                    whenPlay.setDescription(reactionsButtonWhenPlay);
 
-                    event.reply(gotYourWord).setEphemeral(true).queue();
+                    event.replyEmbeds(whenPlay.build()).addActionRow(ButtonIMpl.BUTTON_STOP).queue();
+                    return;
+                    //0 - game | 1 - bot
+                } else if (event.getOptions().size() == 2) {
+                    String opOne = event.getOptions().get(0).getAsString();
+                    String opTwo = event.getOptions().get(1).getAsString();
 
-                    Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
+                    BotStartConfig.getMapGameLanguages().put(userIdLong, opOne);
+                    BotStartConfig.getMapLanguages().put(userIdLong, opTwo);
 
-                    if (word != null && length == hangman.getLengthWord() && word.matches(HG_ONE_WORD)) {
-                        hangman.fullWord(word);
-                    } else {
-                        String wrongLengthJson = jsonGameParsers.getLocale("wrongLength", userIdLong);
-                        EmbedBuilder wrongLength = hangman.embedBuilder(
-                                Color.GREEN,
-                                wrongLengthJson,
-                                false,
-                                false,
-                                word);
+                    String slashLanguage = String.format(jsonParsers.getLocale("slash_language", userIdLong), opOne, opTwo);
 
-                        HangmanHelper.editMessage(wrongLength, userIdLong);
-                        return;
-                    }
-                } else {
-                    String hangmanYouAreNotPlay = jsonParsers.getLocale("Hangman_You_Are_Not_Play", userIdLong);
-                    event.reply(hangmanYouAreNotPlay).addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN).queue();
+                    event.reply(slashLanguage).addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN).queue();
+
+                    GameLanguage gameLanguage = new GameLanguage();
+                    gameLanguage.setUserIdLong(userIdLong);
+                    gameLanguage.setLanguage(opOne);
+                    gameLanguageRepository.save(gameLanguage);
+
+                    Language language = new Language();
+                    language.setUserIdLong(userIdLong);
+                    language.setLanguage(opTwo);
+                    languageRepository.save(language);
+                    return;
                 }
                 return;
             }
@@ -371,5 +276,20 @@ public class SlashCommand extends ListenerAdapter {
             System.out.println("Unknown interaction");
             e.printStackTrace();
         }
+    }
+
+    private void youPlayExt(@NotNull SlashCommandInteractionEvent event, long userIdLong) {
+        String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", userIdLong);
+
+        EmbedBuilder youPlay = new EmbedBuilder();
+
+        youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
+        youPlay.setColor(Color.GREEN);
+
+        youPlay.setDescription(hangmanListenerYouPlay);
+
+        event.replyEmbeds(youPlay.build())
+                .addActionRow(ButtonIMpl.BUTTON_STOP)
+                .queue();
     }
 }
