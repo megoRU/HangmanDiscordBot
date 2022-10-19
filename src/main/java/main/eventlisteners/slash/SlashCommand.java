@@ -76,7 +76,14 @@ public class SlashCommand extends ListenerAdapter {
                     return;
                     //Проверяем если игрок уже играет. То присылаем в чат уведомление
                 } else if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                    youPlayExt(event, userIdLong);
+                    String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", userIdLong);
+
+                    EmbedBuilder youPlay = new EmbedBuilder();
+                    youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
+                    youPlay.setColor(Color.GREEN);
+                    youPlay.setDescription(hangmanListenerYouPlay);
+
+                    event.replyEmbeds(youPlay.build()).addActionRow(ButtonIMpl.BUTTON_STOP).queue();
                     //Если всё хорошо, создаем игру
                 } else {
                     HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder()
@@ -276,20 +283,5 @@ public class SlashCommand extends ListenerAdapter {
             System.out.println("Unknown interaction");
             e.printStackTrace();
         }
-    }
-
-    private void youPlayExt(@NotNull SlashCommandInteractionEvent event, long userIdLong) {
-        String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", userIdLong);
-
-        EmbedBuilder youPlay = new EmbedBuilder();
-
-        youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
-        youPlay.setColor(Color.GREEN);
-
-        youPlay.setDescription(hangmanListenerYouPlay);
-
-        event.replyEmbeds(youPlay.build())
-                .addActionRow(ButtonIMpl.BUTTON_STOP)
-                .queue();
     }
 }
