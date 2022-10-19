@@ -103,9 +103,9 @@ public class Hangman implements HangmanHelper {
     }
 
     public void startGame(MessageChannel textChannel, String avatarUrl, String userName) {
-        String language = BotStartConfig.getMapGameLanguages().get(userId);
+        String gameLanguage = BotStartConfig.getMapGameLanguages().get(userId);
 
-        if (language == null) {
+        if (gameLanguage == null) {
             EmbedBuilder needSetLanguage = new EmbedBuilder();
 
             String hangmanListenerNeedSetLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", userId);
@@ -124,14 +124,19 @@ public class Hangman implements HangmanHelper {
         }
 
         GameWordLanguage gameWordLanguage = new GameWordLanguage();
-        gameWordLanguage.setLanguage(language);
+        gameWordLanguage.setLanguage(gameLanguage);
+
+        if (BotStartConfig.mapGameCategory.get(userId) != null) {
         gameWordLanguage.setCategory(BotStartConfig.mapGameCategory.get(userId));
+        }
 
         try {
             WORD = megoruAPI.getWord(gameWordLanguage).getWord();
-            if (WORD != null) {
+            if (WORD != null && WORD.length() > 0) {
                 WORD_OF_CHARS = WORD.split(""); // Преобразуем строку str в массив символов (char)
                 hideWord(WORD.length());
+            } else {
+                throw new IllegalArgumentException(WORD);
             }
         } catch (Exception e) {
             String errorsTitle = jsonParsers.getLocale("errors_title", userId);
@@ -167,8 +172,9 @@ public class Hangman implements HangmanHelper {
         autoDeletingMessages();
     }
 
-    public void fullWord(final String inputs) {
+    public void fullWord(final String inputs, final Message messages) {
         try {
+            messageList.add(messages);
             if (inputs.length() != getLengthWord()) {
                 String wrongLengthJson = jsonGameParsers.getLocale("wrongLength", userId);
                 EmbedBuilder wrongLength;

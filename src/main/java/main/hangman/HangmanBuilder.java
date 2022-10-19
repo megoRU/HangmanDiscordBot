@@ -21,6 +21,10 @@ public interface HangmanBuilder {
         private Long guildId;
         private Long channelId;
 
+        public long getSecondPlayer() {
+            return secondPlayer;
+        }
+
         public Builder setUserIdLong(long userId) {
             this.userId = userId;
             return this;
