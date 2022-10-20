@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.awt.*;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 @RequiredArgsConstructor
 @Service
@@ -38,6 +39,8 @@ public class ButtonReactions extends ListenerAdapter {
     private final HangmanGameRepository hangmanGameRepository;
     private final GamesRepository gamesRepository;
     private final PlayerRepository playerRepository;
+
+    private final static Logger LOGGER = Logger.getLogger(ButtonReactions.class.getName());
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
@@ -176,19 +179,34 @@ public class ButtonReactions extends ListenerAdapter {
 
                     Hangman hangman;
                     //Guild Play
+                    boolean matches = event.getButton().getId().matches("BUTTON_START_NEW_GAME_\\d+_\\d+");
+                    boolean isFromGuild = event.getGuild() != null;
+
+                    System.out.println("isFromGuild: " + isFromGuild);
+                    System.out.println("matches: " + matches);
+
                     if (event.getGuild() != null) {
-                        boolean matches = event.getButton().getId().matches("BUTTON_START_NEW_GAME_\\d+_\\d+");
 
                         hangmanBuilder.setGuildIdLong(event.getGuild().getIdLong());
                         hangmanBuilder.setChannelId(event.getGuildChannel().getIdLong());
 
                         if (matches) {
-                            String[] split = event.getButton().getId().replaceAll("BUTTON_START_NEW_GAME_", "").split("_");
+                            String[] split = event.getButton().getId()
+                                    .replace("BUTTON_START_NEW_GAME_", "")
+                                    .split("_");
+
                             long secondUser = 0L;
 
                             for (String userId : split) {
+                                System.out.println("Split users: " + userId);
                                 if (userIdLong != Long.parseLong(userId)) {
                                     secondUser = Long.parseLong(userId);
+                                    boolean hasHangmanSecondUser = HangmanRegistry.getInstance().hasHangman(secondUser);
+                                    if (hasHangmanSecondUser) {
+                                        String secondPlayerAlreadyPlaying = jsonParsers.getLocale("second_player_already_playing", userIdLong);
+                                        event.getHook().sendMessage(secondPlayerAlreadyPlaying).setEphemeral(true).queue();
+                                        return;
+                                    }
                                 }
                             }
 

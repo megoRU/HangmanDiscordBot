@@ -110,6 +110,10 @@ public class SlashCommand extends ListenerAdapter {
                             String playWithYourself = jsonParsers.getLocale("play_with_yourself", userIdLong);
                             event.reply(playWithYourself).setEphemeral(true).queue();
                             return;
+                        } else if (HangmanRegistry.getInstance().hasHangman(user.getIdLong())) {
+                            String secondPlayerAlreadyPlaying = jsonParsers.getLocale("second_player_already_playing", userIdLong);
+                            event.reply(secondPlayerAlreadyPlaying).setEphemeral(true).queue();
+                            return;
                         } else {
                             hangmanBuilder.setSecondUserIdLong(user.getIdLong());
                         }
@@ -117,7 +121,6 @@ public class SlashCommand extends ListenerAdapter {
 
                     if (event.getGuild() != null) {
                         hangmanBuilder.setGuildIdLong(event.getGuild().getIdLong());
-
                     } else {
                         hangmanBuilder.setGuildIdLong(null);
                     }
