@@ -35,6 +35,11 @@ public class Hangman implements HangmanHelper {
     private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
     private static final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
 
+    //Timers
+    private final Timer autoDeletingTimer = new Timer();
+    private final Timer autoInsert = new Timer();
+    private final Timer stopHangmanTimer = new Timer();
+
     //Logger
     private final Logger LOGGER = Logger.getLogger(Hangman.class.getName());
 
@@ -102,6 +107,35 @@ public class Hangman implements HangmanHelper {
         this.secondPlayer = secondPlayer;
     }
 
+    Hangman(long userId, long secondPlayer, Long guildId, Long channelId,
+            String guesses, String word, String currentHiddenWord,
+            int hangmanErrors, LocalDateTime localDateTime,
+            HangmanGameRepository hangmanGameRepository,
+            GamesRepository gamesRepository,
+            PlayerRepository playerRepository) {
+        this.STATUS = Status.STARTING;
+        this.hangmanGameRepository = hangmanGameRepository;
+        this.gamesRepository = gamesRepository;
+        this.playerRepository = playerRepository;
+        this.userId = userId;
+        this.guildId = guildId;
+        this.channelId = channelId;
+        this.userIdWithDiscord = String.format("<@%s>\n<@%s>", userId, secondPlayer);
+        this.guesses = new LinkedHashSet<>();
+        this.messageList = new LinkedList<>();
+        this.secondPlayer = secondPlayer;
+        //Обновить параметры
+        this.guesses.addAll(Arrays.asList(guesses.split(", ")));
+        this.WORD = word;
+        this.WORD_HIDDEN = currentHiddenWord;
+        this.currentHiddenWord = currentHiddenWord;
+        this.hangmanErrors = hangmanErrors;
+        this.WORD_OF_CHARS = word.split("");
+        setTimer(localDateTime);
+        autoInsert();
+        autoDeletingMessages();
+    }
+
     public void startGame(MessageChannel textChannel, String avatarUrl, String userName) {
         String gameLanguage = BotStartConfig.getMapGameLanguages().get(userId);
 
@@ -127,7 +161,7 @@ public class Hangman implements HangmanHelper {
         gameWordLanguage.setLanguage(gameLanguage);
 
         if (BotStartConfig.mapGameCategory.get(userId) != null) {
-        gameWordLanguage.setCategory(BotStartConfig.mapGameCategory.get(userId));
+            gameWordLanguage.setCategory(BotStartConfig.mapGameCategory.get(userId));
         }
 
         try {
@@ -394,7 +428,7 @@ public class Hangman implements HangmanHelper {
         }
     }
 
-    private String categoryExt() {
+    private String category() {
         String category = BotStartConfig.getMapGameCategory().get(userId);
         String language = BotStartConfig.getMapLanguages().get(userId);
         if (category == null) return Objects.equals(language, "eng") ? "`Any`" : "`Любая`";
@@ -410,8 +444,8 @@ public class Hangman implements HangmanHelper {
         EmbedBuilder embedBuilder = new EmbedBuilder();
 
         String language = BotStartConfig.getMapGameLanguages().get(userId).equals("rus")
-                ? "Кириллица\nКатег.: " + categoryExt()
-                : "Latin\nCateg.:" + categoryExt();
+                ? "Кириллица\nКатег.: " + category()
+                : "Latin\nCateg.:" + category();
 
         LOGGER.info("\ngamePlayer: " + userIdWithDiscord
                 + "\ngameInfo: " + gameInfo
@@ -494,37 +528,6 @@ public class Hangman implements HangmanHelper {
         }
     }
 
-    private void stopGameByTime() {
-        try {
-            if (HangmanRegistry.getInstance().hasHangman(this.userId)) {
-                String gameOver = jsonGameParsers.getLocale("gameOver", userId);
-                String timeIsOver = jsonGameParsers.getLocale("timeIsOver", userId);
-                String gamePlayer = jsonGameParsers.getLocale("Game_Player", userId);
-
-                EmbedBuilder info = new EmbedBuilder();
-                info.setColor(Color.GREEN);
-                info.setTitle(gameOver);
-                info.setDescription(timeIsOver);
-                info.addField(gamePlayer, userIdWithDiscord, false);
-
-                HangmanHelper.editMessageWithButtons(info, userId, EndGameButtons.getListButtons(userId));
-                hangmanGameRepository.deleteActiveGame(userId);
-                HangmanRegistry.getInstance().removeHangman(userId);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void setTimer(LocalDateTime ldt) {
-        Timer timer = new Timer();
-        StopHangmanTimer stopGiveawayByTimer = new StopHangmanTimer();
-        Timestamp timestamp = Timestamp.valueOf(ldt.atZone(ZoneOffset.UTC).toLocalDateTime().plusMinutes(10));
-        Date date = new Date(timestamp.getTime());
-        timer.schedule(stopGiveawayByTimer, date);
-        HangmanRegistry.getInstance().setHangmanTimer(userId, timer);
-    }
-
     //Создает скрытую линию из длины слова
     private void hideWord(int length) {
         StringBuilder sb = new StringBuilder();
@@ -565,25 +568,6 @@ public class Hangman implements HangmanHelper {
         return currentHiddenWord;
     }
 
-    //Для инъекции при восстановлении
-    public void updateVariables(String guesses, String word, String currentHiddenWord, int hangmanErrors, LocalDateTime localDateTime) {
-        if (this.guesses.isEmpty() && this.WORD == null && this.currentHiddenWord == null && this.hangmanErrors == 0) {
-            if (guesses != null) {
-                this.guesses.addAll(Arrays.asList(guesses.split(", ")));
-            }
-            this.WORD = word;
-            this.WORD_HIDDEN = currentHiddenWord;
-            this.currentHiddenWord = currentHiddenWord;
-            this.hangmanErrors = hangmanErrors;
-            this.WORD_OF_CHARS = word.split("");
-            setTimer(localDateTime);
-            autoInsert();
-            autoDeletingMessages();
-        } else {
-            System.out.println("Вы не можете менять значения. Это нарушает инкапсуляцию!");
-        }
-    }
-
     private synchronized boolean isLetterPresent(final String inputs) {
         boolean contains = guesses.contains(inputs.toUpperCase());
         if (!contains) {
@@ -619,12 +603,22 @@ public class Hangman implements HangmanHelper {
         return WORD != null ? WORD.length() : 0;
     }
 
-    private void executeInsert() {
+    public Timer getAutoDeletingTimer() {
+        return autoDeletingTimer;
+    }
+
+    public Timer getAutoInsert() {
+        return autoInsert;
+    }
+
+    public Timer getStopHangmanTimer() {
+        return stopHangmanTimer;
+    }
+
+    private void insert() {
         try {
             if ((guesses.size() > countUsedLetters) && HangmanRegistry.getInstance().hasHangman(userId)) {
                 countUsedLetters = guesses.size();
-                System.out.println("currentHiddenWord: " + currentHiddenWord);
-                System.out.println("getGuesses(): " + getGuesses());
                 hangmanGameRepository.updateGame(userId, currentHiddenWord, getGuesses(), hangmanErrors);
             }
         } catch (Exception e) {
@@ -632,20 +626,23 @@ public class Hangman implements HangmanHelper {
         }
     }
 
+    private void setTimer(LocalDateTime ldt) {
+        StopHangmanTimer stopHangman = new StopHangmanTimer();
+        Timestamp timestamp = Timestamp.valueOf(ldt.atZone(ZoneOffset.UTC).toLocalDateTime().plusMinutes(10));
+        Date date = new Date(timestamp.getTime());
+        stopHangmanTimer.schedule(stopHangman, date);
+    }
+
     //Автоматически отправляет в БД данные
     private void autoInsert() {
         AutoUpdate autoUpdate = new AutoUpdate();
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(autoUpdate, 7000, 5000);
-        HangmanRegistry.getInstance().setTimeAutoUpdate(userId, timer);
+        autoInsert.scheduleAtFixedRate(autoUpdate, 7000, 5000);
     }
 
     //Автоматически отправляет в БД данные
     private void autoDeletingMessages() {
         AutoDeletingMessages autoDeletingMessages = new AutoDeletingMessages();
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(autoDeletingMessages, 7000, 5000);
-        HangmanRegistry.getInstance().setAutoDeletingMessages(userId, timer);
+        autoDeletingTimer.scheduleAtFixedRate(autoDeletingMessages, 7000, 5000);
     }
 
     private final class AutoDeletingMessages extends TimerTask {
@@ -654,7 +651,7 @@ public class Hangman implements HangmanHelper {
         public void run() {
             try {
                 if (guildId == null) {
-                    HangmanRegistry.getInstance().getAutoDeletingMessages(userId).cancel();
+                    autoDeletingTimer.cancel();
                     return;
                 }
 
@@ -665,12 +662,15 @@ public class Hangman implements HangmanHelper {
                     TextChannel textChannelById = BotStartConfig.jda.getTextChannelById(channelId);
 
                     if (textChannelById != null) {
-                        if (selfMember.hasPermission(textChannelById, Permission.MESSAGE_MANAGE) && messageList.size() > 2) {
-                            LOGGER.info("messageList.size(): " + messageList.size()
-                                    + "\nmessageList: " + Arrays.toString(messageList.toArray()));
+                        if (selfMember.hasPermission(textChannelById, Permission.MESSAGE_MANAGE) && messageList.size() >= 3) {
+                            String format =
+                                    String.format("\nAutoDeletingMessages: %s\nmessageList: %s",
+                                            messageList.size(),
+                                            Arrays.toString(messageList.toArray()));
+
+                            LOGGER.info(format);
                             textChannelById.deleteMessages(messageList).submit().get();
                             //Так как метод асинхронный иногда может возникать NPE
-                            Thread.sleep(2000);
                             messageList.clear();
                         }
                     }
@@ -685,16 +685,7 @@ public class Hangman implements HangmanHelper {
 
         @Override
         public void run() {
-            try {
-                if (HangmanRegistry.getInstance().hasHangman(userId)) {
-                    executeInsert();
-                } else {
-                    Thread.currentThread().interrupt();
-                }
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-                e.printStackTrace();
-            }
+            insert();
         }
 
     }
@@ -703,15 +694,24 @@ public class Hangman implements HangmanHelper {
 
         @Override
         public void run() {
+            STATUS = Status.TIME_OVER;
             try {
                 if (HangmanRegistry.getInstance().hasHangman(userId)) {
-                    STATUS = Status.TIME_OVER;
-                    stopGameByTime();
-                } else {
-                    Thread.currentThread().interrupt();
+                    String gameOver = jsonGameParsers.getLocale("gameOver", userId);
+                    String timeIsOver = jsonGameParsers.getLocale("timeIsOver", userId);
+                    String gamePlayer = jsonGameParsers.getLocale("Game_Player", userId);
+
+                    EmbedBuilder info = new EmbedBuilder();
+                    info.setColor(Color.GREEN);
+                    info.setTitle(gameOver);
+                    info.setDescription(timeIsOver);
+                    info.addField(gamePlayer, userIdWithDiscord, false);
+
+                    HangmanHelper.editMessageWithButtons(info, userId, EndGameButtons.getListButtons(userId));
+                    hangmanGameRepository.deleteActiveGame(userId);
+                    HangmanRegistry.getInstance().removeHangman(userId);
                 }
             } catch (Exception e) {
-                Thread.currentThread().interrupt();
                 e.printStackTrace();
             }
         }

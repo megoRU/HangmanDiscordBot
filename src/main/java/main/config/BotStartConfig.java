@@ -317,6 +317,7 @@ public class BotStartConfig {
             String sql = "SELECT * FROM active_hangman";
             ResultSet rs = statement.executeQuery(sql);
             while (rs.next()) {
+                HangmanRegistry instance = HangmanRegistry.getInstance();
 
                 long userIdLong = rs.getLong("user_id_long");
                 long secondUserIdLong = rs.getLong("second_user_id_long");
@@ -337,24 +338,26 @@ public class BotStartConfig {
                         .setChannelId(channelIdLong)
                         .setHangmanGameRepository(hangmanGameRepository)
                         .setGamesRepository(gamesRepository)
-                        .setPlayerRepository(playerRepository);
+                        .setPlayerRepository(playerRepository)
+                        .setHangmanErrors(hangmanErrors)
+                        .setWord(word)
+                        .setGuesses(guesses)
+                        .setCurrentHiddenWord(currentHiddenWord)
+                        .setWordHidden(currentHiddenWord)
+                        .setLocalDateTime(game_created_time);
 
                 if (secondUserIdLong == 0L) {
-                    HangmanRegistry.getInstance().setHangman(userIdLong, hangmanBuilder.build());
+                    instance.setHangman(userIdLong, hangmanBuilder.build());
                 } else {
                     hangmanBuilder.setSecondUserIdLong(secondUserIdLong);
 
                     Hangman hangman = hangmanBuilder.build();
 
-                    HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
-                    HangmanRegistry.getInstance().setHangman(secondUserIdLong, hangman);
+                    instance.setHangman(userIdLong, hangman);
+                    instance.setHangman(secondUserIdLong, hangman);
                 }
 
-                HangmanRegistry.getInstance().setMessageId(userIdLong, message_id_long);
-
-                HangmanRegistry.getInstance().getActiveHangman(userIdLong)
-                        .updateVariables(guesses, word, currentHiddenWord, hangmanErrors, game_created_time);
-
+                instance.setMessageId(userIdLong, message_id_long);
             }
             rs.close();
             statement.close();

@@ -8,12 +8,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class HangmanRegistry {
+
     //Long это UserIdLong
     private static final Map<Long, Hangman> activeHangman = new ConcurrentHashMap<>();
     private static final Map<Long, String> messageId = new ConcurrentHashMap<>();
-    private static final Map<Long, Timer> timeCreatedGame = new ConcurrentHashMap<>();
-    private static final Map<Long, Timer> timeAutoUpdate = new ConcurrentHashMap<>();
-    private static final Map<Long, Timer> autoDeletingMessages = new ConcurrentHashMap<>();
 
     private static volatile HangmanRegistry hangmanRegistry;
     private final AtomicInteger idGame = new AtomicInteger();
@@ -30,30 +28,6 @@ public class HangmanRegistry {
             }
         }
         return hangmanRegistry;
-    }
-
-    public Timer getAutoDeletingMessages(long userIdLong) {
-        return autoDeletingMessages.get(userIdLong);
-    }
-
-    public void setAutoDeletingMessages(long userIdLong, Timer timer) {
-        autoDeletingMessages.put(userIdLong, timer);
-    }
-
-    public Timer getTimeAutoUpdate(long userIdLong) {
-        return timeAutoUpdate.get(userIdLong);
-    }
-
-    public Timer getHangmanTimer(long userIdLong) {
-        return timeCreatedGame.get(userIdLong);
-    }
-
-    public void setHangmanTimer(long userIdLong, Timer timer) {
-        timeCreatedGame.put(userIdLong, timer);
-    }
-
-    public void setTimeAutoUpdate(long userIdLong, Timer timer) {
-        timeAutoUpdate.put(userIdLong, timer);
     }
 
     public int getIdGame() {
@@ -88,28 +62,26 @@ public class HangmanRegistry {
     }
 
     public void removeHangman(long userIdLong) {
-        Timer timerAutoUpdate = timeAutoUpdate.get(userIdLong);
-        Timer timerCreatedGame = timeCreatedGame.get(userIdLong);
-        Timer autoDeletingMessage = autoDeletingMessages.get(userIdLong);
+        Hangman hangman = activeHangman.get(userIdLong);
+        if (hangman == null) return;
 
-        if (timerAutoUpdate != null) {
-            timerAutoUpdate.cancel();
-            timeAutoUpdate.remove(userIdLong);
+        Timer timerAutoInsert = hangman.getAutoInsert();
+        Timer stopHangmanTimer = hangman.getStopHangmanTimer();
+        Timer autoDeletingMessage = hangman.getAutoDeletingTimer();
+
+        if (timerAutoInsert != null) {
+            timerAutoInsert.cancel();
         }
 
-        if (timerCreatedGame != null) {
-            timerCreatedGame.cancel();
-            timeCreatedGame.remove(userIdLong);
+        if (stopHangmanTimer != null) {
+            stopHangmanTimer.cancel();
         }
 
         if (autoDeletingMessage != null) {
             autoDeletingMessage.cancel();
-            autoDeletingMessages.remove(userIdLong);
         }
 
-        Hangman hangman = activeHangman.get(userIdLong);
-
-        if (hangman != null && hangman.getSecondPlayer() != 0L) {
+        if (hangman.getSecondPlayer() != 0L) {
             activeHangman.remove(hangman.getSecondPlayer());
         }
 
