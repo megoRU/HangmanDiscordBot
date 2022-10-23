@@ -66,7 +66,6 @@ public class Hangman implements HangmanHelper {
     private String WORD;
     private String[] WORD_OF_CHARS;
     private String WORD_HIDDEN;
-    private String currentHiddenWord;
     private int hangmanErrors;
 
     private volatile Status STATUS;
@@ -84,7 +83,6 @@ public class Hangman implements HangmanHelper {
         this.channelId = channelId;
         this.userIdWithDiscord = String.format("<@%s>", userId);
         this.guesses = new LinkedHashSet<>();
-        this.currentHiddenWord = null;
         this.messageList = new LinkedList<>();
         this.secondPlayer = 0L;
     }
@@ -102,13 +100,12 @@ public class Hangman implements HangmanHelper {
         this.channelId = channelId;
         this.userIdWithDiscord = String.format("<@%s>\n<@%s>", userId, secondPlayer);
         this.guesses = new LinkedHashSet<>();
-        this.currentHiddenWord = null;
         this.messageList = new LinkedList<>();
         this.secondPlayer = secondPlayer;
     }
 
     Hangman(long userId, long secondPlayer, Long guildId, Long channelId,
-            String guesses, String word, String currentHiddenWord,
+            String guesses, String word, String WORD_HIDDEN,
             int hangmanErrors, LocalDateTime localDateTime,
             HangmanGameRepository hangmanGameRepository,
             GamesRepository gamesRepository,
@@ -120,15 +117,22 @@ public class Hangman implements HangmanHelper {
         this.userId = userId;
         this.guildId = guildId;
         this.channelId = channelId;
-        this.userIdWithDiscord = String.format("<@%s>\n<@%s>", userId, secondPlayer);
+
+        if (secondPlayer != 0) {
+            this.userIdWithDiscord = String.format("<@%s>\n<@%s>", userId, secondPlayer);
+        } else {
+            this.userIdWithDiscord = String.format("<@%s>", userId);
+        }
+
         this.guesses = new LinkedHashSet<>();
         this.messageList = new LinkedList<>();
         this.secondPlayer = secondPlayer;
         //Обновить параметры
-        this.guesses.addAll(Arrays.asList(guesses.split(", ")));
+        if (guesses != null) {
+            this.guesses.addAll(Arrays.asList(guesses.split(", ")));
+        }
         this.WORD = word;
-        this.WORD_HIDDEN = currentHiddenWord;
-        this.currentHiddenWord = currentHiddenWord;
+        this.WORD_HIDDEN = WORD_HIDDEN;
         this.hangmanErrors = hangmanErrors;
         this.WORD_OF_CHARS = word.split("");
         setTimer(localDateTime);
@@ -548,9 +552,7 @@ public class Hangman implements HangmanHelper {
     //заменяет "_" на букву которая есть в слове
     private String replacementLetters(String letter) {
         try {
-            if (currentHiddenWord == null) currentHiddenWord = WORD_HIDDEN;
-
-            StringBuilder sb = new StringBuilder(currentHiddenWord);
+            StringBuilder sb = new StringBuilder(WORD_HIDDEN);
             for (int i = 0; i < WORD_OF_CHARS.length; i++) {
                 if (WORD_OF_CHARS[i].equals(letter)) {
                     sb.replace(
@@ -559,13 +561,12 @@ public class Hangman implements HangmanHelper {
                             String.valueOf(WORD_OF_CHARS[i]));
                 }
             }
-            currentHiddenWord = sb.toString();
-            WORD_HIDDEN = currentHiddenWord;
+            WORD_HIDDEN = sb.toString();
         } catch (Exception e) {
             e.printStackTrace();
             LOGGER.info(e.getMessage());
         }
-        return currentHiddenWord;
+        return WORD_HIDDEN;
     }
 
     private synchronized boolean isLetterPresent(final String inputs) {
@@ -619,7 +620,7 @@ public class Hangman implements HangmanHelper {
         try {
             if ((guesses.size() > countUsedLetters) && HangmanRegistry.getInstance().hasHangman(userId)) {
                 countUsedLetters = guesses.size();
-                hangmanGameRepository.updateGame(userId, currentHiddenWord, getGuesses(), hangmanErrors);
+                hangmanGameRepository.updateGame(userId, WORD_HIDDEN, getGuesses(), hangmanErrors);
             }
         } catch (Exception e) {
             LOGGER.info(e.getMessage());

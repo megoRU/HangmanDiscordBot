@@ -343,7 +343,6 @@ public class BotStartConfig {
                         .setWord(word)
                         .setGuesses(guesses)
                         .setCurrentHiddenWord(currentHiddenWord)
-                        .setWordHidden(currentHiddenWord)
                         .setLocalDateTime(game_created_time);
 
                 if (secondUserIdLong == 0L) {

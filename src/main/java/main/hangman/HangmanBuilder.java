@@ -26,7 +26,6 @@ public interface HangmanBuilder {
         //For restoring
         private String guesses;
         private String word;
-        private String wordHidden;
         private String currentHiddenWord;
         private int hangmanErrors;
         private LocalDateTime localDateTime;
@@ -38,11 +37,6 @@ public interface HangmanBuilder {
 
         public Builder setWord(String word) {
             this.word = word;
-            return this;
-        }
-
-        public Builder setWordHidden(String wordHidden) {
-            this.wordHidden = wordHidden;
             return this;
         }
 
@@ -117,8 +111,19 @@ public interface HangmanBuilder {
             if (channelId == null || channelId == 0L)
                 throw new IllegalArgumentException("The provided channelId cannot be null!");
 
-            if (guesses != null && word != null && currentHiddenWord != null && localDateTime != null) {
-                return new Hangman(userId, secondPlayer, guildId, channelId, guesses, word, currentHiddenWord, hangmanErrors, localDateTime, hangmanGameRepository, gamesRepository, playerRepository);
+            if (word != null && currentHiddenWord != null) {
+                return new Hangman(userId,
+                        secondPlayer,
+                        guildId,
+                        channelId,
+                        guesses,
+                        word,
+                        currentHiddenWord,
+                        hangmanErrors,
+                        localDateTime,
+                        hangmanGameRepository,
+                        gamesRepository,
+                        playerRepository);
             }
 
             if (secondPlayer != 0L) {
