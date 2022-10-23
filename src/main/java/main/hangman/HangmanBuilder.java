@@ -6,6 +6,8 @@ import main.model.repository.PlayerRepository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.LocalDateTime;
+
 public interface HangmanBuilder {
 
     class Builder {
@@ -20,6 +22,38 @@ public interface HangmanBuilder {
         private long secondPlayer;
         private Long guildId;
         private Long channelId;
+
+        //For restoring
+        private String guesses;
+        private String word;
+        private String currentHiddenWord;
+        private int hangmanErrors;
+        private LocalDateTime localDateTime;
+
+        public Builder setGuesses(String guesses) {
+            this.guesses = guesses;
+            return this;
+        }
+
+        public Builder setWord(String word) {
+            this.word = word;
+            return this;
+        }
+
+        public Builder setCurrentHiddenWord(String currentHiddenWord) {
+            this.currentHiddenWord = currentHiddenWord;
+            return this;
+        }
+
+        public Builder setHangmanErrors(int hangmanErrors) {
+            this.hangmanErrors = hangmanErrors;
+            return this;
+        }
+
+        public Builder setLocalDateTime(LocalDateTime localDateTime) {
+            this.localDateTime = localDateTime;
+            return this;
+        }
 
         public long getSecondPlayer() {
             return secondPlayer;
@@ -76,6 +110,21 @@ public interface HangmanBuilder {
 
             if (channelId == null || channelId == 0L)
                 throw new IllegalArgumentException("The provided channelId cannot be null!");
+
+            if (word != null && currentHiddenWord != null) {
+                return new Hangman(userId,
+                        secondPlayer,
+                        guildId,
+                        channelId,
+                        guesses,
+                        word,
+                        currentHiddenWord,
+                        hangmanErrors,
+                        localDateTime,
+                        hangmanGameRepository,
+                        gamesRepository,
+                        playerRepository);
+            }
 
             if (secondPlayer != 0L) {
                 return new Hangman(userId, secondPlayer, guildId, channelId, hangmanGameRepository, gamesRepository, playerRepository);
