@@ -3,6 +3,7 @@ package main.eventlisteners;
 import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.jsonparser.JSONParsers;
+import main.model.repository.CategoryRepository;
 import main.model.repository.GameLanguageRepository;
 import main.model.repository.GamesRepository;
 import main.model.repository.LanguageRepository;
@@ -28,6 +29,7 @@ public class DeleteAllMyData extends ListenerAdapter {
     private final GamesRepository gamesRepository;
     private final LanguageRepository languageRepository;
     private final GameLanguageRepository gameLanguageRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
@@ -102,6 +104,7 @@ public class DeleteAllMyData extends ListenerAdapter {
             gamesRepository.deleteAllMyData(user.getIdLong());
             languageRepository.deleteLanguage(user.getIdLong());
             gameLanguageRepository.deleteGameLanguage(user.getIdLong());
+            categoryRepository.deleteCategory(user.getIdLong());
         }
     }
 }

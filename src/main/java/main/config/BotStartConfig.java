@@ -132,7 +132,7 @@ public class BotStartConfig {
             jdaBuilder.addEventListeners(new GameHangmanListener());
             jdaBuilder.addEventListeners(new MessageWhenBotJoinToGuild());
             jdaBuilder.addEventListeners(new ButtonReactions(gameLanguageRepository, languageRepository, hangmanGameRepository, gamesRepository, playerRepository));
-            jdaBuilder.addEventListeners(new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository));
+            jdaBuilder.addEventListeners(new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository, categoryRepository));
             jdaBuilder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository, gameLanguageRepository, languageRepository, categoryRepository));
 
             jda = jdaBuilder.build();
