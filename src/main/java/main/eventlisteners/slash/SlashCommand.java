@@ -239,7 +239,7 @@ public class SlashCommand extends ListenerAdapter {
             }
 
             if (event.getName().equals("delete")) {
-                DeleteAllMyData deleteAllMyData = new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository);
+                DeleteAllMyData deleteAllMyData = new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository, categoryRepository);
                 deleteAllMyData.buildMessage(event, event.getUser());
                 return;
             }
