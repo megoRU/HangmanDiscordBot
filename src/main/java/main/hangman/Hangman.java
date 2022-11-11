@@ -447,6 +447,7 @@ public class Hangman implements HangmanHelper {
     public EmbedBuilder embedBuilder(Color color, String gameInfo, boolean gameGuesses, boolean isDefeat, @Nullable String inputs) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
 
+        System.out.println("BotStartConfig.getMapGameLanguages().get(userId): " + BotStartConfig.getMapGameLanguages().get(userId));
         String language = BotStartConfig.getMapGameLanguages().get(userId).equals("rus")
                 ? "Кириллица\nКатег.: " + category()
                 : "Latin\nCateg.:" + category();
