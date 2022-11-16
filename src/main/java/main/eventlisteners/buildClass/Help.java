@@ -1,30 +1,39 @@
 package main.eventlisteners.buildClass;
 
+import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.hangman.impl.ButtonIMpl;
 import main.jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@AllArgsConstructor
 public class Help {
 
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
+    private final InteractionHook interactionHook;
+    private final long userIdLong;
 
-    public void send(MessageChannel messageChannel, SlashCommandInteractionEvent event, String avatar, long userIdLong, String name) {
-        if (avatar == null) {
-            avatar = "https://cdn.discordapp.com/avatars/754093698681274369/dc4b416065569253bc6323efb6296703.png";
-        }
-
+    public void send() {
         EmbedBuilder info = new EmbedBuilder();
-        info.setColor(0xa224db);
-        info.setAuthor(name, null, avatar);
-
-        info.addField("Slash Commands", "`/hg`, `/multi`, `/stop`, `/language`, \n`/stats`, `/mystats`, `/allstats`, `/delete`", false);
+        info.setColor(Color.GREEN);
+        info.addField("Slash Commands",
+                """
+                        </hg:940560633504604161>
+                        </multi:1024084212762038352>
+                        </stop:940560633504604162>
+                        </language:940560633504604160>
+                        </stats:940560633504604164>
+                        </category:1029784705073168486>
+                        </mystats:940560633504604165>
+                        </allstats:940560633504604166>
+                        </delete:940560633504604167>
+                         """, false);
 
         String messagesEventsLinks = jsonParsers.getLocale("messages_events_Links", userIdLong);
         String messagesEventsSite = jsonParsers.getLocale("messages_events_Site", userIdLong);
@@ -40,9 +49,7 @@ public class Help {
         buttons.add(ButtonIMpl.BUTTON_SUPPORT);
 
         if (BotStartConfig.getMapLanguages().get(userIdLong) != null) {
-
             if (BotStartConfig.getMapLanguages().get(userIdLong).equals("eng")) {
-
                 buttons.add(ButtonIMpl.BUTTON_RUSSIAN_CHANGE);
             } else {
                 buttons.add(ButtonIMpl.BUTTON_ENGLISH_CHANGE);
@@ -50,11 +57,6 @@ public class Help {
         } else {
             buttons.add(ButtonIMpl.BUTTON_RUSSIAN_CHANGE);
         }
-
-        if (messageChannel != null) {
-            messageChannel.sendMessageEmbeds(info.build()).setActionRow(buttons).queue();
-        } else {
-            event.replyEmbeds(info.build()).addActionRow(buttons).queue();
-        }
+        interactionHook.sendMessageEmbeds(info.build()).setActionRow(buttons).queue();
     }
 }

@@ -19,7 +19,7 @@ public class MessageStats {
     private final long userIdLong;
     private final String userName;
 
-    public void sendStats() {
+    public void send() {
         try {
             String[] statistic = gamesRepository.getStatistic(userIdLong).replaceAll(",", " ").split(" ");
 

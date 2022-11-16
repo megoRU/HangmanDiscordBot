@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -69,6 +70,7 @@ public class BotStartConfig {
     private final BotiCordAPI api = new BotiCordAPI.Builder()
             .tokenEnum(TokenEnum.BOT)
             .token(System.getenv("BOTICORD"))
+            .enableDevMode()
             .build();
 
     //REPOSITORY
@@ -145,7 +147,7 @@ public class BotStartConfig {
         System.out.println(jda.retrieveCommands().complete());
 
         //Обновить команды
-//        updateSlashCommands();
+        updateSlashCommands();
         System.out.println("20:11");
     }
 
@@ -157,17 +159,23 @@ public class BotStartConfig {
             options.add(new OptionData(STRING, "game", "Setting the Game language")
                     .addChoice("eng", "eng")
                     .addChoice("rus", "rus")
-                    .setRequired(true));
+                    .setRequired(true)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Настройка языка игры")
+            );
 
             options.add(new OptionData(STRING, "bot", "Setting the bot language")
                     .addChoice("eng", "eng")
                     .addChoice("rus", "rus")
-                    .setRequired(true));
+                    .setRequired(true)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Настройка языка бота")
+            );
 
             List<OptionData> multi = new ArrayList<>();
             multi.add(new OptionData(USER, "user", "@Mention player to play with him")
                     .setRequired(true)
-                    .setName("user"));
+                    .setName("user")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "@Упомяните игрока, чтобы поиграть с ним")
+            );
 
             List<OptionData> category = new ArrayList<>();
             category.add(new OptionData(STRING, "set", "Select a category")
@@ -176,18 +184,43 @@ public class BotStartConfig {
                     .addChoice("fruits", "fruits")
                     .addChoice("flowers", "flowers")
                     .setRequired(true)
-                    .setName("set"));
+                    .setName("set")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выбрать категорию")
+            );
 
-            commands.addCommands(Commands.slash("language", "Setting language").addOptions(options));
-            commands.addCommands(Commands.slash("hg", "Start the game"));
-            commands.addCommands(Commands.slash("stop", "Stop the game"));
-            commands.addCommands(Commands.slash("help", "Bot commands"));
-            commands.addCommands(Commands.slash("stats", "Get your statistics"));
-            commands.addCommands(Commands.slash("mystats", "Find out the number of your wins and losses"));
-            commands.addCommands(Commands.slash("allstats", "Find out the statistics of all the bot's games"));
-            commands.addCommands(Commands.slash("delete", "Deleting your data"));
-            commands.addCommands(Commands.slash("multi", "Play Hangman with another player").setGuildOnly(true).addOptions(multi));
-            commands.addCommands(Commands.slash("category", "Set a category for words").addOptions(category));
+            commands.addCommands(Commands.slash("language", "Setting language")
+                    .addOptions(options)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Настройка языка"));
+
+            commands.addCommands(Commands.slash("hg", "Start the game")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Начать игру"));
+
+            commands.addCommands(Commands.slash("stop", "Stop the game")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Остановить игру"));
+
+            commands.addCommands(Commands.slash("help", "Bot commands")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Команды бота"));
+
+            commands.addCommands(Commands.slash("stats", "Get your statistics")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Получить свою статистику"));
+
+            commands.addCommands(Commands.slash("mystats", "Find out the number of your wins and losses")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Узнайте количество ваших побед и поражений"));
+
+            commands.addCommands(Commands.slash("allstats", "Find out the statistics of all the bot games")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Узнайте статистику всех игр бота"));
+
+            commands.addCommands(Commands.slash("delete", "Deleting your data")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Удаление ваших данных"));
+
+            commands.addCommands(Commands.slash("multi", "Play Hangman with another player")
+                    .setGuildOnly(true)
+                    .addOptions(multi)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Играйте в Hangman с другим игроком"));
+
+            commands.addCommands(Commands.slash("category", "Set a category for words")
+                    .addOptions(category)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установите категорию для слов"));
 
             commands.queue();
 
