@@ -98,22 +98,21 @@ public class ButtonReactions extends ListenerAdapter {
                 return;
             }
 
-            if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_RUS.name())) {
+            //Смена языка по кнопке
+            if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_RUS.name())
+                    || Objects.equals(event.getButton().getId(), Buttons.BUTTON_ENG.name())) {
                 event.editButton(event.getButton().asDisabled()).queue();
                 GameLanguageChange gameLanguageChange = new GameLanguageChange(gameLanguageRepository);
-                gameLanguageChange.set("rus", event.getUser().getIdLong());
-                String languageChange = jsonParsers.getLocale("language_change_lang", event.getUser().getIdLong());
-                String languageChangeLang = String.format(languageChange, "Кириллица");
-                event.getHook().sendMessage(languageChangeLang).setEphemeral(true).queue();
-                return;
-            }
-
-            if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_ENG.name())) {
-                event.editButton(event.getButton().asDisabled()).queue();
-                GameLanguageChange gameLanguageChange = new GameLanguageChange(gameLanguageRepository);
-                gameLanguageChange.set("eng", event.getUser().getIdLong());
-                String languageChange = jsonParsers.getLocale("language_change_lang", event.getUser().getIdLong());
-                String languageChangeLang = String.format(languageChange, "Latin");
+                String languageChangeLang;
+                if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_RUS.name())) {
+                    gameLanguageChange.set("rus", event.getUser().getIdLong());
+                    String languageChange = jsonParsers.getLocale("language_change_lang", event.getUser().getIdLong());
+                    languageChangeLang = String.format(languageChange, "Кириллица");
+                } else {
+                    gameLanguageChange.set("eng", event.getUser().getIdLong());
+                    String languageChange = jsonParsers.getLocale("language_change_lang", event.getUser().getIdLong());
+                    languageChangeLang = String.format(languageChange, "Latin");
+                }
                 event.getHook().sendMessage(languageChangeLang).setEphemeral(true).queue();
                 return;
             }
@@ -140,14 +139,8 @@ public class ButtonReactions extends ListenerAdapter {
             //При нажатии на кнопку HELP, бот присылает в чат информацию
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_HELP.name())) {
                 event.editButton(event.getButton().asDisabled()).queue();
-
-                Help help = new Help();
-                help.send(
-                        event.getChannel(),
-                        null,
-                        event.getUser().getAvatarUrl(),
-                        event.getUser().getIdLong(),
-                        event.getUser().getName());
+                Help help = new Help(event.getHook(), userIdLong);
+                help.send();
                 return;
             }
 
@@ -308,7 +301,7 @@ public class ButtonReactions extends ListenerAdapter {
                         event.getUser().getIdLong(),
                         event.getUser().getName());
 
-                messageStats.sendStats();
+                messageStats.send();
             }
         } catch (Exception e) {
             e.printStackTrace();

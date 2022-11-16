@@ -50,12 +50,9 @@ public class SlashCommand extends ListenerAdapter {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         try {
             if (event.getUser().isBot()) return;
-
             boolean permission = ChecksClass.canSendHG(event.getChannel(), event);
             if (!permission) return;
-
             long userIdLong = event.getUser().getIdLong();
-
             LOGGER.info("\nSlash Command name: " + event.getName());
 
             if (event.getName().equals("hg") || event.getName().equals("multi")) {
@@ -239,32 +236,31 @@ public class SlashCommand extends ListenerAdapter {
             }
 
             if (event.getName().equals("delete")) {
-                DeleteAllMyData deleteAllMyData = new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository, categoryRepository);
+                DeleteAllMyData deleteAllMyData = new DeleteAllMyData(
+                        gamesRepository,
+                        languageRepository,
+                        gameLanguageRepository,
+                        categoryRepository);
                 deleteAllMyData.buildMessage(event, event.getUser());
                 return;
             }
 
             if (event.getName().equals("help")) {
-                Help help = new Help();
-                help.send(
-                        null,
-                        event,
-                        event.getUser().getAvatarUrl(),
-                        userIdLong,
-                        event.getUser().getName());
+                event.deferReply().queue();
+                Help help = new Help(event.getHook(), userIdLong);
+                help.send();
                 return;
             }
 
             if (event.getName().equals("stats")) {
                 event.deferReply().queue();
-
                 MessageStats messageStats = new MessageStats(
-                        gamesRepository, event.getHook(),
+                        gamesRepository,
+                        event.getHook(),
                         event.getUser().getAvatarUrl(),
                         userIdLong,
                         event.getUser().getName());
-
-                messageStats.sendStats();
+                messageStats.send();
                 return;
             }
 

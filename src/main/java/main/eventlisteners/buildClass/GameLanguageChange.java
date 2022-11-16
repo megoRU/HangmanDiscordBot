@@ -1,16 +1,14 @@
 package main.eventlisteners.buildClass;
 
+import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.model.entity.GameLanguage;
 import main.model.repository.GameLanguageRepository;
 
+@AllArgsConstructor
 public class GameLanguageChange {
 
     private final GameLanguageRepository gameLanguageRepository;
-
-    public GameLanguageChange(GameLanguageRepository gameLanguageRepository) {
-        this.gameLanguageRepository = gameLanguageRepository;
-    }
 
     public void set(String message, Long userIdLong) {
         try {

@@ -54,7 +54,6 @@ public class DeleteAllMyData extends ListenerAdapter {
 
         event.reply(restoreData).queue();
 
-
         user.openPrivateChannel()
                 .flatMap(channel -> channel.sendMessage(restoreDataPm))
                 .queue(null, (exception) -> event.getChannel().sendMessage("""

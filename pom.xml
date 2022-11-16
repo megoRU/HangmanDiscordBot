@@ -22,34 +22,30 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-maven-plugin</artifactId>
-			<version>2.7.5</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-autoconfigure -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-autoconfigure</artifactId>
-			<version>2.7.5</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-commons -->
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-commons</artifactId>
-			<version>2.7.5</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
-			<version>2.7.5</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.github.megoRU</groupId>
 			<artifactId>api.megoru.ru</artifactId>
-			<version>v3.6</version>
+			<version>3.8</version>
 		</dependency>
 
 		<dependency>
@@ -58,17 +54,17 @@
 			<optional>true</optional>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+		<!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
 			<version>8.0.31</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.github.megoRU</groupId>
 			<artifactId>boticordjava</artifactId>
-			<version>v3.6</version>
+			<version>v3.7</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/net.dv8tion/JDA -->

@@ -21,19 +21,17 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
         try {
             if (event.getGuild().getDefaultChannel() == null) return;
-
-            if (!event.getGuild().getSelfMember().hasPermission(event.getGuild().getDefaultChannel(), Permission.MESSAGE_EMBED_LINKS)) {
+            if (!event.getGuild().getSelfMember().hasPermission(event.getGuild().getDefaultChannel(),
+                    Permission.MESSAGE_SEND,
+                    Permission.MESSAGE_EMBED_LINKS,
+                    Permission.VIEW_CHANNEL)) {
                 return;
             }
 
             if (event.getGuild().getSelfMember().hasPermission(event.getGuild().getDefaultChannel(), Permission.MESSAGE_SEND)) {
                 EmbedBuilder welcome = new EmbedBuilder();
                 welcome.setColor(Color.GREEN);
-                welcome.addField("Hangman", "Thanks for adding " +
-                        "**"
-                        + event.getGuild().getSelfMember().getUser().getName() +
-                        "** " + "bot to " + event.getGuild().getName() +
-                        "!\n", false);
+                welcome.addField("Hangman", "Thanks for adding **Hangman** bot to " + event.getGuild().getName() + "!\n", false);
                 welcome.addField("List of commands", "Use **/help** for a list of commands.", false);
                 welcome.addField("Support server", ":helmet_with_cross: [Discord server](https://discord.com/invite/UrWG3R683d)\n", false);
                 welcome.addField("Information", "We are actively writing about new updates or problems in our discord. We recommend that you follow up.", false);

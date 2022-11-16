@@ -53,7 +53,7 @@ public class Hangman implements HangmanHelper {
 
     private final Set<String> guesses;
 
-    public final List<Message> messageList;
+    private final List<Message> messageList;
 
     //User|Guild|Channel data
     private final long userId;
