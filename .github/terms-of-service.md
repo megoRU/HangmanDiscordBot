@@ -8,5 +8,5 @@ USA MATURE 17+ <br>
 RUSSIA 16+ <br>
 EU PEGI 16
 
-##Privacy Policy
+## Privacy Policy
 See here: [Press to open](https://github.com/megoRU/HangmanDiscordBot/blob/main/.github/privacy.md)
