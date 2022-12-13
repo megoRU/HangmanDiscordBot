@@ -350,8 +350,10 @@ public class Hangman implements HangmanHelper {
         StringBuilder sb = new StringBuilder();
         int i = 0;
         while (i < length) {
-            if (Objects.equals(WORD_OF_CHARS[i], "-")) {
-                sb.append(" -");
+            if (Objects.equals(WORD_OF_CHARS[i], "-")
+                    || Objects.equals(WORD_OF_CHARS[i], "–")
+                    || Objects.equals(WORD_OF_CHARS[i], "—")) {
+                sb.append(" —");
             } else if (Objects.equals(WORD_OF_CHARS[i], " ")) {
                 sb.append("  ");
             } else {
