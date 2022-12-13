@@ -9,6 +9,7 @@ import main.eventlisteners.buildClass.Help;
 import main.eventlisteners.buildClass.MessageStats;
 import main.hangman.Hangman;
 import main.hangman.HangmanBuilder;
+import main.hangman.HangmanEmbedUtils;
 import main.hangman.HangmanRegistry;
 import main.hangman.impl.ButtonIMpl;
 import main.hangman.impl.HangmanHelper;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
+import java.util.Map;
 import java.util.logging.Logger;
 
 @RequiredArgsConstructor
@@ -58,7 +60,8 @@ public class SlashCommand extends ListenerAdapter {
             if (event.getName().equals("hg") || event.getName().equals("multi")) {
                 event.getChannel().sendTyping().queue();
                 //Проверяем установлен ли язык. Если нет - то возвращаем в чат ошибку
-                if (!BotStartConfig.getMapGameLanguages().containsKey(userIdLong)) {
+                Map<Long, String> mapGameLanguages = BotStartConfig.getMapGameLanguages();
+                if (!mapGameLanguages.containsKey(userIdLong)) {
                     String hangmanListenerNeedSetLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", userIdLong);
 
                     EmbedBuilder needSetLanguage = new EmbedBuilder();
@@ -139,7 +142,7 @@ public class SlashCommand extends ListenerAdapter {
             }
 
             if (event.getName().equals("category")) {
-                String categorySlash = event.getOption("set", OptionMapping::getAsString);
+                String categorySlash = event.getOption("category", OptionMapping::getAsString);
                 String gameCategory = jsonParsers.getLocale("game_category", userIdLong);
 
                 if (categorySlash != null && categorySlash.equals("any")) {
@@ -159,10 +162,10 @@ public class SlashCommand extends ListenerAdapter {
 
             if (event.getName().equals("stop")) {
                 //Проверяем играет ли сейчас игрок. Если да удаляем игру.
-                if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                    Hangman activeHangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
-                    long userId = activeHangman.getUserId(); //NPE? по идеи не должно
-                    long secondPlayer = activeHangman.getSecondPlayer(); //NPE? по идеи не должно
+                Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
+                if (hangman != null) {
+                    long userId = hangman.getUserId(); //NPE? по идеи не должно
+                    long secondPlayer = hangman.getSecondPlayer(); //NPE? по идеи не должно
 
                     String hangmanEngGame = jsonParsers.getLocale("Hangman_Eng_game", userId);
                     String hangmanEngGame1 = jsonGameParsers.getLocale("Hangman_Eng_game", userId);
@@ -176,14 +179,7 @@ public class SlashCommand extends ListenerAdapter {
                                 .addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN)
                                 .queue();
                     }
-
-                    var embedBuilder = activeHangman
-                            .embedBuilder(Color.GREEN,
-                                    hangmanEngGame1,
-                                    false,
-                                    false,
-                                    null
-                            );
+                    EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanPattern(userId, hangmanEngGame1);
 
                     HangmanHelper.editMessage(embedBuilder, userId);
                     HangmanRegistry.getInstance().removeHangman(userId);

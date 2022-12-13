@@ -178,13 +178,13 @@ public class BotStartConfig {
             );
 
             List<OptionData> category = new ArrayList<>();
-            category.add(new OptionData(STRING, "set", "Select a category")
+            category.add(new OptionData(STRING, "category", "Select a category")
                     .addChoice("any", "any")
                     .addChoice("colors", "colors")
                     .addChoice("fruits", "fruits")
                     .addChoice("flowers", "flowers")
                     .setRequired(true)
-                    .setName("set")
+                    .setName("category")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выбрать категорию")
             );
 
@@ -376,7 +376,8 @@ public class BotStartConfig {
                         .setWord(word)
                         .setGuesses(guesses)
                         .setCurrentHiddenWord(currentHiddenWord)
-                        .setLocalDateTime(game_created_time);
+                        .setLocalDateTime(game_created_time)
+                        .setMessageId(Long.parseLong(message_id_long));
 
                 if (secondUserIdLong == 0L) {
                     instance.setHangman(userIdLong, hangmanBuilder.build());
@@ -388,8 +389,6 @@ public class BotStartConfig {
                     instance.setHangman(userIdLong, hangman);
                     instance.setHangman(secondUserIdLong, hangman);
                 }
-
-                instance.setMessageId(userIdLong, message_id_long);
             }
             rs.close();
             statement.close();

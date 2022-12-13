@@ -1,6 +1,7 @@
 package main.hangman;
 
 import main.config.BotStartConfig;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Timer;
@@ -11,8 +12,6 @@ public class HangmanRegistry {
 
     //Long это UserIdLong
     private static final Map<Long, Hangman> activeHangman = new ConcurrentHashMap<>();
-    private static final Map<Long, String> messageId = new ConcurrentHashMap<>();
-
     private static volatile HangmanRegistry hangmanRegistry;
     private final AtomicInteger idGame = new AtomicInteger();
 
@@ -39,17 +38,10 @@ public class HangmanRegistry {
         System.out.println(idGame);
     }
 
-    //2 User могут иметь 1 Gift
+    //2 User могут иметь 1 game
+    @Nullable
     public Hangman getActiveHangman(long userIdLong) {
         return activeHangman.get(userIdLong);
-    }
-
-    public String getMessageId(long userIdLong) {
-        return messageId.get(userIdLong);
-    }
-
-    public void setMessageId(long userIdLong, String messageIdString) {
-        messageId.put(userIdLong, messageIdString);
     }
 
     public void setHangman(long userIdLong, Hangman hangman) {
@@ -86,6 +78,5 @@ public class HangmanRegistry {
         }
 
         activeHangman.remove(userIdLong);
-        messageId.remove(userIdLong);
     }
 }
