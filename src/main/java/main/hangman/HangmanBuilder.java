@@ -22,6 +22,7 @@ public interface HangmanBuilder {
         private long secondPlayer;
         private Long guildId;
         private Long channelId;
+        private long messageId;
 
         //For restoring
         private String guesses;
@@ -29,6 +30,11 @@ public interface HangmanBuilder {
         private String currentHiddenWord;
         private int hangmanErrors;
         private LocalDateTime localDateTime;
+
+        public Builder setMessageId(long messageId) {
+            this.messageId = messageId;
+            return this;
+        }
 
         public Builder setGuesses(String guesses) {
             this.guesses = guesses;
@@ -116,6 +122,7 @@ public interface HangmanBuilder {
                         secondPlayer,
                         guildId,
                         channelId,
+                        messageId,
                         guesses,
                         word,
                         currentHiddenWord,

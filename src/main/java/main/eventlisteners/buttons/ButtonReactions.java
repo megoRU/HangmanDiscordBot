@@ -9,6 +9,7 @@ import main.eventlisteners.buildClass.Help;
 import main.eventlisteners.buildClass.MessageStats;
 import main.hangman.Hangman;
 import main.hangman.HangmanBuilder;
+import main.hangman.HangmanEmbedUtils;
 import main.hangman.HangmanRegistry;
 import main.hangman.impl.ButtonIMpl;
 import main.hangman.impl.HangmanHelper;
@@ -23,7 +24,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -248,11 +248,10 @@ public class ButtonReactions extends ListenerAdapter {
             //Если нажата кнопка STOP, и игрок сейчас играет, завершаем
             if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_STOP.name())) {
                 event.editButton(event.getButton().asDisabled()).queue();
-
-                if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                    Hangman activeHangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
-                    long userId = activeHangman.getUserId();
-                    long secondPlayer = activeHangman.getSecondPlayer();
+                Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
+                if (hangman != null) {
+                    long userId = hangman.getUserId();
+                    long secondPlayer = hangman.getSecondPlayer();
 
                     String hangmanEngGame = jsonParsers.getLocale("Hangman_Eng_game", userId);
                     String hangmanEngGame1 = jsonGameParsers.getLocale("Hangman_Eng_game", userId);
@@ -268,13 +267,7 @@ public class ButtonReactions extends ListenerAdapter {
                                 .queue();
                     }
 
-                    var embedBuilder = activeHangman
-                            .embedBuilder(Color.GREEN,
-                                    hangmanEngGame1,
-                                    false,
-                                    false,
-                                    null
-                            );
+                    EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanPattern(userId, hangmanEngGame1);
 
                     HangmanHelper.editMessage(embedBuilder, userId);
                     HangmanRegistry.getInstance().removeHangman(userId);

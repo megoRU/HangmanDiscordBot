@@ -21,10 +21,11 @@ public interface HangmanHelper {
     static void editMessage(EmbedBuilder embedBuilder, Long userIdLong) {
         try {
             if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                Hangman activeHangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
-                Long guildId = activeHangman.getGuildId();
-                Long channelId = activeHangman.getChannelId();
-                String messageId = HangmanRegistry.getInstance().getMessageId(activeHangman.getUserId());
+                Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
+                if (hangman == null) return;
+                Long guildId = hangman.getGuildId();
+                Long channelId = hangman.getChannelId();
+                long messageId = hangman.getMessageId();
 
                 if (guildId != null) {
                     Guild guildById = BotStartConfig.jda.getGuildById(guildId);
@@ -68,10 +69,11 @@ public interface HangmanHelper {
     static void editMessageWithButtons(EmbedBuilder embedBuilder, Long userIdLong, List<Button> buttons) {
         try {
             if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                Hangman activeHangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
-                Long guildId = activeHangman.getGuildId();
-                Long channelId = activeHangman.getChannelId();
-                String messageId = HangmanRegistry.getInstance().getMessageId(activeHangman.getUserId());
+                Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
+                if (hangman == null) return;
+                Long guildId = hangman.getGuildId();
+                Long channelId = hangman.getChannelId();
+                long messageId = hangman.getMessageId();
 
                 if (guildId != null) {
                     Guild guildById = BotStartConfig.jda.getGuildById(guildId);

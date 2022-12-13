@@ -1,16 +1,8 @@
 FROM maven:3.8.3-openjdk-17
 
-ENV HOME=/home/usr/app
+WORKDIR /app
 
-RUN mkdir -p $HOME
-
-WORKDIR $HOME
-
-ADD pom.xml $HOME
-
-RUN ["/usr/local/bin/mvn-entrypoint.sh", "mvn", "verify", "clean", "--fail-never"]
-
-ADD . $HOME
+COPY . .
 
 RUN ["mvn", "install"]
 
