@@ -445,6 +445,14 @@ public class Hangman implements HangmanHelper {
         return stopHangmanTimer;
     }
 
+    public String getWORD() {
+        return WORD;
+    }
+
+    public Status getSTATUS() {
+        return STATUS;
+    }
+
     private void setTimer(LocalDateTime ldt) {
         StopHangmanTimer stopHangman = new StopHangmanTimer();
         Timestamp timestamp = Timestamp.valueOf(ldt.atZone(ZoneOffset.UTC).toLocalDateTime().plusMinutes(10));
@@ -542,7 +550,7 @@ public class Hangman implements HangmanHelper {
         }
     }
 
-    private enum Status {
+    public enum Status {
         WRONG_LETTER,
         SAME_LETTER,
         RIGHT_LETTER,

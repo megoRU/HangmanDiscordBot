@@ -23,6 +23,8 @@ public class HangmanEmbedUtils {
             int hangmanErrors = hangman.getHangmanErrors();
             String wordHidden = hangman.getWORD_HIDDEN();
             String guesses = hangman.getGuesses();
+            String word = hangman.getWORD().toUpperCase().replaceAll("", " ").trim();
+            Hangman.Status hangmanSTATUS = hangman.getSTATUS();
 
             String gamePlayer;
             if (secondPlayer == 0L) {
@@ -46,14 +48,25 @@ public class HangmanEmbedUtils {
             //Guesses
             if (guesses.length() > 0) {
                 String gameGuesses = jsonGameParsers.getLocale("Game_Guesses", userId);
-                String guessesFormat = String.format("`%s`", guesses);
+                String guessesFormat = String.format("`%s`", guesses.toUpperCase());
                 embedBuilder.addField(gameGuesses, guessesFormat, false);
             }
 
             //Current Hidden Word
             String gameCurrentWord = jsonGameParsers.getLocale("Game_Current_Word", userId);
-            String worldUpper = String.format("`%s`", wordHidden);
-            embedBuilder.addField(gameCurrentWord, worldUpper, false);
+            String currentWorldUpper = String.format("`%s`", wordHidden.toUpperCase());
+
+            //Game Word That Was
+            if (hangmanSTATUS == Hangman.Status.LOSE_GAME) {
+                embedBuilder.addField(gameCurrentWord, currentWorldUpper, false);
+
+                String gameWordThatWas = jsonGameParsers.getLocale("Game_Word_That_Was", userId);
+                String worldUpper = String.format("`%s`", word);
+                embedBuilder.addField(gameWordThatWas, worldUpper, false);
+            } else {
+                //Current Hidden Word
+                embedBuilder.addField(gameCurrentWord, currentWorldUpper, false);
+            }
 
             //Status
             String gameInfo = jsonGameParsers.getLocale("Game_Info", userId);
