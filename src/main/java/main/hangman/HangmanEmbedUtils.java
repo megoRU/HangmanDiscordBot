@@ -55,16 +55,16 @@ public class HangmanEmbedUtils {
             //Current Hidden Word
             String gameCurrentWord = jsonGameParsers.getLocale("Game_Current_Word", userId);
             String currentWorldUpper = String.format("`%s`", wordHidden.toUpperCase());
+            String worldUpper = String.format("`%s`", word);
 
             //Game Word That Was
             if (hangmanSTATUS == Hangman.Status.LOSE_GAME) {
-                embedBuilder.addField(gameCurrentWord, currentWorldUpper, false);
-
                 String gameWordThatWas = jsonGameParsers.getLocale("Game_Word_That_Was", userId);
-                String worldUpper = String.format("`%s`", word);
+                embedBuilder.addField(gameCurrentWord, currentWorldUpper, false);
                 embedBuilder.addField(gameWordThatWas, worldUpper, false);
+            } else if (hangmanSTATUS == Hangman.Status.WIN_GAME) {
+                embedBuilder.addField(gameCurrentWord, worldUpper, false);
             } else {
-                //Current Hidden Word
                 embedBuilder.addField(gameCurrentWord, currentWorldUpper, false);
             }
 
