@@ -41,7 +41,7 @@ public class ChecksClass {
         }
 
         String checkPermissions =
-                String.format(jsonParsers.getLocale("check_permissions", 0L),
+                String.format(jsonParsers.getLocale("check_permissions", event.getUser().getIdLong()),
                         event.getGuild().getId(),
                         stringBuilder);
 
@@ -79,7 +79,7 @@ public class ChecksClass {
         }
 
         String checkPermissions =
-                String.format(jsonParsers.getLocale("check_permissions", 0L),
+                String.format(jsonParsers.getLocale("check_permissions", event.getAuthor().getIdLong()),
                         event.getGuild().getId(),
                         stringBuilder);
 
@@ -117,7 +117,7 @@ public class ChecksClass {
         }
 
         String checkPermissions =
-                String.format(jsonParsers.getLocale("check_permissions", 0L),
+                String.format(jsonParsers.getLocale("check_permissions", event.getUser().getIdLong()),
                         event.getGuild().getId(),
                         stringBuilder);
 
