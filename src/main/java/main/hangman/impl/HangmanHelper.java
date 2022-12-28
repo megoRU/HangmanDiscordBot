@@ -6,10 +6,8 @@ import main.hangman.HangmanRegistry;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.ErrorResponse;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -30,18 +28,21 @@ public interface HangmanHelper {
                 if (guildId != null) {
                     Guild guildById = BotStartConfig.jda.getGuildById(guildId);
                     if (guildById != null) {
-                        TextChannel textChannelById = guildById.getTextChannelById(channelId);
+                        GuildMessageChannel textChannelById = guildById.getTextChannelById(channelId);
+                        if (textChannelById == null) textChannelById = guildById.getNewsChannelById(channelId);
+                        if (textChannelById == null) textChannelById = guildById.getThreadChannelById(channelId);
                         if (textChannelById != null) {
-                            textChannelById.retrieveMessageById(messageId).queue((message) ->
-                                    message.editMessageEmbeds(embedBuilder.build())
-                                            .queue(), (failure) -> {
-                                if (failure instanceof ErrorResponseException) {
-                                    ErrorResponseException ex = (ErrorResponseException) failure;
-                                    if (ex.getErrorResponse() == ErrorResponse.UNKNOWN_MESSAGE) {
-                                        LOGGER.info("editMessageWithButtons(): UNKNOWN_MESSAGE");
-                                    }
+                            try {
+                                textChannelById.editMessageEmbedsById(messageId, embedBuilder.build()).queue();
+                            } catch (Exception e) {
+                                if (e.getMessage().contains("UNKNOWN_MESSAGE")) {
+                                    LOGGER.info("editMessage(): UNKNOWN_MESSAGE");
+                                } else if (e.getMessage().contains("MISSING_ACCESS")) {
+                                    LOGGER.info("editMessage(): MISSING_ACCESS");
+                                } else if (e.getMessage().contains("UNKNOWN_CHANNEL")) {
+                                    LOGGER.info("editMessage(): UNKNOWN_CHANNEL");
                                 }
-                            });
+                            }
                         }
                     }
                 } else {
@@ -60,10 +61,12 @@ public interface HangmanHelper {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (
+                Exception e) {
             e.printStackTrace();
             System.out.println("editMessage(): " + "Скорее всего бот в чс!");
         }
+
     }
 
     static void editMessageWithButtons(EmbedBuilder embedBuilder, Long userIdLong, List<Button> buttons) {
@@ -78,19 +81,24 @@ public interface HangmanHelper {
                 if (guildId != null) {
                     Guild guildById = BotStartConfig.jda.getGuildById(guildId);
                     if (guildById != null) {
-                        TextChannel textChannelById = guildById.getTextChannelById(channelId);
+                        GuildMessageChannel textChannelById = guildById.getTextChannelById(channelId);
+                        if (textChannelById == null) textChannelById = guildById.getNewsChannelById(channelId);
+                        if (textChannelById == null) textChannelById = guildById.getThreadChannelById(channelId);
                         if (textChannelById != null) {
-                            textChannelById.retrieveMessageById(messageId).queue((message) ->
-                                    message.editMessageEmbeds(embedBuilder.build())
-                                            .setActionRow(buttons)
-                                            .queue(), (failure) -> {
-                                if (failure instanceof ErrorResponseException) {
-                                    ErrorResponseException ex = (ErrorResponseException) failure;
-                                    if (ex.getErrorResponse() == ErrorResponse.UNKNOWN_MESSAGE) {
-                                        LOGGER.info("editMessageWithButtons(): UNKNOWN_MESSAGE");
-                                    }
+                            try {
+                                textChannelById
+                                        .editMessageEmbedsById(messageId, embedBuilder.build())
+                                        .setActionRow(buttons)
+                                        .queue();
+                            } catch (Exception e) {
+                                if (e.getMessage().contains("UNKNOWN_MESSAGE")) {
+                                    LOGGER.info("editMessage(): UNKNOWN_MESSAGE");
+                                } else if (e.getMessage().contains("MISSING_ACCESS")) {
+                                    LOGGER.info("editMessage(): MISSING_ACCESS");
+                                } else if (e.getMessage().contains("UNKNOWN_CHANNEL")) {
+                                    LOGGER.info("editMessage(): UNKNOWN_CHANNEL");
                                 }
-                            });
+                            }
                         }
                     }
                 } else {

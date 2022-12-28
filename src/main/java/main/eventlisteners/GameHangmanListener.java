@@ -21,9 +21,6 @@ public class GameHangmanListener extends ListenerAdapter {
         try {
             if (event.getAuthor().isBot()) return;
 
-            boolean permission = ChecksClass.canSendHG(event.getChannel(), event);
-            if (!permission) return;
-
             String message = event.getMessage().getContentRaw().trim().toLowerCase();
             long userIdLong = event.getAuthor().getIdLong();
 
@@ -33,6 +30,9 @@ public class GameHangmanListener extends ListenerAdapter {
             Message messageEvent = event.getMessage();
 
             if (hangman != null) {
+                boolean permission = ChecksClass.check(event);
+                if (!permission) return;
+
                 if (message.matches(HG_ONE_LETTER) || message.matches(HG_ONE_WORD)) {
                     hangman.inputHandler(message, messageEvent);
                 }

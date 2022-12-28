@@ -52,7 +52,7 @@ public class SlashCommand extends ListenerAdapter {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         try {
             if (event.getUser().isBot()) return;
-            boolean permission = ChecksClass.canSendHG(event.getChannel(), event);
+            boolean permission = ChecksClass.check(event);
             if (!permission) return;
             long userIdLong = event.getUser().getIdLong();
             LOGGER.info("\nSlash Command name: " + event.getName());
@@ -95,8 +95,6 @@ public class SlashCommand extends ListenerAdapter {
                             .setUserIdLong(userIdLong);
 
                     if (event.getName().equals("multi")) {
-                        boolean canSendHG = ChecksClass.canSendHG(event.getChannel(), event);
-                        if (!canSendHG) return;
                         User user = event.getOption("user", OptionMapping::getAsUser);
 
                         if (user == null || event.getGuild() == null) {
