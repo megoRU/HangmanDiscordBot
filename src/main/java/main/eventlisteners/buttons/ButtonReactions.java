@@ -47,7 +47,7 @@ public class ButtonReactions extends ListenerAdapter {
         try {
             if (event.getUser().isBot()) return;
 
-            boolean permission = ChecksClass.canSendHG(event.getChannel(), event);
+            boolean permission = ChecksClass.check(event);
             if (!permission) return;
 
             long userIdLong = event.getUser().getIdLong();
