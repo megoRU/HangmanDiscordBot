@@ -1,5 +1,6 @@
 package main.config;
 
+import main.eventlisteners.ContextMenuListener;
 import main.eventlisteners.DeleteAllMyData;
 import main.eventlisteners.GameHangmanListener;
 import main.eventlisteners.MessageWhenBotJoinToGuild;
@@ -15,6 +16,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -136,6 +138,7 @@ public class BotStartConfig {
             jdaBuilder.addEventListeners(new ButtonReactions(gameLanguageRepository, languageRepository, hangmanGameRepository, gamesRepository, playerRepository));
             jdaBuilder.addEventListeners(new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository, categoryRepository));
             jdaBuilder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository, gameLanguageRepository, languageRepository, categoryRepository));
+            jdaBuilder.addEventListeners(new ContextMenuListener(hangmanGameRepository, gamesRepository, playerRepository));
 
             jda = jdaBuilder.build();
             jda.awaitReady();
@@ -148,7 +151,7 @@ public class BotStartConfig {
 
         //Обновить команды
         updateSlashCommands();
-        System.out.println("20:11");
+        System.out.println("18:31");
     }
 
     private void updateSlashCommands() {
@@ -217,6 +220,11 @@ public class BotStartConfig {
                     .setGuildOnly(true)
                     .addOptions(multi)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Играйте в Hangman с другим игроком"));
+
+            //Context Menu
+            commands.addCommands(Commands.context(Command.Type.USER, "multi")
+                    .setGuildOnly(true)
+            );
 
             commands.addCommands(Commands.slash("category", "Set a category for words")
                     .addOptions(category)
