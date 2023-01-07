@@ -99,6 +99,7 @@ public class ChecksClass {
 
         MessageChannelUnion channel = event.getChannel();
         boolean canWrite = true;
+        boolean canWriteThreads = true;
         boolean permissions = true;
 
         switch (channel.getType()) {
@@ -112,6 +113,7 @@ public class ChecksClass {
             }
             case GUILD_PUBLIC_THREAD, GUILD_NEWS_THREAD, GUILD_PRIVATE_THREAD -> {
                 canWrite = canWrite(channel.asThreadChannel(), selfMember, stringBuilder);
+                canWriteThreads = canWriteThreads(channel.asThreadChannel(), selfMember, stringBuilder);
                 permissions = hasPermission(channel.asThreadChannel(), selfMember, stringBuilder);
             }
         }
@@ -121,12 +123,23 @@ public class ChecksClass {
                         event.getGuild().getId(),
                         stringBuilder);
 
-        if (!permissions || !canWrite) {
+        if (!permissions || !canWrite || !canWriteThreads) {
             event.reply(checkPermissions).queue();
             return false;
         }
 
         return true;
+    }
+
+    private static boolean canWriteThreads(GuildChannel channel, Member selfMember, StringBuilder stringBuilder) {
+        boolean canWrite = true;
+
+        if (!selfMember.hasPermission(channel, Permission.MESSAGE_SEND_IN_THREADS)) {
+            stringBuilder.append(stringBuilder.length() == 0 ? "`Permission.MESSAGE_SEND_IN_THREADS`" : ", `Permission.MESSAGE_SEND_IN_THREADS`");
+            canWrite = false;
+        }
+
+        return canWrite;
     }
 
     private static boolean canWrite(GuildChannel channel, Member selfMember, StringBuilder stringBuilder) {
@@ -139,11 +152,6 @@ public class ChecksClass {
 
         if (!selfMember.hasPermission(channel, Permission.VIEW_CHANNEL)) {
             stringBuilder.append(stringBuilder.length() == 0 ? "`Permission.VIEW_CHANNEL`" : ", `Permission.VIEW_CHANNEL`");
-            canWrite = false;
-        }
-
-        if (!selfMember.hasPermission(channel, Permission.MESSAGE_SEND_IN_THREADS)) {
-            stringBuilder.append(stringBuilder.length() == 0 ? "`Permission.MESSAGE_SEND_IN_THREADS`" : ", `Permission.MESSAGE_SEND_IN_THREADS`");
             canWrite = false;
         }
 
