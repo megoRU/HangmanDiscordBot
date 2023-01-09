@@ -3,6 +3,7 @@ package main.hangman.impl;
 import main.config.BotStartConfig;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
+import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
@@ -16,7 +17,7 @@ public interface HangmanHelper {
 
     Logger LOGGER = Logger.getLogger(HangmanHelper.class.getName());
 
-    static void editMessage(EmbedBuilder embedBuilder, Long userIdLong) {
+    static void editMessage(EmbedBuilder embedBuilder, Long userIdLong, HangmanGameRepository hangmanGameRepository) {
         if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
             Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
             if (hangman == null) return;
@@ -39,6 +40,7 @@ public interface HangmanHelper {
                                     || e.getMessage().contains("UNKNOWN_CHANNEL")
                                     || e.getMessage().contains("INVALID_AUTHOR_EDIT")) {
                                 HangmanRegistry.getInstance().removeHangman(userIdLong);
+                                hangmanGameRepository.deleteActiveGame(userIdLong);
                                 LOGGER.info("editMessage(): " + e.getMessage());
                             }
                         }
@@ -60,6 +62,7 @@ public interface HangmanHelper {
                                 || e.getMessage().contains("MISSING_ACCESS")
                                 || e.getMessage().contains("UNKNOWN_CHANNEL")
                                 || e.getMessage().contains("INVALID_AUTHOR_EDIT")) {
+                            hangmanGameRepository.deleteActiveGame(userIdLong);
                             HangmanRegistry.getInstance().removeHangman(userIdLong);
                             LOGGER.info("editMessage(): " + e.getMessage());
                         }
@@ -69,7 +72,7 @@ public interface HangmanHelper {
         }
     }
 
-    static void editMessageWithButtons(EmbedBuilder embedBuilder, Long userIdLong, List<Button> buttons) {
+    static void editMessageWithButtons(EmbedBuilder embedBuilder, Long userIdLong, List<Button> buttons, HangmanGameRepository hangmanGameRepository) {
         if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
             Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
             if (hangman == null) return;
@@ -95,6 +98,7 @@ public interface HangmanHelper {
                                     || e.getMessage().contains("MISSING_ACCESS")
                                     || e.getMessage().contains("INVALID_AUTHOR_EDIT")) {
                                 HangmanRegistry.getInstance().removeHangman(userIdLong);
+                                hangmanGameRepository.deleteActiveGame(userIdLong);
                                 LOGGER.info("editMessageWithButtons(): " + e.getMessage());
                             }
                         }
@@ -121,6 +125,7 @@ public interface HangmanHelper {
                             || e.getMessage().contains("UNKNOWN_CHANNEL")
                             || e.getMessage().contains("INVALID_AUTHOR_EDIT")) {
                         HangmanRegistry.getInstance().removeHangman(userIdLong);
+                        hangmanGameRepository.deleteActiveGame(userIdLong);
                         LOGGER.info("editMessageWithButtons(): " + e.getMessage());
                     }
                 }
