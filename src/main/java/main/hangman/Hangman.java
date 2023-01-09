@@ -492,12 +492,12 @@ public class Hangman implements HangmanHelper {
 
                     if (textChannelById != null) {
                         if (selfMember.hasPermission(textChannelById, Permission.MESSAGE_MANAGE) && messageList.size() >= 3) {
-                            String format =
-                                    String.format("\nAutoDeletingMessages: %s\nmessageList: %s",
-                                            messageList.size(),
-                                            Arrays.toString(messageList.toArray()));
+//                            String format =
+//                                    String.format("\nAutoDeletingMessages: %s\nmessageList: %s",
+//                                            messageList.size(),
+//                                            Arrays.toString(messageList.toArray()));
 
-                            LOGGER.info(format);
+//                            LOGGER.info(format);
                             textChannelById.deleteMessages(messageList).submit().get();
                             //Так как метод асинхронный иногда может возникать NPE
                             messageList.clear();
