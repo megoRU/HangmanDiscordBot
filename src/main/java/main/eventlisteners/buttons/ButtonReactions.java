@@ -269,7 +269,7 @@ public class ButtonReactions extends ListenerAdapter {
 
                     EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanPattern(userId, hangmanEngGame1);
 
-                    HangmanHelper.editMessage(embedBuilder, userId);
+                    HangmanHelper.editMessage(embedBuilder, userId, hangmanGameRepository);
                     HangmanRegistry.getInstance().removeHangman(userId);
                     hangmanGameRepository.deleteActiveGame(userId);
                     //Если нажата кнопка STOP, и игрок сейчас не играет, присылаем в час уведомление

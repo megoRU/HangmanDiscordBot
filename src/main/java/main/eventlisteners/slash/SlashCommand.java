@@ -179,7 +179,7 @@ public class SlashCommand extends ListenerAdapter {
                     }
                     EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanPattern(userId, hangmanEngGame1);
 
-                    HangmanHelper.editMessage(embedBuilder, userId);
+                    HangmanHelper.editMessage(embedBuilder, userId, hangmanGameRepository);
                     HangmanRegistry.getInstance().removeHangman(userId);
                     hangmanGameRepository.deleteActiveGame(userId);
                     //Если игрок не играет, а хочет завершить игру, то нужно ему это прислать уведомление, что он сейчас не играет
