@@ -1,24 +1,18 @@
-package main.eventlisteners;
+package main.core.events;
 
-import lombok.AllArgsConstructor;
 import main.hangman.impl.ButtonIMpl;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
-import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
 
-@AllArgsConstructor
 @Service
-public class MessageWhenBotJoinToGuild extends ListenerAdapter {
+public class JoinEvent {
 
-    //bot join msg
-    @Override
-    public void onGuildJoin(@NotNull GuildJoinEvent event) {
+    public void join(@NotNull GuildJoinEvent event) {
         try {
             if (event.getGuild().getDefaultChannel() == null) return;
             if (!event.getGuild().getSelfMember().hasPermission(event.getGuild().getDefaultChannel(),
@@ -45,10 +39,5 @@ public class MessageWhenBotJoinToGuild extends ListenerAdapter {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void onGuildLeave(@NotNull GuildLeaveEvent event) {
-        System.out.println("Удаляем данные после удаления бота из Guild");
     }
 }

@@ -6,13 +6,10 @@ import main.enums.Buttons;
 import main.eventlisteners.ChecksClass;
 import main.eventlisteners.buildClass.GameLanguageChange;
 import main.eventlisteners.buildClass.Help;
-import main.eventlisteners.buildClass.MessageStats;
 import main.hangman.Hangman;
 import main.hangman.HangmanBuilder;
-import main.hangman.HangmanEmbedUtils;
 import main.hangman.HangmanRegistry;
 import main.hangman.impl.ButtonIMpl;
-import main.hangman.impl.HangmanHelper;
 import main.jsonparser.JSONParsers;
 import main.model.entity.GameLanguage;
 import main.model.entity.Language;
@@ -243,58 +240,6 @@ public class ButtonReactions extends ListenerAdapter {
                             .queue();
                 }
                 return;
-            }
-
-            //Если нажата кнопка STOP, и игрок сейчас играет, завершаем
-            if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_STOP.name())) {
-                event.editButton(event.getButton().asDisabled()).queue();
-                Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
-                if (hangman != null) {
-                    long userId = hangman.getUserId();
-                    long secondPlayer = hangman.getSecondPlayer();
-
-                    String hangmanEngGame = jsonParsers.getLocale("Hangman_Eng_game", userId);
-                    String hangmanEngGame1 = jsonGameParsers.getLocale("Hangman_Eng_game", userId);
-
-                    if (secondPlayer != 0L) {
-                        event.getHook()
-                                .sendMessage(hangmanEngGame)
-                                .addActionRow(ButtonIMpl.getButtonPlayAgainWithUsers(userId, secondPlayer))
-                                .queue();
-                    } else {
-                        event.getHook().sendMessage(hangmanEngGame)
-                                .addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN)
-                                .queue();
-                    }
-
-                    EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanPattern(userId, hangmanEngGame1);
-
-                    HangmanHelper.editMessage(embedBuilder, userId, hangmanGameRepository);
-                    HangmanRegistry.getInstance().removeHangman(userId);
-                    hangmanGameRepository.deleteActiveGame(userId);
-                    //Если нажата кнопка STOP, и игрок сейчас не играет, присылаем в час уведомление
-                } else {
-                    String hangmanYouAreNotPlay = jsonParsers.getLocale("Hangman_You_Are_Not_Play", event.getUser().getIdLong());
-                    event.getHook()
-                            .sendMessage(hangmanYouAreNotPlay)
-                            .setActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN)
-                            .queue();
-                }
-                return;
-            }
-
-            //Получаем статистику по нажатии на кнопку
-            if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_MY_STATS.name())) {
-                event.editButton(event.getButton().asDisabled()).queue();
-
-                MessageStats messageStats = new MessageStats(
-                        gamesRepository,
-                        event.getHook(),
-                        event.getUser().getAvatarUrl(),
-                        event.getUser().getIdLong(),
-                        event.getUser().getName());
-
-                messageStats.send();
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,16 +1,14 @@
 package main.config;
 
-import main.eventlisteners.ContextMenuListener;
-import main.eventlisteners.DeleteAllMyData;
-import main.eventlisteners.GameHangmanListener;
-import main.eventlisteners.MessageWhenBotJoinToGuild;
-import main.eventlisteners.buttons.ButtonReactions;
-import main.eventlisteners.slash.SlashCommand;
+import main.controller.UpdateController;
+import main.core.CoreBot;
 import main.hangman.Hangman;
 import main.hangman.HangmanBuilder;
 import main.hangman.HangmanRegistry;
 import main.jsonparser.ParserClass;
-import main.model.repository.*;
+import main.model.repository.GamesRepository;
+import main.model.repository.HangmanGameRepository;
+import main.model.repository.PlayerRepository;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -76,12 +74,11 @@ public class BotStartConfig {
             .build();
 
     //REPOSITORY
-    private final LanguageRepository languageRepository;
-    private final GameLanguageRepository gameLanguageRepository;
     private final HangmanGameRepository hangmanGameRepository;
     private final PlayerRepository playerRepository;
     private final GamesRepository gamesRepository;
-    private final CategoryRepository categoryRepository;
+
+    private final UpdateController updateController;
 
     //DataBase
     @Value("${spring.datasource.url}")
@@ -92,16 +89,15 @@ public class BotStartConfig {
     private String PASSWORD_CONNECTION;
 
     @Autowired
-    public BotStartConfig(LanguageRepository languageRepository, GameLanguageRepository gameLanguageRepository,
-                          HangmanGameRepository hangmanGameRepository, PlayerRepository playerRepository,
-                          GamesRepository gamesRepository, CategoryRepository categoryRepository) {
-        this.languageRepository = languageRepository;
-        this.gameLanguageRepository = gameLanguageRepository;
+    public BotStartConfig(HangmanGameRepository hangmanGameRepository,
+                          PlayerRepository playerRepository,
+                          GamesRepository gamesRepository,
+                          UpdateController updateController) {
         this.hangmanGameRepository = hangmanGameRepository;
         this.playerRepository = playerRepository;
         this.gamesRepository = gamesRepository;
-        this.categoryRepository = categoryRepository;
         idGame = hangmanGameRepository.getCountGames() == null ? 0 : hangmanGameRepository.getCountGames();
+        this.updateController = updateController;
     }
 
     @Bean
@@ -133,12 +129,7 @@ public class BotStartConfig {
             jdaBuilder.enableIntents(intents);
             jdaBuilder.setActivity(Activity.playing("Starting..."));
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
-            jdaBuilder.addEventListeners(new GameHangmanListener());
-            jdaBuilder.addEventListeners(new MessageWhenBotJoinToGuild());
-            jdaBuilder.addEventListeners(new ButtonReactions(gameLanguageRepository, languageRepository, hangmanGameRepository, gamesRepository, playerRepository));
-            jdaBuilder.addEventListeners(new DeleteAllMyData(gamesRepository, languageRepository, gameLanguageRepository, categoryRepository));
-            jdaBuilder.addEventListeners(new SlashCommand(hangmanGameRepository, gamesRepository, playerRepository, gameLanguageRepository, languageRepository, categoryRepository));
-            jdaBuilder.addEventListeners(new ContextMenuListener(hangmanGameRepository, gamesRepository, playerRepository));
+            jdaBuilder.addEventListeners(new CoreBot(updateController));
 
             jda = jdaBuilder.build();
             jda.awaitReady();
