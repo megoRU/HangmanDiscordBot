@@ -26,7 +26,7 @@ public class JoinEvent {
                 EmbedBuilder welcome = new EmbedBuilder();
                 welcome.setColor(Color.GREEN);
                 welcome.addField("Hangman", "Thanks for adding **Hangman** bot to " + event.getGuild().getName() + "!\n", false);
-                welcome.addField("List of commands", "Use **/help** for a list of commands.", false);
+                welcome.addField("List of commands", "Use </help:940560633504604163> for a list of commands.", false);
                 welcome.addField("Support server", ":helmet_with_cross: [Discord server](https://discord.com/invite/UrWG3R683d)\n", false);
                 welcome.addField("Information", "We are actively writing about new updates or problems in our discord. We recommend that you follow up.", false);
                 welcome.addField("One more Thing", "If you are not satisfied with something in the bot, please let us know, we will fix it!", false);

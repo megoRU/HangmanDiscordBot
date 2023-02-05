@@ -112,7 +112,6 @@ public class UpdateController {
         if (Objects.equals(buttonId, Buttons.BUTTON_START_NEW_GAME.name()) || buttonId.matches("BUTTON_START_NEW_GAME_\\d+_\\d+")) {
             HangmanButton hangmanCommand = new HangmanButton();
             hangmanCommand.hangman(event, this);
-
         }
     }
 
@@ -177,7 +176,10 @@ public class UpdateController {
                 HangmanCommand hangmanCommand = new HangmanCommand();
                 hangmanCommand.hangman(event, this);
             }
-
+            case "category" -> {
+                CategoryCommand categoryCommand = new CategoryCommand(categoryRepository);
+                categoryCommand.category(event);
+            }
         }
     }
 
