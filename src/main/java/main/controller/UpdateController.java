@@ -73,6 +73,7 @@ public class UpdateController {
 
     private void buttonEvent(@NotNull ButtonInteractionEvent event) {
         String buttonId = event.getButton().getId();
+        if (buttonId == null) return;
 
         if (Objects.equals(buttonId, Buttons.BUTTON_RUS.name()) || Objects.equals(buttonId, Buttons.BUTTON_ENG.name())) {
             LanguageButton languageButton = new LanguageButton(gameLanguageRepository);
@@ -108,8 +109,7 @@ public class UpdateController {
             return;
         }
 
-        if (Objects.equals(buttonId, Buttons.BUTTON_START_NEW_GAME.name())
-                || Objects.requireNonNull(buttonId).matches("BUTTON_START_NEW_GAME_\\d+_\\d+")) {
+        if (Objects.equals(buttonId, Buttons.BUTTON_START_NEW_GAME.name()) || buttonId.matches("BUTTON_START_NEW_GAME_\\d+_\\d+")) {
             HangmanButton hangmanCommand = new HangmanButton();
             hangmanCommand.hangman(event, this);
 
@@ -196,17 +196,6 @@ public class UpdateController {
             return buttonInteractionEvent.getUser().getIdLong();
         }
     }
-
-//    public void sendTyping(@NotNull Event event) {
-//        if (event instanceof SlashCommandInteractionEvent slashEvent) {
-//            slashEvent.getChannel().sendTyping().queue();
-//        } else if (event instanceof UserContextInteractionEvent contextEvent) {
-//            contextEvent.getMessageChannel().sendTyping().queue();
-//        } else {
-//            ButtonInteractionEvent buttonInteractionEvent = (ButtonInteractionEvent) event;
-//            buttonInteractionEvent.getChannel().sendTyping().queue();
-//        }
-//    }
 
     public User getUser(@NotNull Event event) {
         if (event instanceof SlashCommandInteractionEvent slashEvent) {
