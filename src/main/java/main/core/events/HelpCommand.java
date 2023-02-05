@@ -1,6 +1,6 @@
 package main.core.events;
 
-import main.config.BotStartConfig;
+import main.controller.UpdateController;
 import main.hangman.impl.ButtonIMpl;
 import main.jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -21,13 +21,8 @@ public class HelpCommand {
     //Language
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
 
-    public void help(@NotNull Event event) {
-        var userIdLong = 0L;
-        if (event instanceof SlashCommandInteractionEvent slashEvent) {
-            userIdLong = slashEvent.getUser().getIdLong();
-        } else if (event instanceof ButtonInteractionEvent buttonEvent) {
-            userIdLong = buttonEvent.getUser().getIdLong();
-        }
+    public void help(@NotNull Event event, UpdateController updateController) {
+        var userIdLong = updateController.getUserId(event);
 
         EmbedBuilder info = new EmbedBuilder();
         info.setColor(Color.GREEN);
@@ -56,16 +51,6 @@ public class HelpCommand {
 
         List<Button> buttons = new ArrayList<>();
         buttons.add(ButtonIMpl.BUTTON_SUPPORT);
-
-        if (BotStartConfig.getMapLanguages().get(userIdLong) != null) {
-            if (BotStartConfig.getMapLanguages().get(userIdLong).equals("eng")) {
-                buttons.add(ButtonIMpl.BUTTON_RUSSIAN_CHANGE);
-            } else {
-                buttons.add(ButtonIMpl.BUTTON_ENGLISH_CHANGE);
-            }
-        } else {
-            buttons.add(ButtonIMpl.BUTTON_RUSSIAN_CHANGE);
-        }
 
         if (event instanceof SlashCommandInteractionEvent slashEvent) {
             slashEvent.replyEmbeds(info.build()).setActionRow(buttons).queue();

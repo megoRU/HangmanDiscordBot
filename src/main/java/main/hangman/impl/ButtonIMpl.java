@@ -7,9 +7,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 public interface ButtonIMpl {
 
     Button BUTTON_RUSSIAN = Button.secondary(Buttons.BUTTON_RUS.name(), "Кириллица").withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA"));
-    Button BUTTON_RUSSIAN_CHANGE = Button.secondary(Buttons.BUTTON_CHANGE_LANGUAGE.name(), "Сменить язык").withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA"));
     Button BUTTON_ENGLISH = Button.secondary(Buttons.BUTTON_ENG.name(), "Latin").withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7"));
-    Button BUTTON_ENGLISH_CHANGE = Button.secondary(Buttons.BUTTON_CHANGE_LANGUAGE.name(), "Change language").withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7"));
     Button BUTTON_MY_STATS = Button.primary(Buttons.BUTTON_MY_STATS.name(), "My stats");
     Button BUTTON_PLAY_AGAIN = Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again");
     Button BUTTON_SUPPORT = Button.link("https://discord.gg/UrWG3R683d", "Support");

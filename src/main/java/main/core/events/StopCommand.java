@@ -65,6 +65,7 @@ public class StopCommand {
         }
     }
 
+    //TODO: Вынести в UpdateController -> CoreBot
     private void sendMessage(Event event, String text, Button button) {
         if (event instanceof SlashCommandInteractionEvent slashEvent) {
             if (slashEvent.isAcknowledged()) slashEvent.getHook().sendMessage(text).addActionRow(button).queue();

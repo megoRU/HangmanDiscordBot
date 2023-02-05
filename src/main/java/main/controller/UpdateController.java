@@ -1,14 +1,15 @@
 package main.controller;
 
 import lombok.Getter;
+import main.core.ChecksClass;
 import main.core.CoreBot;
 import main.core.events.*;
 import main.enums.Buttons;
-import main.eventlisteners.ChecksClass;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
 import main.model.repository.*;
-import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
@@ -71,34 +72,53 @@ public class UpdateController {
     }
 
     private void buttonEvent(@NotNull ButtonInteractionEvent event) {
-        //Получаем статистику по нажатии на кнопку
-        if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_MY_STATS.name())) {
+        String buttonId = event.getButton().getId();
+
+        if (Objects.equals(buttonId, Buttons.BUTTON_RUS.name()) || Objects.equals(buttonId, Buttons.BUTTON_ENG.name())) {
+            LanguageButton languageButton = new LanguageButton(gameLanguageRepository);
+            languageButton.language(event);
+            return;
+        }
+
+        if (Objects.equals(buttonId, Buttons.BUTTON_MY_STATS.name())) {
             event.editButton(event.getButton().asDisabled()).queue();
             StatsCommand statsCommand = new StatsCommand(gamesRepository);
             statsCommand.stats(event.getHook());
             return;
         }
 
-        if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_HELP.name())) {
+        if (Objects.equals(buttonId, Buttons.BUTTON_HELP.name())) {
             event.editButton(event.getButton().asDisabled()).queue();
             HelpCommand helpCommand = new HelpCommand();
-            helpCommand.help(event);
+            helpCommand.help(event, this);
             return;
         }
 
-        if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_STOP.name())) {
+        if (Objects.equals(buttonId, Buttons.BUTTON_STOP.name())) {
             event.editButton(event.getButton().asDisabled()).queue();
             StopCommand stopCommand = new StopCommand(hangmanGameRepository);
             stopCommand.stop(event);
             return;
         }
 
+        if (Objects.equals(buttonId, Buttons.BUTTON_CHANGE_GAME_LANGUAGE.name())) {
+            event.editButton(event.getButton().asDisabled()).queue();
+            LanguageGameButton languageGameButton = new LanguageGameButton(gameLanguageRepository);
+            languageGameButton.language(event);
+            return;
+        }
 
+        if (Objects.equals(buttonId, Buttons.BUTTON_START_NEW_GAME.name())
+                || Objects.requireNonNull(buttonId).matches("BUTTON_START_NEW_GAME_\\d+_\\d+")) {
+            HangmanButton hangmanCommand = new HangmanButton();
+            hangmanCommand.hangman(event, this);
+
+        }
     }
 
     private void contextEvent(@NotNull UserContextInteractionEvent event) {
-        HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, gamesRepository, playerRepository);
-        hangmanCommand.hangman(event);
+        HangmanCommand hangmanCommand = new HangmanCommand();
+        hangmanCommand.hangman(event, this);
     }
 
     private void messageReceivedEvent(@NotNull MessageReceivedEvent event) {
@@ -130,7 +150,7 @@ public class UpdateController {
         switch (event.getName()) {
             case "help" -> {
                 HelpCommand helpCommand = new HelpCommand();
-                helpCommand.help(event);
+                helpCommand.help(event, this);
             }
             case "language" -> {
                 LanguageCommand languageCommand = new LanguageCommand(languageRepository, gameLanguageRepository);
@@ -154,8 +174,8 @@ public class UpdateController {
                 deleteCommand.delete(event);
             }
             case "hg", "multi" -> {
-                HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, gamesRepository, playerRepository);
-                hangmanCommand.hangman(event);
+                HangmanCommand hangmanCommand = new HangmanCommand();
+                hangmanCommand.hangman(event, this);
             }
 
         }
@@ -166,7 +186,37 @@ public class UpdateController {
         joinEvent.join(event);
     }
 
-    public void setView(EmbedBuilder embedBuilder, final long guildId, final long textChannel) {
-
+    public long getUserId(@NotNull Event event) {
+        if (event instanceof SlashCommandInteractionEvent slashEvent) {
+            return slashEvent.getUser().getIdLong();
+        } else if (event instanceof UserContextInteractionEvent contextEvent) {
+            return contextEvent.getUser().getIdLong();
+        } else {
+            ButtonInteractionEvent buttonInteractionEvent = (ButtonInteractionEvent) event;
+            return buttonInteractionEvent.getUser().getIdLong();
+        }
     }
+
+//    public void sendTyping(@NotNull Event event) {
+//        if (event instanceof SlashCommandInteractionEvent slashEvent) {
+//            slashEvent.getChannel().sendTyping().queue();
+//        } else if (event instanceof UserContextInteractionEvent contextEvent) {
+//            contextEvent.getMessageChannel().sendTyping().queue();
+//        } else {
+//            ButtonInteractionEvent buttonInteractionEvent = (ButtonInteractionEvent) event;
+//            buttonInteractionEvent.getChannel().sendTyping().queue();
+//        }
+//    }
+
+    public User getUser(@NotNull Event event) {
+        if (event instanceof SlashCommandInteractionEvent slashEvent) {
+            return slashEvent.getUser();
+        } else if (event instanceof UserContextInteractionEvent contextEvent) {
+            return contextEvent.getUser();
+        } else {
+            ButtonInteractionEvent buttonInteractionEvent = (ButtonInteractionEvent) event;
+            return buttonInteractionEvent.getUser();
+        }
+    }
+
 }

@@ -1,14 +1,12 @@
 package main.core.events;
 
 import main.config.BotStartConfig;
+import main.controller.UpdateController;
 import main.hangman.Hangman;
 import main.hangman.HangmanBuilder;
 import main.hangman.HangmanRegistry;
 import main.hangman.impl.ButtonIMpl;
 import main.jsonparser.JSONParsers;
-import main.model.repository.GamesRepository;
-import main.model.repository.HangmanGameRepository;
-import main.model.repository.PlayerRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -17,7 +15,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
@@ -28,18 +25,7 @@ public class HangmanCommand {
 
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
 
-    private final HangmanGameRepository hangmanGameRepository;
-    private final GamesRepository gamesRepository;
-    private final PlayerRepository playerRepository;
-
-    @Autowired
-    public HangmanCommand(HangmanGameRepository hangmanGameRepository, GamesRepository gamesRepository, PlayerRepository playerRepository) {
-        this.hangmanGameRepository = hangmanGameRepository;
-        this.gamesRepository = gamesRepository;
-        this.playerRepository = playerRepository;
-    }
-
-    public void hangman(@NotNull GenericCommandInteractionEvent event) {
+    public void hangman(@NotNull GenericCommandInteractionEvent event, UpdateController updateController) {
         long userIdLong = event.getUser().getIdLong();
         if (event instanceof SlashCommandInteractionEvent slashEvent) {
             slashEvent.getChannel().sendTyping().queue();
@@ -74,9 +60,7 @@ public class HangmanCommand {
             HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder()
                     .setUserIdLong(userIdLong)
                     .setChannelId(event.getMessageChannel().getIdLong())
-                    .setHangmanGameRepository(hangmanGameRepository)
-                    .setGamesRepository(gamesRepository)
-                    .setPlayerRepository(playerRepository)
+                    .setUpdateController(updateController)
                     .setUserIdLong(userIdLong);
 
             if (event.getName().equals("multi")) {
