@@ -1,5 +1,6 @@
 package main.core.events;
 
+import main.controller.UpdateController;
 import main.hangman.Hangman;
 import main.hangman.HangmanEmbedUtils;
 import main.hangman.HangmanRegistry;
@@ -9,8 +10,6 @@ import main.jsonparser.JSONParsers;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.Event;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +28,8 @@ public class StopCommand {
         this.hangmanGameRepository = hangmanGameRepository;
     }
 
-    public void stop(@NotNull Event event) {
-        var userIdLong = 0L;
-        if (event instanceof SlashCommandInteractionEvent slashEvent) {
-            userIdLong = slashEvent.getUser().getIdLong();
-        } else if (event instanceof ButtonInteractionEvent buttonEvent) {
-            userIdLong = buttonEvent.getUser().getIdLong();
-        }
+    public void stop(@NotNull Event event, UpdateController updateController) {
+        var userIdLong = updateController.getUserId(event);
 
         //Проверяем играет ли сейчас игрок. Если да удаляем игру.
         Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
@@ -48,9 +42,9 @@ public class StopCommand {
 
             if (secondPlayer != 0L) {
                 Button buttonPlayAgainWithUsers = ButtonIMpl.getButtonPlayAgainWithUsers(userId, secondPlayer);
-                sendMessage(event, hangmanEngGame, buttonPlayAgainWithUsers);
+                updateController.sendMessage(event, hangmanEngGame, buttonPlayAgainWithUsers);
             } else {
-                sendMessage(event, hangmanEngGame, ButtonIMpl.BUTTON_PLAY_AGAIN);
+                updateController.sendMessage(event, hangmanEngGame, ButtonIMpl.BUTTON_PLAY_AGAIN);
             }
             EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanPattern(userId, hangmanEngGame1);
 
@@ -60,19 +54,7 @@ public class StopCommand {
             //Если игрок не играет, а хочет завершить игру, то нужно ему это прислать уведомление, что он сейчас не играет
         } else {
             String hangmanYouAreNotPlay = jsonParsers.getLocale("Hangman_You_Are_Not_Play", userIdLong);
-
-            sendMessage(event, hangmanYouAreNotPlay, ButtonIMpl.BUTTON_PLAY_AGAIN);
-        }
-    }
-
-    //TODO: Вынести в UpdateController -> CoreBot
-    private void sendMessage(Event event, String text, Button button) {
-        if (event instanceof SlashCommandInteractionEvent slashEvent) {
-            if (slashEvent.isAcknowledged()) slashEvent.getHook().sendMessage(text).addActionRow(button).queue();
-            else slashEvent.reply(text).addActionRow(button).queue();
-        } else if (event instanceof ButtonInteractionEvent buttonEvent) {
-            if (buttonEvent.isAcknowledged()) buttonEvent.getHook().sendMessage(text).addActionRow(button).queue();
-            else buttonEvent.reply(text).addActionRow(button).queue();
+            updateController.sendMessage(event, hangmanYouAreNotPlay, ButtonIMpl.BUTTON_PLAY_AGAIN);
         }
     }
 }

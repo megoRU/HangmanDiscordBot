@@ -23,7 +23,10 @@ public class DeleteMessage {
     private final CategoryRepository categoryRepository;
 
     @Autowired
-    public DeleteMessage(GamesRepository gamesRepository, LanguageRepository languageRepository, GameLanguageRepository gameLanguageRepository, CategoryRepository categoryRepository) {
+    public DeleteMessage(GamesRepository gamesRepository,
+                         LanguageRepository languageRepository,
+                         GameLanguageRepository gameLanguageRepository,
+                         CategoryRepository categoryRepository) {
         this.gamesRepository = gamesRepository;
         this.languageRepository = languageRepository;
         this.gameLanguageRepository = gameLanguageRepository;

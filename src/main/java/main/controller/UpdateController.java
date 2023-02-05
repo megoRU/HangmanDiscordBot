@@ -8,17 +8,19 @@ import main.enums.Buttons;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
 import main.model.repository.*;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -98,7 +100,7 @@ public class UpdateController {
         if (Objects.equals(buttonId, Buttons.BUTTON_STOP.name())) {
             event.editButton(event.getButton().asDisabled()).queue();
             StopCommand stopCommand = new StopCommand(hangmanGameRepository);
-            stopCommand.stop(event);
+            stopCommand.stop(event, this);
             return;
         }
 
@@ -166,7 +168,7 @@ public class UpdateController {
             }
             case "stop" -> {
                 StopCommand stopCommand = new StopCommand(hangmanGameRepository);
-                stopCommand.stop(event);
+                stopCommand.stop(event, this);
             }
             case "delete" -> {
                 DeleteCommand deleteCommand = new DeleteCommand();
@@ -180,6 +182,24 @@ public class UpdateController {
                 CategoryCommand categoryCommand = new CategoryCommand(categoryRepository);
                 categoryCommand.category(event);
             }
+        }
+    }
+
+    public void sendMessage(Event event, String text, Button button) {
+        if (event instanceof SlashCommandInteractionEvent slashEvent) {
+            if (slashEvent.isAcknowledged()) slashEvent.getHook().sendMessage(text).addActionRow(button).queue();
+            else slashEvent.reply(text).addActionRow(button).queue();
+        } else if (event instanceof ButtonInteractionEvent buttonEvent) {
+            if (buttonEvent.isAcknowledged()) buttonEvent.getHook().sendMessage(text).addActionRow(button).queue();
+            else buttonEvent.reply(text).addActionRow(button).queue();
+        }
+    }
+
+    public void sendMessage(@NotNull Event event, MessageEmbed build, List<Button> buttonList) {
+        if (event instanceof SlashCommandInteractionEvent slashEvent) {
+            slashEvent.replyEmbeds(build).setActionRow(buttonList).queue();
+        } else if (event instanceof ButtonInteractionEvent buttonEvent) {
+            buttonEvent.replyEmbeds(build).setActionRow(buttonList).queue();
         }
     }
 
@@ -198,16 +218,4 @@ public class UpdateController {
             return buttonInteractionEvent.getUser().getIdLong();
         }
     }
-
-    public User getUser(@NotNull Event event) {
-        if (event instanceof SlashCommandInteractionEvent slashEvent) {
-            return slashEvent.getUser();
-        } else if (event instanceof UserContextInteractionEvent contextEvent) {
-            return contextEvent.getUser();
-        } else {
-            ButtonInteractionEvent buttonInteractionEvent = (ButtonInteractionEvent) event;
-            return buttonInteractionEvent.getUser();
-        }
-    }
-
 }
