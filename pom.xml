@@ -62,13 +62,13 @@
 		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
-			<version>8.0.31</version>
+			<version>8.0.32</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.github.megoRU</groupId>
 			<artifactId>boticordjava</artifactId>
-			<version>v3.7</version>
+			<version>v4.1</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/net.dv8tion/JDA -->
@@ -106,7 +106,7 @@
 		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
-			<version>23.0.0</version>
+			<version>24.0.0</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305 -->
