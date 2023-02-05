@@ -104,13 +104,6 @@ public class UpdateController {
             return;
         }
 
-        if (Objects.equals(buttonId, Buttons.BUTTON_CHANGE_GAME_LANGUAGE.name())) {
-            event.editButton(event.getButton().asDisabled()).queue();
-            LanguageGameButton languageGameButton = new LanguageGameButton(gameLanguageRepository);
-            languageGameButton.language(event);
-            return;
-        }
-
         if (Objects.equals(buttonId, Buttons.BUTTON_START_NEW_GAME.name()) || buttonId.matches("BUTTON_START_NEW_GAME_\\d+_\\d+")) {
             HangmanButton hangmanCommand = new HangmanButton();
             hangmanCommand.hangman(event, this);
@@ -197,9 +190,11 @@ public class UpdateController {
 
     public void sendMessage(@NotNull Event event, MessageEmbed build, List<Button> buttonList) {
         if (event instanceof SlashCommandInteractionEvent slashEvent) {
-            slashEvent.replyEmbeds(build).setActionRow(buttonList).queue();
+            if (slashEvent.isAcknowledged()) slashEvent.getHook().sendMessageEmbeds(build).addActionRow(buttonList).queue();
+            else slashEvent.replyEmbeds(build).addActionRow(buttonList).queue();
         } else if (event instanceof ButtonInteractionEvent buttonEvent) {
-            buttonEvent.replyEmbeds(build).setActionRow(buttonList).queue();
+            if (buttonEvent.isAcknowledged()) buttonEvent.getHook().sendMessageEmbeds(build).addActionRow(buttonList).queue();
+            else buttonEvent.replyEmbeds(build).addActionRow(buttonList).queue();
         }
     }
 

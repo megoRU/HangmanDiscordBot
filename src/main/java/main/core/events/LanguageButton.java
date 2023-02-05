@@ -2,9 +2,12 @@ package main.core.events;
 
 import main.config.BotStartConfig;
 import main.enums.Buttons;
+import main.hangman.HangmanRegistry;
+import main.hangman.impl.ButtonIMpl;
 import main.jsonparser.JSONParsers;
 import main.model.entity.GameLanguage;
 import main.model.repository.GameLanguageRepository;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,17 @@ public class LanguageButton {
     public void language(@NotNull ButtonInteractionEvent event) {
         event.editButton(event.getButton().asDisabled()).queue();
         var userId = event.getUser().getIdLong();
+
+        boolean hasHangman = HangmanRegistry.getInstance().hasHangman(userId);
+        if (hasHangman) {
+            String reactionsButtonWhenPlay = jsonParsers.getLocale("ReactionsButton_When_Play", event.getUser().getIdLong());
+            EmbedBuilder youPlay = new EmbedBuilder();
+            youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
+            youPlay.setColor(0x00FF00);
+            youPlay.setDescription(reactionsButtonWhenPlay);
+            event.getHook().sendMessageEmbeds(youPlay.build()).setEphemeral(true).addActionRow(ButtonIMpl.BUTTON_STOP).queue();
+            return;
+        }
 
         String languageChangeLang;
         if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_RUS.name())) {

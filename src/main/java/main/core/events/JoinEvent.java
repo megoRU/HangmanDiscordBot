@@ -32,7 +32,8 @@ public class JoinEvent {
                 welcome.addField("One more Thing", "If you are not satisfied with something in the bot, please let us know, we will fix it!", false);
                 welcome.addField("Vote", ":boom: [Vote for this bot](https://boticord.top/bot/845974873682608129)", false);
 
-                event.getGuild().getDefaultChannel().asTextChannel().sendMessageEmbeds(welcome.build())
+                event.getGuild().getDefaultChannel().asTextChannel()
+                        .sendMessageEmbeds(welcome.build())
                         .setActionRow(ButtonIMpl.BUTTON_HELP, ButtonIMpl.BUTTON_SUPPORT)
                         .queue();
             }

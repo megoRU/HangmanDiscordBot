@@ -138,7 +138,10 @@ public class BotStartConfig {
         }
         getAndSetActiveGames();
 
-        System.out.println(jda.retrieveCommands().complete());
+        List<Command> complete = jda.retrieveCommands().complete();
+        complete.forEach(command -> System.out.println(command.toString()));
+
+        System.out.println("IsDevMode: " + Config.isIsDev());
 
         //Обновить команды
 //        updateSlashCommands();
