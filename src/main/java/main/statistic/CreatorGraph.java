@@ -14,14 +14,15 @@ import java.util.List;
 public class CreatorGraph {
 
     private static final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
-    private final String userIdLong;
+
+    private final GamesRepository gamesRepository;
 
     private final InteractionHook interactionHook;
 
     private final StringBuilder date = new StringBuilder();
     private final StringBuilder columnFirst = new StringBuilder();
     private final StringBuilder columnSecond = new StringBuilder();
-    private final GamesRepository gamesRepository;
+    private final String userIdLong;
 
     public CreatorGraph(GamesRepository gamesRepository, String userIdLong, InteractionHook interactionHook) {
         this.userIdLong = userIdLong;
@@ -54,7 +55,6 @@ public class CreatorGraph {
                     }
                     setImage(chart, statistic).getShortUrl();
                 }
-
             }
             EmbedBuilder globalStats = new EmbedBuilder();
 

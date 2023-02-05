@@ -1,4 +1,4 @@
-package main.eventlisteners;
+package main.core;
 
 import main.jsonparser.JSONParsers;
 import net.dv8tion.jda.api.Permission;

@@ -71,5 +71,15 @@
   "play_with_bot": "You cannot play with bot!",
   "play_with_yourself": "I understand that this is a joke, but then use: `/hg`",
   "game_category": "Category saved.",
-  "second_player_already_playing": "You can't create a cooperative game\nwhen the second player is playing!"
+  "second_player_already_playing": "You can't create a cooperative game\nwhen the second player is playing!",
+  "help": "All available commands and extended description",
+  "help_hg": "Start a game",
+  "help_multi": "Start playing together",
+  "help_stop": "Stop the game",
+  "help_language": "Language change",
+  "help_stats": "Find out your statistics",
+  "help_category": "Choose a category of words for the game",
+  "help_mystats": "Find out your statistics in the form of a graph",
+  "help_allstats": "Find out the statistics of all bot games in the form of a graph",
+  "help_deleted": "Delete all the data we collected about you"
 }

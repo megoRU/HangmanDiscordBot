@@ -1,8 +1,6 @@
 package main.hangman;
 
-import main.model.repository.GamesRepository;
-import main.model.repository.HangmanGameRepository;
-import main.model.repository.PlayerRepository;
+import main.controller.UpdateController;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,9 +11,7 @@ public interface HangmanBuilder {
     class Builder {
 
         //REPO
-        private HangmanGameRepository hangmanGameRepository;
-        private GamesRepository gamesRepository;
-        private PlayerRepository playerRepository;
+        private UpdateController updateController;
 
         //User|Guild|Channel data
         private long userId;
@@ -85,18 +81,8 @@ public interface HangmanBuilder {
             return this;
         }
 
-        public Builder setHangmanGameRepository(@NotNull HangmanGameRepository hangmanGameRepository) {
-            this.hangmanGameRepository = hangmanGameRepository;
-            return this;
-        }
-
-        public Builder setGamesRepository(@NotNull GamesRepository gamesRepository) {
-            this.gamesRepository = gamesRepository;
-            return this;
-        }
-
-        public Builder setPlayerRepository(@NotNull PlayerRepository playerRepository) {
-            this.playerRepository = playerRepository;
+        public Builder setUpdateController(UpdateController updateController) {
+            this.updateController = updateController;
             return this;
         }
 
@@ -105,14 +91,8 @@ public interface HangmanBuilder {
          */
         public Hangman build() {
 
-            if (hangmanGameRepository == null)
-                throw new IllegalArgumentException("The provided hangmanGameRepository cannot be null!");
-
-            if (playerRepository == null)
-                throw new IllegalArgumentException("The provided playerRepository cannot be null!");
-
-            if (gamesRepository == null)
-                throw new IllegalArgumentException("The provided gamesRepository cannot be null!");
+            if (updateController == null)
+                throw new IllegalArgumentException("The provided updateController cannot be null!");
 
             if (channelId == null || channelId == 0L)
                 throw new IllegalArgumentException("The provided channelId cannot be null!");
@@ -128,16 +108,14 @@ public interface HangmanBuilder {
                         currentHiddenWord,
                         hangmanErrors,
                         localDateTime,
-                        hangmanGameRepository,
-                        gamesRepository,
-                        playerRepository);
+                        updateController);
             }
 
             if (secondPlayer != 0L) {
-                return new Hangman(userId, secondPlayer, guildId, channelId, hangmanGameRepository, gamesRepository, playerRepository);
+                return new Hangman(userId, secondPlayer, guildId, channelId, updateController);
             }
 
-            return new Hangman(userId, guildId, channelId, hangmanGameRepository, gamesRepository, playerRepository);
+            return new Hangman(userId, guildId, channelId, updateController);
         }
 
     }
