@@ -125,15 +125,13 @@ public class UpdateController {
             deleteMessage.delete(event);
             return;
         }
-        Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
 
         if (message.toLowerCase().matches("[A-Za-zА-ЯЁа-яё]") || message.toLowerCase().matches("[-A-Za-zА-ЯЁа-яё\\s]{3,24}+")) {
+            Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
             if (hangman != null) {
                 boolean permission = ChecksClass.check(event);
                 if (!permission) return;
-                {
-                    hangman.inputHandler(message, event.getMessage());
-                }
+                hangman.inputHandler(message.toLowerCase(), event.getMessage());
             }
         }
     }
