@@ -143,7 +143,7 @@ public class Hangman implements HangmanHelper {
         try {
             WORD = megoruAPI.getWord(gameWordLanguage).getWord();
             if (WORD != null && WORD.length() > 0) {
-                WORD_OF_CHARS = WORD.split(""); // Преобразуем строку str в массив символов (char)
+                WORD_OF_CHARS = WORD.toLowerCase().split(""); // Преобразуем строку str в массив символов (char)
                 hideWord(WORD.length());
             } else {
                 throw new IllegalArgumentException(WORD);
