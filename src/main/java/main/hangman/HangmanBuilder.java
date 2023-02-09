@@ -10,7 +10,7 @@ public interface HangmanBuilder {
 
     class Builder {
 
-        //REPO
+        //UpdateController
         private UpdateController updateController;
 
         //User|Guild|Channel data
