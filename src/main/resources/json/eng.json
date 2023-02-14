@@ -67,7 +67,7 @@
   "got_your_word": "Got your word",
   "create_game": "Creating game",
   "cannot_write_dm": "I couldn't send a message to you in DM\nUse `/hg` in DM",
-  "check_permissions": "Bot don't have in <#%s>\n%s",
+  "check_permissions": "The bot does not have permissions in this channel:\n\n%s",
   "play_with_bot": "You cannot play with bot!",
   "play_with_yourself": "I understand that this is a joke, but then use: `/hg`",
   "game_category": "Category saved.",
