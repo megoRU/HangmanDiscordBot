@@ -74,9 +74,6 @@ public class UpdateController {
     }
 
     private void buttonEvent(@NotNull ButtonInteractionEvent event) {
-        boolean permission = ChecksClass.check(event);
-        if (!permission) return;
-
         String buttonId = event.getButton().getId();
         if (buttonId == null) return;
 
@@ -114,9 +111,6 @@ public class UpdateController {
     }
 
     private void contextEvent(@NotNull UserContextInteractionEvent event) {
-        boolean permission = ChecksClass.check(event);
-        if (!permission) return;
-
         HangmanCommand hangmanCommand = new HangmanCommand();
         hangmanCommand.hangman(event, this);
     }
@@ -143,9 +137,6 @@ public class UpdateController {
     }
 
     private void slashEvent(@NotNull SlashCommandInteractionEvent event) {
-        boolean permission = ChecksClass.check(event);
-        if (!permission) return;
-
         if (event.getUser().isBot()) return;
 
         switch (event.getName()) {
