@@ -3,6 +3,9 @@ package main.core.events;
 import main.hangman.impl.ButtonIMpl;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -32,10 +35,22 @@ public class JoinEvent {
                 welcome.addField("One more Thing", "If you are not satisfied with something in the bot, please let us know, we will fix it!", false);
                 welcome.addField("Vote", ":boom: [Vote for this bot](https://boticord.top/bot/845974873682608129)", false);
 
-                event.getGuild().getDefaultChannel().asTextChannel()
-                        .sendMessageEmbeds(welcome.build())
-                        .setActionRow(ButtonIMpl.BUTTON_HELP, ButtonIMpl.BUTTON_SUPPORT)
-                        .queue();
+                DefaultGuildChannelUnion defaultChannel = event.getGuild().getDefaultChannel();
+                MessageChannel messageChannel = null;
+                if (defaultChannel != null) {
+                    ChannelType type = defaultChannel.getType();
+                    if (type == ChannelType.NEWS) {
+                        messageChannel = defaultChannel.asNewsChannel();
+                    } else if (type == ChannelType.TEXT) {
+                        messageChannel = defaultChannel.asTextChannel();
+                    }
+                    if (messageChannel != null) {
+                        messageChannel
+                                .sendMessageEmbeds(welcome.build())
+                                .setActionRow(ButtonIMpl.BUTTON_HELP, ButtonIMpl.BUTTON_SUPPORT)
+                                .queue();
+                    }
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
