@@ -42,7 +42,12 @@ public class UpdateController {
     private CoreBot coreBot;
 
     @Autowired
-    public UpdateController(LanguageRepository languageRepository, GameLanguageRepository gameLanguageRepository, HangmanGameRepository hangmanGameRepository, PlayerRepository playerRepository, GamesRepository gamesRepository, CategoryRepository categoryRepository) {
+    public UpdateController(LanguageRepository languageRepository,
+                            GameLanguageRepository gameLanguageRepository,
+                            HangmanGameRepository hangmanGameRepository,
+                            PlayerRepository playerRepository,
+                            GamesRepository gamesRepository,
+                            CategoryRepository categoryRepository) {
         this.languageRepository = languageRepository;
         this.gameLanguageRepository = gameLanguageRepository;
         this.hangmanGameRepository = hangmanGameRepository;
@@ -197,10 +202,12 @@ public class UpdateController {
 
     public void sendMessage(@NotNull Event event, MessageEmbed build, List<Button> buttonList) {
         if (event instanceof SlashCommandInteractionEvent slashEvent) {
-            if (slashEvent.isAcknowledged()) slashEvent.getHook().sendMessageEmbeds(build).addActionRow(buttonList).queue();
+            if (slashEvent.isAcknowledged())
+                slashEvent.getHook().sendMessageEmbeds(build).addActionRow(buttonList).queue();
             else slashEvent.replyEmbeds(build).addActionRow(buttonList).queue();
         } else if (event instanceof ButtonInteractionEvent buttonEvent) {
-            if (buttonEvent.isAcknowledged()) buttonEvent.getHook().sendMessageEmbeds(build).addActionRow(buttonList).queue();
+            if (buttonEvent.isAcknowledged())
+                buttonEvent.getHook().sendMessageEmbeds(build).addActionRow(buttonList).queue();
             else buttonEvent.replyEmbeds(build).addActionRow(buttonList).queue();
         }
     }
