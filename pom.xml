@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.0.0</version>
+		<version>3.0.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.mego</groupId>
@@ -22,28 +22,28 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-maven-plugin</artifactId>
-			<version>3.0.0</version>
+			<version>3.0.4</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-autoconfigure -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-autoconfigure</artifactId>
-			<version>3.0.0</version>
+			<version>3.0.4</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-commons -->
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-commons</artifactId>
-			<version>3.0.0</version>
+			<version>3.0.3</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
-			<version>3.0.0</version>
+			<version>3.0.4</version>
 		</dependency>
 
 		<dependency>
@@ -75,7 +75,7 @@
 		<dependency>
 			<groupId>net.dv8tion</groupId>
 			<artifactId>JDA</artifactId>
-			<version>5.0.0-beta.3</version>
+			<version>5.0.0-beta.6</version>
 			<exclusions>
 				<exclusion>
 					<groupId>club.minnced</groupId>
@@ -106,7 +106,7 @@
 		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
-			<version>24.0.0</version>
+			<version>24.0.1</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305 -->
