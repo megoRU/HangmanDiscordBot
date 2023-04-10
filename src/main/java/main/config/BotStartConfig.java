@@ -5,10 +5,9 @@ import main.core.CoreBot;
 import main.hangman.Hangman;
 import main.hangman.HangmanBuilder;
 import main.hangman.HangmanRegistry;
+import main.hangman.MessageDeleting;
 import main.jsonparser.ParserClass;
-import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
-import main.model.repository.PlayerRepository;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -74,10 +73,6 @@ public class BotStartConfig {
             .build();
 
     //REPOSITORY
-    private final HangmanGameRepository hangmanGameRepository;
-    private final PlayerRepository playerRepository;
-    private final GamesRepository gamesRepository;
-
     private final UpdateController updateController;
 
     //DataBase
@@ -89,13 +84,7 @@ public class BotStartConfig {
     private String PASSWORD_CONNECTION;
 
     @Autowired
-    public BotStartConfig(HangmanGameRepository hangmanGameRepository,
-                          PlayerRepository playerRepository,
-                          GamesRepository gamesRepository,
-                          UpdateController updateController) {
-        this.hangmanGameRepository = hangmanGameRepository;
-        this.playerRepository = playerRepository;
-        this.gamesRepository = gamesRepository;
+    public BotStartConfig(HangmanGameRepository hangmanGameRepository, UpdateController updateController) {
         idGame = hangmanGameRepository.getCountGames() == null ? 0 : hangmanGameRepository.getCountGames();
         this.updateController = updateController;
     }
@@ -103,6 +92,8 @@ public class BotStartConfig {
     @Bean
     public void startBot() {
         try {
+            //запускаем автоудаление сообщений
+            MessageDeleting messageDeleting = new MessageDeleting();
             //Теперь HangmanRegistry знает количество игр и может отдавать правильное значение
             HangmanRegistry.getInstance().setIdGame();
             setLanguages();

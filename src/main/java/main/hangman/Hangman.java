@@ -9,11 +9,7 @@ import main.hangman.impl.HangmanHelper;
 import main.jsonparser.JSONParsers;
 import main.model.entity.ActiveHangman;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.jetbrains.annotations.NotNull;
 import org.junit.internal.Checks;
@@ -22,7 +18,6 @@ import java.awt.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -33,7 +28,6 @@ public class Hangman implements HangmanHelper {
     private static final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
 
     //Timers
-    private final Timer autoDeletingTimer = new Timer();
     private final Timer autoInsert = new Timer();
     private final Timer stopHangmanTimer = new Timer();
 
@@ -47,8 +41,6 @@ public class Hangman implements HangmanHelper {
     private final MegoruAPI megoruAPI = new MegoruAPI.Builder().build();
 
     private final Set<String> guesses;
-
-    private final List<Message> messageList;
 
     //User|Guild|Channel data
     private final long userId;
@@ -74,7 +66,6 @@ public class Hangman implements HangmanHelper {
         this.channelId = channelId;
         this.userIdWithDiscord = String.format("<@%s>", userId);
         this.guesses = new LinkedHashSet<>();
-        this.messageList = new LinkedList<>();
         this.secondPlayer = 0L;
     }
 
@@ -86,7 +77,6 @@ public class Hangman implements HangmanHelper {
         this.channelId = channelId;
         this.userIdWithDiscord = String.format("<@%s>\n<@%s>", userId, secondPlayer);
         this.guesses = new LinkedHashSet<>();
-        this.messageList = new LinkedList<>();
         this.secondPlayer = secondPlayer;
     }
 
@@ -115,7 +105,6 @@ public class Hangman implements HangmanHelper {
         }
 
         this.guesses = new LinkedHashSet<>();
-        this.messageList = new LinkedList<>();
         this.secondPlayer = secondPlayer;
         //Обновить параметры
         if (guesses != null) {
@@ -127,7 +116,6 @@ public class Hangman implements HangmanHelper {
         this.WORD_OF_CHARS = word.split("");
         setTimer(localDateTime);
         autoInsert();
-        autoDeletingMessages();
     }
 
     //TODO: Сделать проверку в классах что вызывают на наличие языка
@@ -171,11 +159,10 @@ public class Hangman implements HangmanHelper {
         //Установка авто завершения
         setTimer(LocalDateTime.now());
         autoInsert();
-        autoDeletingMessages();
     }
 
     public void inputHandler(@NotNull final String inputs, @NotNull final Message messages) {
-        messageList.add(messages);
+        MessageDeleting.addMessageToDelete(messages);
         try {
             Checks.notNull(WORD);
         } catch (NullPointerException e) {
@@ -424,10 +411,6 @@ public class Hangman implements HangmanHelper {
         return WORD != null ? WORD.length() : 0;
     }
 
-    public Timer getAutoDeletingTimer() {
-        return autoDeletingTimer;
-    }
-
     public Timer getAutoInsert() {
         return autoInsert;
     }
@@ -455,48 +438,6 @@ public class Hangman implements HangmanHelper {
     private void autoInsert() {
         AutoUpdate autoUpdate = new AutoUpdate();
         autoInsert.scheduleAtFixedRate(autoUpdate, 7000, 5000);
-    }
-
-    //Автоматически отправляет в БД данные
-    private void autoDeletingMessages() {
-        AutoDeletingMessages autoDeletingMessages = new AutoDeletingMessages();
-        autoDeletingTimer.scheduleAtFixedRate(autoDeletingMessages, 7000, 5000);
-    }
-
-    private final class AutoDeletingMessages extends TimerTask {
-
-        @Override
-        public void run() {
-            try {
-                if (guildId == null) {
-                    autoDeletingTimer.cancel();
-                    return;
-                }
-
-                Guild guildById = BotStartConfig.jda.getGuildById(guildId);
-
-                if (guildById != null) {
-                    Member selfMember = guildById.getSelfMember();
-                    TextChannel textChannelById = BotStartConfig.jda.getTextChannelById(channelId);
-
-                    if (textChannelById != null) {
-                        if (selfMember.hasPermission(textChannelById, Permission.MESSAGE_MANAGE) && messageList.size() >= 3) {
-//                            String format =
-//                                    String.format("\nAutoDeletingMessages: %s\nmessageList: %s",
-//                                            messageList.size(),
-//                                            Arrays.toString(messageList.toArray()));
-
-//                            LOGGER.info(format);
-                            textChannelById.deleteMessages(messageList).submit().get();
-                            //Так как метод асинхронный иногда может возникать NPE
-                            messageList.clear();
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     private final class AutoUpdate extends TimerTask {
