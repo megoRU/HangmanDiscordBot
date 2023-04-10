@@ -59,7 +59,6 @@ public class HangmanRegistry {
 
         Timer timerAutoInsert = hangman.getAutoInsert();
         Timer stopHangmanTimer = hangman.getStopHangmanTimer();
-        Timer autoDeletingMessage = hangman.getAutoDeletingTimer();
 
         if (timerAutoInsert != null) {
             timerAutoInsert.cancel();
@@ -67,10 +66,6 @@ public class HangmanRegistry {
 
         if (stopHangmanTimer != null) {
             stopHangmanTimer.cancel();
-        }
-
-        if (autoDeletingMessage != null) {
-            autoDeletingMessage.cancel();
         }
 
         if (hangman.getSecondPlayer() != 0L) {
