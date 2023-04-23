@@ -1,5 +1,6 @@
 package main.hangman;
 
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
@@ -32,11 +33,15 @@ public class MessageDeleting extends TimerTask {
                 List<Message> list = localMessageList
                         .stream()
                         .filter(message -> message.getChannel() == messageChannelUnion)
+                        .filter(message -> message.getGuild().getSelfMember().hasPermission(message.getGuildChannel(), Permission.MESSAGE_MANAGE))
                         .toList();
+
                 try {
-                    List<CompletableFuture<Void>> completableFutures = messageChannelUnion.purgeMessages(list);
-                    for (CompletableFuture<Void> completableFuture : completableFutures) {
-                        CompletableFuture.allOf(completableFuture);
+                    if (!list.isEmpty()) {
+                        List<CompletableFuture<Void>> completableFutures = messageChannelUnion.purgeMessages(list);
+                        for (CompletableFuture<Void> completableFuture : completableFutures) {
+                            CompletableFuture.allOf(completableFuture);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
