@@ -1,11 +1,11 @@
 package main.hangman;
 
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 public class MessageDeleting extends TimerTask {
 
@@ -30,17 +30,21 @@ public class MessageDeleting extends TimerTask {
             }
 
             for (MessageChannelUnion messageChannelUnion : messageChannelUnions) {
-                List<Message> list = localMessageList
+                List<String> list = localMessageList
                         .stream()
                         .filter(message -> message.getChannel() == messageChannelUnion)
                         .filter(message -> message.getGuild().getSelfMember().hasPermission(message.getGuildChannel(), Permission.MESSAGE_MANAGE))
+                        .map(ISnowflake::getId)
                         .toList();
 
                 try {
-                    if (!list.isEmpty()) {
-                        List<CompletableFuture<Void>> completableFutures = messageChannelUnion.purgeMessages(list);
-                        for (CompletableFuture<Void> completableFuture : completableFutures) {
-                            CompletableFuture.allOf(completableFuture);
+                    switch (messageChannelUnion.getType()) {
+                        case TEXT -> messageChannelUnion.asTextChannel().deleteMessagesByIds(list).queue();
+                        case GUILD_PUBLIC_THREAD, GUILD_NEWS_THREAD, GUILD_PRIVATE_THREAD ->
+                                messageChannelUnion.asThreadChannel().deleteMessagesByIds(list).queue();
+                        case NEWS -> messageChannelUnion.asNewsChannel().deleteMessagesByIds(list).queue();
+                        default -> {
+                            return;
                         }
                     }
                 } catch (Exception e) {
