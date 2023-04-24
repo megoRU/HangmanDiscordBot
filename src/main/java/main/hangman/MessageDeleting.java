@@ -37,18 +37,30 @@ public class MessageDeleting extends TimerTask {
                         .map(ISnowflake::getId)
                         .toList();
 
-                try {
+                if (list.size() > 1) {
+                    try {
+                        switch (messageChannelUnion.getType()) {
+                            case TEXT -> messageChannelUnion.asTextChannel().deleteMessagesByIds(list).queue();
+                            case GUILD_PUBLIC_THREAD, GUILD_NEWS_THREAD, GUILD_PRIVATE_THREAD ->
+                                    messageChannelUnion.asThreadChannel().deleteMessagesByIds(list).queue();
+                            case NEWS -> messageChannelUnion.asNewsChannel().deleteMessagesByIds(list).queue();
+                            default -> {
+                                return;
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
                     switch (messageChannelUnion.getType()) {
-                        case TEXT -> messageChannelUnion.asTextChannel().deleteMessagesByIds(list).queue();
+                        case TEXT -> messageChannelUnion.asTextChannel().deleteMessageById(list.get(0)).queue();
                         case GUILD_PUBLIC_THREAD, GUILD_NEWS_THREAD, GUILD_PRIVATE_THREAD ->
-                                messageChannelUnion.asThreadChannel().deleteMessagesByIds(list).queue();
-                        case NEWS -> messageChannelUnion.asNewsChannel().deleteMessagesByIds(list).queue();
+                                messageChannelUnion.asThreadChannel().deleteMessageById(list.get(0)).queue();
+                        case NEWS -> messageChannelUnion.asNewsChannel().deleteMessageById(list.get(0)).queue();
                         default -> {
                             return;
                         }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
         }
