@@ -49,7 +49,7 @@
 		<dependency>
 			<groupId>com.github.megoRU</groupId>
 			<artifactId>api.megoru.ru</artifactId>
-			<version>v4.0</version>
+			<version>v4.1</version>
 		</dependency>
 
 		<dependency>
