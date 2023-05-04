@@ -1,11 +1,11 @@
 spring:
   datasource:
-    driverClassName: com.mysql.cj.jdbc.Driver
+    driverClassName: org.mariadb.jdbc.Driver
     url: ${DATABASE_URL}
     username: ${DATABASE_USER}
     password: ${DATABASE_PASS}
 
   jpa:
-    database-platform: org.hibernate.dialect.MySQLDialect
+    database-platform: org.hibernate.dialect.MariaDBDialect
     hibernate:
       ddl-auto: validate

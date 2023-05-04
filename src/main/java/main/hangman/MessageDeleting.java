@@ -22,9 +22,9 @@ public class MessageDeleting extends TimerTask {
         Set<MessageChannelUnion> messageChannelUnions = new HashSet<>();
 
         synchronized (messageList) {
-            for (Message message : messageList) {
+            for (int i = 0; i < messageList.size(); i++) {
+                Message message = messageList.poll();
                 MessageChannelUnion channel = message.getChannel();
-
                 localMessageList.add(message);
                 messageChannelUnions.add(channel);
             }
