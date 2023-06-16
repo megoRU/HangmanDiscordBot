@@ -28,4 +28,7 @@ public class Game {
 
     @Column(name = "game_date", nullable = false)
     private Timestamp gameDate;
+
+    @Column(name = "user_id_long", nullable = false)
+    private Long userIdLong;
 }

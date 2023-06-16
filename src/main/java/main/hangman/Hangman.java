@@ -250,7 +250,6 @@ public class Hangman implements HangmanHelper {
             e.printStackTrace();
             LOGGER.info(e.getMessage());
         }
-
     }
 
     private void gameWin() {
@@ -264,11 +263,11 @@ public class Hangman implements HangmanHelper {
                 HangmanHelper.editMessageWithButtons(win, userId, EndGameButtons.getListButtons(userId), updateController.getHangmanGameRepository());
             }
 
-            ResultGame resultGame = new ResultGame(updateController.getHangmanGameRepository(), updateController.getGamesRepository(), updateController.getPlayerRepository(), userId, true);
+            ResultGame resultGame = new ResultGame(updateController.getHangmanGameRepository(), updateController.getGamesRepository(), userId, true);
             resultGame.send();
 
             if (secondPlayer != 0L) {
-                ResultGame resultGameSecondPlayer = new ResultGame(updateController.getHangmanGameRepository(), updateController.getGamesRepository(), updateController.getPlayerRepository(), secondPlayer, true);
+                ResultGame resultGameSecondPlayer = new ResultGame(updateController.getHangmanGameRepository(), updateController.getGamesRepository(), secondPlayer, true);
                 resultGameSecondPlayer.send();
             }
 
@@ -288,11 +287,11 @@ public class Hangman implements HangmanHelper {
                 HangmanHelper.editMessageWithButtons(info, userId, EndGameButtons.getListButtons(userId), updateController.getHangmanGameRepository());
             }
 
-            ResultGame resultGame = new ResultGame(updateController.getHangmanGameRepository(), updateController.getGamesRepository(), updateController.getPlayerRepository(), userId, false);
+            ResultGame resultGame = new ResultGame(updateController.getHangmanGameRepository(), updateController.getGamesRepository(), userId, false);
             resultGame.send();
 
             if (secondPlayer != 0L) {
-                ResultGame resultGameSecondPlayer = new ResultGame(updateController.getHangmanGameRepository(), updateController.getGamesRepository(), updateController.getPlayerRepository(), secondPlayer, false);
+                ResultGame resultGameSecondPlayer = new ResultGame(updateController.getHangmanGameRepository(), updateController.getGamesRepository(), secondPlayer, false);
                 resultGameSecondPlayer.send();
             }
 

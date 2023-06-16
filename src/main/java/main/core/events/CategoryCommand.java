@@ -30,7 +30,7 @@ public class CategoryCommand {
 
         if (categorySlash != null && categorySlash.equals("any")) {
             BotStartConfig.mapGameCategory.remove(userIdLong);
-            categoryRepository.deleteCategory(userIdLong);
+            categoryRepository.deleteByUserIdLong(userIdLong);
             event.reply(gameCategory).setEphemeral(true).queue();
             return;
         }

@@ -16,10 +16,9 @@ import java.util.List;
 public interface GamesRepository extends JpaRepository<Game, Long> {
 
     @Query(value = "SELECT COUNT(g.id) AS COUNT_GAMES, " +
-            "SUM (CASE WHEN g.result = false THEN 1 ELSE 0 END) AS TOTAL_ZEROS, " +
-            "SUM (CASE WHEN g.result = true THEN 1 ELSE 0 END) AS TOTAL_ONES " +
-            "FROM Player pl, Game g WHERE pl.userIdLong = :userIdLong " +
-            "AND pl.games_id.id = g.id")
+                    "SUM (CASE WHEN g.result = false THEN 1 ELSE 0 END) AS TOTAL_ZEROS, " +
+                    "SUM (CASE WHEN g.result = true THEN 1 ELSE 0 END) AS TOTAL_ONES " +
+                    "FROM Game g WHERE g.userIdLong = :userIdLong")
     String getStatistic(@Param("userIdLong") Long userIdLong);
 
     @Query(value = "SELECT COUNT(*) AS count, game_date AS gameDate FROM games GROUP BY YEAR(game_date), MONTH(game_date) ORDER BY `gameDate` DESC LIMIT 8", nativeQuery = true)
@@ -34,8 +33,5 @@ public interface GamesRepository extends JpaRepository<Game, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "DELETE g FROM games g " +
-            "JOIN player p on g.id = p.games_id " +
-            "WHERE p.user_id_long = :userIdLong", nativeQuery = true)
-    void deleteAllMyData(@Param("userIdLong") Long userIdLong);
+    void deleteGameByUserIdLong(Long userIdLong);
 }

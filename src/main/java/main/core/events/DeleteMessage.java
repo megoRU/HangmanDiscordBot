@@ -48,10 +48,10 @@ public class DeleteMessage {
             BotStartConfig.getMapLanguages().remove(userIdLong);
             BotStartConfig.getSecretCode().remove(userIdLong);
 
-            gamesRepository.deleteAllMyData(userIdLong);
+            gamesRepository.deleteGameByUserIdLong(userIdLong);
             languageRepository.deleteLanguage(userIdLong);
             gameLanguageRepository.deleteGameLanguage(userIdLong);
-            categoryRepository.deleteCategory(userIdLong);
+            categoryRepository.deleteByUserIdLong(userIdLong);
         }
     }
 }
