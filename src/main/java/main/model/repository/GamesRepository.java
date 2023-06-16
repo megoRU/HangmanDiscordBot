@@ -27,8 +27,8 @@ public interface GamesRepository extends JpaRepository<Game, Long> {
     @Query(value = "SELECT SUM(IF(result = 0, 1, 0)) AS TOTAL_ZEROS, " +
             "SUM(IF(result = 1, 1, 0)) AS TOTAL_ONES, " +
             "game_date AS gameDate " +
-            "FROM player, games " +
-            "WHERE player.user_id_long = :userIdLong AND player.games_id = games.id GROUP BY YEAR(game_date), MONTH(game_date) ORDER BY `gameDate` DESC LIMIT 8", nativeQuery = true)
+            "FROM games g " +
+            "WHERE g.user_id_long = :userIdLong GROUP BY YEAR(game_date), MONTH(game_date) ORDER BY `gameDate` DESC LIMIT 8", nativeQuery = true)
     List<StatisticMy> getAllMyStatistic(@Param("userIdLong") String userIdLong);
 
     @Modifying
