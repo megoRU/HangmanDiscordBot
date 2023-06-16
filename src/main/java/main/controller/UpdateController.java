@@ -32,7 +32,6 @@ public class UpdateController {
     private final LanguageRepository languageRepository;
     private final GameLanguageRepository gameLanguageRepository;
     private final HangmanGameRepository hangmanGameRepository;
-    private final PlayerRepository playerRepository;
     private final GamesRepository gamesRepository;
     private final CategoryRepository categoryRepository;
     //LOGGER
@@ -45,13 +44,11 @@ public class UpdateController {
     public UpdateController(LanguageRepository languageRepository,
                             GameLanguageRepository gameLanguageRepository,
                             HangmanGameRepository hangmanGameRepository,
-                            PlayerRepository playerRepository,
                             GamesRepository gamesRepository,
                             CategoryRepository categoryRepository) {
         this.languageRepository = languageRepository;
         this.gameLanguageRepository = gameLanguageRepository;
         this.hangmanGameRepository = hangmanGameRepository;
-        this.playerRepository = playerRepository;
         this.gamesRepository = gamesRepository;
         this.categoryRepository = categoryRepository;
     }
