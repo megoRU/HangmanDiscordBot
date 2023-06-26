@@ -1,7 +1,7 @@
 package main.core.events;
 
 import main.controller.UpdateController;
-import main.hangman.impl.ButtonIMpl;
+import main.hangman.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.Event;
@@ -48,7 +48,7 @@ public class HelpCommand {
         info.addField(messagesEventsBotCreator, messagesEventsBotCreatorUrlSteam, false);
 
         List<Button> buttons = new ArrayList<>();
-        buttons.add(ButtonIMpl.BUTTON_SUPPORT);
+        buttons.add(HangmanUtils.BUTTON_SUPPORT);
 
         updateController.sendMessage(event, info.build(), buttons);
     }

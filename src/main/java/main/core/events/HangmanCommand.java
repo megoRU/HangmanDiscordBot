@@ -5,7 +5,7 @@ import main.controller.UpdateController;
 import main.hangman.Hangman;
 import main.hangman.HangmanBuilder;
 import main.hangman.HangmanRegistry;
-import main.hangman.impl.ButtonIMpl;
+import main.hangman.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
@@ -41,10 +41,9 @@ public class HangmanCommand {
             needSetLanguage.setDescription(hangmanListenerNeedSetLanguage);
 
             event.replyEmbeds(needSetLanguage.build())
-                    .addActionRow(ButtonIMpl.BUTTON_RUSSIAN, ButtonIMpl.BUTTON_ENGLISH)
-                    .addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN)
+                    .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
+                    .addActionRow(HangmanUtils.BUTTON_PLAY_AGAIN)
                     .queue();
-            return;
             //Проверяем если игрок уже играет. То присылаем в чат уведомление
         } else if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
             String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", userIdLong);
@@ -54,7 +53,7 @@ public class HangmanCommand {
             youPlay.setColor(Color.GREEN);
             youPlay.setDescription(hangmanListenerYouPlay);
 
-            event.replyEmbeds(youPlay.build()).addActionRow(ButtonIMpl.BUTTON_STOP).queue();
+            event.replyEmbeds(youPlay.build()).addActionRow(HangmanUtils.BUTTON_STOP).queue();
             //Если всё хорошо, создаем игру
         } else {
             HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder()

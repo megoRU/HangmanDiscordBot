@@ -6,7 +6,7 @@ import main.enums.Buttons;
 import main.hangman.Hangman;
 import main.hangman.HangmanBuilder;
 import main.hangman.HangmanRegistry;
-import main.hangman.impl.ButtonIMpl;
+import main.hangman.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -29,8 +29,8 @@ public class HangmanButton {
 
         if (userGameLanguage == null) {
             event.getHook().sendMessage(gameLanguage)
-                    .addActionRow(ButtonIMpl.BUTTON_RUSSIAN, ButtonIMpl.BUTTON_ENGLISH)
-                    .addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN)
+                    .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
+                    .addActionRow(HangmanUtils.BUTTON_PLAY_AGAIN)
                     .setEphemeral(true)
                     .queue();
             return;

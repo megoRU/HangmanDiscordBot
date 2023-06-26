@@ -4,8 +4,7 @@ import main.controller.UpdateController;
 import main.hangman.Hangman;
 import main.hangman.HangmanEmbedUtils;
 import main.hangman.HangmanRegistry;
-import main.hangman.impl.ButtonIMpl;
-import main.hangman.impl.HangmanHelper;
+import main.hangman.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -41,20 +40,20 @@ public class StopCommand {
             String hangmanEngGame1 = jsonGameParsers.getLocale("Hangman_Eng_game", userId);
 
             if (secondPlayer != 0L) {
-                Button buttonPlayAgainWithUsers = ButtonIMpl.getButtonPlayAgainWithUsers(userId, secondPlayer);
+                Button buttonPlayAgainWithUsers = HangmanUtils.getButtonPlayAgainWithUsers(userId, secondPlayer);
                 updateController.sendMessage(event, hangmanEngGame, buttonPlayAgainWithUsers);
             } else {
-                updateController.sendMessage(event, hangmanEngGame, ButtonIMpl.BUTTON_PLAY_AGAIN);
+                updateController.sendMessage(event, hangmanEngGame, HangmanUtils.BUTTON_PLAY_AGAIN);
             }
             EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanPattern(userId, hangmanEngGame1);
 
-            HangmanHelper.editMessage(embedBuilder, userId, hangmanGameRepository);
+            HangmanEmbedUtils.editMessage(embedBuilder, userId, hangmanGameRepository);
             HangmanRegistry.getInstance().removeHangman(userId);
             hangmanGameRepository.deleteActiveGame(userId);
             //Если игрок не играет, а хочет завершить игру, то нужно ему это прислать уведомление, что он сейчас не играет
         } else {
             String hangmanYouAreNotPlay = jsonParsers.getLocale("Hangman_You_Are_Not_Play", userIdLong);
-            updateController.sendMessage(event, hangmanYouAreNotPlay, ButtonIMpl.BUTTON_PLAY_AGAIN);
+            updateController.sendMessage(event, hangmanYouAreNotPlay, HangmanUtils.BUTTON_PLAY_AGAIN);
         }
     }
 }
