@@ -1,6 +1,6 @@
 package main.core.events;
 
-import main.hangman.impl.ButtonIMpl;
+import main.hangman.HangmanUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
@@ -47,7 +47,7 @@ public class JoinEvent {
                     if (messageChannel != null) {
                         messageChannel
                                 .sendMessageEmbeds(welcome.build())
-                                .setActionRow(ButtonIMpl.BUTTON_HELP, ButtonIMpl.BUTTON_SUPPORT)
+                                .setActionRow(HangmanUtils.BUTTON_HELP, HangmanUtils.BUTTON_SUPPORT)
                                 .queue();
                     }
                 }

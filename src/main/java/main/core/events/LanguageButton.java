@@ -3,7 +3,7 @@ package main.core.events;
 import main.config.BotStartConfig;
 import main.enums.Buttons;
 import main.hangman.HangmanRegistry;
-import main.hangman.impl.ButtonIMpl;
+import main.hangman.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.GameLanguage;
 import main.model.repository.GameLanguageRepository;
@@ -38,7 +38,7 @@ public class LanguageButton {
             youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
             youPlay.setColor(0x00FF00);
             youPlay.setDescription(reactionsButtonWhenPlay);
-            event.getHook().sendMessageEmbeds(youPlay.build()).setEphemeral(true).addActionRow(ButtonIMpl.BUTTON_STOP).queue();
+            event.getHook().sendMessageEmbeds(youPlay.build()).setEphemeral(true).addActionRow(HangmanUtils.BUTTON_STOP).queue();
             return;
         }
 

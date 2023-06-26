@@ -2,7 +2,7 @@ package main.core.events;
 
 import main.config.BotStartConfig;
 import main.hangman.HangmanRegistry;
-import main.hangman.impl.ButtonIMpl;
+import main.hangman.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.GameLanguage;
 import main.model.entity.Language;
@@ -44,7 +44,7 @@ public class LanguageCommand {
             whenPlay.setColor(Color.GREEN);
             whenPlay.setDescription(reactionsButtonWhenPlay);
 
-            event.replyEmbeds(whenPlay.build()).addActionRow(ButtonIMpl.BUTTON_STOP).queue();
+            event.replyEmbeds(whenPlay.build()).addActionRow(HangmanUtils.BUTTON_STOP).queue();
             return;
         }
         //0 - game | 1 - bot
@@ -57,7 +57,7 @@ public class LanguageCommand {
 
             String slashLanguage = String.format(jsonParsers.getLocale("slash_language", userIdLong), opOne, opTwo);
 
-            event.reply(slashLanguage).addActionRow(ButtonIMpl.BUTTON_PLAY_AGAIN).queue();
+            event.reply(slashLanguage).addActionRow(HangmanUtils.BUTTON_PLAY_AGAIN).queue();
 
             GameLanguage gameLanguage = new GameLanguage();
             gameLanguage.setUserIdLong(userIdLong);

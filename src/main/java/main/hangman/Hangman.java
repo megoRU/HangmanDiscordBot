@@ -4,8 +4,6 @@ import api.megoru.ru.entity.GameWordLanguage;
 import api.megoru.ru.impl.MegoruAPI;
 import main.config.BotStartConfig;
 import main.controller.UpdateController;
-import main.hangman.impl.EndGameButtons;
-import main.hangman.impl.HangmanHelper;
 import main.jsonparser.JSONParsers;
 import main.model.entity.ActiveHangman;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -21,7 +19,7 @@ import java.time.ZoneOffset;
 import java.util.*;
 import java.util.logging.Logger;
 
-public class Hangman implements HangmanHelper {
+public class Hangman {
 
     //Localisation
     private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
@@ -169,7 +167,7 @@ public class Hangman implements HangmanHelper {
             String wordIsNull = jsonParsers.getLocale("word_is_null", userId);
             messages.getChannel()
                     .sendMessage(wordIsNull)
-                    .setActionRow(EndGameButtons.getListButtons(userId))
+                    .setActionRow(HangmanUtils.getListButtons(userId))
                     .queue();
 
             HangmanRegistry.getInstance().removeHangman(userId);
@@ -184,7 +182,7 @@ public class Hangman implements HangmanHelper {
                         STATUS = Status.SAME_LETTER;
                         String gameYouUseThisLetter = jsonGameParsers.getLocale("Game_You_Use_This_Letter", userId);
                         EmbedBuilder info = HangmanEmbedUtils.hangmanPattern(userId, gameYouUseThisLetter);
-                        HangmanHelper.editMessage(info, userId, updateController.getHangmanGameRepository());
+                        HangmanEmbedUtils.editMessage(info, userId, updateController.getHangmanGameRepository());
                         return;
                     }
 
@@ -199,7 +197,7 @@ public class Hangman implements HangmanHelper {
                         }
                         String gameYouGuessLetter = jsonGameParsers.getLocale("Game_You_Guess_Letter", userId);
                         EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanPattern(userId, gameYouGuessLetter);
-                        HangmanHelper.editMessage(embedBuilder, userId, updateController.getHangmanGameRepository());
+                        HangmanEmbedUtils.editMessage(embedBuilder, userId, updateController.getHangmanGameRepository());
                     } else {
                         hangmanErrors++;
                         if (hangmanErrors >= 8) {
@@ -209,7 +207,7 @@ public class Hangman implements HangmanHelper {
                             STATUS = Status.WRONG_LETTER;
                             String gameNoSuchLetter = jsonGameParsers.getLocale("Game_No_Such_Letter", userId);
                             EmbedBuilder wordNotFound = HangmanEmbedUtils.hangmanPattern(userId, gameNoSuchLetter);
-                            HangmanHelper.editMessage(wordNotFound, userId, updateController.getHangmanGameRepository());
+                            HangmanEmbedUtils.editMessage(wordNotFound, userId, updateController.getHangmanGameRepository());
                         }
                     }
                 }
@@ -217,7 +215,7 @@ public class Hangman implements HangmanHelper {
                 if (inputs.length() != getLengthWord()) {
                     String wrongLengthJson = jsonGameParsers.getLocale("wrongLength", userId);
                     EmbedBuilder wrongLength = HangmanEmbedUtils.hangmanPattern(userId, wrongLengthJson);
-                    HangmanHelper.editMessage(wrongLength, userId, updateController.getHangmanGameRepository());
+                    HangmanEmbedUtils.editMessage(wrongLength, userId, updateController.getHangmanGameRepository());
                     return;
                 }
 
@@ -226,7 +224,7 @@ public class Hangman implements HangmanHelper {
                     STATUS = Status.SAME_LETTER;
                     String gameYouUseThisWord = jsonGameParsers.getLocale("Game_You_Use_This_Word", userId);
                     EmbedBuilder info = HangmanEmbedUtils.hangmanPattern(userId, gameYouUseThisWord);
-                    HangmanHelper.editMessage(info, userId, updateController.getHangmanGameRepository());
+                    HangmanEmbedUtils.editMessage(info, userId, updateController.getHangmanGameRepository());
                     return;
                 }
 
@@ -242,7 +240,7 @@ public class Hangman implements HangmanHelper {
                         STATUS = Status.WRONG_WORD;
                         String gameNoSuchWord = jsonGameParsers.getLocale("Game_No_Such_Word", userId);
                         EmbedBuilder wordNotFound = HangmanEmbedUtils.hangmanPattern(userId, gameNoSuchWord);
-                        HangmanHelper.editMessage(wordNotFound, userId, updateController.getHangmanGameRepository());
+                        HangmanEmbedUtils.editMessage(wordNotFound, userId, updateController.getHangmanGameRepository());
                     }
                 }
             }
@@ -258,9 +256,9 @@ public class Hangman implements HangmanHelper {
             EmbedBuilder win = HangmanEmbedUtils.hangmanPattern(userId, gameStopWin);
 
             if (secondPlayer != 0L) {
-                HangmanHelper.editMessageWithButtons(win, userId, EndGameButtons.getListButtons(userId, secondPlayer), updateController.getHangmanGameRepository());
+                HangmanEmbedUtils.editMessageWithButtons(win, userId, HangmanUtils.getListButtons(userId, secondPlayer), updateController.getHangmanGameRepository());
             } else {
-                HangmanHelper.editMessageWithButtons(win, userId, EndGameButtons.getListButtons(userId), updateController.getHangmanGameRepository());
+                HangmanEmbedUtils.editMessageWithButtons(win, userId, HangmanUtils.getListButtons(userId), updateController.getHangmanGameRepository());
             }
 
             ResultGame resultGame = new ResultGame(updateController.getHangmanGameRepository(), updateController.getGamesRepository(), userId, true);
@@ -282,9 +280,9 @@ public class Hangman implements HangmanHelper {
             String gameYouLose = jsonGameParsers.getLocale("Game_You_Lose", userId);
             EmbedBuilder info = HangmanEmbedUtils.hangmanPattern(userId, gameYouLose);
             if (secondPlayer != 0L) {
-                HangmanHelper.editMessageWithButtons(info, userId, EndGameButtons.getListButtons(userId, secondPlayer), updateController.getHangmanGameRepository());
+                HangmanEmbedUtils.editMessageWithButtons(info, userId, HangmanUtils.getListButtons(userId, secondPlayer), updateController.getHangmanGameRepository());
             } else {
-                HangmanHelper.editMessageWithButtons(info, userId, EndGameButtons.getListButtons(userId), updateController.getHangmanGameRepository());
+                HangmanEmbedUtils.editMessageWithButtons(info, userId, HangmanUtils.getListButtons(userId), updateController.getHangmanGameRepository());
             }
 
             ResultGame resultGame = new ResultGame(updateController.getHangmanGameRepository(), updateController.getGamesRepository(), userId, false);
@@ -471,7 +469,7 @@ public class Hangman implements HangmanHelper {
                     info.setDescription(timeIsOver);
                     info.addField(gamePlayer, userIdWithDiscord, false);
 
-                    HangmanHelper.editMessageWithButtons(info, userId, EndGameButtons.getListButtons(userId), updateController.getHangmanGameRepository());
+                    HangmanEmbedUtils.editMessageWithButtons(info, userId, HangmanUtils.getListButtons(userId), updateController.getHangmanGameRepository());
                     updateController.getHangmanGameRepository().deleteActiveGame(userId);
                     HangmanRegistry.getInstance().removeHangman(userId);
                 }

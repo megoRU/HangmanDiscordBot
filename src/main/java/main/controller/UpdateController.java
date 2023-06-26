@@ -119,6 +119,7 @@ public class UpdateController {
         boolean permission = ChecksClass.check(event);
         if (!permission) return;
 
+
         HangmanCommand hangmanCommand = new HangmanCommand();
         hangmanCommand.hangman(event, this);
     }

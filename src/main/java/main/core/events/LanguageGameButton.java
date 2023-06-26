@@ -2,7 +2,7 @@ package main.core.events;
 
 import main.config.BotStartConfig;
 import main.hangman.HangmanRegistry;
-import main.hangman.impl.ButtonIMpl;
+import main.hangman.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.GameLanguage;
 import main.model.repository.GameLanguageRepository;
@@ -28,7 +28,7 @@ public class LanguageGameButton {
 
         if (HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
             String reactionsButtonWhenPlay = jsonParsers.getLocale("ReactionsButton_When_Play", event.getUser().getIdLong());
-            event.getHook().sendMessage(reactionsButtonWhenPlay).addActionRow(ButtonIMpl.BUTTON_STOP).setEphemeral(true).queue();
+            event.getHook().sendMessage(reactionsButtonWhenPlay).addActionRow(HangmanUtils.BUTTON_STOP).setEphemeral(true).queue();
         } else {
             if (event.getButton().getEmoji() != null) {
                 String buttonName = event.getButton().getEmoji().getName().contains("\uD83C\uDDF7\uD83C\uDDFA") ? "rus" : "eng";
