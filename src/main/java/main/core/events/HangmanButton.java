@@ -3,10 +3,7 @@ package main.core.events;
 import main.config.BotStartConfig;
 import main.controller.UpdateController;
 import main.enums.Buttons;
-import main.hangman.Hangman;
-import main.hangman.HangmanBuilder;
-import main.hangman.HangmanRegistry;
-import main.hangman.HangmanUtils;
+import main.hangman.*;
 import main.jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -23,6 +20,7 @@ public class HangmanButton {
         event.editButton(event.getButton().asDisabled()).queue();
 
         var userIdLong = event.getUser().getIdLong();
+        var channelIdLong = event.getChannel().getIdLong();
 
         String gameLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getIdLong());
         String userGameLanguage = BotStartConfig.getMapGameLanguages().get(userIdLong);
@@ -39,9 +37,8 @@ public class HangmanButton {
         if (!HangmanRegistry.getInstance().hasHangman(userIdLong)) {
             event.getChannel().sendTyping().queue();
 
-            HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder()
-                    .setUserIdLong(userIdLong)
-                    .setUpdateController(updateController);
+            HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder();
+            hangmanBuilder.setUpdateController(updateController);
 
             Hangman hangman;
             //Guild Play
@@ -52,9 +49,10 @@ public class HangmanButton {
             System.out.println("matches: " + matches);
 
             if (event.getGuild() != null) {
+                long guildIdLong = event.getGuild().getIdLong();
 
-                hangmanBuilder.setGuildIdLong(event.getGuild().getIdLong());
-                hangmanBuilder.setChannelId(event.getGuildChannel().getIdLong());
+                HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, guildIdLong, channelIdLong);
+                hangmanBuilder.addHangmanPlayer(hangmanPlayer);
 
                 if (matches) {
                     String[] split = event.getButton().getId()
@@ -76,7 +74,8 @@ public class HangmanButton {
                         }
                     }
 
-                    hangmanBuilder.setSecondUserIdLong(secondUser);
+                    HangmanPlayer hangmanPlayerSecond = new HangmanPlayer(secondUser, guildIdLong, channelIdLong);
+                    hangmanBuilder.addHangmanPlayer(hangmanPlayerSecond);
 
                     hangman = hangmanBuilder.build();
 
@@ -93,8 +92,8 @@ public class HangmanButton {
                 }
                 //DM play
             } else {
-                hangmanBuilder.setChannelId(event.getChannel().getIdLong());
-                hangmanBuilder.setGuildIdLong(null);
+                HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, null, channelIdLong);
+                hangmanBuilder.addHangmanPlayer(hangmanPlayer);
 
                 hangman = hangmanBuilder.build();
 

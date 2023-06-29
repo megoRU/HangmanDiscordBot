@@ -2,10 +2,7 @@ package main.core.events;
 
 import main.config.BotStartConfig;
 import main.controller.UpdateController;
-import main.hangman.Hangman;
-import main.hangman.HangmanBuilder;
-import main.hangman.HangmanRegistry;
-import main.hangman.HangmanUtils;
+import main.hangman.*;
 import main.jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
@@ -27,6 +24,13 @@ public class HangmanCommand {
 
     public void hangman(@NotNull GenericCommandInteractionEvent event, UpdateController updateController) {
         long userIdLong = event.getUser().getIdLong();
+        long channelIdLong = event.getMessageChannel().getIdLong();
+        Long guildIdLong = null;
+
+        if (event.getGuild() != null) {
+            guildIdLong = event.getGuild().getIdLong();
+        }
+
         if (event instanceof SlashCommandInteractionEvent slashEvent) {
             slashEvent.getChannel().sendTyping().queue();
         }
@@ -56,11 +60,10 @@ public class HangmanCommand {
             event.replyEmbeds(youPlay.build()).addActionRow(HangmanUtils.BUTTON_STOP).queue();
             //Если всё хорошо, создаем игру
         } else {
-            HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder()
-                    .setUserIdLong(userIdLong)
-                    .setChannelId(event.getMessageChannel().getIdLong())
-                    .setUpdateController(updateController)
-                    .setUserIdLong(userIdLong);
+            HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, guildIdLong, channelIdLong);
+            HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder();
+            hangmanBuilder.addHangmanPlayer(hangmanPlayer);
+            hangmanBuilder.setUpdateController(updateController);
 
             if (event.getName().equals("multi")) {
                 User user = null;
@@ -91,14 +94,9 @@ public class HangmanCommand {
                     event.reply(secondPlayerAlreadyPlaying).setEphemeral(true).queue();
                     return;
                 } else {
-                    hangmanBuilder.setSecondUserIdLong(user.getIdLong());
+                    HangmanPlayer hangmanPlayerSecond = new HangmanPlayer(user.getIdLong(), guildIdLong, channelIdLong);
+                    hangmanBuilder.addHangmanPlayer(hangmanPlayerSecond);
                 }
-            }
-
-            if (event.getGuild() != null) {
-                hangmanBuilder.setGuildIdLong(event.getGuild().getIdLong());
-            } else {
-                hangmanBuilder.setGuildIdLong(null);
             }
 
             String createGame = jsonParsers.getLocale("create_game", userIdLong);
@@ -108,8 +106,11 @@ public class HangmanCommand {
 
             //Заполнение коллекции
             HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
-            if (hangmanBuilder.getSecondPlayer() != 0) {
-                HangmanRegistry.getInstance().setHangman(hangmanBuilder.getSecondPlayer(), hangman);
+
+            if (hangman.getHangmanPlayers().length > 1) {
+                HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
+                HangmanPlayer hangmanPlayerSecond = hangmanPlayers[1];
+                HangmanRegistry.getInstance().setHangman(hangmanPlayerSecond.getUserId(), hangman);
             }
 
             hangman.startGame(event.getMessageChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
