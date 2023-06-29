@@ -140,7 +140,13 @@ public class Hangman {
             String gameStopWin = jsonGameParsers.getLocale("Game_Stop_Win", userId);
             EmbedBuilder win = HangmanEmbedUtils.hangmanPattern(userId, gameStopWin);
 
-            HangmanEmbedUtils.editMessageWithButtons(win, userId, HangmanUtils.getListButtons(userId), updateController.getHangmanGameRepository());
+            if (hangmanPlayers.length == 1) {
+                HangmanEmbedUtils.editMessageWithButtons(win, userId, HangmanUtils.getListButtons(userId), updateController.getHangmanGameRepository());
+            } else {
+                HangmanPlayer hangmanPlayerSecond = hangmanPlayers[1];
+                long secondUserId = hangmanPlayerSecond.getUserId();
+                HangmanEmbedUtils.editMessageWithButtons(win, userId, HangmanUtils.getListButtons(userId, secondUserId), updateController.getHangmanGameRepository());
+            }
 
             HangmanResult hangmanResult = new HangmanResult(hangmanPlayers, result, updateController);
             hangmanResult.save();
