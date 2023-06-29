@@ -1,10 +1,10 @@
 package main.hangman;
 
 import main.controller.UpdateController;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public interface HangmanBuilder {
 
@@ -14,10 +14,8 @@ public interface HangmanBuilder {
         private UpdateController updateController;
 
         //User|Guild|Channel data
-        private long userId;
-        private long secondPlayer;
-        private Long guildId;
-        private Long channelId;
+
+        private final List<HangmanPlayer> hangmanPlayerList = new ArrayList<>();
         private long messageId;
 
         //For restoring
@@ -26,6 +24,17 @@ public interface HangmanBuilder {
         private String currentHiddenWord;
         private int hangmanErrors;
         private LocalDateTime localDateTime;
+
+        private HangmanPlayer[] toArray() {
+            List<HangmanPlayer> list = hangmanPlayerList.stream().distinct().toList();
+            int size = list.size();
+            HangmanPlayer[] hangmanPlayers = new HangmanPlayer[size];
+            for (int i = 0; i < list.size(); i++) {
+                HangmanPlayer hangmanPlayer = list.get(i);
+                hangmanPlayers[i] = hangmanPlayer;
+            }
+            return hangmanPlayers;
+        }
 
         public Builder setMessageId(long messageId) {
             this.messageId = messageId;
@@ -57,27 +66,8 @@ public interface HangmanBuilder {
             return this;
         }
 
-        public long getSecondPlayer() {
-            return secondPlayer;
-        }
-
-        public Builder setUserIdLong(long userId) {
-            this.userId = userId;
-            return this;
-        }
-
-        public Builder setSecondUserIdLong(long secondPlayer) {
-            this.secondPlayer = secondPlayer;
-            return this;
-        }
-
-        public Builder setGuildIdLong(@Nullable Long guildId) {
-            this.guildId = guildId;
-            return this;
-        }
-
-        public Builder setChannelId(@NotNull Long channelId) {
-            this.channelId = channelId;
+        public Builder addHangmanPlayer(HangmanPlayer... hangmanPlayer) {
+            hangmanPlayerList.addAll(List.of(hangmanPlayer));
             return this;
         }
 
@@ -90,32 +80,21 @@ public interface HangmanBuilder {
          * @throws IllegalArgumentException if hangmanGameRepository, playerRepository, gamesRepository, channelId == null
          */
         public Hangman build() {
-
             if (updateController == null)
                 throw new IllegalArgumentException("The provided updateController cannot be null!");
 
-            if (channelId == null || channelId == 0L)
-                throw new IllegalArgumentException("The provided channelId cannot be null!");
-
             if (word != null && currentHiddenWord != null) {
-                return new Hangman(userId,
-                        secondPlayer,
-                        guildId,
-                        channelId,
+                return new Hangman(
                         messageId,
                         guesses,
                         word,
                         currentHiddenWord,
                         hangmanErrors,
                         localDateTime,
-                        updateController);
+                        updateController,
+                        toArray());
             }
-
-            if (secondPlayer != 0L) {
-                return new Hangman(userId, secondPlayer, guildId, channelId, updateController);
-            }
-
-            return new Hangman(userId, guildId, channelId, updateController);
+            return new Hangman(updateController, toArray());
         }
 
     }

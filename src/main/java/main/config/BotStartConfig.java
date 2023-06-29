@@ -2,10 +2,7 @@ package main.config;
 
 import main.controller.UpdateController;
 import main.core.CoreBot;
-import main.hangman.Hangman;
-import main.hangman.HangmanBuilder;
-import main.hangman.HangmanRegistry;
-import main.hangman.MessageDeleting;
+import main.hangman.*;
 import main.jsonparser.ParserClass;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.JDA;
@@ -135,7 +132,7 @@ public class BotStartConfig {
         System.out.println("IsDevMode: " + Config.isIsDev());
 
         //Обновить команды
-//        updateSlashCommands();
+        updateSlashCommands();
         System.out.println("18:31");
     }
 
@@ -207,7 +204,9 @@ public class BotStartConfig {
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Играйте в Hangman с другим игроком"));
 
             //Context Menu
-            commands.addCommands(Commands.context(Command.Type.USER, "multi")
+            commands.addCommands(Commands.context(Command.Type.USER, "Play multi")
+                    .setName("multi")
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "Играть вместе")
                     .setGuildOnly(true)
             );
 
@@ -358,10 +357,11 @@ public class BotStartConfig {
 
                 Long hangmanGuildLong = guildIdLong == null ? null : Long.valueOf(guildIdLong);
 
+
+                HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, hangmanGuildLong, channelIdLong);
+
                 HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder()
-                        .setUserIdLong(userIdLong)
-                        .setGuildIdLong(hangmanGuildLong)
-                        .setChannelId(channelIdLong)
+                        .addHangmanPlayer(hangmanPlayer)
                         .setUpdateController(updateController)
                         .setHangmanErrors(hangmanErrors)
                         .setWord(word)
@@ -373,7 +373,8 @@ public class BotStartConfig {
                 if (secondUserIdLong == 0L) {
                     instance.setHangman(userIdLong, hangmanBuilder.build());
                 } else {
-                    hangmanBuilder.setSecondUserIdLong(secondUserIdLong);
+                    HangmanPlayer hangmanPlayerSecond = new HangmanPlayer(secondUserIdLong, hangmanGuildLong, channelIdLong);
+                    hangmanBuilder.addHangmanPlayer(hangmanPlayerSecond);
 
                     Hangman hangman = hangmanBuilder.build();
 

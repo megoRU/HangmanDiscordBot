@@ -2,6 +2,7 @@ package main.hangman;
 
 import api.megoru.ru.entity.GameWordLanguage;
 import api.megoru.ru.impl.MegoruAPI;
+import lombok.Getter;
 import main.config.BotStartConfig;
 import main.controller.UpdateController;
 import main.jsonparser.JSONParsers;
@@ -10,45 +11,38 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.jetbrains.annotations.NotNull;
-import org.junit.internal.Checks;
 
 import java.awt.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Logger;
 
+@Getter
 public class Hangman {
+
+    //Logger
+    private final Logger LOGGER = Logger.getLogger(Hangman.class.getName());
 
     //Localisation
     private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
     private static final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
 
-    //Timers
-    private final Timer autoInsert = new Timer();
-    private final Timer stopHangmanTimer = new Timer();
-
-    //Logger
-    private final Logger LOGGER = Logger.getLogger(Hangman.class.getName());
-
-    //Repository
+    //UpdateController
     private final UpdateController updateController;
 
     //API
     private final MegoruAPI megoruAPI = new MegoruAPI.Builder().build();
 
     private final Set<String> guesses;
-
-    //User|Guild|Channel data
-    private final long userId;
-    private final long secondPlayer;
-    private final Long guildId;
-    private final Long channelId;
-    private final String userIdWithDiscord;
+    private final HangmanPlayer[] hangmanPlayers;
     private long messageId;
 
-    private int countUsedLetters;
+    private int usedLettersCount;
     private String WORD;
     private String[] WORD_OF_CHARS;
     private String WORD_HIDDEN;
@@ -56,54 +50,27 @@ public class Hangman {
 
     private volatile Status STATUS;
 
-    Hangman(long userId, Long guildId, Long channelId, UpdateController updateController) {
+    Hangman(UpdateController updateController, HangmanPlayer... hangmanPlayers) {
         this.STATUS = Status.STARTING;
         this.updateController = updateController;
-        this.userId = userId;
-        this.guildId = guildId;
-        this.channelId = channelId;
-        this.userIdWithDiscord = String.format("<@%s>", userId);
         this.guesses = new LinkedHashSet<>();
-        this.secondPlayer = 0L;
+        this.hangmanPlayers = hangmanPlayers;
     }
 
-    Hangman(long userId, long secondPlayer, Long guildId, Long channelId, UpdateController updateController) {
-        this.STATUS = Status.STARTING;
-        this.updateController = updateController;
-        this.userId = userId;
-        this.guildId = guildId;
-        this.channelId = channelId;
-        this.userIdWithDiscord = String.format("<@%s>\n<@%s>", userId, secondPlayer);
-        this.guesses = new LinkedHashSet<>();
-        this.secondPlayer = secondPlayer;
-    }
-
-    Hangman(long userId,
-            long secondPlayer,
-            Long guildId,
-            Long channelId,
-            long messageId,
+    Hangman(long messageId,
             String guesses,
             String word,
             String WORD_HIDDEN,
             int hangmanErrors,
             LocalDateTime localDateTime,
-            UpdateController updateController) {
+            UpdateController updateController,
+            HangmanPlayer... hangmanPlayers) {
         this.STATUS = Status.STARTING;
         this.updateController = updateController;
-        this.userId = userId;
-        this.guildId = guildId;
-        this.channelId = channelId;
         this.messageId = messageId;
-
-        if (secondPlayer != 0) {
-            this.userIdWithDiscord = String.format("<@%s>\n<@%s>", userId, secondPlayer);
-        } else {
-            this.userIdWithDiscord = String.format("<@%s>", userId);
-        }
-
+        this.hangmanPlayers = hangmanPlayers;
         this.guesses = new LinkedHashSet<>();
-        this.secondPlayer = secondPlayer;
+
         //Обновить параметры
         if (guesses != null) {
             this.guesses.addAll(Arrays.asList(guesses.split(", ")));
@@ -113,11 +80,13 @@ public class Hangman {
         this.hangmanErrors = hangmanErrors;
         this.WORD_OF_CHARS = word.split("");
         setTimer(localDateTime);
-        autoInsert();
     }
 
     //TODO: Сделать проверку в классах что вызывают на наличие языка
     public void startGame(MessageChannel textChannel, String avatarUrl, String userName) {
+        HangmanPlayer hangmanPlayer = hangmanPlayers[0];
+        long userId = hangmanPlayer.getUserId();
+
         String gameLanguage = BotStartConfig.getMapGameLanguages().get(userId);
         GameWordLanguage gameWordLanguage = new GameWordLanguage();
         gameWordLanguage.setLanguage(gameLanguage);
@@ -156,155 +125,53 @@ public class Hangman {
 
         //Установка авто завершения
         setTimer(LocalDateTime.now());
-        autoInsert();
     }
 
     public void inputHandler(@NotNull final String inputs, @NotNull final Message messages) {
-        MessageDeleting.addMessageToDelete(messages);
-        try {
-            Checks.notNull(WORD);
-        } catch (NullPointerException e) {
-            String wordIsNull = jsonParsers.getLocale("word_is_null", userId);
-            messages.getChannel()
-                    .sendMessage(wordIsNull)
-                    .setActionRow(HangmanUtils.getListButtons(userId))
-                    .queue();
-
-            HangmanRegistry.getInstance().removeHangman(userId);
-            e.printStackTrace();
-            return;
-        }
-        try {
-            if (inputs.length() == 1) {
-                if (WORD_HIDDEN.contains("_")) {
-                    if (isLetterPresent(inputs.toUpperCase())) {
-                        if (STATUS == Status.SAME_LETTER) return;
-                        STATUS = Status.SAME_LETTER;
-                        String gameYouUseThisLetter = jsonGameParsers.getLocale("Game_You_Use_This_Letter", userId);
-                        EmbedBuilder info = HangmanEmbedUtils.hangmanPattern(userId, gameYouUseThisLetter);
-                        HangmanEmbedUtils.editMessage(info, userId, updateController.getHangmanGameRepository());
-                        return;
-                    }
-
-                    if (WORD.contains(inputs)) {
-                        STATUS = Status.RIGHT_LETTER;
-                        String result = replacementLetters(inputs);
-                        //Игрок угадал все буквы
-                        if (!result.contains("_")) {
-                            STATUS = Status.WIN_GAME;
-                            gameWin();
-                            return;
-                        }
-                        String gameYouGuessLetter = jsonGameParsers.getLocale("Game_You_Guess_Letter", userId);
-                        EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanPattern(userId, gameYouGuessLetter);
-                        HangmanEmbedUtils.editMessage(embedBuilder, userId, updateController.getHangmanGameRepository());
-                    } else {
-                        hangmanErrors++;
-                        if (hangmanErrors >= 8) {
-                            STATUS = Status.LOSE_GAME;
-                            gameLose();
-                        } else {
-                            STATUS = Status.WRONG_LETTER;
-                            String gameNoSuchLetter = jsonGameParsers.getLocale("Game_No_Such_Letter", userId);
-                            EmbedBuilder wordNotFound = HangmanEmbedUtils.hangmanPattern(userId, gameNoSuchLetter);
-                            HangmanEmbedUtils.editMessage(wordNotFound, userId, updateController.getHangmanGameRepository());
-                        }
-                    }
-                }
-            } else {
-                if (inputs.length() != getLengthWord()) {
-                    String wrongLengthJson = jsonGameParsers.getLocale("wrongLength", userId);
-                    EmbedBuilder wrongLength = HangmanEmbedUtils.hangmanPattern(userId, wrongLengthJson);
-                    HangmanEmbedUtils.editMessage(wrongLength, userId, updateController.getHangmanGameRepository());
-                    return;
-                }
-
-                if (isLetterPresent(inputs)) {
-                    if (STATUS == Status.SAME_LETTER) return;
-                    STATUS = Status.SAME_LETTER;
-                    String gameYouUseThisWord = jsonGameParsers.getLocale("Game_You_Use_This_Word", userId);
-                    EmbedBuilder info = HangmanEmbedUtils.hangmanPattern(userId, gameYouUseThisWord);
-                    HangmanEmbedUtils.editMessage(info, userId, updateController.getHangmanGameRepository());
-                    return;
-                }
-
-                if (inputs.equals(WORD)) {
-                    STATUS = Status.WIN_GAME;
-                    gameWin();
-                } else {
-                    hangmanErrors++;
-                    if (hangmanErrors >= 8) {
-                        STATUS = Status.LOSE_GAME;
-                        gameLose();
-                    } else {
-                        STATUS = Status.WRONG_WORD;
-                        String gameNoSuchWord = jsonGameParsers.getLocale("Game_No_Such_Word", userId);
-                        EmbedBuilder wordNotFound = HangmanEmbedUtils.hangmanPattern(userId, gameNoSuchWord);
-                        HangmanEmbedUtils.editMessage(wordNotFound, userId, updateController.getHangmanGameRepository());
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            LOGGER.info(e.getMessage());
-        }
+        HangmanInputs hangmanInputs = new HangmanInputs(this, updateController);
+        hangmanInputs.handler(inputs, messages);
     }
 
-    private void gameWin() {
+    void gameEnd(boolean result) {
         try {
+            HangmanPlayer hangmanPlayer = hangmanPlayers[0];
+            long userId = hangmanPlayer.getUserId();
+
             String gameStopWin = jsonGameParsers.getLocale("Game_Stop_Win", userId);
             EmbedBuilder win = HangmanEmbedUtils.hangmanPattern(userId, gameStopWin);
 
-            if (secondPlayer != 0L) {
-                HangmanEmbedUtils.editMessageWithButtons(win, userId, HangmanUtils.getListButtons(userId, secondPlayer), updateController.getHangmanGameRepository());
-            } else {
+            if (hangmanPlayers.length == 1) {
                 HangmanEmbedUtils.editMessageWithButtons(win, userId, HangmanUtils.getListButtons(userId), updateController.getHangmanGameRepository());
-            }
-
-            ResultGame resultGame = new ResultGame(updateController.getHangmanGameRepository(), updateController.getGamesRepository(), userId, true);
-            resultGame.send();
-
-            if (secondPlayer != 0L) {
-                ResultGame resultGameSecondPlayer = new ResultGame(updateController.getHangmanGameRepository(), updateController.getGamesRepository(), secondPlayer, true);
-                resultGameSecondPlayer.send();
-            }
-
-            HangmanRegistry.getInstance().removeHangman(userId);
-        } catch (Exception e) {
-            LOGGER.info(e.getMessage());
-        }
-    }
-
-    private void gameLose() {
-        try {
-            String gameYouLose = jsonGameParsers.getLocale("Game_You_Lose", userId);
-            EmbedBuilder info = HangmanEmbedUtils.hangmanPattern(userId, gameYouLose);
-            if (secondPlayer != 0L) {
-                HangmanEmbedUtils.editMessageWithButtons(info, userId, HangmanUtils.getListButtons(userId, secondPlayer), updateController.getHangmanGameRepository());
             } else {
-                HangmanEmbedUtils.editMessageWithButtons(info, userId, HangmanUtils.getListButtons(userId), updateController.getHangmanGameRepository());
+                HangmanPlayer hangmanPlayerSecond = hangmanPlayers[1];
+                long secondUserId = hangmanPlayerSecond.getUserId();
+                HangmanEmbedUtils.editMessageWithButtons(win, userId, HangmanUtils.getListButtons(userId, secondUserId), updateController.getHangmanGameRepository());
             }
 
-            ResultGame resultGame = new ResultGame(updateController.getHangmanGameRepository(), updateController.getGamesRepository(), userId, false);
-            resultGame.send();
-
-            if (secondPlayer != 0L) {
-                ResultGame resultGameSecondPlayer = new ResultGame(updateController.getHangmanGameRepository(), updateController.getGamesRepository(), secondPlayer, false);
-                resultGameSecondPlayer.send();
-            }
+            HangmanResult hangmanResult = new HangmanResult(hangmanPlayers, result, updateController);
+            hangmanResult.save();
 
             HangmanRegistry.getInstance().removeHangman(userId);
         } catch (Exception e) {
-            LOGGER.info(e.getMessage());
+            e.printStackTrace();
         }
     }
 
     private void createEntityInDataBase() {
         try {
+            HangmanPlayer hangmanPlayer = hangmanPlayers[0];
+            long userId = hangmanPlayer.getUserId();
+            long guildId = hangmanPlayer.getGuildId();
+            long channelId = hangmanPlayer.getChannelId();
+
             Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now().atZone(ZoneOffset.UTC).toLocalDateTime());
             ActiveHangman activeHangman = new ActiveHangman();
             activeHangman.setUserIdLong(userId);
-            activeHangman.setSecondUserIdLong(secondPlayer == 0L ? null : secondPlayer);
+
+            if (hangmanPlayers.length > 1) {
+                activeHangman.setSecondUserIdLong(hangmanPlayers[1].getUserId());
+            }
+
             activeHangman.setMessageIdLong(messageId);
             activeHangman.setChannelIdLong(channelId);
             activeHangman.setGuildLongId(guildId);
@@ -319,7 +186,7 @@ public class Hangman {
     }
 
     //Создает скрытую линию из длины слова
-    private void hideWord(int length) {
+    void hideWord(int length) {
         StringBuilder sb = new StringBuilder();
         int i = 0;
         while (i < length) {
@@ -338,7 +205,7 @@ public class Hangman {
     }
 
     //заменяет "_" на букву которая есть в слове
-    private String replacementLetters(String letter) {
+    String replacementLetters(String letter) {
         try {
             StringBuilder sb = new StringBuilder(WORD_HIDDEN);
             for (int i = 0; i < WORD_OF_CHARS.length; i++) {
@@ -357,7 +224,7 @@ public class Hangman {
         return WORD_HIDDEN;
     }
 
-    private synchronized boolean isLetterPresent(final String inputs) {
+    synchronized boolean isLetterPresent(final String inputs) {
         boolean contains = guesses.contains(inputs.toUpperCase());
         if (!contains) {
             guesses.add(inputs.toUpperCase());
@@ -372,110 +239,36 @@ public class Hangman {
                 .replaceAll("]", "");
     }
 
-    public long getMessageId() {
-        return messageId;
+    synchronized void incrementHangmanErrors() {
+        this.hangmanErrors++;
     }
 
-    public String getUserIdWithDiscord() {
-        return userIdWithDiscord;
+    public int getGuessesSize() {
+        return guesses.size();
     }
 
-    public int getHangmanErrors() {
-        return hangmanErrors;
-    }
-
-    public String getWORD_HIDDEN() {
-        return WORD_HIDDEN;
-    }
-
-    public Long getGuildId() {
-        return guildId;
-    }
-
-    public Long getChannelId() {
-        return channelId;
-    }
-
-    public long getSecondPlayer() {
-        return secondPlayer;
-    }
-
-    public long getUserId() {
-        return userId;
+    public void setUsedLettersCount(int number) {
+        usedLettersCount = number;
     }
 
     public int getLengthWord() {
         return WORD != null ? WORD.length() : 0;
     }
 
-    public Timer getAutoInsert() {
-        return autoInsert;
-    }
-
-    public Timer getStopHangmanTimer() {
-        return stopHangmanTimer;
-    }
-
-    public String getWORD() {
-        return WORD;
-    }
-
-    public Status getSTATUS() {
-        return STATUS;
+    public void setSTATUS(Status status) {
+        this.STATUS = status;
     }
 
     private void setTimer(LocalDateTime ldt) {
-        StopHangmanTimer stopHangman = new StopHangmanTimer();
         Timestamp timestamp = Timestamp.valueOf(ldt.atZone(ZoneOffset.UTC).toLocalDateTime().plusMinutes(10));
-        Date date = new Date(timestamp.getTime());
-        stopHangmanTimer.schedule(stopHangman, date);
+        HangmanRegistry.getInstance().setHangmanTimer(this, timestamp);
     }
 
-    //Автоматически отправляет в БД данные
-    private void autoInsert() {
-        AutoUpdate autoUpdate = new AutoUpdate();
-        autoInsert.scheduleAtFixedRate(autoUpdate, 7000, 5000);
-    }
-
-    private final class AutoUpdate extends TimerTask {
-
-        @Override
-        public void run() {
-            try {
-                if ((guesses.size() > countUsedLetters) && HangmanRegistry.getInstance().hasHangman(userId)) {
-                    countUsedLetters = guesses.size();
-                    updateController.getHangmanGameRepository().updateGame(userId, WORD_HIDDEN, getGuesses(), hangmanErrors);
-                }
-            } catch (Exception e) {
-                LOGGER.info(e.getMessage());
-            }
-        }
-    }
-
-    private final class StopHangmanTimer extends TimerTask {
-
-        @Override
-        public void run() {
-            STATUS = Status.TIME_OVER;
-            try {
-                if (HangmanRegistry.getInstance().hasHangman(userId)) {
-                    String gameOver = jsonGameParsers.getLocale("gameOver", userId);
-                    String timeIsOver = jsonGameParsers.getLocale("timeIsOver", userId);
-                    String gamePlayer = jsonGameParsers.getLocale("Game_Player", userId);
-
-                    EmbedBuilder info = new EmbedBuilder();
-                    info.setColor(Color.GREEN);
-                    info.setTitle(gameOver);
-                    info.setDescription(timeIsOver);
-                    info.addField(gamePlayer, userIdWithDiscord, false);
-
-                    HangmanEmbedUtils.editMessageWithButtons(info, userId, HangmanUtils.getListButtons(userId), updateController.getHangmanGameRepository());
-                    updateController.getHangmanGameRepository().deleteActiveGame(userId);
-                    HangmanRegistry.getInstance().removeHangman(userId);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+    String getUserIdWithDiscord() {
+        if (hangmanPlayers.length > 1) {
+            return String.format("<@%s>\n<@%s>", hangmanPlayers[0].getUserId(), hangmanPlayers[1].getUserId());
+        } else {
+            return String.format("<@%s>", hangmanPlayers[0].getUserId());
         }
     }
 

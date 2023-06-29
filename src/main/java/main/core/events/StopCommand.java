@@ -1,10 +1,7 @@
 package main.core.events;
 
 import main.controller.UpdateController;
-import main.hangman.Hangman;
-import main.hangman.HangmanEmbedUtils;
-import main.hangman.HangmanRegistry;
-import main.hangman.HangmanUtils;
+import main.hangman.*;
 import main.jsonparser.JSONParsers;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -33,14 +30,18 @@ public class StopCommand {
         //Проверяем играет ли сейчас игрок. Если да удаляем игру.
         Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
         if (hangman != null) {
-            long userId = hangman.getUserId(); //NPE? по идеи не должно
-            long secondPlayer = hangman.getSecondPlayer(); //NPE? по идеи не должно
+
+            HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
+            HangmanPlayer hangmanPlayer = hangmanPlayers[0];
+            long userId = hangmanPlayer.getUserId();
 
             String hangmanEngGame = jsonParsers.getLocale("Hangman_Eng_game", userId);
             String hangmanEngGame1 = jsonGameParsers.getLocale("Hangman_Eng_game", userId);
 
-            if (secondPlayer != 0L) {
-                Button buttonPlayAgainWithUsers = HangmanUtils.getButtonPlayAgainWithUsers(userId, secondPlayer);
+            if (hangmanPlayers.length > 1) {
+                HangmanPlayer hangmanPlayerSecond = hangmanPlayers[1];
+                long secondUserId = hangmanPlayerSecond.getUserId();
+                Button buttonPlayAgainWithUsers = HangmanUtils.getButtonPlayAgainWithUsers(userId, secondUserId);
                 updateController.sendMessage(event, hangmanEngGame, buttonPlayAgainWithUsers);
             } else {
                 updateController.sendMessage(event, hangmanEngGame, HangmanUtils.BUTTON_PLAY_AGAIN);

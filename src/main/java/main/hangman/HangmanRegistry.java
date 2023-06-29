@@ -3,17 +3,21 @@ package main.hangman;
 import main.config.BotStartConfig;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-import java.util.Timer;
+import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class HangmanRegistry {
 
     //Long это UserIdLong
-    private static final Map<Long, Hangman> activeHangman = new ConcurrentHashMap<>();
-    private static volatile HangmanRegistry hangmanRegistry;
+    private static final ConcurrentMap<Long, Hangman> activeHangman = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Hangman, Timestamp> hangmanTimer = new ConcurrentHashMap<>();
+
     private final AtomicInteger idGame = new AtomicInteger();
+
+    private static volatile HangmanRegistry hangmanRegistry;
 
     private HangmanRegistry() {
     }
@@ -38,6 +42,10 @@ public class HangmanRegistry {
         System.out.println(idGame);
     }
 
+    public Collection<Hangman> getAllGames() {
+        return activeHangman.values();
+    }
+
     //2 User могут иметь 1 game
     @Nullable
     public Hangman getActiveHangman(long userIdLong) {
@@ -48,30 +56,26 @@ public class HangmanRegistry {
         activeHangman.put(userIdLong, hangman);
     }
 
+    public void setHangmanTimer(Hangman hangman, Timestamp timestamp) {
+        hangmanTimer.put(hangman, timestamp);
+    }
+
+    public Timestamp getHangmanTimer(Hangman hangman) {
+        return hangmanTimer.get(hangman);
+    }
+
     //2 User могут иметь 1 Gift
     public boolean hasHangman(long userIdLong) {
         return activeHangman.containsKey(userIdLong);
     }
 
     public void removeHangman(long userIdLong) {
-        Hangman hangman = activeHangman.get(userIdLong);
+        Hangman hangman = getActiveHangman(userIdLong);
         if (hangman == null) return;
-
-        Timer timerAutoInsert = hangman.getAutoInsert();
-        Timer stopHangmanTimer = hangman.getStopHangmanTimer();
-
-        if (timerAutoInsert != null) {
-            timerAutoInsert.cancel();
+        hangmanTimer.remove(hangman);
+        HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
+        for (HangmanPlayer hangmanPlayer : hangmanPlayers) {
+            activeHangman.remove(hangmanPlayer.getUserId());
         }
-
-        if (stopHangmanTimer != null) {
-            stopHangmanTimer.cancel();
-        }
-
-        if (hangman.getSecondPlayer() != 0L) {
-            activeHangman.remove(hangman.getSecondPlayer());
-        }
-
-        activeHangman.remove(userIdLong);
     }
 }
