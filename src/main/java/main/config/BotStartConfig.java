@@ -132,7 +132,7 @@ public class BotStartConfig {
         System.out.println("IsDevMode: " + Config.isIsDev());
 
         //Обновить команды
-//        updateSlashCommands();
+        updateSlashCommands();
         System.out.println("18:31");
     }
 
@@ -204,7 +204,9 @@ public class BotStartConfig {
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Играйте в Hangman с другим игроком"));
 
             //Context Menu
-            commands.addCommands(Commands.context(Command.Type.USER, "multi")
+            commands.addCommands(Commands.context(Command.Type.USER, "Play multi")
+                    .setName("multi")
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "Играть вместе")
                     .setGuildOnly(true)
             );
 

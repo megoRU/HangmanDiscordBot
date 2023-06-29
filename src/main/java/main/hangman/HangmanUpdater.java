@@ -7,12 +7,9 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Logger;
 
 @Service
 public class HangmanUpdater extends TimerTask {
-
-    private final Logger LOGGER = Logger.getLogger(HangmanUpdater.class.getName());
 
     private final HangmanGameRepository hangmanGameRepository;
 
@@ -43,7 +40,7 @@ public class HangmanUpdater extends TimerTask {
                     }
             );
         } catch (Exception e) {
-            LOGGER.info(e.getMessage());
+            e.printStackTrace();
         }
     }
 }

@@ -43,10 +43,6 @@ public class HangmanButton {
             Hangman hangman;
             //Guild Play
             boolean matches = event.getButton().getId().matches("BUTTON_START_NEW_GAME_\\d+_\\d+");
-            boolean isFromGuild = event.getGuild() != null;
-
-            System.out.println("isFromGuild: " + isFromGuild);
-            System.out.println("matches: " + matches);
 
             if (event.getGuild() != null) {
                 long guildIdLong = event.getGuild().getIdLong();

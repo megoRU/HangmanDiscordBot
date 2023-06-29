@@ -31,7 +31,7 @@ public class HangmanTimer extends TimerTask {
         allGames.forEach(hangman -> {
                     Timestamp localTimestamp = new Timestamp(System.currentTimeMillis());
                     Timestamp hangmanTimestamp = HangmanRegistry.getInstance().getHangmanTimer(hangman);
-                    if (localTimestamp.after(hangmanTimestamp)) {
+                    if (hangmanTimestamp != null && localTimestamp.after(hangmanTimestamp)) {
                         hangman.setSTATUS(Hangman.Status.TIME_OVER);
                         try {
                             HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
