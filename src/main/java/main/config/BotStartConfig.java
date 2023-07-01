@@ -65,7 +65,6 @@ public class BotStartConfig {
 
     private final BotiCordAPI api = new BotiCordAPI.Builder()
             .token(System.getenv("BOTICORD"))
-            .enableDevMode()
             .build();
 
     //REPOSITORY
