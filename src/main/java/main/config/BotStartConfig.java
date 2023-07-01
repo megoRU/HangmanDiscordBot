@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.boticordjava.api.entity.Enums.TokenEnum;
+import org.boticordjava.api.entity.bot.stats.BotStats;
 import org.boticordjava.api.impl.BotiCordAPI;
 import org.boticordjava.api.io.UnsuccessfulHttpException;
 import org.discordbots.api.client.DiscordBotListAPI;
@@ -64,7 +64,6 @@ public class BotStartConfig {
             .build();
 
     private final BotiCordAPI api = new BotiCordAPI.Builder()
-            .tokenEnum(TokenEnum.BOT)
             .token(System.getenv("BOTICORD"))
             .enableDevMode()
             .build();
@@ -132,7 +131,7 @@ public class BotStartConfig {
         System.out.println("IsDevMode: " + Config.isIsDev());
 
         //Обновить команды
-        updateSlashCommands();
+//        updateSlashCommands();
         System.out.println("18:31");
     }
 
@@ -233,9 +232,10 @@ public class BotStartConfig {
                 jda.getGuilds().forEach(g -> usersCount.addAndGet(g.getMembers().size()));
 
                 try {
-                    api.setStats(serverCount, 1, usersCount.get());
+                    BotStats botStats = new BotStats(usersCount.get(), serverCount, 1);
+                    api.setBotStats(Config.getBotId(), botStats);
                 } catch (UnsuccessfulHttpException un) {
-                    System.out.println(un.getMessage());
+                    un.printStackTrace();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
