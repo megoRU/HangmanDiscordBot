@@ -1,11 +1,15 @@
 package main.hangman;
 
+import main.config.BotStartConfig;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.ISnowflake;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 
-import java.util.*;
+import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class MessageDeleting extends TimerTask {
@@ -19,64 +23,34 @@ public class MessageDeleting extends TimerTask {
 
     @Override
     public void run() {
-        List<Message> localMessageList = new ArrayList<>();
-        Set<MessageChannelUnion> messageChannelUnions = new HashSet<>();
+        while (!messageList.isEmpty()) {
+            Message poll = messageList.poll();
 
-        for (int i = 0; i < messageList.size(); i++) {
-            Message message = messageList.poll();
-            if (message == null) continue;
-            MessageChannelUnion channel = message.getChannel();
-            localMessageList.add(message);
-            messageChannelUnions.add(channel);
-        }
-
-        for (MessageChannelUnion messageChannelUnion : messageChannelUnions) {
             try {
-                List<String> list = localMessageList
-                        .stream()
-                        .filter(message -> message.getChannel() == messageChannelUnion)
-                        .filter(message -> message.getGuild().getSelfMember().hasPermission(message.getGuildChannel(), Permission.MESSAGE_MANAGE))
-                        .map(ISnowflake::getId)
-                        .toList();
+                if (poll != null) {
+                    Guild guild = BotStartConfig.jda.getGuildById(poll.getGuild().getId());
+                    if (guild != null) {
+                        ChannelType channelType = poll.getChannelType();
+                        GuildChannel guildChannel = null;
+                        switch (channelType) {
+                            case TEXT -> guildChannel = poll.getChannel().asTextChannel();
+                            case GUILD_PUBLIC_THREAD, GUILD_NEWS_THREAD, GUILD_PRIVATE_THREAD ->
+                                    guildChannel = poll.getChannel().asThreadChannel();
+                            case NEWS -> guildChannel = poll.getChannel().asNewsChannel();
+                        }
 
-                if (list.size() > 1) {
-                    try {
-                        switch (messageChannelUnion.getType()) {
-                            case TEXT -> messageChannelUnion.asTextChannel().deleteMessagesByIds(list).queue();
-                            case GUILD_PUBLIC_THREAD, GUILD_NEWS_THREAD, GUILD_PRIVATE_THREAD ->
-                                    messageChannelUnion.asThreadChannel().deleteMessagesByIds(list).queue();
-                            case NEWS -> messageChannelUnion.asNewsChannel().deleteMessagesByIds(list).queue();
-                            default -> {
-                                return;
+                        if (guildChannel != null) {
+                            boolean hasPermission = guild.getSelfMember().hasPermission(guildChannel, Permission.MESSAGE_MANAGE);
+                            if (hasPermission) {
+                                poll.delete().queue();
                             }
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else if (list.isEmpty()) {
-                    return;
-                } else {
-                    try {
-                        switch (messageChannelUnion.getType()) {
-                            case TEXT -> messageChannelUnion.asTextChannel().deleteMessageById(list.get(0)).queue();
-                            case GUILD_PUBLIC_THREAD, GUILD_NEWS_THREAD, GUILD_PRIVATE_THREAD ->
-                                    messageChannelUnion.asThreadChannel().deleteMessageById(list.get(0)).queue();
-                            case NEWS -> messageChannelUnion.asNewsChannel().deleteMessageById(list.get(0)).queue();
-                            default -> {
-                                return;
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
                 }
             } catch (Exception e) {
-                if (!e.getMessage().contains("Unknown Message")) {
-                    e.printStackTrace();
-                }
+                e.printStackTrace();
             }
         }
-
     }
 
     public static void addMessageToDelete(Message message) {
