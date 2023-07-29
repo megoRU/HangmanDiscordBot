@@ -97,7 +97,7 @@ public class Hangman {
 
         try {
             WORD = megoruAPI.getWord(gameWordLanguage).getWord();
-            if (WORD != null && WORD.length() > 0) {
+            if (WORD != null && !WORD.isEmpty()) {
                 WORD_OF_CHARS = WORD.toLowerCase().split(""); // Преобразуем строку str в массив символов (char)
                 hideWord(WORD.length());
             } else {
@@ -197,7 +197,7 @@ public class Hangman {
             } else if (Objects.equals(WORD_OF_CHARS[i], " ")) {
                 sb.append("  ");
             } else {
-                sb.append(sb.length() == 0 ? "_" : " _");
+                sb.append(sb.isEmpty() ? "_" : " _");
             }
             i++;
         }
@@ -218,7 +218,6 @@ public class Hangman {
             }
             WORD_HIDDEN = sb.toString();
         } catch (Exception e) {
-            e.printStackTrace();
             LOGGER.info(e.getMessage());
         }
         return WORD_HIDDEN;
