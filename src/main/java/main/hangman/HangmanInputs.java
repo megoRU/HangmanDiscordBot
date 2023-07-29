@@ -26,7 +26,6 @@ public class HangmanInputs {
         try {
             MessageDeleting.addMessageToDelete(messages);
             Checks.notNull(hangman.getWORD());
-
             if (inputs.length() == 1) {
                 if (hangman.getWORD_HIDDEN().contains("_")) {
                     if (hangman.isLetterPresent(inputs.toUpperCase())) {
@@ -44,6 +43,7 @@ public class HangmanInputs {
                         //Игрок угадал все буквы
                         if (!result.contains("_")) {
                             hangman.setSTATUS(Hangman.Status.WIN_GAME);
+                            hangman.gameEnd(true);
                             return;
                         }
                         String gameYouGuessLetter = jsonGameParsers.getLocale("Game_You_Guess_Letter", userId);
