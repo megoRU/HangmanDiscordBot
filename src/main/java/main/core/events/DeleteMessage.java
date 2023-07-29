@@ -1,6 +1,7 @@
 package main.core.events;
 
 import main.config.BotStartConfig;
+import main.hangman.HangmanRegistry;
 import main.jsonparser.JSONParsers;
 import main.model.repository.CategoryRepository;
 import main.model.repository.GameLanguageRepository;
@@ -47,6 +48,7 @@ public class DeleteMessage {
             BotStartConfig.getMapGameLanguages().remove(userIdLong);
             BotStartConfig.getMapLanguages().remove(userIdLong);
             BotStartConfig.getSecretCode().remove(userIdLong);
+            HangmanRegistry.getInstance().removeHangman(userIdLong);
 
             gamesRepository.deleteGameByUserIdLong(userIdLong);
             languageRepository.deleteLanguage(userIdLong);
