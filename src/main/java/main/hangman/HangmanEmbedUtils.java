@@ -53,7 +53,7 @@ public class HangmanEmbedUtils {
             embedBuilder.setThumbnail(HangmanUtils.getImage(hangmanErrors));
 
             //Guesses
-            if (guesses.length() > 0) {
+            if (!guesses.isEmpty()) {
                 String gameGuesses = jsonGameParsers.getLocale("Game_Guesses", userId);
                 String guessesFormat = String.format("`%s`", guesses.toUpperCase());
                 embedBuilder.addField(gameGuesses, guessesFormat, false);
@@ -126,10 +126,10 @@ public class HangmanEmbedUtils {
                         privateChannelById.editMessageEmbedsById(messageId, embedBuilder.build()).queue();
                     }
                 } catch (Exception e) {
-                    if (e.getMessage().contains("UNKNOWN_MESSAGE")
-                            || e.getMessage().contains("MISSING_ACCESS")
-                            || e.getMessage().contains("UNKNOWN_CHANNEL")
-                            || e.getMessage().contains("INVALID_AUTHOR_EDIT")) {
+                    if (e.getMessage().contains("Unknown Message")
+                            || e.getMessage().contains("Unknown Channel")
+                            || e.getMessage().contains("Missing Access")
+                            || e.getMessage().contains("Cannot edit a message authored by another user")) {
                         hangmanGameRepository.deleteActiveGame(userIdLong);
                         HangmanRegistry.getInstance().removeHangman(userIdLong);
                         LOGGER.info("editMessage(): " + e.getMessage());
@@ -162,10 +162,10 @@ public class HangmanEmbedUtils {
                                 .setActionRow(buttons)
                                 .queue();
                     } catch (Exception e) {
-                        if (e.getMessage().contains("UNKNOWN_MESSAGE")
-                                || e.getMessage().contains("UNKNOWN_CHANNEL")
-                                || e.getMessage().contains("MISSING_ACCESS")
-                                || e.getMessage().contains("INVALID_AUTHOR_EDIT")) {
+                        if (e.getMessage().contains("Unknown Message")
+                                || e.getMessage().contains("Unknown Channel")
+                                || e.getMessage().contains("Missing Access")
+                                || e.getMessage().contains("Cannot edit a message authored by another user")) {
                             HangmanRegistry.getInstance().removeHangman(userIdLong);
                             hangmanGameRepository.deleteActiveGame(userIdLong);
                             LOGGER.info("editMessageWithButtons(): " + e.getMessage());
@@ -197,10 +197,10 @@ public class HangmanEmbedUtils {
                             .queue();
                 }
             } catch (Exception e) {
-                if (e.getMessage().contains("UNKNOWN_MESSAGE")
-                        || e.getMessage().contains("MISSING_ACCESS")
-                        || e.getMessage().contains("UNKNOWN_CHANNEL")
-                        || e.getMessage().contains("INVALID_AUTHOR_EDIT")) {
+                if (e.getMessage().contains("Unknown Message")
+                        || e.getMessage().contains("Unknown Channel")
+                        || e.getMessage().contains("Missing Access")
+                        || e.getMessage().contains("Cannot edit a message authored by another user")) {
                     HangmanRegistry.getInstance().removeHangman(userIdLong);
                     hangmanGameRepository.deleteActiveGame(userIdLong);
                     LOGGER.info("editMessageWithButtons(): " + e.getMessage());
