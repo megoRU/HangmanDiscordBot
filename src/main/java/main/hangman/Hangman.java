@@ -7,6 +7,7 @@ import main.config.BotStartConfig;
 import main.controller.UpdateController;
 import main.jsonparser.JSONParsers;
 import main.model.entity.ActiveHangman;
+import main.model.entity.UserSettings;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -87,16 +88,16 @@ public class Hangman {
         HangmanPlayer hangmanPlayer = hangmanPlayers[0];
         long userId = hangmanPlayer.getUserId();
 
-        String gameLanguage = BotStartConfig.getMapGameLanguages().get(userId);
-        GameWordLanguage gameWordLanguage = new GameWordLanguage();
-        gameWordLanguage.setLanguage(gameLanguage);
+        UserSettings.GameLanguage gameLanguage = BotStartConfig.getMapGameLanguages().get(userId);
+        UserSettings.Category category = BotStartConfig.getMapGameCategory().get(userId);
 
-        if (BotStartConfig.mapGameCategory.get(userId) != null) {
-            gameWordLanguage.setCategory(BotStartConfig.mapGameCategory.get(userId));
-        }
+        GameWordLanguage gameWordLanguage = new GameWordLanguage();
+        gameWordLanguage.setLanguage(gameLanguage.name());
+        gameWordLanguage.setCategory(category.name());
 
         try {
-            WORD = megoruAPI.getWord(gameWordLanguage).getWord();
+//            WORD = megoruAPI.getWord(gameWordLanguage).getWord();
+            WORD = "привет";
             if (WORD != null && !WORD.isEmpty()) {
                 WORD_OF_CHARS = WORD.toLowerCase().split(""); // Преобразуем строку str в массив символов (char)
                 hideWord(WORD.length());

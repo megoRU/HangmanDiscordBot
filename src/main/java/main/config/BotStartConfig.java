@@ -1,9 +1,14 @@
 package main.config;
 
+import lombok.Getter;
 import main.controller.UpdateController;
 import main.core.CoreBot;
-import main.hangman.*;
+import main.hangman.Hangman;
+import main.hangman.HangmanBuilder;
+import main.hangman.HangmanPlayer;
+import main.hangman.HangmanRegistry;
 import main.jsonparser.ParserClass;
+import main.model.entity.UserSettings;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -48,11 +53,16 @@ public class BotStartConfig {
     public static final String activity = "/help | ";
 
     //String - userLongId
+    @Getter
     public static final Map<Long, String> secretCode = new HashMap<>();
-    public static final Map<Long, String> mapLanguages = new HashMap<>();
-    public static final Map<Long, String> mapGameLanguages = new HashMap<>();
-    public static final Map<Long, String> mapGameCategory = new HashMap<>();
+    @Getter
+    public static final Map<Long, UserSettings.BotLanguage> mapLanguages = new HashMap<>();
+    @Getter
+    public static final Map<Long, UserSettings.GameLanguage> mapGameLanguages = new HashMap<>();
+    @Getter
+    public static final Map<Long, UserSettings.Category> mapGameCategory = new HashMap<>();
 
+    @Getter
     private static int idGame;
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
@@ -87,14 +97,10 @@ public class BotStartConfig {
     @Bean
     public void startBot() {
         try {
-            //запускаем автоудаление сообщений
-            MessageDeleting messageDeleting = new MessageDeleting();
             //Теперь HangmanRegistry знает количество игр и может отдавать правильное значение
             HangmanRegistry.getInstance().setIdGame();
             setLanguages();
-            getLocalizationFromDB();
-            getGameLocalizationFromDB();
-            getCategoriesFromDB();
+            getUserSettings();
 
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
@@ -130,7 +136,7 @@ public class BotStartConfig {
         System.out.println("IsDevMode: " + Config.isIsDev());
 
         //Обновить команды
-//        updateSlashCommands();
+        updateSlashCommands();
         System.out.println("18:31");
     }
 
@@ -140,15 +146,15 @@ public class BotStartConfig {
             List<OptionData> options = new ArrayList<>();
 
             options.add(new OptionData(STRING, "game", "Setting the Game language")
-                    .addChoice("eng", "eng")
-                    .addChoice("rus", "rus")
+                    .addChoice("english", "EN")
+                    .addChoice("russian", "RU")
                     .setRequired(true)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Настройка языка игры")
             );
 
             options.add(new OptionData(STRING, "bot", "Setting the bot language")
-                    .addChoice("eng", "eng")
-                    .addChoice("rus", "rus")
+                    .addChoice("english", "EN")
+                    .addChoice("russian", "RU")
                     .setRequired(true)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Настройка языка бота")
             );
@@ -163,9 +169,9 @@ public class BotStartConfig {
             List<OptionData> category = new ArrayList<>();
             category.add(new OptionData(STRING, "category", "Select a category")
                     .addChoice("any", "any")
-                    .addChoice("colors", "colors")
-                    .addChoice("fruits", "fruits")
-                    .addChoice("flowers", "flowers")
+                    .addChoice("colors", "COLORS")
+                    .addChoice("fruits", "FRUITS")
+                    .addChoice("flowers", "FLOWERS")
                     .setRequired(true)
                     .setName("category")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выбрать категорию")
@@ -274,61 +280,27 @@ public class BotStartConfig {
         }
     }
 
-    private void getLocalizationFromDB() {
+    private void getUserSettings() {
         try {
             Connection connection = DriverManager.getConnection(URL_CONNECTION, USER_CONNECTION, PASSWORD_CONNECTION);
             Statement statement = connection.createStatement();
-            String sql = "SELECT * FROM language";
+            String sql = "SELECT * FROM user_settings";
             ResultSet rs = statement.executeQuery(sql);
 
             while (rs.next()) {
-                mapLanguages.put(rs.getLong("user_id_long"), rs.getString("language"));
-            }
+                mapLanguages.put(rs.getLong("user_id_long"),
+                        UserSettings.BotLanguage.valueOf(rs.getString("bot_language")));
 
+                mapGameLanguages.put(rs.getLong("user_id_long"),
+                        UserSettings.GameLanguage.valueOf(rs.getString("game_language")));
+
+                mapGameCategory.put(rs.getLong("user_id_long"),
+                        UserSettings.Category.valueOf(rs.getString("category")));
+            }
             rs.close();
             statement.close();
             connection.close();
-            System.out.println("getLocalizationFromDB()");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void getCategoriesFromDB() {
-        try {
-            Connection connection = DriverManager.getConnection(URL_CONNECTION, USER_CONNECTION, PASSWORD_CONNECTION);
-            Statement statement = connection.createStatement();
-            String sql = "SELECT * FROM category";
-            ResultSet rs = statement.executeQuery(sql);
-
-            while (rs.next()) {
-                mapGameCategory.put(rs.getLong("user_id_long"), rs.getString("category"));
-            }
-
-            rs.close();
-            statement.close();
-            connection.close();
-            System.out.println("getCategoriesFromDB()");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void getGameLocalizationFromDB() {
-        try {
-            Connection connection = DriverManager.getConnection(URL_CONNECTION, USER_CONNECTION, PASSWORD_CONNECTION);
-            Statement statement = connection.createStatement();
-            String sql = "SELECT * FROM game_language";
-            ResultSet rs = statement.executeQuery(sql);
-
-            while (rs.next()) {
-                mapGameLanguages.put(Long.valueOf(rs.getString("user_id_long")), rs.getString("language"));
-            }
-
-            rs.close();
-            statement.close();
-            connection.close();
-            System.out.println("getGameLocalizationFromDB()");
+            System.out.println("getUserSettings()");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -346,7 +318,7 @@ public class BotStartConfig {
                 long userIdLong = rs.getLong("user_id_long");
                 long secondUserIdLong = rs.getLong("second_user_id_long");
                 String message_id_long = rs.getString("message_id_long");
-                Long channelIdLong = Long.parseLong(rs.getString("channel_id_long"));
+                long channelIdLong = Long.parseLong(rs.getString("channel_id_long"));
                 String guildIdLong = rs.getString("guild_long_id");
                 String word = rs.getString("word");
                 String currentHiddenWord = rs.getString("current_hidden_word");
@@ -355,7 +327,6 @@ public class BotStartConfig {
                 LocalDateTime game_created_time = rs.getTimestamp("game_created_time").toLocalDateTime();
 
                 Long hangmanGuildLong = guildIdLong == null ? null : Long.valueOf(guildIdLong);
-
 
                 HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, hangmanGuildLong, channelIdLong);
 
@@ -390,23 +361,4 @@ public class BotStartConfig {
         }
     }
 
-    public static Map<Long, String> getMapLanguages() {
-        return mapLanguages;
-    }
-
-    public static Map<Long, String> getMapGameLanguages() {
-        return mapGameLanguages;
-    }
-
-    public static Map<Long, String> getSecretCode() {
-        return secretCode;
-    }
-
-    public static Map<Long, String> getMapGameCategory() {
-        return mapGameCategory;
-    }
-
-    public static int getIdGame() {
-        return idGame;
-    }
 }

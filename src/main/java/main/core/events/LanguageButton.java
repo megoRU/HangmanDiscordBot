@@ -5,8 +5,8 @@ import main.enums.Buttons;
 import main.hangman.HangmanRegistry;
 import main.hangman.HangmanUtils;
 import main.jsonparser.JSONParsers;
-import main.model.entity.GameLanguage;
-import main.model.repository.GameLanguageRepository;
+import main.model.entity.UserSettings;
+import main.model.repository.UserSettingsRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
@@ -20,11 +20,11 @@ public class LanguageButton {
 
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
 
-    private final GameLanguageRepository gameLanguageRepository;
+    private final UserSettingsRepository userSettingsRepository;
 
     @Autowired
-    public LanguageButton(GameLanguageRepository gameLanguageRepository) {
-        this.gameLanguageRepository = gameLanguageRepository;
+    public LanguageButton(UserSettingsRepository userSettingsRepository) {
+        this.userSettingsRepository = userSettingsRepository;
     }
 
     public void language(@NotNull ButtonInteractionEvent event) {
@@ -44,11 +44,11 @@ public class LanguageButton {
 
         String languageChangeLang;
         if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_RUS.name())) {
-            setGameLanguage(userId, "rus");
+            setGameLanguage(userId, "RU");
             String languageChange = jsonParsers.getLocale("language_change_lang", event.getUser().getIdLong());
             languageChangeLang = String.format(languageChange, "Кириллица");
         } else {
-            setGameLanguage(userId, "eng");
+            setGameLanguage(userId, "EN");
             String languageChange = jsonParsers.getLocale("language_change_lang", event.getUser().getIdLong());
             languageChangeLang = String.format(languageChange, "Latin");
         }
@@ -56,10 +56,12 @@ public class LanguageButton {
     }
 
     private void setGameLanguage(long userId, String language) {
-        BotStartConfig.getMapGameLanguages().put(userId, language);
-        GameLanguage gameLanguage = new GameLanguage();
-        gameLanguage.setUserIdLong(userId);
-        gameLanguage.setLanguage(language);
-        gameLanguageRepository.save(gameLanguage);
+        UserSettings.GameLanguage gameLanguage = UserSettings.GameLanguage.valueOf(language);
+        UserSettings userSettings = userSettingsRepository.getByUserIdLong(userId);
+
+        userSettings.setGameLanguage(gameLanguage);
+        BotStartConfig.getMapGameLanguages().put(userId, gameLanguage);
+
+        userSettingsRepository.save(userSettings);
     }
 }

@@ -34,6 +34,8 @@ public class UpdateController {
     private final HangmanGameRepository hangmanGameRepository;
     private final GamesRepository gamesRepository;
     private final CategoryRepository categoryRepository;
+    private final UserSettingsRepository userSettingsRepository;
+
     //LOGGER
     private final static Logger LOGGER = Logger.getLogger(UpdateController.class.getName());
 
@@ -45,12 +47,14 @@ public class UpdateController {
                             GameLanguageRepository gameLanguageRepository,
                             HangmanGameRepository hangmanGameRepository,
                             GamesRepository gamesRepository,
-                            CategoryRepository categoryRepository) {
+                            CategoryRepository categoryRepository,
+                            UserSettingsRepository userSettingsRepository) {
         this.languageRepository = languageRepository;
         this.gameLanguageRepository = gameLanguageRepository;
         this.hangmanGameRepository = hangmanGameRepository;
         this.gamesRepository = gamesRepository;
         this.categoryRepository = categoryRepository;
+        this.userSettingsRepository = userSettingsRepository;
     }
 
     public void registerBot(CoreBot coreBot) {
@@ -83,7 +87,7 @@ public class UpdateController {
         if (buttonId == null) return;
 
         if (Objects.equals(buttonId, Buttons.BUTTON_RUS.name()) || Objects.equals(buttonId, Buttons.BUTTON_ENG.name())) {
-            LanguageButton languageButton = new LanguageButton(gameLanguageRepository);
+            LanguageButton languageButton = new LanguageButton(userSettingsRepository);
             languageButton.language(event);
             return;
         }
@@ -157,7 +161,7 @@ public class UpdateController {
                 helpCommand.help(event, this);
             }
             case "language" -> {
-                LanguageCommand languageCommand = new LanguageCommand(languageRepository, gameLanguageRepository);
+                LanguageCommand languageCommand = new LanguageCommand(userSettingsRepository);
                 languageCommand.language(event);
             }
             case "mystats", "allstats" -> {
@@ -182,7 +186,7 @@ public class UpdateController {
                 hangmanCommand.hangman(event, this);
             }
             case "category" -> {
-                CategoryCommand categoryCommand = new CategoryCommand(categoryRepository);
+                CategoryCommand categoryCommand = new CategoryCommand(userSettingsRepository);
                 categoryCommand.category(event);
             }
         }

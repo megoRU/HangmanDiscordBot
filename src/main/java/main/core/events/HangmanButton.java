@@ -5,6 +5,7 @@ import main.controller.UpdateController;
 import main.enums.Buttons;
 import main.hangman.*;
 import main.jsonparser.JSONParsers;
+import main.model.entity.UserSettings;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -23,7 +24,7 @@ public class HangmanButton {
         var channelIdLong = event.getChannel().getIdLong();
 
         String gameLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getIdLong());
-        String userGameLanguage = BotStartConfig.getMapGameLanguages().get(userIdLong);
+        UserSettings.GameLanguage userGameLanguage = BotStartConfig.getMapGameLanguages().get(userIdLong);
 
         if (userGameLanguage == null) {
             event.getHook().sendMessage(gameLanguage)

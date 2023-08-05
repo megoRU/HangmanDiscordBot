@@ -24,7 +24,7 @@ public class ParserClass {
     }
 
     public String getTranslation(String key, String language) {
-        if (language == null || language.equals("eng")) return english.get(key);
+        if (language == null || language.equals("EN")) return english.get(key);
         else return russian.get(key);
     }
 }
