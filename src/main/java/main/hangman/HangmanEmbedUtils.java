@@ -90,7 +90,7 @@ public class HangmanEmbedUtils {
             HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
             HangmanPlayer hangmanPlayer = hangmanPlayers[0];
 
-            long guildId = hangmanPlayer.getGuildId();
+            Long guildId = hangmanPlayer.getGuildId();
             long channelId = hangmanPlayer.getChannelId();
             long messageId = hangman.getMessageId();
 
@@ -146,7 +146,7 @@ public class HangmanEmbedUtils {
             HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
             HangmanPlayer hangmanPlayer = hangmanPlayers[0];
 
-            long guildId = hangmanPlayer.getGuildId();
+            Long guildId = hangmanPlayer.getGuildId();
             long channelId = hangmanPlayer.getChannelId();
             long messageId = hangman.getMessageId();
 
