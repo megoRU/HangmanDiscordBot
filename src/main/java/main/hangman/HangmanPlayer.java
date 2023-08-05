@@ -19,4 +19,8 @@ public class HangmanPlayer {
         HangmanRegistry instance = HangmanRegistry.getInstance();
         return instance.getActiveHangman(userId);
     }
+
+    public boolean isFromGuild() {
+        return guildId != null;
+    }
 }

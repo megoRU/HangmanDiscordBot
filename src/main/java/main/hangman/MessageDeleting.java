@@ -28,21 +28,23 @@ public class MessageDeleting extends TimerTask {
 
             try {
                 if (poll != null) {
-                    Guild guild = BotStartConfig.jda.getGuildById(poll.getGuild().getId());
-                    if (guild != null) {
-                        ChannelType channelType = poll.getChannelType();
-                        GuildChannel guildChannel = null;
-                        switch (channelType) {
-                            case TEXT -> guildChannel = poll.getChannel().asTextChannel();
-                            case GUILD_PUBLIC_THREAD, GUILD_NEWS_THREAD, GUILD_PRIVATE_THREAD ->
-                                    guildChannel = poll.getChannel().asThreadChannel();
-                            case NEWS -> guildChannel = poll.getChannel().asNewsChannel();
-                        }
+                    if (poll.isFromGuild()) {
+                        Guild guild = BotStartConfig.jda.getGuildById(poll.getGuild().getId());
+                        if (guild != null) {
+                            ChannelType channelType = poll.getChannelType();
+                            GuildChannel guildChannel = null;
+                            switch (channelType) {
+                                case TEXT -> guildChannel = poll.getChannel().asTextChannel();
+                                case GUILD_PUBLIC_THREAD, GUILD_NEWS_THREAD, GUILD_PRIVATE_THREAD ->
+                                        guildChannel = poll.getChannel().asThreadChannel();
+                                case NEWS -> guildChannel = poll.getChannel().asNewsChannel();
+                            }
 
-                        if (guildChannel != null) {
-                            boolean hasPermission = guild.getSelfMember().hasPermission(guildChannel, Permission.MESSAGE_MANAGE);
-                            if (hasPermission) {
-                                poll.delete().queue();
+                            if (guildChannel != null) {
+                                boolean hasPermission = guild.getSelfMember().hasPermission(guildChannel, Permission.MESSAGE_MANAGE);
+                                if (hasPermission) {
+                                    poll.delete().queue();
+                                }
                             }
                         }
                     }

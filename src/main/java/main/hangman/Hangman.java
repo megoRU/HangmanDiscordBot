@@ -161,7 +161,7 @@ public class Hangman {
         try {
             HangmanPlayer hangmanPlayer = hangmanPlayers[0];
             long userId = hangmanPlayer.getUserId();
-            long guildId = hangmanPlayer.getGuildId();
+            Long guildId = hangmanPlayer.getGuildId(); //Nullable is fine
             long channelId = hangmanPlayer.getChannelId();
 
             Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now().atZone(ZoneOffset.UTC).toLocalDateTime());
