@@ -6,12 +6,14 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import org.springframework.stereotype.Service;
 
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+@Service
 public class MessageDeleting extends TimerTask {
 
     private static final Queue<Message> messageList = new ConcurrentLinkedQueue<>();

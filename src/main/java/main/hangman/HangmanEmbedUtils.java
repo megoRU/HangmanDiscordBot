@@ -2,6 +2,7 @@ package main.hangman;
 
 import main.config.BotStartConfig;
 import main.jsonparser.JSONParsers;
+import main.model.entity.UserSettings;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -40,9 +41,11 @@ public class HangmanEmbedUtils {
             String word = hangman.getWORD().toUpperCase().replaceAll("", " ").trim();
             Hangman.Status hangmanSTATUS = hangman.getSTATUS();
 
-            Map<Long, String> mapGameLanguages = BotStartConfig.getMapGameLanguages();
+            Map<Long, UserSettings.GameLanguage> mapGameLanguages = BotStartConfig.getMapGameLanguages();
             String gameLanguage = jsonGameParsers.getLocale("Game_Language", userId);
-            String language = mapGameLanguages.get(userId).equals("rus") ? "Кириллица\nКатег.: " + category(userId) : "Latin\nCateg.:" + category(userId);
+            String language = mapGameLanguages.get(userId)
+                    .name()
+                    .equals("RU") ? "Кириллица\nКатег.: " + category(userId) : "Latin\nCateg.:" + category(userId);
 
             embedBuilder.setColor(Color.GREEN);
             //Gamers
@@ -177,52 +180,43 @@ public class HangmanEmbedUtils {
                         }
                     }
                 }
-            }
-        } else {
-            try {
-                Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
-                if (hangman == null) return;
-                HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
-                HangmanPlayer hangmanPlayer = hangmanPlayers[0];
-
-                long channelId = hangmanPlayer.getChannelId();
-                long messageId = hangman.getMessageId();
-
-                PrivateChannel privateChannelById = BotStartConfig.jda.getPrivateChannelById(channelId);
-                if (privateChannelById == null) {
-                    BotStartConfig
-                            .jda.retrieveUserById(userIdLong).complete()
-                            .openPrivateChannel()
-                            .flatMap(channel -> channel.editMessageEmbedsById(messageId, embedBuilder.build())
-                                    .setActionRow(buttons))
-                            .queue();
-                } else {
-                    privateChannelById.editMessageEmbedsById(messageId, embedBuilder.build())
-                            .setActionRow(buttons)
-                            .queue();
-                }
-            } catch (Exception e) {
-                if (e.getMessage().contains("Unknown Message")
-                        || e.getMessage().contains("Unknown Channel")
-                        || e.getMessage().contains("Missing Access")
-                        || e.getMessage().contains("Cannot edit a message authored by another user")) {
-                    HangmanRegistry.getInstance().removeHangman(userIdLong);
-                    hangmanGameRepository.deleteActiveGame(userIdLong);
-                    LOGGER.info("editMessageWithButtons(): " + e.getMessage());
+            } else {
+                try {
+                    PrivateChannel privateChannelById = BotStartConfig.jda.getPrivateChannelById(channelId);
+                    if (privateChannelById == null) {
+                        BotStartConfig
+                                .jda.retrieveUserById(userIdLong).complete()
+                                .openPrivateChannel()
+                                .flatMap(channel -> channel.editMessageEmbedsById(messageId, embedBuilder.build())
+                                        .setActionRow(buttons))
+                                .queue();
+                    } else {
+                        privateChannelById.editMessageEmbedsById(messageId, embedBuilder.build())
+                                .setActionRow(buttons)
+                                .queue();
+                    }
+                } catch (Exception e) {
+                    if (e.getMessage().contains("Unknown Message")
+                            || e.getMessage().contains("Unknown Channel")
+                            || e.getMessage().contains("Missing Access")
+                            || e.getMessage().contains("Cannot edit a message authored by another user")) {
+                        HangmanRegistry.getInstance().removeHangman(userIdLong);
+                        hangmanGameRepository.deleteActiveGame(userIdLong);
+                        LOGGER.info("editMessageWithButtons(): " + e.getMessage());
+                    }
                 }
             }
         }
     }
 
     private static String category(Long userId) {
-        String category = BotStartConfig.getMapGameCategory().get(userId);
-        String language = BotStartConfig.getMapLanguages().get(userId);
-        if (category == null) return Objects.equals(language, "eng") ? "`Any`" : "`Любая`";
-        return switch (category) {
-            case "colors" -> Objects.equals(language, "eng") ? "`Colors`" : "`Цвета`";
-            case "flowers" -> Objects.equals(language, "eng") ? "`Flowers`" : "`Цветы`";
-            case "fruits" -> Objects.equals(language, "eng") ? "`Fruits`" : "`Фрукты`";
-            default -> Objects.equals(language, "eng") ? "`Any`" : "`Любая`";
+        UserSettings.Category category = BotStartConfig.getMapGameCategory().get(userId);
+        UserSettings.BotLanguage language = BotStartConfig.getMapLanguages().get(userId);
+        return switch (category.name()) {
+            case "colors" -> Objects.equals(language.name(), "EN") ? "`Colors`" : "`Цвета`";
+            case "flowers" -> Objects.equals(language.name(), "EN") ? "`Flowers`" : "`Цветы`";
+            case "fruits" -> Objects.equals(language.name(), "EN") ? "`Fruits`" : "`Фрукты`";
+            default -> Objects.equals(language.name(), "EN") ? "`Any`" : "`Любая`";
         };
     }
 }

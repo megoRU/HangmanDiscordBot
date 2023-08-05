@@ -4,6 +4,7 @@ import main.config.BotStartConfig;
 import main.controller.UpdateController;
 import main.hangman.*;
 import main.jsonparser.JSONParsers;
+import main.model.entity.UserSettings;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -35,7 +36,7 @@ public class HangmanCommand {
             slashEvent.getChannel().sendTyping().queue();
         }
         //Проверяем установлен ли язык. Если нет - то возвращаем в чат ошибку
-        Map<Long, String> mapGameLanguages = BotStartConfig.getMapGameLanguages();
+        Map<Long, UserSettings.GameLanguage> mapGameLanguages = BotStartConfig.getMapGameLanguages();
         if (!mapGameLanguages.containsKey(userIdLong)) {
             String hangmanListenerNeedSetLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", userIdLong);
 

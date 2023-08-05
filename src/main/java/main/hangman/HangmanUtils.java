@@ -2,6 +2,7 @@ package main.hangman;
 
 import main.config.BotStartConfig;
 import main.enums.Buttons;
+import main.model.entity.UserSettings;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
@@ -42,8 +43,8 @@ public class HangmanUtils {
 
     @NotNull
     private static List<Button> getButtons(long userIdLong, List<Button> buttonList) {
-        String language = BotStartConfig.getMapGameLanguages().get(userIdLong);
-        if (language != null && language.equals("eng")) {
+        UserSettings.GameLanguage language = BotStartConfig.getMapGameLanguages().get(userIdLong);
+        if (language != null && language.name().equals("EN")) {
             buttonList.add(BUTTON_RUSSIAN);
         } else {
             buttonList.add(BUTTON_ENGLISH);
