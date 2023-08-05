@@ -138,14 +138,17 @@ public class Hangman {
             long userId = hangmanPlayer.getUserId();
 
             String gameStopWin = jsonGameParsers.getLocale("Game_Stop_Win", userId);
+            String gameYouLose = jsonGameParsers.getLocale("Game_You_Lose", userId);
+
             EmbedBuilder win = HangmanEmbedUtils.hangmanPattern(userId, gameStopWin);
+            EmbedBuilder lose = HangmanEmbedUtils.hangmanPattern(userId, gameYouLose);
 
             if (hangmanPlayers.length == 1) {
-                HangmanEmbedUtils.editMessageWithButtons(win, userId, HangmanUtils.getListButtons(userId), updateController.getHangmanGameRepository());
+                HangmanEmbedUtils.editMessageWithButtons(result ? win : lose, userId, HangmanUtils.getListButtons(userId), updateController.getHangmanGameRepository());
             } else {
                 HangmanPlayer hangmanPlayerSecond = hangmanPlayers[1];
                 long secondUserId = hangmanPlayerSecond.getUserId();
-                HangmanEmbedUtils.editMessageWithButtons(win, userId, HangmanUtils.getListButtons(userId, secondUserId), updateController.getHangmanGameRepository());
+                HangmanEmbedUtils.editMessageWithButtons(result ? win : lose, userId, HangmanUtils.getListButtons(userId, secondUserId), updateController.getHangmanGameRepository());
             }
 
             HangmanResult hangmanResult = new HangmanResult(hangmanPlayers, result, updateController);
