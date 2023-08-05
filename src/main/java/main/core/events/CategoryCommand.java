@@ -51,6 +51,7 @@ public class CategoryCommand {
 
         if (userSettings == null) {
             userSettings = new UserSettings();
+            userSettings.setUserIdLong(userIdLong);
             userSettings.setCategory(UserSettings.Category.ALL);
             userSettings.setGameLanguage(UserSettings.GameLanguage.EN);
             userSettings.setBotLanguage(UserSettings.BotLanguage.EN);
