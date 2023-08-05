@@ -106,7 +106,9 @@ public class ChecksClass {
             return buttonInteractionEvent.getGuild();
         } else {
             MessageReceivedEvent messageReceivedEvent = (MessageReceivedEvent) event;
-            return messageReceivedEvent.getGuild();
+            boolean isFromGuild = messageReceivedEvent.isFromGuild();
+            if (isFromGuild) return messageReceivedEvent.getGuild();
+            else return null;
         }
     }
 
