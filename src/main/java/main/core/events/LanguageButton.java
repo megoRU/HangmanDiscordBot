@@ -59,6 +59,14 @@ public class LanguageButton {
         UserSettings.GameLanguage gameLanguage = UserSettings.GameLanguage.valueOf(language);
         UserSettings userSettings = userSettingsRepository.getByUserIdLong(userId);
 
+        if (userSettings == null) {
+            userSettings = new UserSettings();
+            userSettings.setUserIdLong(userId);
+            userSettings.setCategory(UserSettings.Category.ALL);
+            userSettings.setGameLanguage(UserSettings.GameLanguage.EN);
+            userSettings.setBotLanguage(UserSettings.BotLanguage.EN);
+        }
+
         userSettings.setGameLanguage(gameLanguage);
         BotStartConfig.getMapGameLanguages().put(userId, gameLanguage);
 
