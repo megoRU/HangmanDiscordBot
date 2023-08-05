@@ -96,8 +96,7 @@ public class Hangman {
         gameWordLanguage.setCategory(category.name());
 
         try {
-//            WORD = megoruAPI.getWord(gameWordLanguage).getWord();
-            WORD = "привет";
+            WORD = megoruAPI.getWord(gameWordLanguage).getWord();
             if (WORD != null && !WORD.isEmpty()) {
                 WORD_OF_CHARS = WORD.toLowerCase().split(""); // Преобразуем строку str в массив символов (char)
                 hideWord(WORD.length());
