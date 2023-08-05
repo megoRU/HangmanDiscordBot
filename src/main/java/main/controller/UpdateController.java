@@ -7,7 +7,9 @@ import main.core.events.*;
 import main.enums.Buttons;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
-import main.model.repository.*;
+import main.model.repository.GamesRepository;
+import main.model.repository.HangmanGameRepository;
+import main.model.repository.UserSettingsRepository;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -29,11 +31,8 @@ import java.util.logging.Logger;
 public class UpdateController {
 
     //REPO
-    private final LanguageRepository languageRepository;
-    private final GameLanguageRepository gameLanguageRepository;
     private final HangmanGameRepository hangmanGameRepository;
     private final GamesRepository gamesRepository;
-    private final CategoryRepository categoryRepository;
     private final UserSettingsRepository userSettingsRepository;
 
     //LOGGER
@@ -43,17 +42,12 @@ public class UpdateController {
     private CoreBot coreBot;
 
     @Autowired
-    public UpdateController(LanguageRepository languageRepository,
-                            GameLanguageRepository gameLanguageRepository,
-                            HangmanGameRepository hangmanGameRepository,
+    public UpdateController(HangmanGameRepository hangmanGameRepository,
                             GamesRepository gamesRepository,
-                            CategoryRepository categoryRepository,
+
                             UserSettingsRepository userSettingsRepository) {
-        this.languageRepository = languageRepository;
-        this.gameLanguageRepository = gameLanguageRepository;
         this.hangmanGameRepository = hangmanGameRepository;
         this.gamesRepository = gamesRepository;
-        this.categoryRepository = categoryRepository;
         this.userSettingsRepository = userSettingsRepository;
     }
 
@@ -134,7 +128,7 @@ public class UpdateController {
         String message = event.getMessage().getContentRaw();
 
         if (message.matches("!delete\\s[A-Za-z0-9]+$")) {
-            DeleteMessage deleteMessage = new DeleteMessage(gamesRepository, languageRepository, gameLanguageRepository, categoryRepository);
+            DeleteMessage deleteMessage = new DeleteMessage(gamesRepository, userSettingsRepository);
             deleteMessage.delete(event);
             return;
         }
