@@ -3,10 +3,8 @@ package main.core.events;
 import main.config.BotStartConfig;
 import main.hangman.HangmanRegistry;
 import main.jsonparser.JSONParsers;
-import main.model.repository.CategoryRepository;
-import main.model.repository.GameLanguageRepository;
 import main.model.repository.GamesRepository;
-import main.model.repository.LanguageRepository;
+import main.model.repository.UserSettingsRepository;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
@@ -19,19 +17,12 @@ public class DeleteMessage {
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
 
     private final GamesRepository gamesRepository;
-    private final LanguageRepository languageRepository;
-    private final GameLanguageRepository gameLanguageRepository;
-    private final CategoryRepository categoryRepository;
+    private final UserSettingsRepository userSettingsRepository;
 
     @Autowired
-    public DeleteMessage(GamesRepository gamesRepository,
-                         LanguageRepository languageRepository,
-                         GameLanguageRepository gameLanguageRepository,
-                         CategoryRepository categoryRepository) {
+    public DeleteMessage(GamesRepository gamesRepository, UserSettingsRepository userSettingsRepository) {
         this.gamesRepository = gamesRepository;
-        this.languageRepository = languageRepository;
-        this.gameLanguageRepository = gameLanguageRepository;
-        this.categoryRepository = categoryRepository;
+        this.userSettingsRepository = userSettingsRepository;
     }
 
     public void delete(@NotNull MessageReceivedEvent event) {
@@ -51,9 +42,7 @@ public class DeleteMessage {
             HangmanRegistry.getInstance().removeHangman(userIdLong);
 
             gamesRepository.deleteGameByUserIdLong(userIdLong);
-            languageRepository.deleteLanguage(userIdLong);
-            gameLanguageRepository.deleteGameLanguage(userIdLong);
-            categoryRepository.deleteByUserIdLong(userIdLong);
+            userSettingsRepository.deleteByUserIdLong(userIdLong);
         }
     }
 }
