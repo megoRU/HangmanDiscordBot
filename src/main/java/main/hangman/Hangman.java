@@ -17,10 +17,8 @@ import java.awt.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 @Getter
@@ -172,7 +170,8 @@ public class Hangman {
             activeHangman.setUserIdLong(userId);
 
             if (hangmanPlayers.length > 1) {
-                activeHangman.setSecondUserIdLong(hangmanPlayers[1].getUserId());
+                List<HangmanPlayer> hangmanPlayersList = new ArrayList<>(List.of(hangmanPlayers));
+                activeHangman.setPlayers(Arrays.toString(hangmanPlayersList.stream().map(HangmanPlayer::getUserId).toArray()));
             }
 
             activeHangman.setMessageIdLong(messageId);
