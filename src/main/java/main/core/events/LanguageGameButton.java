@@ -46,6 +46,11 @@ public class LanguageGameButton {
 
                 UserSettings userSettings = userSettingsRepository.getByUserIdLong(event.getUser().getIdLong());
                 userSettings.setGameLanguage(gameLanguage);
+
+                if (userSettings.getCategory() == null) {
+                    BotStartConfig.getMapGameCategory().put(event.getUser().getIdLong(), UserSettings.Category.ALL);
+                }
+
                 userSettingsRepository.save(userSettings);
             }
         }

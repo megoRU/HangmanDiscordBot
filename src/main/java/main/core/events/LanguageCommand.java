@@ -69,6 +69,11 @@ public class LanguageCommand {
 
             userSettings.setBotLanguage(botLanguage);
             userSettings.setGameLanguage(gameLanguage);
+
+            if (userSettings.getCategory() == null) {
+                BotStartConfig.getMapGameCategory().put(event.getUser().getIdLong(), UserSettings.Category.ALL);
+            }
+
             userSettingsRepository.save(userSettings);
         }
     }
