@@ -26,9 +26,10 @@ public class LanguageGameButton {
 
     public void language(@NotNull ButtonInteractionEvent event) {
         event.editButton(event.getButton().asDisabled()).queue();
+        long userIdLong = event.getUser().getIdLong();
 
-        if (HangmanRegistry.getInstance().hasHangman(event.getUser().getIdLong())) {
-            String reactionsButtonWhenPlay = jsonParsers.getLocale("ReactionsButton_When_Play", event.getUser().getIdLong());
+        if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+            String reactionsButtonWhenPlay = jsonParsers.getLocale("ReactionsButton_When_Play", userIdLong);
             EmbedBuilder youPlay = new EmbedBuilder();
             youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
             youPlay.setColor(0x00FF00);
@@ -37,20 +38,29 @@ public class LanguageGameButton {
         } else {
             if (event.getButton().getEmoji() != null) {
                 String buttonName = event.getButton().getEmoji().getName().contains("\uD83C\uDDF7\uD83C\uDDFA") ? "RU" : "EN";
-                String reactionsButton = jsonParsers.getLocale("ReactionsButton_Save", event.getUser().getIdLong());
+                String reactionsButton = jsonParsers.getLocale("ReactionsButton_Save", userIdLong);
                 String reactionsButtonSave = String.format(reactionsButton, event.getButton().getLabel());
 
                 UserSettings.GameLanguage gameLanguage = UserSettings.GameLanguage.valueOf(buttonName);
-                BotStartConfig.getMapGameLanguages().put(event.getUser().getIdLong(), gameLanguage);
                 event.getHook().sendMessage(reactionsButtonSave).setEphemeral(true).queue();
 
-                UserSettings userSettings = userSettingsRepository.getByUserIdLong(event.getUser().getIdLong());
-                userSettings.setGameLanguage(gameLanguage);
+                UserSettings userSettings = userSettingsRepository.getByUserIdLong(userIdLong);
 
-                if (userSettings.getCategory() == null) {
-                    BotStartConfig.getMapGameCategory().put(event.getUser().getIdLong(), UserSettings.Category.ALL);
+                if (userSettings == null) {
+                    userSettings = new UserSettings();
+                    userSettings.setUserIdLong(userIdLong);
+
+                    userSettings.setCategory(UserSettings.Category.ALL);
+                    userSettings.setGameLanguage(UserSettings.GameLanguage.EN);
+                    userSettings.setBotLanguage(UserSettings.BotLanguage.EN);
+
+                    BotStartConfig.getMapGameCategory().put(userIdLong, UserSettings.Category.ALL);
+                    BotStartConfig.getMapGameLanguages().put(userIdLong, UserSettings.GameLanguage.EN);
+                    BotStartConfig.getMapLanguages().put(userIdLong, UserSettings.BotLanguage.EN);
                 }
 
+                userSettings.setGameLanguage(gameLanguage);
+                BotStartConfig.getMapGameLanguages().put(userIdLong, gameLanguage);
                 userSettingsRepository.save(userSettings);
             }
         }
