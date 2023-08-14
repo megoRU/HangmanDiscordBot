@@ -35,9 +35,14 @@ public class LanguageCommand {
         if (userSettings == null) {
             userSettings = new UserSettings();
             userSettings.setUserIdLong(userIdLong);
+
             userSettings.setCategory(UserSettings.Category.ALL);
             userSettings.setGameLanguage(UserSettings.GameLanguage.EN);
             userSettings.setBotLanguage(UserSettings.BotLanguage.EN);
+
+            BotStartConfig.getMapGameCategory().put(userIdLong, UserSettings.Category.ALL);
+            BotStartConfig.getMapGameLanguages().put(userIdLong, UserSettings.GameLanguage.EN);
+            BotStartConfig.getMapLanguages().put(userIdLong, UserSettings.BotLanguage.EN);
         }
 
         //Если игрок сейчас играет сменить язык не даст
@@ -69,11 +74,6 @@ public class LanguageCommand {
 
             userSettings.setBotLanguage(botLanguage);
             userSettings.setGameLanguage(gameLanguage);
-
-            if (userSettings.getCategory() == null) {
-                BotStartConfig.getMapGameCategory().put(event.getUser().getIdLong(), UserSettings.Category.ALL);
-            }
-
             userSettingsRepository.save(userSettings);
         }
     }
