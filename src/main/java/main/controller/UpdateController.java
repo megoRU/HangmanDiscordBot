@@ -1,6 +1,7 @@
 package main.controller;
 
 import lombok.Getter;
+import main.config.BotStartConfig;
 import main.core.ChecksClass;
 import main.core.CoreBot;
 import main.core.events.*;
@@ -126,6 +127,13 @@ public class UpdateController {
         if (event.getAuthor().isBot()) return;
         long userIdLong = event.getAuthor().getIdLong();
         String message = event.getMessage().getContentRaw();
+
+        if (message.equals("ping-test")) {
+            BotStartConfig.jda.getRestPing().queue((time)  ->
+                    event.getChannel().sendMessageFormat("Ping: %d ms", time).queue()
+            );
+            return;
+        }
 
         if (message.matches("!delete\\s[A-Za-z0-9]+$")) {
             DeleteMessage deleteMessage = new DeleteMessage(gamesRepository, userSettingsRepository);
