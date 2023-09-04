@@ -29,10 +29,13 @@ public class MessageDeleting extends TimerTask {
                 boolean hasPermission = message.getGuild().getSelfMember().hasPermission(guildChannel, Permission.MESSAGE_MANAGE);
                 if (hasPermission) {
                     List<String> listMessages = messages.stream().map(ISnowflake::getId).toList();
-                    guildChannel
-                            .deleteMessagesByIds(listMessages)
-                            .queue();
-                    messageList.remove(channelId);
+                    try {
+                        guildChannel
+                                .deleteMessagesByIds(listMessages)
+                                .queue();
+                    } catch (Exception ignored) {
+                    }
+                    messageList.get(channelId).removeAll(messages);
                 }
             }
         });
