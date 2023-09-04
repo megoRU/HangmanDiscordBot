@@ -1,22 +1,18 @@
 package main.hangman;
 
-import main.config.BotStartConfig;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.unions.GuildMessageChannelUnion;
 import org.springframework.stereotype.Service;
 
-import java.util.Queue;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class MessageDeleting extends TimerTask {
 
-    private static final Queue<Message> messageList = new ConcurrentLinkedQueue<>();
+    private static final Map<String, List<Message>> messageList = new ConcurrentHashMap<>();
 
     static {
         Timer timer = new Timer();
@@ -25,39 +21,35 @@ public class MessageDeleting extends TimerTask {
 
     @Override
     public void run() {
-        while (!messageList.isEmpty()) {
-            Message poll = messageList.poll();
-
-            try {
-                if (poll != null) {
-                    if (poll.isFromGuild()) {
-                        Guild guild = BotStartConfig.jda.getGuildById(poll.getGuild().getId());
-                        if (guild != null) {
-                            ChannelType channelType = poll.getChannelType();
-                            GuildChannel guildChannel = null;
-                            switch (channelType) {
-                                case TEXT -> guildChannel = poll.getChannel().asTextChannel();
-                                case GUILD_PUBLIC_THREAD, GUILD_NEWS_THREAD, GUILD_PRIVATE_THREAD ->
-                                        guildChannel = poll.getChannel().asThreadChannel();
-                                case NEWS -> guildChannel = poll.getChannel().asNewsChannel();
-                            }
-
-                            if (guildChannel != null) {
-                                boolean hasPermission = guild.getSelfMember().hasPermission(guildChannel, Permission.MESSAGE_MANAGE);
-                                if (hasPermission) {
-                                    poll.delete().queue();
-                                }
-                            }
-                        }
+        messageList.forEach((channelId, messages) -> {
+            int messageSize = messages.size();
+            if (messageSize >= 2) {
+                Message message = messages.get(0);
+                GuildMessageChannelUnion guildChannel = message.getGuildChannel();
+                boolean hasPermission = message.getGuild().getSelfMember().hasPermission(guildChannel, Permission.MESSAGE_MANAGE);
+                if (hasPermission) {
+                    List<String> listMessages = messages.stream().map(ISnowflake::getId).toList();
+                    try {
+                        guildChannel
+                                .deleteMessagesByIds(listMessages)
+                                .queue();
+                    } catch (Exception ignored) {
                     }
+                    messageList.get(channelId).removeAll(messages);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-        }
+        });
     }
 
     public static void addMessageToDelete(Message message) {
-        messageList.add(message);
+        if (message.isFromGuild()) {
+            String channelID = message.getChannel().getId();
+            List<Message> messages = messageList.get(channelID);
+            if (messages == null) {
+                messages = new ArrayList<>(15);
+            }
+            messages.add(message);
+            messageList.put(channelID, messages);
+        }
     }
 }
