@@ -122,8 +122,9 @@ public class BotStartConfig {
             jdaBuilder.setActivity(Activity.playing("Starting..."));
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
             jdaBuilder.addEventListeners(new CoreBot(updateController));
-
             jda = jdaBuilder.build();
+
+            System.out.println("тут");
             jda.awaitReady();
         } catch (Exception e) {
             e.printStackTrace();
@@ -280,7 +281,7 @@ public class BotStartConfig {
         }
     }
 
-    private void getUserSettings() {
+    public void getUserSettings() {
         try {
             Connection connection = DriverManager.getConnection(URL_CONNECTION, USER_CONNECTION, PASSWORD_CONNECTION);
             Statement statement = connection.createStatement();
