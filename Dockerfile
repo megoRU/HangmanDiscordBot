@@ -1,4 +1,4 @@
-FROM maven:3.8.4-openjdk-20
+FROM maven:3.9.4-eclipse-temurin-20 as build
 
 WORKDIR /app
 
