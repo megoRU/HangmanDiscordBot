@@ -21,7 +21,7 @@ public class HangmanInputs {
         this.updateController = updateController1;
     }
 
-    public void handler(@NotNull final String inputs, @NotNull final Message messages) {
+    public synchronized void handler(@NotNull final String inputs, @NotNull final Message messages) {
         long userId = messages.getAuthor().getIdLong();
         try {
             MessageDeleting.addMessageToDelete(messages);

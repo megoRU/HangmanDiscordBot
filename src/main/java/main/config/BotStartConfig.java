@@ -124,7 +124,6 @@ public class BotStartConfig {
             jdaBuilder.addEventListeners(new CoreBot(updateController));
             jda = jdaBuilder.build();
 
-            System.out.println("тут");
             jda.awaitReady();
         } catch (Exception e) {
             e.printStackTrace();
