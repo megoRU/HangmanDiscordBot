@@ -27,6 +27,7 @@ public class HangmanEmbedUtils {
 
         if (hangman != null) {
             HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
+            userId = hangmanPlayers[0].getUserId();
             String gamePlayer;
             if (hangmanPlayers.length > 1) {
                 gamePlayer = jsonGameParsers.getLocale("Game_Players", userId);
@@ -41,7 +42,8 @@ public class HangmanEmbedUtils {
             String word = hangman.getWORD().toUpperCase().replaceAll("", " ").trim();
             Hangman.Status hangmanSTATUS = hangman.getSTATUS();
 
-            Map<Long, UserSettings.GameLanguage> mapGameLanguages = BotStartConfig.getMapGameLanguages();
+            Map<Long, UserSettings.GameLanguage> mapGameLanguages = BotStartConfig.getMapGameLanguages(); //TODO NPE
+
             String gameLanguage = jsonGameParsers.getLocale("Game_Language", userId);
             String language = mapGameLanguages.get(userId)
                     .name()
