@@ -28,6 +28,7 @@ public class ChecksClass {
         StringBuilder stringBuilder = new StringBuilder();
 
         MessageChannelUnion channel = getChannel(event);
+
         boolean canWrite = true;
         boolean canWriteThreads = true;
         boolean permissions = true;
@@ -49,15 +50,18 @@ public class ChecksClass {
         }
 
         String checkPermissions = String.format(jsonParsers.getLocale("check_permissions", getUser(event).getIdLong()), stringBuilder);
+        boolean allTrue = canWrite && canWriteThreads && permissions;
 
-        if (!permissions || !canWrite || !canWriteThreads) {
-            sendMessage(event, checkPermissions);
+        if (!allTrue) {
+            sendMessage(event, checkPermissions, canWrite);
             return false;
+        } else {
+            return true;
         }
-        return true;
     }
 
-    private static void sendMessage(@NotNull Event event, String checkPermissions) {
+
+    private static void sendMessage(@NotNull Event event, String checkPermissions, boolean canWrite) {
         if (event instanceof SlashCommandInteractionEvent slashEvent) {
             slashEvent.reply(checkPermissions).queue();
         } else if (event instanceof UserContextInteractionEvent contextEvent) {
@@ -65,8 +69,10 @@ public class ChecksClass {
         } else if (event instanceof ButtonInteractionEvent buttonInteractionEvent) {
             buttonInteractionEvent.reply(checkPermissions).queue();
         } else {
-            MessageReceivedEvent messageReceivedEvent = (MessageReceivedEvent) event;
-            messageReceivedEvent.getChannel().sendMessage(checkPermissions).queue();
+            if (canWrite) {
+                MessageReceivedEvent messageReceivedEvent = (MessageReceivedEvent) event;
+                messageReceivedEvent.getChannel().sendMessage(checkPermissions).queue();
+            }
         }
     }
 
@@ -129,7 +135,7 @@ public class ChecksClass {
         boolean canWrite = true;
 
         if (!selfMember.hasPermission(channel, Permission.MESSAGE_SEND_IN_THREADS)) {
-            stringBuilder.append(stringBuilder.length() == 0 ? "`Permission.MESSAGE_SEND_IN_THREADS`" : ",\n`Permission.MESSAGE_SEND_IN_THREADS`");
+            stringBuilder.append(stringBuilder.isEmpty() ? "`Permission.MESSAGE_SEND_IN_THREADS`" : ",\n`Permission.MESSAGE_SEND_IN_THREADS`");
             canWrite = false;
         }
 
@@ -140,12 +146,12 @@ public class ChecksClass {
         boolean canWrite = true;
 
         if (!selfMember.hasPermission(channel, Permission.MESSAGE_SEND)) {
-            stringBuilder.append(stringBuilder.length() == 0 ? "`Permission.MESSAGE_SEND`" : ",\n`Permission.MESSAGE_SEND`");
+            stringBuilder.append(stringBuilder.isEmpty() ? "`Permission.MESSAGE_SEND`" : ",\n`Permission.MESSAGE_SEND`");
             canWrite = false;
         }
 
         if (!selfMember.hasPermission(channel, Permission.VIEW_CHANNEL)) {
-            stringBuilder.append(stringBuilder.length() == 0 ? "`Permission.VIEW_CHANNEL`" : ",\n`Permission.VIEW_CHANNEL`");
+            stringBuilder.append(stringBuilder.isEmpty() ? "`Permission.VIEW_CHANNEL`" : ",\n`Permission.VIEW_CHANNEL`");
             canWrite = false;
         }
 
@@ -156,12 +162,12 @@ public class ChecksClass {
         boolean bool = true;
 
         if (!selfMember.hasPermission(channel, Permission.MESSAGE_HISTORY)) {
-            stringBuilder.append(stringBuilder.length() == 0 ? "`Permission.MESSAGE_HISTORY`" : ",\n`Permission.MESSAGE_HISTORY`");
+            stringBuilder.append(stringBuilder.isEmpty() ? "`Permission.MESSAGE_HISTORY`" : ",\n`Permission.MESSAGE_HISTORY`");
             bool = false;
         }
 
         if (!selfMember.hasPermission(channel, Permission.MESSAGE_EMBED_LINKS)) {
-            stringBuilder.append(stringBuilder.length() == 0 ? "`Permission.MESSAGE_EMBED_LINKS`" : ",\n`Permission.MESSAGE_EMBED_LINKS`");
+            stringBuilder.append(stringBuilder.isEmpty() ? "`Permission.MESSAGE_EMBED_LINKS`" : ",\n`Permission.MESSAGE_EMBED_LINKS`");
             bool = false;
         }
 
