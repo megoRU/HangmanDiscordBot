@@ -6,6 +6,5 @@ spring:
     password: ${DATABASE_PASS}
 
   jpa:
-    database-platform: org.hibernate.dialect.MariaDBDialect
     hibernate:
       ddl-auto: validate
