@@ -71,7 +71,8 @@ public class CreatorGraph {
 
     private QuickChart setImage(QuickChart chart, Statistic statistic) {
         switch (statistic) {
-            case GLOBAL -> chart.setConfig("{" +
+            case GLOBAL ->
+                    chart.setConfig("{" +
                     "  type: 'line'," +
                     "  data: {" +
                     "    labels: [" + date + "]," +
