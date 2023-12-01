@@ -1,18 +1,15 @@
 package main.core.events;
 
 import main.jsonparser.JSONParsers;
-import main.model.entity.Game;
 import main.model.repository.GamesRepository;
+import main.model.repository.impl.PlayerWins;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class LeadboardCommand {
@@ -28,37 +25,29 @@ public class LeadboardCommand {
     public void board(@NotNull SlashCommandInteractionEvent event) {
         var userIdLong = event.getUser().getIdLong();
         event.getInteraction().deferReply().queue();
-        List<Game> gameList = gamesRepository.findGamesForCurrentMonth();
-
-        Map<Long, Integer> playerWinsMap = new HashMap<>();
-
-        for (Game game : gameList) {
-            Long playerId = game.getUserIdLong();
-            boolean result = game.getResult();
-            if (result) {
-                playerWinsMap.merge(playerId, 1, Integer::sum);
-            }
-        }
+        List<PlayerWins> gameList = gamesRepository.findGamesForCurrentMonth();
 
         StringBuilder stringBuilder = new StringBuilder();
-
-        Map<Long, Integer> collect = playerWinsMap.entrySet()
-                .stream()
-                .sorted((entry1, entry2) -> Integer.compare(entry2.getValue(), entry1.getValue()))
-                .limit(10)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        int count = 1;
 
         String gamePlayer = jsonParsers.getLocale("Game_Player", userIdLong);
         String winsLocale = jsonParsers.getLocale("wins", userIdLong);
 
 
-        for (Map.Entry<Long, Integer> entry : collect.entrySet()) {
-            Long playerId = entry.getKey();
-            Integer wins = entry.getValue();
-            stringBuilder.append(count).append(". ").append(gamePlayer).append(": <@").append(playerId).append("> | ").append(winsLocale).append(wins).append("\n");
-            count++;
+        for (int i = 0; i < gameList.size(); i++) {
+            PlayerWins playerWins = gameList.get(i);
+            Long wins = playerWins.getWins();
+            Long playerId = playerWins.getId();
+
+            stringBuilder
+                    .append(i + 1)
+                    .append(". ")
+                    .append(gamePlayer)
+                    .append(": <@")
+                    .append(playerId)
+                    .append("> | ")
+                    .append(winsLocale)
+                    .append(wins)
+                    .append("\n");
         }
 
         String leadboad = jsonParsers.getLocale("leadboad", userIdLong);

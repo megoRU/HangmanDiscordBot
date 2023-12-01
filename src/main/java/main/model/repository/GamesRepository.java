@@ -1,6 +1,7 @@
 package main.model.repository;
 
 import main.model.entity.Game;
+import main.model.repository.impl.PlayerWins;
 import main.model.repository.impl.StatisticGlobal;
 import main.model.repository.impl.StatisticMy;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,6 +37,6 @@ public interface GamesRepository extends JpaRepository<Game, Long> {
     @Transactional
     void deleteGameByUserIdLong(Long userIdLong);
 
-    @Query(value = "SELECT * FROM games WHERE MONTH(game_date) = MONTH(CURRENT_DATE) AND YEAR(game_date) = YEAR(CURRENT_DATE)", nativeQuery = true)
-    List<Game> findGamesForCurrentMonth();
+    @Query(value = "SELECT user_id_long as id, COUNT(*) as wins FROM games WHERE result = true AND MONTH(game_date) = MONTH(NOW()) AND YEAR(game_date) = YEAR(NOW()) GROUP BY user_id_long ORDER BY `wins` DESC LIMIT 10", nativeQuery = true)
+    List<PlayerWins> findGamesForCurrentMonth();
 }
