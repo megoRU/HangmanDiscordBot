@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Repository
@@ -34,4 +35,7 @@ public interface GamesRepository extends JpaRepository<Game, Long> {
     @Modifying
     @Transactional
     void deleteGameByUserIdLong(Long userIdLong);
+
+    @Query(value = "SELECT * FROM games WHERE MONTH(game_date) = MONTH(CURRENT_DATE) AND YEAR(game_date) = YEAR(CURRENT_DATE)", nativeQuery = true)
+    List<Game> findGamesForCurrentMonth();
 }

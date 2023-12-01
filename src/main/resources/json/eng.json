@@ -81,5 +81,7 @@
   "help_category": "Choose a category of words for the game",
   "help_mystats": "Find out your statistics in the form of a graph",
   "help_allstats": "Find out the statistics of all bot games in the form of a graph",
-  "help_deleted": "Delete all the data we collected about you"
+  "help_deleted": "Delete all the data we collected about you",
+  "leadboad": "LeadBoard:",
+  "wins": "Wins: "
 }

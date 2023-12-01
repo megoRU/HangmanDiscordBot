@@ -1,5 +1,6 @@
 package main.config;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import main.controller.UpdateController;
 import main.core.CoreBot;
@@ -94,7 +95,7 @@ public class BotStartConfig {
         this.updateController = updateController;
     }
 
-    @Bean
+    @PostConstruct
     public void startBot() {
         try {
             //Теперь HangmanRegistry знает количество игр и может отдавать правильное значение
@@ -189,6 +190,9 @@ public class BotStartConfig {
 
             commands.addCommands(Commands.slash("help", "Bot commands")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Команды бота"));
+
+            commands.addCommands(Commands.slash("leadboard", "Leadboard")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Доска почёта"));
 
             commands.addCommands(Commands.slash("stats", "Get your statistics")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Получить свою статистику"));

@@ -170,6 +170,10 @@ public class UpdateController {
                 StatsCommand statsCommand = new StatsCommand(gamesRepository);
                 statsCommand.stats(event);
             }
+            case "leadboard" -> {
+                LeadboardCommand leadboardCommand = new LeadboardCommand(gamesRepository);
+                leadboardCommand.board(event);
+            }
             case "stats" -> {
                 StatsCommand statsCommand = new StatsCommand(gamesRepository);
                 event.deferReply().queue();
