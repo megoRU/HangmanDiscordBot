@@ -37,6 +37,9 @@ public interface GamesRepository extends JpaRepository<Game, Long> {
     @Transactional
     void deleteGameByUserIdLong(Long userIdLong);
 
-    @Query(value = "SELECT user_id_long as id, COUNT(*) as wins FROM games WHERE result = true AND MONTH(game_date) = MONTH(NOW()) AND YEAR(game_date) = YEAR(NOW()) GROUP BY user_id_long ORDER BY `wins` DESC LIMIT 10", nativeQuery = true)
+    @Query(value = "SELECT user_id_long as id, COUNT(*) as wins FROM games " +
+            "WHERE result = true AND MONTH(game_date) = MONTH(NOW()) " +
+            "AND YEAR(game_date) = YEAR(NOW()) GROUP BY user_id_long " +
+            "ORDER BY `wins` DESC LIMIT 10", nativeQuery = true)
     List<PlayerWins> findGamesForCurrentMonth();
 }
