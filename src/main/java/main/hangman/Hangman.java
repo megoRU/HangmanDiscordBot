@@ -330,6 +330,10 @@ public class Hangman {
         }
     }
 
+    String getAgainstPlayerWithDiscord() {
+        return String.format("<@%s>", againstPlayerId);
+    }
+
     public enum Status {
         WRONG_LETTER,
         SAME_LETTER,

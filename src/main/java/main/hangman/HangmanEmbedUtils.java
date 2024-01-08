@@ -52,8 +52,14 @@ public class HangmanEmbedUtils {
                     .equals("RU") ? "Кириллица\nКатег.: " + category(userId) : "Latin\nCateg.:" + category(userId);
 
             embedBuilder.setColor(Color.GREEN);
-            //Gamers
-            embedBuilder.addField(gamePlayer, userIdWithDiscord, true);
+            if (!hangman.isCompetitive()) {
+                //Gamers
+                embedBuilder.addField(gamePlayer, userIdWithDiscord, true);
+            } else {
+                String against = jsonGameParsers.getLocale("against", userId);
+                String againstPlayerWithDiscord = hangman.getAgainstPlayerWithDiscord();
+                embedBuilder.addField(against, againstPlayerWithDiscord, true);
+            }
             //Game Language
             embedBuilder.addField(gameLanguage, language, true);
             //Image
@@ -85,6 +91,11 @@ public class HangmanEmbedUtils {
             //Status
             String gameInfo = jsonGameParsers.getLocale("Game_Info", userId);
             embedBuilder.addField(gameInfo, status, false);
+
+            if (hangman.isCompetitive()) {
+                String competitiveGame = jsonGameParsers.getLocale("competitive_game", userId);
+                embedBuilder.setFooter(competitiveGame);
+            }
         }
 
         return embedBuilder;
