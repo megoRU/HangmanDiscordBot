@@ -10,6 +10,7 @@ import main.hangman.HangmanBuilder;
 import main.hangman.HangmanPlayer;
 import main.hangman.HangmanRegistry;
 import main.model.entity.UserSettings;
+import main.model.repository.CompetitiveQueueRepository;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,14 @@ import java.io.IOException;
 @Service
 public class CompetitiveService {
 
+    private final CompetitiveQueueRepository competitiveQueueRepository;
     private final UpdateController updateController;
     private final MegoruAPI megoruAPI = new MegoruAPI.Builder().build();
 
     @Autowired
-    public CompetitiveService(UpdateController updateController) {
+    public CompetitiveService(CompetitiveQueueRepository competitiveQueueRepository,
+                              UpdateController updateController) {
+        this.competitiveQueueRepository = competitiveQueueRepository;
         this.updateController = updateController;
     }
 
@@ -61,6 +65,10 @@ public class CompetitiveService {
                     PrivateChannel complete = privateChannelCacheRestAction.complete();
                     hangman.startGame(complete, word);
                 }
+
+                competitiveQueueRepository.deleteById(competitivePlayers[0].getUserId());
+                competitiveQueueRepository.deleteById(competitivePlayers[1].getUserId());
+
                 //Удаляем из очереди
                 hangmanRegistry.removeFromCompetitiveQueue(competitivePlayers[0].getUserId());
                 hangmanRegistry.removeFromCompetitiveQueue(competitivePlayers[1].getUserId());

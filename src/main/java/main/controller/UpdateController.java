@@ -8,6 +8,7 @@ import main.core.events.*;
 import main.enums.Buttons;
 import main.hangman.Hangman;
 import main.hangman.HangmanRegistry;
+import main.model.repository.CompetitiveQueueRepository;
 import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
 import main.model.repository.UserSettingsRepository;
@@ -35,6 +36,7 @@ public class UpdateController {
     private final HangmanGameRepository hangmanGameRepository;
     private final GamesRepository gamesRepository;
     private final UserSettingsRepository userSettingsRepository;
+    private final CompetitiveQueueRepository competitiveQueueRepository;
 
     //LOGGER
     private final static Logger LOGGER = Logger.getLogger(UpdateController.class.getName());
@@ -45,11 +47,12 @@ public class UpdateController {
     @Autowired
     public UpdateController(HangmanGameRepository hangmanGameRepository,
                             GamesRepository gamesRepository,
-
-                            UserSettingsRepository userSettingsRepository) {
+                            UserSettingsRepository userSettingsRepository,
+                            CompetitiveQueueRepository competitiveQueueRepository) {
         this.hangmanGameRepository = hangmanGameRepository;
         this.gamesRepository = gamesRepository;
         this.userSettingsRepository = userSettingsRepository;
+        this.competitiveQueueRepository = competitiveQueueRepository;
     }
 
     public void registerBot(CoreBot coreBot) {
@@ -108,6 +111,12 @@ public class UpdateController {
             return;
         }
 
+        if (Objects.equals(buttonId, Buttons.BUTTON_COMPETITIVE_STOP.name())) {
+            CompetitiveStopButton competitiveStopButton = new CompetitiveStopButton(competitiveQueueRepository);
+            competitiveStopButton.stop(event);
+            return;
+        }
+
         if (Objects.equals(buttonId, Buttons.BUTTON_START_NEW_GAME.name()) || buttonId.matches("BUTTON_START_NEW_GAME_\\d+_\\d+")) {
             HangmanButton hangmanCommand = new HangmanButton();
             hangmanCommand.hangman(event, this);
@@ -129,7 +138,7 @@ public class UpdateController {
         String message = event.getMessage().getContentRaw();
 
         if (message.equals("ping-test")) {
-            BotStartConfig.jda.getRestPing().queue((time)  ->
+            BotStartConfig.jda.getRestPing().queue((time) ->
                     event.getChannel().sendMessageFormat("Ping: %d ms", time).queue()
             );
             return;
@@ -194,8 +203,9 @@ public class UpdateController {
             case "category" -> {
                 CategoryCommand categoryCommand = new CategoryCommand(userSettingsRepository);
                 categoryCommand.category(event);
-            } case "competitive" -> {
-                CompetitiveCommand competitiveCommand = new CompetitiveCommand();
+            }
+            case "competitive" -> {
+                CompetitiveCommand competitiveCommand = new CompetitiveCommand(competitiveQueueRepository);
                 competitiveCommand.competitive(event);
             }
         }

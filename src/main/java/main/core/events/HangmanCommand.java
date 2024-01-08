@@ -2,6 +2,7 @@ package main.core.events;
 
 import main.config.BotStartConfig;
 import main.controller.UpdateController;
+import main.enums.Buttons;
 import main.hangman.*;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
@@ -12,6 +13,7 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -55,6 +57,7 @@ public class HangmanCommand {
         } else if (instance.hasCompetitive(userIdLong)) {
             String youArePlayNow = jsonParsers.getLocale("you_are_play_now", userIdLong);
             event.reply(youArePlayNow)
+                    .setActionRow(Button.danger(Buttons.BUTTON_COMPETITIVE_STOP.name(), "Cancel Matchmaking"))
                     .queue();
         } else if (instance.hasHangman(userIdLong)) {
             String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", userIdLong);

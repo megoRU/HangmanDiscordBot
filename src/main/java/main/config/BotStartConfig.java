@@ -10,7 +10,9 @@ import main.hangman.HangmanPlayer;
 import main.hangman.HangmanRegistry;
 import main.jsonparser.ParserClass;
 import main.model.entity.ActiveHangman;
+import main.model.entity.CompetitiveQueue;
 import main.model.entity.UserSettings;
+import main.model.repository.CompetitiveQueueRepository;
 import main.model.repository.HangmanGameRepository;
 import main.model.repository.UserSettingsRepository;
 import main.service.CompetitiveService;
@@ -85,6 +87,7 @@ public class BotStartConfig {
     private final UpdateController updateController;
     private final UserSettingsRepository userSettingsRepository;
     private final HangmanGameRepository hangmanGameRepository;
+    private final CompetitiveQueueRepository competitiveQueueRepository;
 
     //DataBase
     @Value("${spring.datasource.url}")
@@ -98,12 +101,14 @@ public class BotStartConfig {
     public BotStartConfig(HangmanGameRepository hangmanGameRepository,
                           CompetitiveService competitiveService,
                           UpdateController updateController,
-                          UserSettingsRepository userSettingsRepository) {
+                          UserSettingsRepository userSettingsRepository,
+                          CompetitiveQueueRepository competitiveQueueRepository) {
         idGame = hangmanGameRepository.getCountGames() == null ? 0 : hangmanGameRepository.getCountGames();
         this.competitiveService = competitiveService;
         this.updateController = updateController;
         this.userSettingsRepository = userSettingsRepository;
         this.hangmanGameRepository = hangmanGameRepository;
+        this.competitiveQueueRepository = competitiveQueueRepository;
     }
 
     @PostConstruct
@@ -113,6 +118,7 @@ public class BotStartConfig {
             HangmanRegistry.getInstance().setIdGame();
             setLanguages();
             getUserSettings();
+            getCompetitiveQueue();
 
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
@@ -148,7 +154,7 @@ public class BotStartConfig {
         System.out.println("IsDevMode: " + Config.isIsDev());
 
         //Обновить команды
-//        updateSlashCommands();
+        updateSlashCommands();
         System.out.println("18:31");
     }
 
@@ -309,6 +315,20 @@ public class BotStartConfig {
             mapGameCategory.put(userIdLong, category);
         }
         System.out.println("getUserSettings()");
+    }
+
+    public void getCompetitiveQueue() {
+        List<CompetitiveQueue> competitiveQueueList = competitiveQueueRepository.findAll();
+        HangmanRegistry instance = HangmanRegistry.getInstance();
+
+        for (CompetitiveQueue competitiveQueue : competitiveQueueList) {
+            Long userIdLong = competitiveQueue.getUserIdLong();
+            Long messageChannel = competitiveQueue.getMessageChannel();
+            UserSettings.GameLanguage gameLanguage = competitiveQueue.getGameLanguage();
+            HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, null, messageChannel, gameLanguage);
+            instance.addCompetitiveQueue(hangmanPlayer);
+        }
+        System.out.println("getCompetitiveQueue()");
     }
 
     private void getAndSetActiveGames() {
