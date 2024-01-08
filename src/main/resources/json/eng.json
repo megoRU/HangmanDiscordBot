@@ -9,7 +9,6 @@
   "messages_events_Support_Url_Discord": ":helmet_with_cross: [Discord server](https://discord.com/invite/UrWG3R683d)\n",
   "messages_events_Send_Private_Message": "I sent you a private message",
   "messages_events_Failed_To_Send_Message": "Failed to send message. Maybe I'm on your blacklist!",
-  "prefix_change_Must_have_Permission": "You cannot change the prefix. You must have permission: `MANAGE SERVER`",
   "prefix_change_Its_Standard_Prefix": "This is the standard prefix!",
   "prefix_change_Now_Prefix": "You changed the prefix to: `{0}`",
   "prefix_change_Prefix_Now_Standard": "The prefix is now standard: `!`",
@@ -83,5 +82,12 @@
   "help_allstats": "Find out the statistics of all bot games in the form of a graph",
   "help_deleted": "Delete all the data we collected about you",
   "leadboad": "LeadBoard:",
-  "wins": "Wins: "
+  "wins": "Wins: ",
+  "already_in_queue": "You are already in the queue!",
+  "added_to_the_queue": "Added you to the queue. As soon as a player is found, I will create a game!",
+  "available_only_pm": "This command is only available in private messages!",
+  "you_are_play_now": "Are you playing now, or cancel the search for a competitive game.",
+  "delete_competitive_search": "Cancelled your participation in the competitive game!",
+  "competitive_game": "• Competitive game •",
+  "against": "Opponent"
 }

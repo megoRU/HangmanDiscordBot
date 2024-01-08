@@ -1,10 +1,12 @@
 package main.hangman;
 
 import main.config.BotStartConfig;
+import main.model.entity.UserSettings;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -14,6 +16,7 @@ public class HangmanRegistry {
     //Long это UserIdLong
     private static final ConcurrentMap<Long, Hangman> activeHangman = new ConcurrentHashMap<>();
     private static final ConcurrentMap<Hangman, Timestamp> hangmanTimer = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Long, HangmanPlayer> competitiveQueue = new ConcurrentHashMap<>();
 
     private final AtomicInteger idGame = new AtomicInteger();
 
@@ -58,6 +61,53 @@ public class HangmanRegistry {
 
     public void setHangmanTimer(Hangman hangman, Timestamp timestamp) {
         hangmanTimer.put(hangman, timestamp);
+    }
+
+    public void addCompetitiveQueue(HangmanPlayer hangmanPlayer) {
+        competitiveQueue.put(hangmanPlayer.getUserId(), hangmanPlayer);
+    }
+
+    public boolean hasCompetitive(long userIdLong) {
+        HangmanPlayer hangmanPlayer = competitiveQueue.get(userIdLong);
+        return hangmanPlayer != null;
+    }
+
+    public int getCompetitiveQueueSize() {
+        return competitiveQueue.size();
+    }
+
+    public void removeFromCompetitiveQueue(long userIdLong) {
+        competitiveQueue.remove(userIdLong);
+    }
+
+    public HangmanPlayer[] getCompetitivePlayers() {
+        if (getCompetitiveQueueSize() > 1) {
+            return findPlayersWithSameLanguage();
+        } else {
+            return new HangmanPlayer[]{};
+        }
+    }
+
+    private HangmanPlayer[] findPlayersWithSameLanguage() {
+        List<HangmanPlayer> listEnglish = competitiveQueue
+                .values()
+                .stream()
+                .filter(v -> v.getGameLanguage() == UserSettings.GameLanguage.EN)
+                .toList();
+
+        List<HangmanPlayer> listRussian = competitiveQueue
+                .values()
+                .stream()
+                .filter(v -> v.getGameLanguage() == UserSettings.GameLanguage.RU)
+                .toList();
+
+        if (listEnglish.size() > 1) {
+            return new HangmanPlayer[]{listEnglish.get(0), listEnglish.get(1)};
+        } else if (listRussian.size() > 1) {
+            return new HangmanPlayer[]{listRussian.get(0), listRussian.get(1)};
+        } else {
+            return new HangmanPlayer[]{};
+        }
     }
 
     public Timestamp getHangmanTimer(Hangman hangman) {

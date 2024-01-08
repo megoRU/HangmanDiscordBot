@@ -16,11 +16,13 @@ public class HangmanResult {
     //Data
     private final HangmanPlayer[] hangmanPlayers;
     private final boolean result;
+    private final boolean isCompetitive;
 
-    public HangmanResult(HangmanPlayer[] hangmanPlayers, boolean result, UpdateController updateController) {
-       this.hangmanPlayers = hangmanPlayers;
-       this.result = result;
-       this.updateController = updateController;
+    public HangmanResult(HangmanPlayer[] hangmanPlayers, boolean result, boolean isCompetitive, UpdateController updateController) {
+        this.isCompetitive = isCompetitive;
+        this.hangmanPlayers = hangmanPlayers;
+        this.result = result;
+        this.updateController = updateController;
     }
 
     public void save() {
@@ -31,6 +33,7 @@ public class HangmanResult {
                 Game game = new Game();
                 game.setId(instance.getIdGame());
                 game.setResult(result);
+                game.setIsCompetitive(isCompetitive);
                 game.setGameDate(new Timestamp(Instant.now().toEpochMilli()));
                 game.setUserIdLong(player.getUserId());
 

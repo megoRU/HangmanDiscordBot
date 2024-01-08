@@ -8,5 +8,6 @@ public enum Buttons {
     BUTTON_RUS,
     BUTTON_ENG,
     BUTTON_STOP,
+    BUTTON_COMPETITIVE_STOP,
     BUTTON_CHANGE_LANGUAGE
 }

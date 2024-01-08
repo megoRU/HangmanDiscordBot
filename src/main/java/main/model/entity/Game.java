@@ -26,6 +26,9 @@ public class Game {
     @Column(name = "result", nullable = false)
     private Boolean result;
 
+    @Column(name = "is_competitive", nullable = false)
+    private Boolean isCompetitive;
+
     @Column(name = "game_date", nullable = false)
     private Timestamp gameDate;
 

@@ -39,7 +39,7 @@
 
         <dependency>
             <groupId>com.github.megoRU</groupId>
-            <artifactId>api.megoru.ru</artifactId>
+            <artifactId>api.megoru.ru-wrapper</artifactId>
             <version>5.0.1</version>
         </dependency>
 
@@ -59,14 +59,14 @@
         <dependency>
             <groupId>com.github.megoRU</groupId>
             <artifactId>boticordjava</artifactId>
-            <version>v5.4.1</version>
+            <version>v6.0.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/net.dv8tion/JDA -->
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-beta.18</version>
+            <version>5.0.0-beta.19</version>
             <exclusions>
                 <exclusion>
                     <groupId>club.minnced</groupId>

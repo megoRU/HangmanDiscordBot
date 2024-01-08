@@ -9,8 +9,13 @@ import main.hangman.HangmanBuilder;
 import main.hangman.HangmanPlayer;
 import main.hangman.HangmanRegistry;
 import main.jsonparser.ParserClass;
+import main.model.entity.ActiveHangman;
+import main.model.entity.CompetitiveQueue;
 import main.model.entity.UserSettings;
+import main.model.repository.CompetitiveQueueRepository;
 import main.model.repository.HangmanGameRepository;
+import main.model.repository.UserSettingsRepository;
+import main.service.CompetitiveService;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -24,13 +29,11 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.boticordjava.api.entity.bot.stats.BotStats;
 import org.boticordjava.api.impl.BotiCordAPI;
-import org.boticordjava.api.io.UnsuccessfulHttpException;
 import org.discordbots.api.client.DiscordBotListAPI;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -39,9 +42,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static net.dv8tion.jda.api.interactions.commands.OptionType.STRING;
@@ -78,8 +81,13 @@ public class BotStartConfig {
             .token(System.getenv("BOTICORD"))
             .build();
 
+    private final CompetitiveService competitiveService;
+
     //REPOSITORY
     private final UpdateController updateController;
+    private final UserSettingsRepository userSettingsRepository;
+    private final HangmanGameRepository hangmanGameRepository;
+    private final CompetitiveQueueRepository competitiveQueueRepository;
 
     //DataBase
     @Value("${spring.datasource.url}")
@@ -90,9 +98,17 @@ public class BotStartConfig {
     private String PASSWORD_CONNECTION;
 
     @Autowired
-    public BotStartConfig(HangmanGameRepository hangmanGameRepository, UpdateController updateController) {
+    public BotStartConfig(HangmanGameRepository hangmanGameRepository,
+                          CompetitiveService competitiveService,
+                          UpdateController updateController,
+                          UserSettingsRepository userSettingsRepository,
+                          CompetitiveQueueRepository competitiveQueueRepository) {
         idGame = hangmanGameRepository.getCountGames() == null ? 0 : hangmanGameRepository.getCountGames();
+        this.competitiveService = competitiveService;
         this.updateController = updateController;
+        this.userSettingsRepository = userSettingsRepository;
+        this.hangmanGameRepository = hangmanGameRepository;
+        this.competitiveQueueRepository = competitiveQueueRepository;
     }
 
     @PostConstruct
@@ -102,6 +118,7 @@ public class BotStartConfig {
             HangmanRegistry.getInstance().setIdGame();
             setLanguages();
             getUserSettings();
+            getCompetitiveQueue();
 
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
@@ -137,7 +154,7 @@ public class BotStartConfig {
         System.out.println("IsDevMode: " + Config.isIsDev());
 
         //Обновить команды
-//        updateSlashCommands();
+        updateSlashCommands();
         System.out.println("18:31");
     }
 
@@ -177,6 +194,9 @@ public class BotStartConfig {
                     .setName("category")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выбрать категорию")
             );
+
+            commands.addCommands(Commands.slash("competitive", "Compete with other players")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Соревноваться с другими игроками"));
 
             commands.addCommands(Commands.slash("language", "Setting language")
                     .addOptions(options)
@@ -222,6 +242,7 @@ public class BotStartConfig {
                     .addOptions(category)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установите категорию для слов"));
 
+
             commands.queue();
 
         } catch (Exception e) {
@@ -240,12 +261,8 @@ public class BotStartConfig {
                 AtomicInteger usersCount = new AtomicInteger();
                 jda.getGuilds().forEach(g -> usersCount.addAndGet(g.getMembers().size()));
 
-                try {
-                    BotStats botStats = new BotStats(usersCount.get(), serverCount, 1);
-                    api.setBotStats(Config.getBotId(), botStats);
-                } catch (UnsuccessfulHttpException un) {
-                    un.printStackTrace();
-                }
+                BotStats botStats = new BotStats(usersCount.get(), serverCount, 1);
+                api.setBotStats(Config.getBotId(), botStats);
             } catch (Exception e) {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
@@ -285,84 +302,88 @@ public class BotStartConfig {
     }
 
     public void getUserSettings() {
-        try {
-            Connection connection = DriverManager.getConnection(URL_CONNECTION, USER_CONNECTION, PASSWORD_CONNECTION);
-            Statement statement = connection.createStatement();
-            String sql = "SELECT * FROM user_settings";
-            ResultSet rs = statement.executeQuery(sql);
+        List<UserSettings> userSettingsList = userSettingsRepository.findAll();
 
-            while (rs.next()) {
-                mapLanguages.put(rs.getLong("user_id_long"),
-                        UserSettings.BotLanguage.valueOf(rs.getString("bot_language")));
+        for (UserSettings userSettings : userSettingsList) {
+            Long userIdLong = userSettings.getUserIdLong();
+            UserSettings.BotLanguage botLanguage = userSettings.getBotLanguage();
+            UserSettings.GameLanguage gameLanguage = userSettings.getGameLanguage();
+            UserSettings.Category category = userSettings.getCategory();
 
-                mapGameLanguages.put(rs.getLong("user_id_long"),
-                        UserSettings.GameLanguage.valueOf(rs.getString("game_language")));
-
-                mapGameCategory.put(rs.getLong("user_id_long"),
-                        UserSettings.Category.valueOf(rs.getString("category")));
-            }
-            rs.close();
-            statement.close();
-            connection.close();
-            System.out.println("getUserSettings()");
-        } catch (SQLException e) {
-            e.printStackTrace();
+            mapLanguages.put(userIdLong, botLanguage);
+            mapGameLanguages.put(userIdLong, gameLanguage);
+            mapGameCategory.put(userIdLong, category);
         }
+        System.out.println("getUserSettings()");
+    }
+
+    public void getCompetitiveQueue() {
+        List<CompetitiveQueue> competitiveQueueList = competitiveQueueRepository.findAll();
+        HangmanRegistry instance = HangmanRegistry.getInstance();
+
+        for (CompetitiveQueue competitiveQueue : competitiveQueueList) {
+            Long userIdLong = competitiveQueue.getUserIdLong();
+            Long messageChannel = competitiveQueue.getMessageChannel();
+            UserSettings.GameLanguage gameLanguage = competitiveQueue.getGameLanguage();
+            HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, null, messageChannel, gameLanguage);
+            instance.addCompetitiveQueue(hangmanPlayer);
+        }
+        System.out.println("getCompetitiveQueue()");
     }
 
     private void getAndSetActiveGames() {
-        try {
-            Connection connection = DriverManager.getConnection(URL_CONNECTION, USER_CONNECTION, PASSWORD_CONNECTION);
-            Statement statement = connection.createStatement();
-            String sql = "SELECT * FROM active_hangman";
-            ResultSet rs = statement.executeQuery(sql);
-            while (rs.next()) {
-                HangmanRegistry instance = HangmanRegistry.getInstance();
+        List<ActiveHangman> activeHangmanList = hangmanGameRepository.findAll();
+        HangmanRegistry instance = HangmanRegistry.getInstance();
 
-                long userIdLong = rs.getLong("user_id_long");
-                long secondUserIdLong = rs.getLong("second_user_id_long");
-                String message_id_long = rs.getString("message_id_long");
-                long channelIdLong = Long.parseLong(rs.getString("channel_id_long"));
-                String guildIdLong = rs.getString("guild_long_id");
-                String word = rs.getString("word");
-                String currentHiddenWord = rs.getString("current_hidden_word");
-                String guesses = rs.getString("guesses");
-                int hangmanErrors = rs.getInt("hangman_errors");
-                LocalDateTime game_created_time = rs.getTimestamp("game_created_time").toLocalDateTime();
+        for (ActiveHangman activeHangman : activeHangmanList) {
+            Long userIdLong = activeHangman.getUserIdLong();
+            Long secondUserIdLong = activeHangman.getSecondUserIdLong();
+            Long messageIdLong = activeHangman.getMessageIdLong();
+            Long channelIdLong = activeHangman.getChannelIdLong();
+            Long guildLongId = activeHangman.getGuildLongId();
+            String word = activeHangman.getWord();
+            String currentHiddenWord = activeHangman.getCurrentHiddenWord();
+            String guesses = activeHangman.getGuesses();
+            Integer hangmanErrors = activeHangman.getHangmanErrors();
+            LocalDateTime gameCreatedTime = activeHangman.getGameCreatedTime().toLocalDateTime();
+            Boolean isCompetitive = activeHangman.getIsCompetitive();
+            Long againstPlayerId = activeHangman.getAgainstPlayerId();
 
-                Long hangmanGuildLong = guildIdLong == null ? null : Long.valueOf(guildIdLong);
+            HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, guildLongId, channelIdLong);
 
-                HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, hangmanGuildLong, channelIdLong);
+            HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder()
+                    .addHangmanPlayer(hangmanPlayer)
+                    .setUpdateController(updateController)
+                    .setHangmanErrors(hangmanErrors)
+                    .setWord(word)
+                    .setGuesses(guesses)
+                    .setCurrentHiddenWord(currentHiddenWord)
+                    .setLocalDateTime(gameCreatedTime)
+                    .setCompetitive(isCompetitive)
+                    .setAgainstPlayerId(againstPlayerId)
+                    .setMessageId(messageIdLong);
 
-                HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder()
-                        .addHangmanPlayer(hangmanPlayer)
-                        .setUpdateController(updateController)
-                        .setHangmanErrors(hangmanErrors)
-                        .setWord(word)
-                        .setGuesses(guesses)
-                        .setCurrentHiddenWord(currentHiddenWord)
-                        .setLocalDateTime(game_created_time)
-                        .setMessageId(Long.parseLong(message_id_long));
+            if (secondUserIdLong == null) {
+                instance.setHangman(userIdLong, hangmanBuilder.build());
+            } else {
+                HangmanPlayer hangmanPlayerSecond = new HangmanPlayer(secondUserIdLong, guildLongId, channelIdLong);
+                hangmanBuilder.addHangmanPlayer(hangmanPlayerSecond);
 
-                if (secondUserIdLong == 0L) {
-                    instance.setHangman(userIdLong, hangmanBuilder.build());
-                } else {
-                    HangmanPlayer hangmanPlayerSecond = new HangmanPlayer(secondUserIdLong, hangmanGuildLong, channelIdLong);
-                    hangmanBuilder.addHangmanPlayer(hangmanPlayerSecond);
+                Hangman hangman = hangmanBuilder.build();
 
-                    Hangman hangman = hangmanBuilder.build();
-
-                    instance.setHangman(userIdLong, hangman);
-                    instance.setHangman(secondUserIdLong, hangman);
-                }
+                instance.setHangman(userIdLong, hangman);
+                instance.setHangman(secondUserIdLong, hangman);
             }
-            rs.close();
-            statement.close();
-            connection.close();
-            System.out.println("getAndSetActiveGames()");
-        } catch (SQLException e) {
+        }
+        System.out.println("getAndSetActiveGames()");
+    }
+
+    @Scheduled(fixedDelay = (1), initialDelay = 1, timeUnit = TimeUnit.SECONDS)
+    public void competitiveHandler() {
+        try {
+            competitiveService.startGame();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 }

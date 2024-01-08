@@ -24,6 +24,8 @@ public interface HangmanBuilder {
         private String currentHiddenWord;
         private int hangmanErrors;
         private LocalDateTime localDateTime;
+        private boolean isCompetitive;
+        private Long againstPlayerId;
 
         private HangmanPlayer[] toArray() {
             List<HangmanPlayer> list = hangmanPlayerList.stream().distinct().toList();
@@ -38,6 +40,16 @@ public interface HangmanBuilder {
 
         public Builder setMessageId(long messageId) {
             this.messageId = messageId;
+            return this;
+        }
+
+        public Builder setCompetitive(boolean isCompetitive) {
+            this.isCompetitive = isCompetitive;
+            return this;
+        }
+
+        public Builder setAgainstPlayerId(Long againstPlayerId) {
+            this.againstPlayerId = againstPlayerId;
             return this;
         }
 
@@ -91,11 +103,12 @@ public interface HangmanBuilder {
                         currentHiddenWord,
                         hangmanErrors,
                         localDateTime,
+                        isCompetitive,
+                        againstPlayerId,
                         updateController,
                         toArray());
             }
-            return new Hangman(updateController, toArray());
+            return new Hangman(updateController, isCompetitive, againstPlayerId, toArray());
         }
-
     }
 }

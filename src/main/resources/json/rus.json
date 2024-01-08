@@ -9,7 +9,6 @@
   "messages_events_Support_Url_Discord": ":helmet_with_cross: [Discord сервер](https://discord.com/invite/UrWG3R683d)\n",
   "messages_events_Send_Private_Message": "Я отправил тебе личное сообщение",
   "messages_events_Failed_To_Send_Message": "Не удалось отправить сообщение. Возможно я у тебя черном списке!",
-  "prefix_change_Must_have_Permission": "Вы не можете изменить префикс. У вас должно быть разрешение: `УПРАВЛЯТЬ СЕРВЕРОМ`",
   "prefix_change_Its_Standard_Prefix": "Это стандартный префикс!",
   "prefix_change_Now_Prefix": "Вы изменили префикс на: `{0}`",
   "prefix_change_Prefix_Now_Standard": "Префикс теперь стандартный: `!`",
@@ -83,5 +82,12 @@
   "help_allstats": "Узнать статистику всех игр бота в виде графика",
   "help_deleted": "Удалить все данные которые мы собрали о вас",
   "leadboad": "Доска почёта:",
-  "wins": "Побед: "
+  "wins": "Побед: ",
+  "already_in_queue": "Вы уже в очереди!",
+  "added_to_the_queue": "Добавил вас в очередь. Как только игрок найдется, я создам игру!",
+  "available_only_pm": "Эта команда доступна только в личных сообщениях!",
+  "you_are_play_now": "Вы сейчас играете, или отмените поиск соревновательной игры.",
+  "delete_competitive_search": "Отменил ваше участие в соревновательной игре!",
+  "competitive_game": "• Соревновательная игра •",
+  "against": "Соперник"
 }
