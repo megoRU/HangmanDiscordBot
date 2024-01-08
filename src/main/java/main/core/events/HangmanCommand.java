@@ -35,6 +35,8 @@ public class HangmanCommand {
         if (event instanceof SlashCommandInteractionEvent slashEvent) {
             slashEvent.getChannel().sendTyping().queue();
         }
+
+        HangmanRegistry instance = HangmanRegistry.getInstance();
         //Проверяем установлен ли язык. Если нет - то возвращаем в чат ошибку
         Map<Long, UserSettings.GameLanguage> mapGameLanguages = BotStartConfig.getMapGameLanguages();
         if (!mapGameLanguages.containsKey(userIdLong)) {
@@ -50,7 +52,11 @@ public class HangmanCommand {
                     .addActionRow(HangmanUtils.BUTTON_PLAY_AGAIN)
                     .queue();
             //Проверяем если игрок уже играет. То присылаем в чат уведомление
-        } else if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+        } else if (instance.hasCompetitive(userIdLong)) {
+            String youArePlayNow = jsonParsers.getLocale("you_are_play_now", userIdLong);
+            event.reply(youArePlayNow)
+                    .queue();
+        } else if (instance.hasHangman(userIdLong)) {
             String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", userIdLong);
 
             EmbedBuilder youPlay = new EmbedBuilder();
@@ -90,7 +96,7 @@ public class HangmanCommand {
                     String playWithYourself = jsonParsers.getLocale("play_with_yourself", userIdLong);
                     event.reply(playWithYourself).setEphemeral(true).queue();
                     return;
-                } else if (HangmanRegistry.getInstance().hasHangman(user.getIdLong())) {
+                } else if (instance.hasHangman(user.getIdLong())) {
                     String secondPlayerAlreadyPlaying = jsonParsers.getLocale("second_player_already_playing", userIdLong);
                     event.reply(secondPlayerAlreadyPlaying).setEphemeral(true).queue();
                     return;
@@ -106,12 +112,12 @@ public class HangmanCommand {
             Hangman hangman = hangmanBuilder.build();
 
             //Заполнение коллекции
-            HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
+            instance.setHangman(userIdLong, hangman);
 
             if (hangman.getHangmanPlayers().length > 1) {
                 HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
                 HangmanPlayer hangmanPlayerSecond = hangmanPlayers[1];
-                HangmanRegistry.getInstance().setHangman(hangmanPlayerSecond.getUserId(), hangman);
+                instance.setHangman(hangmanPlayerSecond.getUserId(), hangman);
             }
 
             hangman.startGame(event.getMessageChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());

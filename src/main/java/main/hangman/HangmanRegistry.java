@@ -81,7 +81,6 @@ public class HangmanRegistry {
     }
 
     public HangmanPlayer[] getCompetitivePlayers() {
-        System.out.println("getCompetitivePlayers: " + getCompetitiveQueueSize());
         if (getCompetitiveQueueSize() > 1) {
             return findPlayersWithSameLanguage();
         } else {
@@ -101,9 +100,6 @@ public class HangmanRegistry {
                 .stream()
                 .filter(v -> v.getGameLanguage() == UserSettings.GameLanguage.RU)
                 .toList();
-
-        System.out.println("listRussian.size() " + listRussian.size());
-        System.out.println("listEnglish.size() " + listEnglish.size());
 
         if (listEnglish.size() > 1) {
             return new HangmanPlayer[]{listEnglish.get(0), listEnglish.get(1)};

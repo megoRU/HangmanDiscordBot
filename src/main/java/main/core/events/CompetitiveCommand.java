@@ -21,7 +21,8 @@ public class CompetitiveCommand {
         long messageChannel = event.getMessageChannel().getIdLong();
 
         if (fromGuild) {
-            event.reply("Run this command in private messages with me!")
+            String availableOnlyPm = jsonParsers.getLocale("available_only_pm", event.getUser().getIdLong());
+            event.reply(availableOnlyPm)
                     .setEphemeral(true)
                     .queue();
         } else {
@@ -29,7 +30,7 @@ public class CompetitiveCommand {
             UserSettings.GameLanguage userGameLanguage = BotStartConfig.getMapGameLanguages().get(userIdLong);
 
             if (userGameLanguage == null) {
-                event.getHook().sendMessage(gameLanguage)
+                event.reply(gameLanguage)
                         .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
                         .addActionRow(HangmanUtils.BUTTON_PLAY_AGAIN)
                         .setEphemeral(true)
@@ -38,14 +39,23 @@ public class CompetitiveCommand {
             }
             HangmanRegistry hangmanRegistry = HangmanRegistry.getInstance();
 
-            if (!hangmanRegistry.hasCompetitive(userIdLong)) {
+            if (!hangmanRegistry.hasCompetitive(userIdLong) && !hangmanRegistry.hasHangman(userIdLong)) {
+                String addedToTheQueue = jsonParsers.getLocale("added_to_the_queue", event.getUser().getIdLong());
+
                 HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, null, messageChannel, userGameLanguage);
                 hangmanRegistry.addCompetitiveQueue(hangmanPlayer);
-                event.reply("Added you to the queue. I'll notify you when the game starts!")
+                event.reply(addedToTheQueue)
+                        .setEphemeral(true)
+                        .queue();
+            } else if (hangmanRegistry.hasHangman(userIdLong)) {
+                String youArePlayNow = jsonParsers.getLocale("you_are_play_now", event.getUser().getIdLong());
+                event.reply(youArePlayNow)
                         .setEphemeral(true)
                         .queue();
             } else {
-                event.reply("You are already in the queue!")
+                String alreadyInQueue = jsonParsers.getLocale("already_in_queue", event.getUser().getIdLong());
+
+                event.reply(alreadyInQueue)
                         .setEphemeral(true)
                         .queue();
             }

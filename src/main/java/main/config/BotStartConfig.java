@@ -358,7 +358,7 @@ public class BotStartConfig {
         System.out.println("getAndSetActiveGames()");
     }
 
-    @Scheduled(fixedDelay = (5), initialDelay = 1, timeUnit = TimeUnit.SECONDS)
+    @Scheduled(fixedDelay = (1), initialDelay = 1, timeUnit = TimeUnit.SECONDS)
     public void competitiveHandler() {
         try {
             competitiveService.startGame();

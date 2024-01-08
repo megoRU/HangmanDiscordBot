@@ -211,6 +211,16 @@ public class UpdateController {
         }
     }
 
+    public void sendMessage(Event event, String text) {
+        if (event instanceof SlashCommandInteractionEvent slashEvent) {
+            if (slashEvent.isAcknowledged()) slashEvent.getHook().sendMessage(text).queue();
+            else slashEvent.reply(text).queue();
+        } else if (event instanceof ButtonInteractionEvent buttonEvent) {
+            if (buttonEvent.isAcknowledged()) buttonEvent.getHook().sendMessage(text).queue();
+            else buttonEvent.reply(text).queue();
+        }
+    }
+
     public void sendMessage(@NotNull Event event, MessageEmbed build, List<Button> buttonList) {
         if (event instanceof SlashCommandInteractionEvent slashEvent) {
             if (slashEvent.isAcknowledged())
