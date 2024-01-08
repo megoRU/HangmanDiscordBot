@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 
 import java.awt.*;
 import java.util.List;
@@ -147,7 +149,7 @@ public class HangmanEmbedUtils {
         }
     }
 
-    public static void editMessageWithButtons(EmbedBuilder embedBuilder, Long userIdLong, List<Button> buttons, HangmanGameRepository hangmanGameRepository) {
+    public static void editMessageWithButtons(EmbedBuilder embedBuilder, boolean isCompetitive, Long userIdLong, List<Button> buttons, HangmanGameRepository hangmanGameRepository) {
         if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
             Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
             if (hangman == null) return;
@@ -166,10 +168,10 @@ public class HangmanEmbedUtils {
                     if (textChannelById == null) textChannelById = guildById.getThreadChannelById(channelId);
                     if (textChannelById != null) {
                         try {
-                            textChannelById
-                                    .editMessageEmbedsById(messageId, embedBuilder.build())
-                                    .setActionRow(buttons)
-                                    .queue();
+                            MessageEditAction messageEditAction = textChannelById
+                                    .editMessageEmbedsById(messageId, embedBuilder.build());
+                            if (!isCompetitive) messageEditAction.setActionRow(buttons);
+                            messageEditAction.queue();
                         } catch (Exception e) {
                             if (e.getMessage().contains("Unknown Message")
                                     || e.getMessage().contains("Unknown Channel")
@@ -186,16 +188,34 @@ public class HangmanEmbedUtils {
                 try {
                     PrivateChannel privateChannelById = BotStartConfig.jda.getPrivateChannelById(channelId);
                     if (privateChannelById == null) {
-                        BotStartConfig
-                                .jda.retrieveUserById(userIdLong).complete()
-                                .openPrivateChannel()
-                                .flatMap(channel -> channel.editMessageEmbedsById(messageId, embedBuilder.build())
-                                        .setActionRow(buttons))
-                                .queue();
+                        CacheRestAction<PrivateChannel> privateChannelCacheRestAction = BotStartConfig
+                                .jda
+                                .retrieveUserById(userIdLong)
+                                .complete()
+                                .openPrivateChannel();
+                        if (!isCompetitive) {
+                            privateChannelCacheRestAction
+                                    .flatMap(channel -> channel
+                                            .editMessageEmbedsById(messageId, embedBuilder.build())
+                                            .setActionRow(buttons))
+                                    .queue();
+                        } else {
+                            privateChannelCacheRestAction
+                                    .flatMap(channel -> channel
+                                            .editMessageEmbedsById(messageId, embedBuilder.build()))
+                                    .queue();
+                        }
                     } else {
-                        privateChannelById.editMessageEmbedsById(messageId, embedBuilder.build())
-                                .setActionRow(buttons)
-                                .queue();
+                        if (!isCompetitive) {
+                            privateChannelById
+                                    .editMessageEmbedsById(messageId, embedBuilder.build())
+                                    .setActionRow(buttons)
+                                    .queue();
+                        } else {
+                            privateChannelById
+                                    .editMessageEmbedsById(messageId, embedBuilder.build())
+                                    .queue();
+                        }
                     }
                 } catch (Exception e) {
                     if (e.getMessage().contains("Unknown Message")

@@ -48,10 +48,15 @@ public class Hangman {
     private String[] WORD_OF_CHARS;
     private String WORD_HIDDEN;
     private int hangmanErrors;
+    private final boolean isCompetitive;
+    private final Long againstPlayerId;
+    private long channelId;
 
     private volatile Status STATUS;
 
-    Hangman(UpdateController updateController, HangmanPlayer... hangmanPlayers) {
+    Hangman(UpdateController updateController, boolean isCompetitive, Long againstPlayerId, HangmanPlayer... hangmanPlayers) {
+        this.againstPlayerId = againstPlayerId;
+        this.isCompetitive = isCompetitive;
         this.STATUS = Status.STARTING;
         this.updateController = updateController;
         this.guesses = new LinkedHashSet<>();
@@ -64,13 +69,22 @@ public class Hangman {
             String WORD_HIDDEN,
             int hangmanErrors,
             LocalDateTime localDateTime,
+            boolean isCompetitive,
+            Long againstPlayerId,
             UpdateController updateController,
             HangmanPlayer... hangmanPlayers) {
+        this.againstPlayerId = againstPlayerId;
+        this.isCompetitive = isCompetitive;
         this.STATUS = Status.STARTING;
         this.updateController = updateController;
         this.messageId = messageId;
         this.hangmanPlayers = hangmanPlayers;
         this.guesses = new LinkedHashSet<>();
+
+        //Люблю кастыли
+        if (isCompetitive) {
+            channelId = hangmanPlayers[0].getChannelId();
+        }
 
         //Обновить параметры
         if (guesses != null) {
@@ -81,6 +95,28 @@ public class Hangman {
         this.hangmanErrors = hangmanErrors;
         this.WORD_OF_CHARS = word.split("");
         setTimer(localDateTime);
+    }
+
+    public void startGame(MessageChannel textChannel, String word) {
+        HangmanPlayer hangmanPlayer = hangmanPlayers[0];
+        long userId = hangmanPlayer.getUserId();
+
+        WORD = word;
+
+        if (WORD != null && !WORD.isEmpty()) {
+            WORD_OF_CHARS = WORD.toLowerCase().split(""); // Преобразуем строку str в массив символов (char)
+            hideWord(WORD.length());
+        } else {
+            throw new IllegalArgumentException(WORD);
+        }
+
+        String gameStart = jsonGameParsers.getLocale("Game_Start", userId);
+        EmbedBuilder start = HangmanEmbedUtils.hangmanPattern(userId, gameStart);
+        messageId = textChannel.sendMessageEmbeds(start.build()).complete().getIdLong();
+        createEntityInDataBase();
+
+        //Установка авто завершения
+        setTimer(LocalDateTime.now());
     }
 
     //TODO: Сделать проверку в классах что вызывают на наличие языка
@@ -144,17 +180,35 @@ public class Hangman {
             EmbedBuilder lose = HangmanEmbedUtils.hangmanPattern(userId, gameYouLose);
 
             if (hangmanPlayers.length == 1) {
-                HangmanEmbedUtils.editMessageWithButtons(result ? win : lose, userId, HangmanUtils.getListButtons(userId), updateController.getHangmanGameRepository());
+                HangmanEmbedUtils.editMessageWithButtons(result ? win : lose, isCompetitive, userId, HangmanUtils.getListButtons(userId), updateController.getHangmanGameRepository());
+
+                if (isCompetitive) {
+                    HangmanEmbedUtils.editMessageWithButtons(!result ? win : lose, true, againstPlayerId, HangmanUtils.getListButtons(againstPlayerId), updateController.getHangmanGameRepository());
+                }
             } else {
                 HangmanPlayer hangmanPlayerSecond = hangmanPlayers[1];
                 long secondUserId = hangmanPlayerSecond.getUserId();
-                HangmanEmbedUtils.editMessageWithButtons(result ? win : lose, userId, HangmanUtils.getListButtons(userId, secondUserId), updateController.getHangmanGameRepository());
+                HangmanEmbedUtils.editMessageWithButtons(result ? win : lose, isCompetitive, userId, HangmanUtils.getListButtons(userId, secondUserId), updateController.getHangmanGameRepository());
             }
 
-            HangmanResult hangmanResult = new HangmanResult(hangmanPlayers, result, updateController);
-            hangmanResult.save();
+            //Люблю кастыли
+            if (isCompetitive) {
+                HangmanResult hangmanResult = new HangmanResult(hangmanPlayers, result, true, updateController);
+                hangmanResult.save();
 
-            HangmanRegistry.getInstance().removeHangman(userId);
+                HangmanPlayer hangmanSecondPlayer = new HangmanPlayer(againstPlayerId, null, channelId);
+                HangmanPlayer[] hangmanPlayers = new HangmanPlayer[]{hangmanSecondPlayer};
+                HangmanResult hangmanResultSecond = new HangmanResult(hangmanPlayers, !result, true, updateController);
+                hangmanResultSecond.save();
+
+                HangmanRegistry.getInstance().removeHangman(userId);
+                HangmanRegistry.getInstance().removeHangman(againstPlayerId);
+            } else {
+                HangmanResult hangmanResult = new HangmanResult(hangmanPlayers, result, false, updateController);
+                hangmanResult.save();
+
+                HangmanRegistry.getInstance().removeHangman(userId);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -165,7 +219,7 @@ public class Hangman {
             HangmanPlayer hangmanPlayer = hangmanPlayers[0];
             long userId = hangmanPlayer.getUserId();
             Long guildId = hangmanPlayer.getGuildId(); //Nullable is fine
-            long channelId = hangmanPlayer.getChannelId();
+            channelId = hangmanPlayer.getChannelId();
 
             Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now().atZone(ZoneOffset.UTC).toLocalDateTime());
             ActiveHangman activeHangman = new ActiveHangman();
@@ -181,6 +235,8 @@ public class Hangman {
             activeHangman.setWord(WORD);
             activeHangman.setCurrentHiddenWord(WORD_HIDDEN);
             activeHangman.setHangmanErrors(hangmanErrors);
+            activeHangman.setIsCompetitive(isCompetitive);
+            activeHangman.setAgainstPlayerId(againstPlayerId);
             activeHangman.setGameCreatedTime(timestamp);
             updateController.getHangmanGameRepository().saveAndFlush(activeHangman);
         } catch (Exception e) {

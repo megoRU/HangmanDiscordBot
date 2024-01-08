@@ -194,6 +194,9 @@ public class UpdateController {
             case "category" -> {
                 CategoryCommand categoryCommand = new CategoryCommand(userSettingsRepository);
                 categoryCommand.category(event);
+            } case "competitive" -> {
+                CompetitiveCommand competitiveCommand = new CompetitiveCommand();
+                competitiveCommand.competitive(event);
             }
         }
     }

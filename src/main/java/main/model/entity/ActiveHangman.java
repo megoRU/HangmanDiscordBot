@@ -49,4 +49,10 @@ public class ActiveHangman {
 
     @Column(name = "game_created_time", nullable = false)
     private Timestamp gameCreatedTime;
+
+    @Column(name = "is_competitive", nullable = false)
+    private Boolean isCompetitive;
+
+    @Column(name = "against_player_id")
+    private Long againstPlayerId;
 }
