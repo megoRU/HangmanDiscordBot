@@ -154,23 +154,23 @@ public class BotStartConfig {
         System.out.println("IsDevMode: " + Config.isIsDev());
 
         //Обновить команды
-        updateSlashCommands();
+//        updateSlashCommands();
         System.out.println("18:31");
     }
 
     private void updateSlashCommands() {
         try {
             CommandListUpdateAction commands = jda.updateCommands();
-            List<OptionData> options = new ArrayList<>();
+            List<OptionData> language = new ArrayList<>();
 
-            options.add(new OptionData(STRING, "game", "Setting the Game language")
+            language.add(new OptionData(STRING, "game", "Setting the Game language")
                     .addChoice("english", "EN")
                     .addChoice("russian", "RU")
                     .setRequired(true)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Настройка языка игры")
             );
 
-            options.add(new OptionData(STRING, "bot", "Setting the bot language")
+            language.add(new OptionData(STRING, "bot", "Setting the bot language")
                     .addChoice("english", "EN")
                     .addChoice("russian", "RU")
                     .setRequired(true)
@@ -199,7 +199,7 @@ public class BotStartConfig {
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Соревноваться с другими игроками"));
 
             commands.addCommands(Commands.slash("language", "Setting language")
-                    .addOptions(options)
+                    .addOptions(language)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Настройка языка"));
 
             commands.addCommands(Commands.slash("hg", "Start the game")
