@@ -57,7 +57,9 @@ public class Hangman {
     private String[] WORD_OF_CHARS;
     private String WORD_HIDDEN;
     private int hangmanErrors;
+    @Setter
     private boolean isCompetitive;
+    @Setter
     private Long againstPlayerId;
     private long channelId;
     private long messageId;
@@ -79,14 +81,14 @@ public class Hangman {
     }
 
     Hangman update(long messageId,
-                          String guesses,
-                          String word,
-                          String WORD_HIDDEN,
-                          int hangmanErrors,
-                          LocalDateTime localDateTime,
-                          boolean isCompetitive,
-                          Long againstPlayerId,
-                          HangmanPlayer... hangmanPlayers) {
+                   String guesses,
+                   String word,
+                   String WORD_HIDDEN,
+                   int hangmanErrors,
+                   LocalDateTime localDateTime,
+                   boolean isCompetitive,
+                   Long againstPlayerId,
+                   HangmanPlayer... hangmanPlayers) {
         this.againstPlayerId = againstPlayerId;
         this.isCompetitive = isCompetitive;
         this.gameStatus = GameStatus.STARTING;
@@ -166,15 +168,27 @@ public class Hangman {
 
             String gameStopWin = JSON_GAME_PARSERS.getLocale("Game_Stop_Win", userId);
             String gameYouLose = JSON_GAME_PARSERS.getLocale("Game_You_Lose", userId);
+            String gameCompetitiveYouWin = JSON_GAME_PARSERS.getLocale("Game_Competitive_You_Win", userId);
+            String gameCompetitiveYouLose = JSON_GAME_PARSERS.getLocale("Game_Competitive_You_Lose", userId);
+
+            //Чтобы было показано слово которое было
+            HangmanRegistry instance = HangmanRegistry.getInstance();
+            if (result) {
+                instance.setHangmanStatus(againstPlayerId, GameStatus.LOSE_GAME);
+            } else {
+                instance.setHangmanStatus(againstPlayerId, GameStatus.WIN_GAME);
+            }
 
             EmbedBuilder win = HangmanEmbedUtils.hangmanLayout(userId, gameStopWin);
             EmbedBuilder lose = HangmanEmbedUtils.hangmanLayout(userId, gameYouLose);
+            EmbedBuilder competitiveWin = HangmanEmbedUtils.hangmanLayout(againstPlayerId, gameCompetitiveYouWin);
+            EmbedBuilder competitiveLose = HangmanEmbedUtils.hangmanLayout(againstPlayerId, gameCompetitiveYouLose);
 
             if (hangmanPlayers.length == 1) {
                 HangmanEmbedUtils.editMessageWithButtons(result ? win : lose, isCompetitive, userId, HangmanUtils.getListButtons(userId), updateController.getHangmanGameRepository());
 
                 if (isCompetitive) {
-                    HangmanEmbedUtils.editMessageWithButtons(!result ? win : lose, true, againstPlayerId, HangmanUtils.getListButtons(againstPlayerId), updateController.getHangmanGameRepository());
+                    HangmanEmbedUtils.editMessageWithButtons(!result ? competitiveWin : competitiveLose, true, againstPlayerId, HangmanUtils.getListButtons(againstPlayerId), updateController.getHangmanGameRepository());
                 }
             } else {
                 HangmanPlayer hangmanPlayerSecond = hangmanPlayers[1];

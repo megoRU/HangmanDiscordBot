@@ -135,6 +135,8 @@ public interface HangmanBuilder {
                         hangmanPlayersArrays());
             } else {
                 hangman.setHangmanPlayers(hangmanPlayersArrays());
+                hangman.setCompetitive(isCompetitive);
+                hangman.setAgainstPlayerId(againstPlayerId);
                 return hangman;
             }
         }

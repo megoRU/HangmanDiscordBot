@@ -1,6 +1,7 @@
 package main.game.core;
 
 import main.config.BotStartConfig;
+import main.enums.GameStatus;
 import main.game.Hangman;
 import main.game.HangmanPlayer;
 import main.model.entity.UserSettings;
@@ -59,6 +60,13 @@ public class HangmanRegistry {
 
     public void setHangman(long userIdLong, Hangman hangman) {
         activeHangman.put(userIdLong, hangman);
+    }
+
+    public void setHangmanStatus(long userIdLong, GameStatus gameStatus) {
+        Hangman hangman = activeHangman.get(userIdLong);
+        if (hangman != null) {
+            hangman.setGameStatus(gameStatus);
+        }
     }
 
     public void setHangmanTimer(Hangman hangman, Timestamp timestamp) {

@@ -90,5 +90,7 @@
   "delete_competitive_search": "Cancelled your participation in the competitive game!",
   "competitive_game": "• Competitive game •",
   "against": "Opponent",
-  "help_competitive": "Playing against another player."
+  "help_competitive": "Playing against another player.",
+  "Game_Competitive_You_Lose": ":x: The opponent guessed the word faster. You've lost!",
+  "Game_Competitive_You_Win": ":white_check_mark: The opponent lost. You've won!"
 }

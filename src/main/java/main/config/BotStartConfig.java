@@ -90,13 +90,17 @@ public class BotStartConfig {
     private final HangmanGameRepository hangmanGameRepository;
     private final CompetitiveQueueRepository competitiveQueueRepository;
 
+    //Service
+    private final HangmanResult hangmanResult;
+
     @Autowired
     public BotStartConfig(HangmanGameRepository hangmanGameRepository,
                           CompetitiveService competitiveService,
                           HangmanDataSaving hangmanDataSaving,
                           UpdateController updateController,
                           UserSettingsRepository userSettingsRepository,
-                          CompetitiveQueueRepository competitiveQueueRepository) {
+                          CompetitiveQueueRepository competitiveQueueRepository,
+                          HangmanResult hangmanResult) {
         idGame = hangmanGameRepository.getCountGames() == null ? 0 : hangmanGameRepository.getCountGames();
         this.competitiveService = competitiveService;
         this.hangmanDataSaving = hangmanDataSaving;
@@ -104,6 +108,7 @@ public class BotStartConfig {
         this.userSettingsRepository = userSettingsRepository;
         this.hangmanGameRepository = hangmanGameRepository;
         this.competitiveQueueRepository = competitiveQueueRepository;
+        this.hangmanResult = hangmanResult;
     }
 
     @PostConstruct
@@ -349,6 +354,7 @@ public class BotStartConfig {
             HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder()
                     .setHangmanGameRepository(hangmanGameRepository)
                     .setHangmanDataSaving(hangmanDataSaving)
+                    .setHangmanResult(hangmanResult)
                     .setUpdateController(updateController)
                     .addHangmanPlayer(hangmanPlayer)
                     .setHangmanErrors(hangmanErrors)
@@ -375,7 +381,7 @@ public class BotStartConfig {
         System.out.println("getAndSetActiveGames()");
     }
 
-    @Scheduled(fixedDelay = (1), initialDelay = 1, timeUnit = TimeUnit.SECONDS)
+    @Scheduled(fixedDelay = (200), initialDelay = 1000)
     public void competitiveHandler() {
         try {
             competitiveService.startGame();

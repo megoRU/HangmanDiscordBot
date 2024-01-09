@@ -26,5 +26,6 @@ public class CompetitiveStopButton {
         String deleteCompetitiveSearch = jsonParsers.getLocale("delete_competitive_search", userIdLong);
         event.reply(deleteCompetitiveSearch).queue();
         competitiveQueueRepository.deleteById(userIdLong);
+        event.editButton(event.getButton().asDisabled()).queue();
     }
 }
