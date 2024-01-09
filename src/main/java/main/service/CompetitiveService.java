@@ -5,12 +5,11 @@ import api.megoru.ru.entity.exceptions.UnsuccessfulHttpException;
 import api.megoru.ru.impl.MegoruAPI;
 import main.config.BotStartConfig;
 import main.controller.UpdateController;
-import main.hangman.Hangman;
-import main.hangman.HangmanBuilder;
-import main.hangman.HangmanPlayer;
-import main.hangman.HangmanRegistry;
+import main.game.*;
+import main.game.core.HangmanRegistry;
 import main.model.entity.UserSettings;
 import main.model.repository.CompetitiveQueueRepository;
+import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +21,24 @@ import java.io.IOException;
 public class CompetitiveService {
 
     private final CompetitiveQueueRepository competitiveQueueRepository;
+    private final HangmanGameRepository hangmanGameRepository;
+    private final HangmanDataSaving hangmanDataSaving;
     private final UpdateController updateController;
+    private final HangmanResult hangmanResult;
+
     private final MegoruAPI megoruAPI = new MegoruAPI.Builder().build();
 
     @Autowired
     public CompetitiveService(CompetitiveQueueRepository competitiveQueueRepository,
-                              UpdateController updateController) {
+                              HangmanGameRepository hangmanGameRepository,
+                              HangmanDataSaving hangmanDataSaving,
+                              UpdateController updateController,
+                              HangmanResult hangmanResult) {
         this.competitiveQueueRepository = competitiveQueueRepository;
+        this.hangmanGameRepository = hangmanGameRepository;
+        this.hangmanDataSaving = hangmanDataSaving;
         this.updateController = updateController;
+        this.hangmanResult = hangmanResult;
     }
 
     public void startGame() throws UnsuccessfulHttpException, IOException {
@@ -53,6 +62,9 @@ public class CompetitiveService {
                     hangmanBuilder.setCompetitive(true);
                     hangmanBuilder.setAgainstPlayerId(getAnotherUserId(currentPlayerUserId, competitivePlayers));
                     hangmanBuilder.setUpdateController(updateController);
+                    hangmanBuilder.setHangmanGameRepository(hangmanGameRepository);
+                    hangmanBuilder.setHangmanDataSaving(hangmanDataSaving);
+                    hangmanBuilder.setHangmanResult(hangmanResult);
 
                     Hangman hangman = hangmanBuilder.build();
                     HangmanRegistry.getInstance().setHangman(currentPlayerUserId, hangman);

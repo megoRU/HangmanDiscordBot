@@ -1,31 +1,29 @@
-package main.hangman;
+package main.game;
 
-import main.controller.UpdateController;
+import main.game.core.HangmanRegistry;
 import main.model.entity.Game;
+import main.model.repository.GamesRepository;
+import main.model.repository.HangmanGameRepository;
+import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class HangmanResult {
 
     //Repo
-    private final UpdateController updateController;
+    private final HangmanGameRepository hangmanGameRepository;
+    private final GamesRepository gamesRepository;
 
-    //Data
-    private final HangmanPlayer[] hangmanPlayers;
-    private final boolean result;
-    private final boolean isCompetitive;
-
-    public HangmanResult(HangmanPlayer[] hangmanPlayers, boolean result, boolean isCompetitive, UpdateController updateController) {
-        this.isCompetitive = isCompetitive;
-        this.hangmanPlayers = hangmanPlayers;
-        this.result = result;
-        this.updateController = updateController;
+    public HangmanResult(HangmanGameRepository hangmanGameRepository, GamesRepository gamesRepository) {
+        this.hangmanGameRepository = hangmanGameRepository;
+        this.gamesRepository = gamesRepository;
     }
 
-    public void save() {
+    public void save(HangmanPlayer[] hangmanPlayers, boolean result, boolean isCompetitive) {
         try {
             HangmanRegistry instance = HangmanRegistry.getInstance();
             List<Game> gameList = new ArrayList<>();
@@ -40,10 +38,10 @@ public class HangmanResult {
                 gameList.add(game);
             }
 
-            updateController.getGamesRepository().saveAllAndFlush(gameList);
+            gamesRepository.saveAllAndFlush(gameList);
 
             HangmanPlayer hangmanPlayer = hangmanPlayers[0];
-            updateController.getHangmanGameRepository().deleteActiveGame(hangmanPlayer.getUserId());
+            hangmanGameRepository.deleteActiveGame(hangmanPlayer.getUserId());
         } catch (Exception e) {
             e.printStackTrace();
         }

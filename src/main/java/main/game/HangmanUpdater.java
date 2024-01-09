@@ -1,5 +1,7 @@
-package main.hangman;
+package main.game;
 
+import main.game.core.HangmanRegistry;
+import main.game.utils.HangmanUtils;
 import main.model.repository.HangmanGameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,9 @@
-package main.hangman;
+package main.game;
 
 import main.config.BotStartConfig;
+import main.enums.GameStatus;
+import main.game.core.HangmanRegistry;
+import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
 import main.model.repository.HangmanGameRepository;
@@ -15,7 +18,6 @@ import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.logging.Logger;
 
 public class HangmanEmbedUtils {
@@ -42,7 +44,7 @@ public class HangmanEmbedUtils {
             String wordHidden = hangman.getWORD_HIDDEN();
             String guesses = HangmanUtils.getGuesses(hangman.getGuesses());
             String word = hangman.getWORD().toUpperCase().replaceAll("", " ").trim();
-            Hangman.Status hangmanSTATUS = hangman.getSTATUS();
+            GameStatus gameStatus = hangman.getGameStatus();
 
             Map<Long, UserSettings.GameLanguage> mapGameLanguages = BotStartConfig.getMapGameLanguages();
 
@@ -78,11 +80,11 @@ public class HangmanEmbedUtils {
             String worldUpper = String.format("`%s`", word);
 
             //Game Word That Was
-            if (hangmanSTATUS == Hangman.Status.LOSE_GAME) {
+            if (gameStatus == GameStatus.LOSE_GAME) {
                 String gameWordThatWas = jsonGameParsers.getLocale("Game_Word_That_Was", userId);
                 embedBuilder.addField(gameCurrentWord, currentWorldUpper, false);
                 embedBuilder.addField(gameWordThatWas, worldUpper, false);
-            } else if (hangmanSTATUS == Hangman.Status.WIN_GAME) {
+            } else if (gameStatus == GameStatus.WIN_GAME) {
                 embedBuilder.addField(gameCurrentWord, worldUpper, false);
             } else {
                 embedBuilder.addField(gameCurrentWord, currentWorldUpper, false);

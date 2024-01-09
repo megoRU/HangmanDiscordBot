@@ -1,6 +1,6 @@
 package main.core.events;
 
-import main.hangman.HangmanUtils;
+import main.game.utils.HangmanUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.channel.ChannelType;

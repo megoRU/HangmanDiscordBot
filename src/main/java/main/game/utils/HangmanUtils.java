@@ -1,4 +1,4 @@
-package main.hangman;
+package main.game.utils;
 
 import main.config.BotStartConfig;
 import main.enums.Buttons;

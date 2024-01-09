@@ -2,9 +2,9 @@ package main.core.events;
 
 import main.config.BotStartConfig;
 import main.enums.Buttons;
-import main.hangman.HangmanPlayer;
-import main.hangman.HangmanRegistry;
-import main.hangman.HangmanUtils;
+import main.game.HangmanPlayer;
+import main.game.core.HangmanRegistry;
+import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.CompetitiveQueue;
 import main.model.entity.UserSettings;

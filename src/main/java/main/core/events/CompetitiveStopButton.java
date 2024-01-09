@@ -1,6 +1,6 @@
 package main.core.events;
 
-import main.hangman.HangmanRegistry;
+import main.game.core.HangmanRegistry;
 import main.jsonparser.JSONParsers;
 import main.model.repository.CompetitiveQueueRepository;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;

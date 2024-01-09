@@ -3,9 +3,12 @@ package main.core.events;
 import main.config.BotStartConfig;
 import main.controller.UpdateController;
 import main.enums.Buttons;
-import main.hangman.*;
+import main.game.*;
+import main.game.core.HangmanRegistry;
+import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
+import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -15,6 +18,7 @@ import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEven
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
@@ -24,6 +28,18 @@ import java.util.Map;
 public class HangmanCommand {
 
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
+    private final HangmanGameRepository hangmanGameRepository;
+    private final HangmanDataSaving hangmanDataSaving;
+    private final HangmanResult hangmanResult;
+
+    @Autowired
+    public HangmanCommand(HangmanGameRepository hangmanGameRepository,
+                          HangmanDataSaving hangmanDataSaving,
+                          HangmanResult hangmanResult) {
+        this.hangmanGameRepository = hangmanGameRepository;
+        this.hangmanDataSaving = hangmanDataSaving;
+        this.hangmanResult = hangmanResult;
+    }
 
     public void hangman(@NotNull GenericCommandInteractionEvent event, UpdateController updateController) {
         long userIdLong = event.getUser().getIdLong();
@@ -74,6 +90,9 @@ public class HangmanCommand {
             HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder();
             hangmanBuilder.addHangmanPlayer(hangmanPlayer);
             hangmanBuilder.setUpdateController(updateController);
+            hangmanBuilder.setHangmanDataSaving(hangmanDataSaving);
+            hangmanBuilder.setHangmanGameRepository(hangmanGameRepository);
+            hangmanBuilder.setHangmanResult(hangmanResult);
 
             if (event.getName().equals("multi")) {
                 User user = null;
@@ -123,7 +142,7 @@ public class HangmanCommand {
                 instance.setHangman(hangmanPlayerSecond.getUserId(), hangman);
             }
 
-            hangman.startGame(event.getMessageChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
+            hangman.startGame(event.getMessageChannel());
         }
     }
 }

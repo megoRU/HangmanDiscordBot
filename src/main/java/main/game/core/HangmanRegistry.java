@@ -1,6 +1,8 @@
-package main.hangman;
+package main.game.core;
 
 import main.config.BotStartConfig;
+import main.game.Hangman;
+import main.game.HangmanPlayer;
 import main.model.entity.UserSettings;
 import org.jetbrains.annotations.Nullable;
 
@@ -124,8 +126,10 @@ public class HangmanRegistry {
         if (hangman == null) return;
         hangmanTimer.remove(hangman);
         HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
+        if (hangman.isCompetitive()) activeHangman.remove(hangman.getAgainstPlayerId());
         for (HangmanPlayer hangmanPlayer : hangmanPlayers) {
             activeHangman.remove(hangmanPlayer.getUserId());
         }
+
     }
 }

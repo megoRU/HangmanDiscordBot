@@ -3,7 +3,9 @@ package main.core.events;
 import main.config.BotStartConfig;
 import main.controller.UpdateController;
 import main.enums.Buttons;
-import main.hangman.*;
+import main.game.*;
+import main.game.core.HangmanRegistry;
+import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -79,13 +81,13 @@ public class HangmanButton {
                     HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
                     HangmanRegistry.getInstance().setHangman(secondUser, hangman);
 
-                    hangman.startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
+                    hangman.startGame(event.getChannel());
                 } else {
                     hangman = hangmanBuilder.build();
 
                     HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
 
-                    hangman.startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
+                    hangman.startGame(event.getChannel());
                 }
                 //DM play
             } else {
@@ -95,7 +97,7 @@ public class HangmanButton {
                 hangman = hangmanBuilder.build();
 
                 HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
-                hangman.startGame(event.getChannel(), event.getUser().getAvatarUrl(), event.getUser().getName());
+                hangman.startGame(event.getChannel());
             }
         } else {
             String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());

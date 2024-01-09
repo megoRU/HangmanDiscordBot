@@ -1,6 +1,7 @@
-package main.hangman;
+package main.game;
 
 import main.controller.UpdateController;
+import main.model.repository.HangmanGameRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,6 +13,9 @@ public interface HangmanBuilder {
 
         //UpdateController
         private UpdateController updateController;
+        private HangmanGameRepository hangmanGameRepository;
+        private HangmanDataSaving hangmanDataSaving;
+        private HangmanResult hangmanResult;
 
         //User|Guild|Channel data
 
@@ -27,7 +31,7 @@ public interface HangmanBuilder {
         private boolean isCompetitive;
         private Long againstPlayerId;
 
-        private HangmanPlayer[] toArray() {
+        private HangmanPlayer[] hangmanPlayersArrays() {
             List<HangmanPlayer> list = hangmanPlayerList.stream().distinct().toList();
             int size = list.size();
             HangmanPlayer[] hangmanPlayers = new HangmanPlayer[size];
@@ -36,6 +40,21 @@ public interface HangmanBuilder {
                 hangmanPlayers[i] = hangmanPlayer;
             }
             return hangmanPlayers;
+        }
+
+        public Builder setHangmanGameRepository(HangmanGameRepository hangmanGameRepository) {
+            this.hangmanGameRepository = hangmanGameRepository;
+            return this;
+        }
+
+        public Builder setHangmanResult(HangmanResult hangmanResult) {
+            this.hangmanResult = hangmanResult;
+            return this;
+        }
+
+        public Builder setHangmanDataSaving(HangmanDataSaving hangmanDataSaving) {
+            this.hangmanDataSaving = hangmanDataSaving;
+            return this;
         }
 
         public Builder setMessageId(long messageId) {
@@ -94,9 +113,17 @@ public interface HangmanBuilder {
         public Hangman build() {
             if (updateController == null)
                 throw new IllegalArgumentException("The provided updateController cannot be null!");
+            else if (hangmanGameRepository == null)
+                throw new IllegalArgumentException("The provided hangmanGameRepository cannot be null!");
+            else if (hangmanDataSaving == null)
+                throw new IllegalArgumentException("The provided hangmanDataSaving cannot be null!");
+            else if (hangmanResult == null)
+                throw new IllegalArgumentException("The provided hangmanResult cannot be null!");
+
+            Hangman hangman = new Hangman(updateController, hangmanGameRepository, hangmanDataSaving, hangmanResult);
 
             if (word != null && currentHiddenWord != null) {
-                return new Hangman(
+                return hangman.update(
                         messageId,
                         guesses,
                         word,
@@ -105,10 +132,11 @@ public interface HangmanBuilder {
                         localDateTime,
                         isCompetitive,
                         againstPlayerId,
-                        updateController,
-                        toArray());
+                        hangmanPlayersArrays());
+            } else {
+                hangman.setHangmanPlayers(hangmanPlayersArrays());
+                return hangman;
             }
-            return new Hangman(updateController, isCompetitive, againstPlayerId, toArray());
         }
     }
 }

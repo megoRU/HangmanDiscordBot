@@ -1,6 +1,7 @@
-package main.hangman;
+package main.game;
 
 import main.controller.UpdateController;
+import main.enums.GameStatus;
 import main.jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -31,8 +32,8 @@ public class HangmanInputs {
             if (inputs.length() == 1) {
                 if (hangman.getWORD_HIDDEN().contains("_")) {
                     if (hangman.isLetterPresent(inputs.toUpperCase())) {
-                        if (hangman.getSTATUS() == Hangman.Status.SAME_LETTER) return;
-                        hangman.setSTATUS(Hangman.Status.SAME_LETTER);
+                        if (hangman.getGameStatus() == GameStatus.SAME_LETTER) return;
+                        hangman.setGameStatus(GameStatus.SAME_LETTER);
                         String gameYouUseThisLetter = jsonGameParsers.getLocale("Game_You_Use_This_Letter", userId);
                         EmbedBuilder info = HangmanEmbedUtils.hangmanLayout(userId, gameYouUseThisLetter);
                         HangmanEmbedUtils.editMessage(info, userId, updateController.getHangmanGameRepository());
@@ -40,11 +41,11 @@ public class HangmanInputs {
                     }
 
                     if (hangman.getWORD().contains(inputs)) {
-                        hangman.setSTATUS(Hangman.Status.RIGHT_LETTER);
+                        hangman.setGameStatus(GameStatus.RIGHT_LETTER);
                         String result = hangman.replacementLetters(inputs);
                         //Игрок угадал все буквы
                         if (!result.contains("_")) {
-                            hangman.setSTATUS(Hangman.Status.WIN_GAME);
+                            hangman.setGameStatus(GameStatus.WIN_GAME);
                             hangman.gameEnd(true);
                             return;
                         }
@@ -54,10 +55,10 @@ public class HangmanInputs {
                     } else {
                         hangman.incrementHangmanErrors();
                         if (hangman.getHangmanErrors() >= 8) {
-                            hangman.setSTATUS(Hangman.Status.LOSE_GAME);
+                            hangman.setGameStatus(GameStatus.LOSE_GAME);
                             hangman.gameEnd(false);
                         } else {
-                            hangman.setSTATUS(Hangman.Status.WRONG_LETTER);
+                            hangman.setGameStatus(GameStatus.WRONG_LETTER);
                             String gameNoSuchLetter = jsonGameParsers.getLocale("Game_No_Such_Letter", userId);
                             EmbedBuilder wordNotFound = HangmanEmbedUtils.hangmanLayout(userId, gameNoSuchLetter);
                             HangmanEmbedUtils.editMessage(wordNotFound, userId, updateController.getHangmanGameRepository());
@@ -73,8 +74,8 @@ public class HangmanInputs {
                 }
 
                 if (hangman.isLetterPresent(inputs)) {
-                    if (hangman.getSTATUS() == Hangman.Status.SAME_LETTER) return;
-                    hangman.setSTATUS(Hangman.Status.SAME_LETTER);
+                    if (hangman.getGameStatus() == GameStatus.SAME_LETTER) return;
+                    hangman.setGameStatus(GameStatus.SAME_LETTER);
                     String gameYouUseThisWord = jsonGameParsers.getLocale("Game_You_Use_This_Word", userId);
                     EmbedBuilder info = HangmanEmbedUtils.hangmanLayout(userId, gameYouUseThisWord);
                     HangmanEmbedUtils.editMessage(info, userId, updateController.getHangmanGameRepository());
@@ -82,15 +83,15 @@ public class HangmanInputs {
                 }
 
                 if (inputs.equals(hangman.getWORD())) {
-                    hangman.setSTATUS(Hangman.Status.WIN_GAME);
+                    hangman.setGameStatus(GameStatus.WIN_GAME);
                     hangman.gameEnd(true);
                 } else {
                     hangman.incrementHangmanErrors();
                     if (hangman.getHangmanErrors() >= 8) {
-                        hangman.setSTATUS(Hangman.Status.LOSE_GAME);
+                        hangman.setGameStatus(GameStatus.LOSE_GAME);
                         hangman.gameEnd(false);
                     } else {
-                        hangman.setSTATUS(Hangman.Status.WRONG_WORD);
+                        hangman.setGameStatus(GameStatus.WRONG_WORD);
                         String gameNoSuchWord = jsonGameParsers.getLocale("Game_No_Such_Word", userId);
                         EmbedBuilder wordNotFound = HangmanEmbedUtils.hangmanLayout(userId, gameNoSuchWord);
                         HangmanEmbedUtils.editMessage(wordNotFound, userId, updateController.getHangmanGameRepository());

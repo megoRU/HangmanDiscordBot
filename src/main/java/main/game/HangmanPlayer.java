@@ -1,6 +1,7 @@
-package main.hangman;
+package main.game;
 
 import lombok.Getter;
+import main.game.core.HangmanRegistry;
 import main.model.entity.UserSettings;
 
 @Getter

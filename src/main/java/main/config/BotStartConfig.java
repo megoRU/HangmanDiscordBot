@@ -4,10 +4,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import main.controller.UpdateController;
 import main.core.CoreBot;
-import main.hangman.Hangman;
-import main.hangman.HangmanBuilder;
-import main.hangman.HangmanPlayer;
-import main.hangman.HangmanRegistry;
+import main.game.*;
+import main.game.core.HangmanRegistry;
 import main.jsonparser.ParserClass;
 import main.model.entity.ActiveHangman;
 import main.model.entity.CompetitiveQueue;
@@ -33,7 +31,6 @@ import org.discordbots.api.client.DiscordBotListAPI;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -46,6 +43,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 import static net.dv8tion.jda.api.interactions.commands.OptionType.STRING;
 import static net.dv8tion.jda.api.interactions.commands.OptionType.USER;
@@ -53,6 +51,8 @@ import static net.dv8tion.jda.api.interactions.commands.OptionType.USER;
 @Configuration
 @EnableScheduling
 public class BotStartConfig {
+
+    private static final Logger LOGGER = Logger.getLogger(BotStartConfig.class.getName());
 
     public static final String activity = "/help | ";
 
@@ -82,6 +82,7 @@ public class BotStartConfig {
             .build();
 
     private final CompetitiveService competitiveService;
+    private final HangmanDataSaving hangmanDataSaving;
 
     //REPOSITORY
     private final UpdateController updateController;
@@ -89,22 +90,16 @@ public class BotStartConfig {
     private final HangmanGameRepository hangmanGameRepository;
     private final CompetitiveQueueRepository competitiveQueueRepository;
 
-    //DataBase
-    @Value("${spring.datasource.url}")
-    private String URL_CONNECTION;
-    @Value("${spring.datasource.username}")
-    private String USER_CONNECTION;
-    @Value("${spring.datasource.password}")
-    private String PASSWORD_CONNECTION;
-
     @Autowired
     public BotStartConfig(HangmanGameRepository hangmanGameRepository,
                           CompetitiveService competitiveService,
+                          HangmanDataSaving hangmanDataSaving,
                           UpdateController updateController,
                           UserSettingsRepository userSettingsRepository,
                           CompetitiveQueueRepository competitiveQueueRepository) {
         idGame = hangmanGameRepository.getCountGames() == null ? 0 : hangmanGameRepository.getCountGames();
         this.competitiveService = competitiveService;
+        this.hangmanDataSaving = hangmanDataSaving;
         this.updateController = updateController;
         this.userSettingsRepository = userSettingsRepository;
         this.hangmanGameRepository = hangmanGameRepository;
@@ -144,7 +139,7 @@ public class BotStartConfig {
 
             jda.awaitReady();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
         getAndSetActiveGames();
 
@@ -246,7 +241,7 @@ public class BotStartConfig {
             commands.queue();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
     }
 
@@ -264,7 +259,7 @@ public class BotStartConfig {
                 BotStats botStats = new BotStats(usersCount.get(), serverCount, 1);
                 api.setBotStats(Config.getBotId(), botStats);
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.info(e.getMessage());
                 Thread.currentThread().interrupt();
             }
         }
@@ -297,7 +292,7 @@ public class BotStartConfig {
             }
             System.out.println("setLanguages()");
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
     }
 
@@ -352,8 +347,10 @@ public class BotStartConfig {
             HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, guildLongId, channelIdLong);
 
             HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder()
-                    .addHangmanPlayer(hangmanPlayer)
+                    .setHangmanGameRepository(hangmanGameRepository)
+                    .setHangmanDataSaving(hangmanDataSaving)
                     .setUpdateController(updateController)
+                    .addHangmanPlayer(hangmanPlayer)
                     .setHangmanErrors(hangmanErrors)
                     .setWord(word)
                     .setGuesses(guesses)
@@ -383,7 +380,7 @@ public class BotStartConfig {
         try {
             competitiveService.startGame();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
     }
 }

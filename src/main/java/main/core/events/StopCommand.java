@@ -1,7 +1,9 @@
 package main.core.events;
 
 import main.controller.UpdateController;
-import main.hangman.*;
+import main.game.*;
+import main.game.core.HangmanRegistry;
+import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;

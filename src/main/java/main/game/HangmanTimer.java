@@ -1,5 +1,8 @@
-package main.hangman;
+package main.game;
 
+import main.enums.GameStatus;
+import main.game.core.HangmanRegistry;
+import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -34,7 +37,7 @@ public class HangmanTimer extends TimerTask {
                     Timestamp localTimestamp = new Timestamp(System.currentTimeMillis());
                     Timestamp hangmanTimestamp = HangmanRegistry.getInstance().getHangmanTimer(hangman);
                     if (hangmanTimestamp != null && localTimestamp.after(hangmanTimestamp)) {
-                        hangman.setSTATUS(Hangman.Status.TIME_OVER);
+                        hangman.setGameStatus(GameStatus.TIME_OVER);
                         try {
                             HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
                             HangmanPlayer hangmanPlayer = hangmanPlayers[0];

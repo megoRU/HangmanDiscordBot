@@ -6,8 +6,10 @@ import main.core.ChecksClass;
 import main.core.CoreBot;
 import main.core.events.*;
 import main.enums.Buttons;
-import main.hangman.Hangman;
-import main.hangman.HangmanRegistry;
+import main.game.Hangman;
+import main.game.HangmanDataSaving;
+import main.game.HangmanResult;
+import main.game.core.HangmanRegistry;
 import main.model.repository.CompetitiveQueueRepository;
 import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
@@ -37,6 +39,8 @@ public class UpdateController {
     private final GamesRepository gamesRepository;
     private final UserSettingsRepository userSettingsRepository;
     private final CompetitiveQueueRepository competitiveQueueRepository;
+    private final HangmanDataSaving hangmanDataSaving;
+    private final HangmanResult hangmanResult;
 
     //LOGGER
     private final static Logger LOGGER = Logger.getLogger(UpdateController.class.getName());
@@ -48,11 +52,15 @@ public class UpdateController {
     public UpdateController(HangmanGameRepository hangmanGameRepository,
                             GamesRepository gamesRepository,
                             UserSettingsRepository userSettingsRepository,
-                            CompetitiveQueueRepository competitiveQueueRepository) {
+                            CompetitiveQueueRepository competitiveQueueRepository,
+                            HangmanDataSaving hangmanDataSaving,
+                            HangmanResult hangmanResult) {
         this.hangmanGameRepository = hangmanGameRepository;
         this.gamesRepository = gamesRepository;
         this.userSettingsRepository = userSettingsRepository;
         this.competitiveQueueRepository = competitiveQueueRepository;
+        this.hangmanDataSaving = hangmanDataSaving;
+        this.hangmanResult = hangmanResult;
     }
 
     public void registerBot(CoreBot coreBot) {
@@ -128,7 +136,7 @@ public class UpdateController {
         if (!permission) return;
 
 
-        HangmanCommand hangmanCommand = new HangmanCommand();
+        HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult);
         hangmanCommand.hangman(event, this);
     }
 
@@ -197,7 +205,7 @@ public class UpdateController {
                 deleteCommand.delete(event);
             }
             case "hg", "multi" -> {
-                HangmanCommand hangmanCommand = new HangmanCommand();
+                HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult);
                 hangmanCommand.hangman(event, this);
             }
             case "category" -> {

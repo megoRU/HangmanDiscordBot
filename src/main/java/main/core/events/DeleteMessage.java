@@ -1,7 +1,7 @@
 package main.core.events;
 
 import main.config.BotStartConfig;
-import main.hangman.HangmanRegistry;
+import main.game.core.HangmanRegistry;
 import main.jsonparser.JSONParsers;
 import main.model.repository.GamesRepository;
 import main.model.repository.UserSettingsRepository;
