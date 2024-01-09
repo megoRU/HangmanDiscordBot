@@ -23,7 +23,7 @@ public class HangmanEmbedUtils {
     private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
     private static final Logger LOGGER = Logger.getLogger(HangmanEmbedUtils.class.getName());
 
-    public static EmbedBuilder hangmanPattern(long userId, String status) {
+    public static EmbedBuilder hangmanLayout(long userId, String status) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userId);
 
@@ -40,16 +40,16 @@ public class HangmanEmbedUtils {
             String userIdWithDiscord = hangman.getUserIdWithDiscord();
             int hangmanErrors = hangman.getHangmanErrors();
             String wordHidden = hangman.getWORD_HIDDEN();
-            String guesses = hangman.getGuesses();
+            String guesses = HangmanUtils.getGuesses(hangman.getGuesses());
             String word = hangman.getWORD().toUpperCase().replaceAll("", " ").trim();
             Hangman.Status hangmanSTATUS = hangman.getSTATUS();
 
-            Map<Long, UserSettings.GameLanguage> mapGameLanguages = BotStartConfig.getMapGameLanguages(); //TODO NPE
+            Map<Long, UserSettings.GameLanguage> mapGameLanguages = BotStartConfig.getMapGameLanguages();
 
             String gameLanguage = jsonGameParsers.getLocale("Game_Language", userId);
             String language = mapGameLanguages.get(userId)
                     .name()
-                    .equals("RU") ? "Кириллица\nКатег.: " + category(userId) : "Latin\nCateg.:" + category(userId);
+                    .equals("RU") ? "Кириллица\nКатег.: " + HangmanUtils.category(userId) : "Latin\nCateg.:" + HangmanUtils.category(userId);
 
             embedBuilder.setColor(Color.GREEN);
             if (!hangman.isCompetitive()) {
@@ -139,7 +139,9 @@ public class HangmanEmbedUtils {
                     PrivateChannel privateChannelById = BotStartConfig.jda.getPrivateChannelById(channelId);
                     if (privateChannelById == null) {
                         BotStartConfig
-                                .jda.retrieveUserById(userIdLong).complete()
+                                .jda
+                                .retrieveUserById(userIdLong)
+                                .complete()
                                 .openPrivateChannel()
                                 .flatMap(channel -> channel.editMessageEmbedsById(messageId, embedBuilder.build()))
                                 .queue();
@@ -240,16 +242,5 @@ public class HangmanEmbedUtils {
                 }
             }
         }
-    }
-
-    private static String category(Long userId) {
-        UserSettings.Category category = BotStartConfig.getMapGameCategory().get(userId);
-        UserSettings.BotLanguage language = BotStartConfig.getMapLanguages().get(userId);
-        return switch (category.name()) {
-            case "colors" -> Objects.equals(language.name(), "EN") ? "`Colors`" : "`Цвета`";
-            case "flowers" -> Objects.equals(language.name(), "EN") ? "`Flowers`" : "`Цветы`";
-            case "fruits" -> Objects.equals(language.name(), "EN") ? "`Fruits`" : "`Фрукты`";
-            default -> Objects.equals(language.name(), "EN") ? "`Any`" : "`Любая`";
-        };
     }
 }

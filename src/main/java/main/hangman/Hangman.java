@@ -3,6 +3,7 @@ package main.hangman;
 import api.megoru.ru.entity.GameWordLanguage;
 import api.megoru.ru.impl.MegoruAPI;
 import lombok.Getter;
+import lombok.Setter;
 import main.config.BotStartConfig;
 import main.controller.UpdateController;
 import main.jsonparser.JSONParsers;
@@ -43,6 +44,7 @@ public class Hangman {
     private final HangmanPlayer[] hangmanPlayers;
     private long messageId;
 
+    @Setter
     private int usedLettersCount;
     private String WORD;
     private String[] WORD_OF_CHARS;
@@ -52,6 +54,7 @@ public class Hangman {
     private final Long againstPlayerId;
     private long channelId;
 
+    @Setter
     private volatile Status STATUS;
 
     Hangman(UpdateController updateController, boolean isCompetitive, Long againstPlayerId, HangmanPlayer... hangmanPlayers) {
@@ -111,9 +114,9 @@ public class Hangman {
         }
 
         String gameStart = jsonGameParsers.getLocale("Game_Start", userId);
-        EmbedBuilder start = HangmanEmbedUtils.hangmanPattern(userId, gameStart);
+        EmbedBuilder start = HangmanEmbedUtils.hangmanLayout(userId, gameStart);
         messageId = textChannel.sendMessageEmbeds(start.build()).complete().getIdLong();
-        createEntityInDataBase();
+        saveGameDAO();
 
         //Установка авто завершения
         setTimer(LocalDateTime.now());
@@ -155,9 +158,9 @@ public class Hangman {
         }
 
         String gameStart = jsonGameParsers.getLocale("Game_Start", userId);
-        EmbedBuilder start = HangmanEmbedUtils.hangmanPattern(userId, gameStart);
+        EmbedBuilder start = HangmanEmbedUtils.hangmanLayout(userId, gameStart);
         messageId = textChannel.sendMessageEmbeds(start.build()).complete().getIdLong();
-        createEntityInDataBase();
+        saveGameDAO();
 
         //Установка авто завершения
         setTimer(LocalDateTime.now());
@@ -176,8 +179,8 @@ public class Hangman {
             String gameStopWin = jsonGameParsers.getLocale("Game_Stop_Win", userId);
             String gameYouLose = jsonGameParsers.getLocale("Game_You_Lose", userId);
 
-            EmbedBuilder win = HangmanEmbedUtils.hangmanPattern(userId, gameStopWin);
-            EmbedBuilder lose = HangmanEmbedUtils.hangmanPattern(userId, gameYouLose);
+            EmbedBuilder win = HangmanEmbedUtils.hangmanLayout(userId, gameStopWin);
+            EmbedBuilder lose = HangmanEmbedUtils.hangmanLayout(userId, gameYouLose);
 
             if (hangmanPlayers.length == 1) {
                 HangmanEmbedUtils.editMessageWithButtons(result ? win : lose, isCompetitive, userId, HangmanUtils.getListButtons(userId), updateController.getHangmanGameRepository());
@@ -210,20 +213,20 @@ public class Hangman {
                 HangmanRegistry.getInstance().removeHangman(userId);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
     }
 
-    private void createEntityInDataBase() {
+    private void saveGameDAO() {
         try {
             HangmanPlayer hangmanPlayer = hangmanPlayers[0];
             long userId = hangmanPlayer.getUserId();
             Long guildId = hangmanPlayer.getGuildId(); //Nullable is fine
             channelId = hangmanPlayer.getChannelId();
 
-            Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now().atZone(ZoneOffset.UTC).toLocalDateTime());
             ActiveHangman activeHangman = new ActiveHangman();
             activeHangman.setUserIdLong(userId);
+            Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now().atZone(ZoneOffset.UTC).toLocalDateTime());
 
             if (hangmanPlayers.length > 1) {
                 activeHangman.setSecondUserIdLong(hangmanPlayers[1].getUserId());
@@ -264,7 +267,7 @@ public class Hangman {
     }
 
     //заменяет "_" на букву которая есть в слове
-    String replacementLetters(String letter) {
+    synchronized String replacementLetters(String letter) {
         try {
             StringBuilder sb = new StringBuilder(WORD_HIDDEN);
             for (int i = 0; i < WORD_OF_CHARS.length; i++) {
@@ -290,13 +293,6 @@ public class Hangman {
         return contains;
     }
 
-    public String getGuesses() {
-        return guesses
-                .toString()
-                .replaceAll("\\[", "")
-                .replaceAll("]", "");
-    }
-
     synchronized void incrementHangmanErrors() {
         this.hangmanErrors++;
     }
@@ -305,16 +301,8 @@ public class Hangman {
         return guesses.size();
     }
 
-    public void setUsedLettersCount(int number) {
-        usedLettersCount = number;
-    }
-
     public int getLengthWord() {
         return WORD != null ? WORD.length() : 0;
-    }
-
-    public void setSTATUS(Status status) {
-        this.STATUS = status;
     }
 
     private void setTimer(LocalDateTime ldt) {

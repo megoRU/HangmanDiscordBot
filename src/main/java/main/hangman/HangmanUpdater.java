@@ -7,11 +7,13 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Logger;
 
 @Service
 public class HangmanUpdater extends TimerTask {
 
     private final HangmanGameRepository hangmanGameRepository;
+    private final Logger LOGGER = Logger.getLogger(HangmanUpdater.class.getName());
 
     @Autowired
     public HangmanUpdater(HangmanGameRepository hangmanGameRepository) {
@@ -32,7 +34,7 @@ public class HangmanUpdater extends TimerTask {
                             HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
                             long userId = hangmanPlayers[0].getUserId();
                             String wordHidden = hangman.getWORD_HIDDEN();
-                            String guesses = hangman.getGuesses();
+                            String guesses = HangmanUtils.getGuesses(hangman.getGuesses());
                             int hangmanErrors = hangman.getHangmanErrors();
 
                             hangmanGameRepository.updateGame(userId, wordHidden, guesses, hangmanErrors);
@@ -40,7 +42,7 @@ public class HangmanUpdater extends TimerTask {
                     }
             );
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
     }
 }

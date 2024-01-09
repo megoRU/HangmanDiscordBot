@@ -54,7 +54,7 @@ public class StopCommand {
                 } else {
                     updateController.sendMessage(event, hangmanEngGame, HangmanUtils.BUTTON_PLAY_AGAIN);
                 }
-                EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanPattern(userId, hangmanEngGame1);
+                EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanLayout(userId, hangmanEngGame1);
 
                 HangmanEmbedUtils.editMessage(embedBuilder, userId, hangmanGameRepository);
                 instance.removeHangman(userId);
@@ -79,7 +79,7 @@ public class StopCommand {
             updateController.sendMessage(event, hangmanEngGame);
         }
 
-        EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanPattern(userIdLong, hangmanEngGame);
+        EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanLayout(userIdLong, hangmanEngGame);
         HangmanEmbedUtils.editMessage(embedBuilder, userIdLong, hangmanGameRepository);
         hangmanGameRepository.deleteActiveGame(userIdLong);
 

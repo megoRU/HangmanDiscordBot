@@ -27,6 +27,7 @@ public class HelpCommand {
         info.addField("Slash Commands",
 
                 "</hg:940560633504604161> - " + " " + jsonParsers.getLocale("help_hg", userIdLong)
+                        + "\n</competitive:1024084212762038352>"
                         + "\n</multi:1024084212762038352> - " + " " + jsonParsers.getLocale("help_multi", userIdLong)
                         + "\n</stop:940560633504604162> - " + " " + jsonParsers.getLocale("help_stop", userIdLong)
                         + "\n</language:940560633504604160> - " + " " + jsonParsers.getLocale("help_language", userIdLong)

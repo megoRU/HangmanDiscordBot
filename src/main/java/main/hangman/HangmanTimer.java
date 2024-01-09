@@ -11,12 +11,14 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Logger;
 
 @Service
 public class HangmanTimer extends TimerTask {
 
     private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
     private final HangmanGameRepository hangmanGameRepository;
+    private final Logger LOGGER = Logger.getLogger(HangmanTimer.class.getName());
 
     @Autowired
     public HangmanTimer(HangmanGameRepository hangmanGameRepository) {
@@ -54,7 +56,7 @@ public class HangmanTimer extends TimerTask {
                                 HangmanRegistry.getInstance().removeHangman(userId);
                             }
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            LOGGER.info(e.getMessage());
                         }
                     }
                 }

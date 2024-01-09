@@ -9,6 +9,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 public class HangmanUtils {
 
@@ -51,5 +53,23 @@ public class HangmanUtils {
         }
         buttonList.add(BUTTON_MY_STATS);
         return buttonList;
+    }
+
+    public static String getGuesses(Set<String> guesses) {
+        return guesses
+                .toString()
+                .replaceAll("\\[", "")
+                .replaceAll("]", "");
+    }
+
+    public static String category(Long userId) {
+        UserSettings.Category category = BotStartConfig.getMapGameCategory().get(userId);
+        UserSettings.BotLanguage language = BotStartConfig.getMapLanguages().get(userId);
+        return switch (category.name()) {
+            case "colors" -> Objects.equals(language.name(), "EN") ? "`Colors`" : "`Цвета`";
+            case "flowers" -> Objects.equals(language.name(), "EN") ? "`Flowers`" : "`Цветы`";
+            case "fruits" -> Objects.equals(language.name(), "EN") ? "`Fruits`" : "`Фрукты`";
+            default -> Objects.equals(language.name(), "EN") ? "`Any`" : "`Любая`";
+        };
     }
 }

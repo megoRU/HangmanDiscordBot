@@ -7,11 +7,13 @@ import net.dv8tion.jda.api.entities.Message;
 import org.jetbrains.annotations.NotNull;
 import org.junit.internal.Checks;
 
+import java.util.logging.Logger;
+
 public class HangmanInputs {
 
     //Localisation
     private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
-    private static final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
+    private final Logger LOGGER = Logger.getLogger(HangmanInputs.class.getName());
 
     private final Hangman hangman;
     private final UpdateController updateController;
@@ -32,7 +34,7 @@ public class HangmanInputs {
                         if (hangman.getSTATUS() == Hangman.Status.SAME_LETTER) return;
                         hangman.setSTATUS(Hangman.Status.SAME_LETTER);
                         String gameYouUseThisLetter = jsonGameParsers.getLocale("Game_You_Use_This_Letter", userId);
-                        EmbedBuilder info = HangmanEmbedUtils.hangmanPattern(userId, gameYouUseThisLetter);
+                        EmbedBuilder info = HangmanEmbedUtils.hangmanLayout(userId, gameYouUseThisLetter);
                         HangmanEmbedUtils.editMessage(info, userId, updateController.getHangmanGameRepository());
                         return;
                     }
@@ -47,7 +49,7 @@ public class HangmanInputs {
                             return;
                         }
                         String gameYouGuessLetter = jsonGameParsers.getLocale("Game_You_Guess_Letter", userId);
-                        EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanPattern(userId, gameYouGuessLetter);
+                        EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanLayout(userId, gameYouGuessLetter);
                         HangmanEmbedUtils.editMessage(embedBuilder, userId, updateController.getHangmanGameRepository());
                     } else {
                         hangman.incrementHangmanErrors();
@@ -57,7 +59,7 @@ public class HangmanInputs {
                         } else {
                             hangman.setSTATUS(Hangman.Status.WRONG_LETTER);
                             String gameNoSuchLetter = jsonGameParsers.getLocale("Game_No_Such_Letter", userId);
-                            EmbedBuilder wordNotFound = HangmanEmbedUtils.hangmanPattern(userId, gameNoSuchLetter);
+                            EmbedBuilder wordNotFound = HangmanEmbedUtils.hangmanLayout(userId, gameNoSuchLetter);
                             HangmanEmbedUtils.editMessage(wordNotFound, userId, updateController.getHangmanGameRepository());
                         }
                     }
@@ -65,7 +67,7 @@ public class HangmanInputs {
             } else {
                 if (inputs.length() != hangman.getLengthWord()) {
                     String wrongLengthJson = jsonGameParsers.getLocale("wrongLength", userId);
-                    EmbedBuilder wrongLength = HangmanEmbedUtils.hangmanPattern(userId, wrongLengthJson);
+                    EmbedBuilder wrongLength = HangmanEmbedUtils.hangmanLayout(userId, wrongLengthJson);
                     HangmanEmbedUtils.editMessage(wrongLength, userId, updateController.getHangmanGameRepository());
                     return;
                 }
@@ -74,7 +76,7 @@ public class HangmanInputs {
                     if (hangman.getSTATUS() == Hangman.Status.SAME_LETTER) return;
                     hangman.setSTATUS(Hangman.Status.SAME_LETTER);
                     String gameYouUseThisWord = jsonGameParsers.getLocale("Game_You_Use_This_Word", userId);
-                    EmbedBuilder info = HangmanEmbedUtils.hangmanPattern(userId, gameYouUseThisWord);
+                    EmbedBuilder info = HangmanEmbedUtils.hangmanLayout(userId, gameYouUseThisWord);
                     HangmanEmbedUtils.editMessage(info, userId, updateController.getHangmanGameRepository());
                     return;
                 }
@@ -90,22 +92,13 @@ public class HangmanInputs {
                     } else {
                         hangman.setSTATUS(Hangman.Status.WRONG_WORD);
                         String gameNoSuchWord = jsonGameParsers.getLocale("Game_No_Such_Word", userId);
-                        EmbedBuilder wordNotFound = HangmanEmbedUtils.hangmanPattern(userId, gameNoSuchWord);
+                        EmbedBuilder wordNotFound = HangmanEmbedUtils.hangmanLayout(userId, gameNoSuchWord);
                         HangmanEmbedUtils.editMessage(wordNotFound, userId, updateController.getHangmanGameRepository());
                     }
                 }
             }
-        } catch (NullPointerException e) {
-            String wordIsNull = jsonParsers.getLocale("word_is_null", userId);
-            messages.getChannel()
-                    .sendMessage(wordIsNull)
-                    .setActionRow(HangmanUtils.getListButtons(userId))
-                    .queue();
-
-            HangmanRegistry.getInstance().removeHangman(userId);
-            e.printStackTrace();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
         }
     }
 }
