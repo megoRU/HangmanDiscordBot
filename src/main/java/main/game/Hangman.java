@@ -16,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -120,7 +119,7 @@ public class Hangman {
             WORD_OF_CHARS = WORD.toLowerCase().split(""); // Преобразуем строку str в массив символов (char)
             hideWord(WORD.length());
         } catch (Exception e) {
-            handleAPIException(userId, textChannel);
+            HangmanUtils.handleAPIException(userId, textChannel);
             return;
         }
 
@@ -142,7 +141,7 @@ public class Hangman {
             WORD_OF_CHARS = WORD.toLowerCase().split(""); // Преобразуем строку str в массив символов (char)
             hideWord(WORD.length());
         } catch (Exception e) {
-            handleAPIException(userId, textChannel);
+            HangmanUtils.handleAPIException(userId, textChannel);
             return;
         }
 
@@ -276,18 +275,5 @@ public class Hangman {
 
     String getAgainstPlayerWithDiscord() {
         return String.format("<@%s>", againstPlayerId);
-    }
-
-    void handleAPIException(long userId, MessageChannel textChannel) {
-        String errorsTitle = JSON_BOT_PARSERS.getLocale("errors_title", userId);
-        String errors = JSON_BOT_PARSERS.getLocale("errors", userId);
-
-        EmbedBuilder wordIsNull = new EmbedBuilder();
-        wordIsNull.setTitle(errorsTitle);
-        wordIsNull.setColor(Color.RED);
-        wordIsNull.setDescription(errors);
-
-        textChannel.sendMessageEmbeds(wordIsNull.build()).queue();
-        HangmanRegistry.getInstance().removeHangman(userId);
     }
 }

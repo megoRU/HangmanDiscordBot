@@ -1,13 +1,11 @@
 package main.service;
 
-import api.megoru.ru.entity.GameWordLanguage;
-import api.megoru.ru.entity.exceptions.UnsuccessfulHttpException;
-import api.megoru.ru.impl.MegoruAPI;
 import main.config.BotStartConfig;
 import main.controller.UpdateController;
 import main.game.*;
+import main.game.api.HangmanAPI;
 import main.game.core.HangmanRegistry;
-import main.model.entity.UserSettings;
+import main.game.utils.HangmanUtils;
 import main.model.repository.CompetitiveQueueRepository;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
@@ -15,7 +13,8 @@ import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 public class CompetitiveService {
@@ -25,8 +24,9 @@ public class CompetitiveService {
     private final HangmanDataSaving hangmanDataSaving;
     private final UpdateController updateController;
     private final HangmanResult hangmanResult;
+    private final HangmanAPI hangmanAPI;
 
-    private final MegoruAPI megoruAPI = new MegoruAPI.Builder().build();
+    private static final Logger LOGGER = Logger.getLogger(CompetitiveService.class.getName());
 
     @Autowired
     public CompetitiveService(CompetitiveQueueRepository competitiveQueueRepository,
@@ -39,43 +39,51 @@ public class CompetitiveService {
         this.hangmanDataSaving = hangmanDataSaving;
         this.updateController = updateController;
         this.hangmanResult = hangmanResult;
+        this.hangmanAPI = new HangmanAPI();
     }
 
-    public void startGame() throws UnsuccessfulHttpException, IOException {
+    public void startGame() {
         HangmanRegistry hangmanRegistry = HangmanRegistry.getInstance();
         int competitiveQueueSize = hangmanRegistry.getCompetitiveQueueSize();
         if (competitiveQueueSize > 1) {
             HangmanPlayer[] competitivePlayers = hangmanRegistry.getCompetitivePlayers();
             if (competitivePlayers.length > 1) {
-                UserSettings.GameLanguage gameLanguage = competitivePlayers[0].getGameLanguage();
+                long userId = competitivePlayers[0].getUserId();
 
-                GameWordLanguage gameWordLanguage = new GameWordLanguage();
-                gameWordLanguage.setLanguage(gameLanguage.name());
-                gameWordLanguage.setCategory("ALL");
+                try {
+                    String word = hangmanAPI.getWord(userId);
+                    for (HangmanPlayer competitiveCurrentPlayer : competitivePlayers) {
+                        long currentPlayerUserId = competitiveCurrentPlayer.getUserId();
 
-                String word = megoruAPI.getWord(gameWordLanguage).getWord();
-                for (HangmanPlayer competitiveCurrentPlayer : competitivePlayers) {
-                    long currentPlayerUserId = competitiveCurrentPlayer.getUserId();
+                        HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder();
+                        hangmanBuilder.addHangmanPlayer(competitiveCurrentPlayer);
+                        hangmanBuilder.setCompetitive(true);
+                        hangmanBuilder.setAgainstPlayerId(getAnotherUserId(currentPlayerUserId, competitivePlayers));
+                        hangmanBuilder.setUpdateController(updateController);
+                        hangmanBuilder.setHangmanGameRepository(hangmanGameRepository);
+                        hangmanBuilder.setHangmanDataSaving(hangmanDataSaving);
+                        hangmanBuilder.setHangmanResult(hangmanResult);
 
-                    HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder();
-                    hangmanBuilder.addHangmanPlayer(competitiveCurrentPlayer);
-                    hangmanBuilder.setCompetitive(true);
-                    hangmanBuilder.setAgainstPlayerId(getAnotherUserId(currentPlayerUserId, competitivePlayers));
-                    hangmanBuilder.setUpdateController(updateController);
-                    hangmanBuilder.setHangmanGameRepository(hangmanGameRepository);
-                    hangmanBuilder.setHangmanDataSaving(hangmanDataSaving);
-                    hangmanBuilder.setHangmanResult(hangmanResult);
+                        Hangman hangman = hangmanBuilder.build();
+                        HangmanRegistry.getInstance().setHangman(currentPlayerUserId, hangman);
 
-                    Hangman hangman = hangmanBuilder.build();
-                    HangmanRegistry.getInstance().setHangman(currentPlayerUserId, hangman);
-
-                    CacheRestAction<PrivateChannel> privateChannelCacheRestAction = BotStartConfig
+                        CacheRestAction<PrivateChannel> privateChannelCacheRestAction = BotStartConfig
+                                .jda
+                                .retrieveUserById(currentPlayerUserId)
+                                .complete()
+                                .openPrivateChannel();
+                        PrivateChannel complete = privateChannelCacheRestAction.complete();
+                        hangman.startGame(complete, word);
+                    }
+                } catch (Exception e) {
+                    PrivateChannel privateChannel = BotStartConfig
                             .jda
-                            .retrieveUserById(currentPlayerUserId)
+                            .retrieveUserById(userId)
                             .complete()
-                            .openPrivateChannel();
-                    PrivateChannel complete = privateChannelCacheRestAction.complete();
-                    hangman.startGame(complete, word);
+                            .openPrivateChannel()
+                            .complete();
+                    HangmanUtils.handleAPIException(userId, privateChannel);
+                    LOGGER.log(Level.SEVERE, e.getMessage());
                 }
 
                 competitiveQueueRepository.deleteById(competitivePlayers[0].getUserId());

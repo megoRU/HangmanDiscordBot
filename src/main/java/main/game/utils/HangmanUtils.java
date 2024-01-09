@@ -2,17 +2,25 @@ package main.game.utils;
 
 import main.config.BotStartConfig;
 import main.enums.Buttons;
+import main.game.core.HangmanRegistry;
+import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 public class HangmanUtils {
+
+    //Localisation
+    private static final JSONParsers JSON_BOT_PARSERS = new JSONParsers(JSONParsers.Locale.BOT);
 
     public static Button BUTTON_RUSSIAN = Button.secondary(Buttons.BUTTON_RUS.name(), "Кириллица").withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA"));
     public static Button BUTTON_ENGLISH = Button.secondary(Buttons.BUTTON_ENG.name(), "Latin").withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7"));
@@ -71,5 +79,18 @@ public class HangmanUtils {
             case "fruits" -> Objects.equals(language.name(), "EN") ? "`Fruits`" : "`Фрукты`";
             default -> Objects.equals(language.name(), "EN") ? "`Any`" : "`Любая`";
         };
+    }
+
+    public static void handleAPIException(long userId, MessageChannel textChannel) {
+        String errorsTitle = JSON_BOT_PARSERS.getLocale("errors_title", userId);
+        String errors = JSON_BOT_PARSERS.getLocale("errors", userId);
+
+        EmbedBuilder wordIsNull = new EmbedBuilder();
+        wordIsNull.setTitle(errorsTitle);
+        wordIsNull.setColor(Color.RED);
+        wordIsNull.setDescription(errors);
+
+        textChannel.sendMessageEmbeds(wordIsNull.build()).queue();
+        HangmanRegistry.getInstance().removeHangman(userId);
     }
 }

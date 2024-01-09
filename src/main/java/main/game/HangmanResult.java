@@ -24,26 +24,22 @@ public class HangmanResult {
     }
 
     public void save(HangmanPlayer[] hangmanPlayers, boolean result, boolean isCompetitive) {
-        try {
-            HangmanRegistry instance = HangmanRegistry.getInstance();
-            List<Game> gameList = new ArrayList<>();
-            for (HangmanPlayer player : hangmanPlayers) {
-                Game game = new Game();
-                game.setId(instance.getIdGame());
-                game.setResult(result);
-                game.setIsCompetitive(isCompetitive);
-                game.setGameDate(new Timestamp(Instant.now().toEpochMilli()));
-                game.setUserIdLong(player.getUserId());
+        HangmanRegistry instance = HangmanRegistry.getInstance();
+        List<Game> gameList = new ArrayList<>();
+        for (HangmanPlayer player : hangmanPlayers) {
+            Game game = new Game();
+            game.setId(instance.getIdGame());
+            game.setResult(result);
+            game.setIsCompetitive(isCompetitive);
+            game.setGameDate(new Timestamp(Instant.now().toEpochMilli()));
+            game.setUserIdLong(player.getUserId());
 
-                gameList.add(game);
-            }
-
-            gamesRepository.saveAllAndFlush(gameList);
-
-            HangmanPlayer hangmanPlayer = hangmanPlayers[0];
-            hangmanGameRepository.deleteActiveGame(hangmanPlayer.getUserId());
-        } catch (Exception e) {
-            e.printStackTrace();
+            gameList.add(game);
         }
+
+        gamesRepository.saveAllAndFlush(gameList);
+
+        HangmanPlayer hangmanPlayer = hangmanPlayers[0];
+        hangmanGameRepository.deleteActiveGame(hangmanPlayer.getUserId());
     }
 }
