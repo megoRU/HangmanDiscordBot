@@ -89,5 +89,6 @@
   "you_are_play_now": "Are you playing now, or cancel the search for a competitive game.",
   "delete_competitive_search": "Cancelled your participation in the competitive game!",
   "competitive_game": "• Competitive game •",
-  "against": "Opponent"
+  "against": "Opponent",
+  "help_competitive": "Playing against another player."
 }
