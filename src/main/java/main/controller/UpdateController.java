@@ -126,8 +126,13 @@ public class UpdateController {
         }
 
         if (Objects.equals(buttonId, Buttons.BUTTON_START_NEW_GAME.name()) || buttonId.matches("BUTTON_START_NEW_GAME_\\d+_\\d+")) {
-            HangmanButton hangmanCommand = new HangmanButton();
+            HangmanButton hangmanCommand = new HangmanButton(hangmanGameRepository, hangmanDataSaving, hangmanResult);
             hangmanCommand.hangman(event);
+            return;
+        }
+        if (Objects.equals(buttonId, Buttons.BUTTON_COMPETITIVE_AGAIN.name())) {
+            CompetitivePlayButton competitivePlayButton = new CompetitivePlayButton(competitiveQueueRepository);
+            competitivePlayButton.competitive(event);
         }
     }
 
@@ -190,12 +195,12 @@ public class UpdateController {
                 LeadboardCommand leadboardCommand = new LeadboardCommand(gamesRepository);
                 leadboardCommand.board(event);
             }
-            case "stats" -> {
+            case "statistics" -> {
                 StatsCommand statsCommand = new StatsCommand(gamesRepository);
                 event.deferReply().queue();
                 statsCommand.stats(event.getHook());
             }
-            case "stop" -> {
+            case "stop", "quit" -> {
                 StopCommand stopCommand = new StopCommand(hangmanGameRepository);
                 stopCommand.stop(event, this);
             }
@@ -203,7 +208,7 @@ public class UpdateController {
                 DeleteCommand deleteCommand = new DeleteCommand();
                 deleteCommand.delete(event);
             }
-            case "hg", "multi" -> {
+            case "hg", "multi", "play" -> {
                 HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult);
                 hangmanCommand.hangman(event);
             }

@@ -43,7 +43,7 @@ public class CategoryCommand {
             whenPlay.setColor(Color.GREEN);
             whenPlay.setDescription(reactionsButtonWhenPlay);
 
-            event.replyEmbeds(whenPlay.build()).addActionRow(HangmanUtils.BUTTON_STOP).queue();
+            event.replyEmbeds(whenPlay.build()).addActionRow(HangmanUtils.getButtonStop(userIdLong)).queue();
             return;
         }
 

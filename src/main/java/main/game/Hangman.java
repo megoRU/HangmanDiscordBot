@@ -143,7 +143,7 @@ public class Hangman {
         setTimer(LocalDateTime.now());
     }
 
-    public void inputHandler(@NotNull final String inputs, @NotNull final Message messages) {
+    public synchronized void inputHandler(@NotNull final String inputs, @NotNull final Message messages) {
         HangmanInputs hangmanInputs = new HangmanInputs(hangmanGameRepository);
         hangmanInputs.handler(inputs, messages, this);
     }
@@ -154,7 +154,7 @@ public class Hangman {
     }
 
     //Создает скрытую линию из длины слова
-    void hideWord(int length) {
+    private void hideWord(int length) {
         StringBuilder sb = new StringBuilder();
         int i = 0;
         while (i < length) {

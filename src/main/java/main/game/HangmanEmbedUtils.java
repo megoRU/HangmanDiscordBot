@@ -12,11 +12,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
-import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -165,9 +162,9 @@ public class HangmanEmbedUtils {
         }
     }
 
-    public static void editMessageWithButtons(EmbedBuilder embedBuilder, long userIdLong, HangmanGameRepository hangmanGameRepository) {
-        if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-            Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
+    public static void editMessageWithButtons(EmbedBuilder embedBuilder, long userId, HangmanGameRepository hangmanGameRepository) {
+        if (HangmanRegistry.getInstance().hasHangman(userId)) {
+            Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userId);
             if (hangman == null) return;
             boolean isCompetitive = hangman.isCompetitive();
             int playersCount = hangman.getPlayersCount();
@@ -177,11 +174,11 @@ public class HangmanEmbedUtils {
             HangmanPlayer hangmanPlayer = hangmanPlayers[0];
 
             if (playersCount > 1) {
-                listButtons = HangmanUtils.getListButtons(userIdLong, hangmanPlayers[1].getUserId());
+                listButtons = HangmanUtils.getListButtons(userId, hangmanPlayers[1].getUserId());
             } else if (playersCount == 1 && !isCompetitive) {
-                listButtons = HangmanUtils.getListButtons(userIdLong);
+                listButtons = HangmanUtils.getListButtons(userId);
             } else {
-                listButtons = new ArrayList<>();
+                listButtons = HangmanUtils.getListCompetitiveButtons(userId);
             }
 
             Long guildId = hangmanPlayer.getGuildId();
@@ -196,16 +193,17 @@ public class HangmanEmbedUtils {
                     if (textChannelById == null) textChannelById = guildById.getThreadChannelById(channelId);
                     if (textChannelById != null) {
                         try {
-                            MessageEditAction messageEditAction = textChannelById.editMessageEmbedsById(messageId, embedBuilder.build());
-                            if (!isCompetitive) messageEditAction.setActionRow(listButtons);
-                            messageEditAction.queue();
+                            textChannelById
+                                    .editMessageEmbedsById(messageId, embedBuilder.build())
+                                    .setActionRow(listButtons)
+                                    .queue();
                         } catch (Exception e) {
                             if (e.getMessage().contains("Unknown Message")
                                     || e.getMessage().contains("Unknown Channel")
                                     || e.getMessage().contains("Missing Access")
                                     || e.getMessage().contains("Cannot edit a message authored by another user")) {
-                                HangmanRegistry.getInstance().removeHangman(userIdLong);
-                                hangmanGameRepository.deleteActiveGame(userIdLong);
+                                HangmanRegistry.getInstance().removeHangman(userId);
+                                hangmanGameRepository.deleteActiveGame(userId);
                                 LOGGER.info("editMessageWithButtons(): " + e.getMessage());
                             }
                         }
@@ -215,42 +213,25 @@ public class HangmanEmbedUtils {
                 try {
                     PrivateChannel privateChannelById = BotStartConfig.jda.getPrivateChannelById(channelId);
                     if (privateChannelById == null) {
-                        CacheRestAction<PrivateChannel> privateChannelCacheRestAction = BotStartConfig
-                                .jda
-                                .retrieveUserById(userIdLong)
-                                .complete()
-                                .openPrivateChannel();
-                        if (!isCompetitive) {
-                            privateChannelCacheRestAction
-                                    .flatMap(channel -> channel
-                                            .editMessageEmbedsById(messageId, embedBuilder.build())
-                                            .setActionRow(listButtons))
-                                    .queue();
-                        } else {
-                            privateChannelCacheRestAction
-                                    .flatMap(channel -> channel
-                                            .editMessageEmbedsById(messageId, embedBuilder.build()))
-                                    .queue();
-                        }
+                        BotStartConfig
+                                .jda.retrieveUserById(userId).complete()
+                                .openPrivateChannel()
+                                .flatMap(channel -> channel.editMessageEmbedsById(messageId, embedBuilder.build())
+                                        .setActionRow(listButtons))
+                                .queue();
                     } else {
-                        if (!isCompetitive) {
-                            privateChannelById
-                                    .editMessageEmbedsById(messageId, embedBuilder.build())
-                                    .setActionRow(listButtons)
-                                    .queue();
-                        } else {
-                            privateChannelById
-                                    .editMessageEmbedsById(messageId, embedBuilder.build())
-                                    .queue();
-                        }
+                        privateChannelById
+                                .editMessageEmbedsById(messageId, embedBuilder.build())
+                                .setActionRow(listButtons)
+                                .queue();
                     }
                 } catch (Exception e) {
                     if (e.getMessage().contains("Unknown Message")
                             || e.getMessage().contains("Unknown Channel")
                             || e.getMessage().contains("Missing Access")
                             || e.getMessage().contains("Cannot edit a message authored by another user")) {
-                        HangmanRegistry.getInstance().removeHangman(userIdLong);
-                        hangmanGameRepository.deleteActiveGame(userIdLong);
+                        HangmanRegistry.getInstance().removeHangman(userId);
+                        hangmanGameRepository.deleteActiveGame(userId);
                         LOGGER.info("editMessageWithButtons(): " + e.getMessage());
                     }
                 }

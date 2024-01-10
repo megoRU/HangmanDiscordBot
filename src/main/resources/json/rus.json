@@ -86,11 +86,18 @@
   "already_in_queue": "Вы уже в очереди!",
   "added_to_the_queue": "Добавил вас в очередь. Как только игрок найдется, я создам игру!",
   "available_only_pm": "Эта команда доступна только в личных сообщениях!",
-  "you_are_play_now": "Вы сейчас играете, или отмените поиск соревновательной игры.",
+  "you_are_search_now": "Чтобы играть в одиночном режиме, отмените поиск соревновательной игры.",
   "delete_competitive_search": "Отменил ваше участие в соревновательной игре!",
   "competitive_game": "• Соревновательная игра •",
   "against": "Соперник",
   "help_competitive": "Игра против другого игрока.",
   "Game_Competitive_You_Lose": ":x: Соперник быстрее отгадал слово. Вы проиграли!",
-  "Game_Competitive_You_Win": ":white_check_mark: Соперник проиграл. Вы выиграли!"
+  "Game_Competitive_You_Win": ":white_check_mark: Соперник проиграл. Вы выиграли!",
+  "button_play": "Играть",
+  "button_statistics": "Статистика",
+  "button_support": "Поддержка",
+  "button_play_competitive": "Играть в матчмейкинг",
+  "button_stop": "Завершить игру",
+  "button_leave": "Покинуть"
+
 }

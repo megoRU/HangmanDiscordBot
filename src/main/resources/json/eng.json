@@ -86,11 +86,18 @@
   "already_in_queue": "You are already in the queue!",
   "added_to_the_queue": "Added you to the queue. As soon as a player is found, I will create a game!",
   "available_only_pm": "This command is only available in private messages!",
-  "you_are_play_now": "Are you playing now, or cancel the search for a competitive game.",
+  "you_are_search_now": "To play in single player mode, cancel the search for a competitive game.",
   "delete_competitive_search": "Cancelled your participation in the competitive game!",
   "competitive_game": "• Competitive game •",
   "against": "Opponent",
   "help_competitive": "Playing against another player.",
   "Game_Competitive_You_Lose": ":x: The opponent guessed the word faster. You've lost!",
-  "Game_Competitive_You_Win": ":white_check_mark: The opponent lost. You've won!"
+  "Game_Competitive_You_Win": ":white_check_mark: The opponent lost. You've won!",
+  "button_play": "Play",
+  "button_statistics": "Statistics",
+  "button_support": "Support",
+  "button_play_competitive": "Play Matchmaking",
+  "button_stop": "Finish game",
+  "button_leave": "Leave"
+
 }

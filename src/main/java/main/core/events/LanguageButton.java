@@ -38,7 +38,7 @@ public class LanguageButton {
             youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
             youPlay.setColor(0x00FF00);
             youPlay.setDescription(reactionsButtonWhenPlay);
-            event.getHook().sendMessageEmbeds(youPlay.build()).setEphemeral(true).addActionRow(HangmanUtils.BUTTON_STOP).queue();
+            event.getHook().sendMessageEmbeds(youPlay.build()).setEphemeral(true).addActionRow(HangmanUtils.getButtonStop(userId)).queue();
             return;
         }
 

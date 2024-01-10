@@ -54,7 +54,7 @@ public class StopCommand {
                     Button buttonPlayAgainWithUsers = HangmanUtils.getButtonPlayAgainWithUsers(userId, secondUserId);
                     updateController.sendMessage(event, hangmanEngGame, buttonPlayAgainWithUsers);
                 } else {
-                    updateController.sendMessage(event, hangmanEngGame, HangmanUtils.BUTTON_PLAY_AGAIN);
+                    updateController.sendMessage(event, hangmanEngGame, HangmanUtils.getButtonPlayAgain(userId));
                 }
                 EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanLayout(userId, hangmanEngGame1);
 
@@ -65,7 +65,7 @@ public class StopCommand {
             //Если игрок не играет, а хочет завершить игру, то нужно ему это прислать уведомление, что он сейчас не играет
         } else {
             String hangmanYouAreNotPlay = jsonParsers.getLocale("Hangman_You_Are_Not_Play", userIdLong);
-            updateController.sendMessage(event, hangmanYouAreNotPlay, HangmanUtils.BUTTON_PLAY_AGAIN);
+            updateController.sendMessage(event, hangmanYouAreNotPlay, HangmanUtils.getButtonPlayAgain(userIdLong));
         }
     }
 

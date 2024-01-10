@@ -34,7 +34,7 @@ public class LanguageGameButton {
             youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
             youPlay.setColor(0x00FF00);
             youPlay.setDescription(reactionsButtonWhenPlay);
-            event.getHook().sendMessageEmbeds(youPlay.build()).setEphemeral(true).addActionRow(HangmanUtils.BUTTON_STOP).queue();
+            event.getHook().sendMessageEmbeds(youPlay.build()).setEphemeral(true).addActionRow(HangmanUtils.getButtonStop(userIdLong)).queue();
         } else {
             if (event.getButton().getEmoji() != null) {
                 String buttonName = event.getButton().getEmoji().getName().contains("\uD83C\uDDF7\uD83C\uDDFA") ? "RU" : "EN";

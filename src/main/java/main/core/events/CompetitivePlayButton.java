@@ -8,23 +8,23 @@ import main.jsonparser.JSONParsers;
 import main.model.entity.CompetitiveQueue;
 import main.model.entity.UserSettings;
 import main.model.repository.CompetitiveQueueRepository;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CompetitiveCommand {
+public class CompetitivePlayButton {
 
     private final CompetitiveQueueRepository competitiveQueueRepository;
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
 
     @Autowired
-    public CompetitiveCommand(CompetitiveQueueRepository competitiveQueueRepository) {
+    public CompetitivePlayButton(CompetitiveQueueRepository competitiveQueueRepository) {
         this.competitiveQueueRepository = competitiveQueueRepository;
     }
 
-    public void competitive(@NotNull SlashCommandInteractionEvent event) {
+    public void competitive(@NotNull ButtonInteractionEvent event) {
         var userId = event.getUser().getIdLong();
         boolean fromGuild = event.isFromGuild();
         long messageChannel = event.getMessageChannel().getIdLong();
@@ -65,13 +65,12 @@ public class CompetitiveCommand {
                         .queue();
             } else if (hangmanRegistry.hasHangman(userId)) {
                 String youArePlayNow = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
-                event.reply(youArePlayNow)
-                        .setActionRow(HangmanUtils.getButtonStop(userId))
-                        .queue();
+                event.reply(youArePlayNow).queue();
             } else {
                 String alreadyInQueue = jsonParsers.getLocale("already_in_queue", event.getUser().getIdLong());
                 event.reply(alreadyInQueue).queue();
             }
         }
+        event.editButton(event.getButton().asDisabled()).queue();
     }
 }

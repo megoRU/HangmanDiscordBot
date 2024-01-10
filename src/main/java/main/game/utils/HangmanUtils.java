@@ -25,11 +25,37 @@ public class HangmanUtils {
 
     public static Button BUTTON_RUSSIAN = Button.secondary(Buttons.BUTTON_RUS.name(), "Кириллица").withEmoji(Emoji.fromUnicode("U+1F1F7U+1F1FA"));
     public static Button BUTTON_ENGLISH = Button.secondary(Buttons.BUTTON_ENG.name(), "Latin").withEmoji(Emoji.fromUnicode("U+1F1ECU+1F1E7"));
-    public static Button BUTTON_MY_STATS = Button.primary(Buttons.BUTTON_MY_STATS.name(), "My stats");
-    public static Button BUTTON_PLAY_AGAIN = Button.success(Buttons.BUTTON_START_NEW_GAME.name(), "Play again");
-    public static Button BUTTON_SUPPORT = Button.link("https://discord.gg/UrWG3R683d", "Support");
     public static Button BUTTON_HELP = Button.success(Buttons.BUTTON_HELP.name(), "/help");
-    public static Button BUTTON_STOP = Button.danger(Buttons.BUTTON_STOP.name(), "Stop game");
+
+    public static Button getButtonLeaveSearch(long userId) {
+        String buttonLeave = JSON_BOT_PARSERS.getLocale("button_leave", userId);
+        return Button.danger(Buttons.BUTTON_COMPETITIVE_STOP.name(), buttonLeave);
+    }
+
+    public static Button getButtonStop(long userId) {
+        String buttonStop = JSON_BOT_PARSERS.getLocale("button_stop", userId);
+        return Button.danger(Buttons.BUTTON_STOP.name(), buttonStop);
+    }
+
+    public static Button getButtonPlayAgain(long userId) {
+        String buttonPlay = JSON_BOT_PARSERS.getLocale("button_play", userId);
+        return Button.success(Buttons.BUTTON_START_NEW_GAME.name(), buttonPlay);
+    }
+
+    public static Button getButtonSupport(long userId) {
+        String buttonSupport = JSON_BOT_PARSERS.getLocale("button_support", userId);
+        return Button.link("https://discord.gg/UrWG3R683d", buttonSupport);
+    }
+
+    public static Button getButtonPlayCompetitiveAgain(long userId) {
+        String buttonPlayCompetitive = JSON_BOT_PARSERS.getLocale("button_play_competitive", userId);
+        return Button.success(Buttons.BUTTON_COMPETITIVE_AGAIN.name(), buttonPlayCompetitive);
+    }
+
+    public static Button getButtonStatistics(long userId) {
+        String buttonStatistics = JSON_BOT_PARSERS.getLocale("button_statistics", userId);
+        return Button.primary(Buttons.BUTTON_MY_STATS.name(), buttonStatistics);
+    }
 
     public static Button getButtonPlayAgainWithUsers(long userIdLong, long secondUser) {
         String multi = String.format("%s_%s_%s", Buttons.BUTTON_START_NEW_GAME.name(), userIdLong, secondUser);
@@ -40,27 +66,33 @@ public class HangmanUtils {
         return String.format("https://megoru.ru/hangman/%s.png", count);
     }
 
-    public static List<Button> getListButtons(long userIdLong) {
+    public static List<Button> getListButtons(long userId) {
         List<Button> buttonList = new LinkedList<>();
-        buttonList.add(BUTTON_PLAY_AGAIN);
-        return getButtons(userIdLong, buttonList);
+        buttonList.add(getButtonPlayAgain(userId));
+        return getButtons(userId, buttonList);
     }
 
-    public static List<Button> getListButtons(long userIdLong, long secondUser) {
+    public static List<Button> getListCompetitiveButtons(long userId) {
         List<Button> buttonList = new LinkedList<>();
-        buttonList.add(getButtonPlayAgainWithUsers(userIdLong, secondUser));
-        return getButtons(userIdLong, buttonList);
+        buttonList.add(getButtonPlayCompetitiveAgain(userId));
+        return buttonList;
+    }
+
+    public static List<Button> getListButtons(long userId, long secondUserId) {
+        List<Button> buttonList = new LinkedList<>();
+        buttonList.add(getButtonPlayAgainWithUsers(userId, secondUserId));
+        return getButtons(userId, buttonList);
     }
 
     @NotNull
-    private static List<Button> getButtons(long userIdLong, List<Button> buttonList) {
-        UserSettings.GameLanguage language = BotStartConfig.getMapGameLanguages().get(userIdLong);
+    private static List<Button> getButtons(long userId, List<Button> buttonList) {
+        UserSettings.GameLanguage language = BotStartConfig.getMapGameLanguages().get(userId);
         if (language != null && language.name().equals("EN")) {
             buttonList.add(BUTTON_RUSSIAN);
         } else {
             buttonList.add(BUTTON_ENGLISH);
         }
-        buttonList.add(BUTTON_MY_STATS);
+        buttonList.add(getButtonStatistics(userId));
         return buttonList;
     }
 

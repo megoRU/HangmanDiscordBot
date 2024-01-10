@@ -52,7 +52,7 @@ public class LanguageCommand {
             whenPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
             whenPlay.setColor(Color.GREEN);
             whenPlay.setDescription(reactionsButtonWhenPlay);
-            event.replyEmbeds(whenPlay.build()).addActionRow(HangmanUtils.BUTTON_STOP).setEphemeral(true).queue();
+            event.replyEmbeds(whenPlay.build()).addActionRow(HangmanUtils.getButtonStop(userIdLong)).setEphemeral(true).queue();
             return;
         } //0 - game | 1 - bot
         else if (event.getOptions().size() == 2) {
@@ -70,7 +70,7 @@ public class LanguageCommand {
 
             String slashLanguage = String.format(jsonParsers.getLocale("slash_language", userIdLong), opOne, opTwo);
 
-            event.reply(slashLanguage).addActionRow(HangmanUtils.BUTTON_PLAY_AGAIN).queue();
+            event.reply(slashLanguage).addActionRow(HangmanUtils.getButtonPlayAgain(userIdLong)).queue();
 
             userSettings.setBotLanguage(botLanguage);
             userSettings.setGameLanguage(gameLanguage);

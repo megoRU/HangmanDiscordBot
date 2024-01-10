@@ -47,7 +47,7 @@ public class JoinEvent {
                     if (messageChannel != null) {
                         messageChannel
                                 .sendMessageEmbeds(welcome.build())
-                                .setActionRow(HangmanUtils.BUTTON_HELP, HangmanUtils.BUTTON_SUPPORT)
+                                .setActionRow(HangmanUtils.BUTTON_HELP, HangmanUtils.getButtonSupport(0L))
                                 .queue();
                     }
                 }

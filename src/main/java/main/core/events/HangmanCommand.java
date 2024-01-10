@@ -66,13 +66,13 @@ public class HangmanCommand {
 
             event.replyEmbeds(needSetLanguage.build())
                     .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
-                    .addActionRow(HangmanUtils.BUTTON_PLAY_AGAIN)
+                    .addActionRow(HangmanUtils.getButtonPlayAgain(userIdLong))
                     .queue();
             //Проверяем если игрок уже играет. То присылаем в чат уведомление
         } else if (instance.hasCompetitive(userIdLong)) {
-            String youArePlayNow = jsonParsers.getLocale("you_are_play_now", userIdLong);
+            String youArePlayNow = jsonParsers.getLocale("you_are_search_now", userIdLong);
             event.reply(youArePlayNow)
-                    .setActionRow(Button.danger(Buttons.BUTTON_COMPETITIVE_STOP.name(), "Cancel Matchmaking"))
+                    .setActionRow(HangmanUtils.getButtonLeaveSearch(userIdLong))
                     .queue();
         } else if (instance.hasHangman(userIdLong)) {
             String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", userIdLong);
@@ -82,7 +82,7 @@ public class HangmanCommand {
             youPlay.setColor(Color.GREEN);
             youPlay.setDescription(hangmanListenerYouPlay);
 
-            event.replyEmbeds(youPlay.build()).addActionRow(HangmanUtils.BUTTON_STOP).queue();
+            event.replyEmbeds(youPlay.build()).addActionRow(HangmanUtils.getButtonStop(userIdLong)).queue();
             //Если всё хорошо, создаем игру
         } else {
             HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, guildIdLong, channelIdLong);
