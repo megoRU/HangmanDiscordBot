@@ -59,7 +59,6 @@ public class CompetitiveService {
                         hangmanBuilder.addHangmanPlayer(competitiveCurrentPlayer);
                         hangmanBuilder.setCompetitive(true);
                         hangmanBuilder.setAgainstPlayerId(getAnotherUserId(currentPlayerUserId, competitivePlayers));
-                        hangmanBuilder.setUpdateController(updateController);
                         hangmanBuilder.setHangmanGameRepository(hangmanGameRepository);
                         hangmanBuilder.setHangmanDataSaving(hangmanDataSaving);
                         hangmanBuilder.setHangmanResult(hangmanResult);

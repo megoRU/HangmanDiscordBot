@@ -1,9 +1,10 @@
 package main.core.events;
 
 import main.config.BotStartConfig;
-import main.controller.UpdateController;
 import main.enums.Buttons;
-import main.game.*;
+import main.game.Hangman;
+import main.game.HangmanBuilder;
+import main.game.HangmanPlayer;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
@@ -19,7 +20,7 @@ public class HangmanButton {
 
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
 
-    public void hangman(@NotNull ButtonInteractionEvent event, UpdateController updateController) {
+    public void hangman(@NotNull ButtonInteractionEvent event) {
         event.editButton(event.getButton().asDisabled()).queue();
 
         var userIdLong = event.getUser().getIdLong();
@@ -41,7 +42,6 @@ public class HangmanButton {
             event.getChannel().sendTyping().queue();
 
             HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder();
-            hangmanBuilder.setUpdateController(updateController);
 
             Hangman hangman;
             //Guild Play

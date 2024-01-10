@@ -355,7 +355,6 @@ public class BotStartConfig {
                     .setHangmanGameRepository(hangmanGameRepository)
                     .setHangmanDataSaving(hangmanDataSaving)
                     .setHangmanResult(hangmanResult)
-                    .setUpdateController(updateController)
                     .addHangmanPlayer(hangmanPlayer)
                     .setHangmanErrors(hangmanErrors)
                     .setWord(word)

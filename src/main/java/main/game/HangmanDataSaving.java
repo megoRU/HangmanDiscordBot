@@ -19,8 +19,7 @@ public class HangmanDataSaving {
         this.hangmanGameRepository = hangmanGameRepository;
     }
 
-    //Returned channelId
-    public long saveGame(Hangman hangman) {
+    public void saveGame(Hangman hangman) {
         HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
         long messageId = hangman.getMessageId();
         String word = hangman.getWORD();
@@ -38,10 +37,7 @@ public class HangmanDataSaving {
         activeHangman.setUserIdLong(userId);
         Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now().atZone(ZoneOffset.UTC).toLocalDateTime());
 
-        if (hangmanPlayers.length > 1) {
-            activeHangman.setSecondUserIdLong(hangmanPlayers[1].getUserId());
-        }
-
+        if (hangmanPlayers.length > 1) activeHangman.setSecondUserIdLong(hangmanPlayers[1].getUserId());
         activeHangman.setMessageIdLong(messageId);
         activeHangman.setChannelIdLong(channelId);
         activeHangman.setGuildLongId(guildId);
@@ -52,6 +48,5 @@ public class HangmanDataSaving {
         activeHangman.setAgainstPlayerId(againstPlayerId);
         activeHangman.setGameCreatedTime(timestamp);
         hangmanGameRepository.saveAndFlush(activeHangman);
-        return channelId;
     }
 }

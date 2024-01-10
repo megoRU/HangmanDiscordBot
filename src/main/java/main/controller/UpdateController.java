@@ -127,7 +127,7 @@ public class UpdateController {
 
         if (Objects.equals(buttonId, Buttons.BUTTON_START_NEW_GAME.name()) || buttonId.matches("BUTTON_START_NEW_GAME_\\d+_\\d+")) {
             HangmanButton hangmanCommand = new HangmanButton();
-            hangmanCommand.hangman(event, this);
+            hangmanCommand.hangman(event);
         }
     }
 
@@ -135,9 +135,8 @@ public class UpdateController {
         boolean permission = ChecksClass.check(event);
         if (!permission) return;
 
-
         HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult);
-        hangmanCommand.hangman(event, this);
+        hangmanCommand.hangman(event);
     }
 
     private void messageReceivedEvent(@NotNull MessageReceivedEvent event) {
@@ -206,7 +205,7 @@ public class UpdateController {
             }
             case "hg", "multi" -> {
                 HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult);
-                hangmanCommand.hangman(event, this);
+                hangmanCommand.hangman(event);
             }
             case "category" -> {
                 CategoryCommand categoryCommand = new CategoryCommand(userSettingsRepository);

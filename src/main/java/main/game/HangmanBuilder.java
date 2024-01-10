@@ -1,6 +1,5 @@
 package main.game;
 
-import main.controller.UpdateController;
 import main.model.repository.HangmanGameRepository;
 
 import java.time.LocalDateTime;
@@ -11,8 +10,7 @@ public interface HangmanBuilder {
 
     class Builder {
 
-        //UpdateController
-        private UpdateController updateController;
+        //Service
         private HangmanGameRepository hangmanGameRepository;
         private HangmanDataSaving hangmanDataSaving;
         private HangmanResult hangmanResult;
@@ -102,25 +100,18 @@ public interface HangmanBuilder {
             return this;
         }
 
-        public Builder setUpdateController(UpdateController updateController) {
-            this.updateController = updateController;
-            return this;
-        }
-
         /**
          * @throws IllegalArgumentException if hangmanGameRepository, playerRepository, gamesRepository, channelId == null
          */
         public Hangman build() {
-            if (updateController == null)
-                throw new IllegalArgumentException("The provided updateController cannot be null!");
-            else if (hangmanGameRepository == null)
+            if (hangmanGameRepository == null)
                 throw new IllegalArgumentException("The provided hangmanGameRepository cannot be null!");
             else if (hangmanDataSaving == null)
                 throw new IllegalArgumentException("The provided hangmanDataSaving cannot be null!");
             else if (hangmanResult == null)
                 throw new IllegalArgumentException("The provided hangmanResult cannot be null!");
 
-            Hangman hangman = new Hangman(updateController, hangmanGameRepository, hangmanDataSaving, hangmanResult);
+            Hangman hangman = new Hangman(hangmanGameRepository, hangmanDataSaving, hangmanResult);
 
             if (word != null && currentHiddenWord != null) {
                 return hangman.update(

@@ -2,6 +2,7 @@ package main.game.utils;
 
 import main.config.BotStartConfig;
 import main.enums.Buttons;
+import main.game.HangmanPlayer;
 import main.game.core.HangmanRegistry;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
@@ -79,6 +80,11 @@ public class HangmanUtils {
             case "fruits" -> Objects.equals(language.name(), "EN") ? "`Fruits`" : "`Фрукты`";
             default -> Objects.equals(language.name(), "EN") ? "`Any`" : "`Любая`";
         };
+    }
+
+    public static long getHangmanFirstPlayer(HangmanPlayer[] hangmanPlayers) {
+        HangmanPlayer hangmanPlayer = hangmanPlayers[0];
+        return hangmanPlayer.getUserId();
     }
 
     public static void handleAPIException(long userId, MessageChannel textChannel) {

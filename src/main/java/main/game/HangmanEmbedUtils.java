@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -31,7 +32,7 @@ public class HangmanEmbedUtils {
 
         if (hangman != null) {
             HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
-            userId = hangmanPlayers[0].getUserId();
+            userId = HangmanUtils.getHangmanFirstPlayer(hangmanPlayers);
             String gamePlayer;
             if (hangmanPlayers.length > 1) {
                 gamePlayer = jsonGameParsers.getLocale("Game_Players", userId);
@@ -164,12 +165,24 @@ public class HangmanEmbedUtils {
         }
     }
 
-    public static void editMessageWithButtons(EmbedBuilder embedBuilder, boolean isCompetitive, Long userIdLong, List<Button> buttons, HangmanGameRepository hangmanGameRepository) {
+    public static void editMessageWithButtons(EmbedBuilder embedBuilder, long userIdLong, HangmanGameRepository hangmanGameRepository) {
         if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
             Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
             if (hangman == null) return;
+            boolean isCompetitive = hangman.isCompetitive();
+            int playersCount = hangman.getPlayersCount();
+            List<Button> listButtons;
+
             HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
             HangmanPlayer hangmanPlayer = hangmanPlayers[0];
+
+            if (playersCount > 1) {
+                listButtons = HangmanUtils.getListButtons(userIdLong, hangmanPlayers[1].getUserId());
+            } else if (playersCount == 1 && !isCompetitive) {
+                listButtons = HangmanUtils.getListButtons(userIdLong);
+            } else {
+                listButtons = new ArrayList<>();
+            }
 
             Long guildId = hangmanPlayer.getGuildId();
             long channelId = hangmanPlayer.getChannelId();
@@ -183,9 +196,8 @@ public class HangmanEmbedUtils {
                     if (textChannelById == null) textChannelById = guildById.getThreadChannelById(channelId);
                     if (textChannelById != null) {
                         try {
-                            MessageEditAction messageEditAction = textChannelById
-                                    .editMessageEmbedsById(messageId, embedBuilder.build());
-                            if (!isCompetitive) messageEditAction.setActionRow(buttons);
+                            MessageEditAction messageEditAction = textChannelById.editMessageEmbedsById(messageId, embedBuilder.build());
+                            if (!isCompetitive) messageEditAction.setActionRow(listButtons);
                             messageEditAction.queue();
                         } catch (Exception e) {
                             if (e.getMessage().contains("Unknown Message")
@@ -212,7 +224,7 @@ public class HangmanEmbedUtils {
                             privateChannelCacheRestAction
                                     .flatMap(channel -> channel
                                             .editMessageEmbedsById(messageId, embedBuilder.build())
-                                            .setActionRow(buttons))
+                                            .setActionRow(listButtons))
                                     .queue();
                         } else {
                             privateChannelCacheRestAction
@@ -224,7 +236,7 @@ public class HangmanEmbedUtils {
                         if (!isCompetitive) {
                             privateChannelById
                                     .editMessageEmbedsById(messageId, embedBuilder.build())
-                                    .setActionRow(buttons)
+                                    .setActionRow(listButtons)
                                     .queue();
                         } else {
                             privateChannelById

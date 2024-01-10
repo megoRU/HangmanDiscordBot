@@ -54,7 +54,7 @@ public class HangmanTimer extends TimerTask {
                                 info.setDescription(timeIsOver);
                                 info.addField(gamePlayer, hangmanPlayer.getGame().getUserIdWithDiscord(), false);
 
-                                HangmanEmbedUtils.editMessageWithButtons(info, hangman.isCompetitive(), userId, HangmanUtils.getListButtons(userId), hangmanGameRepository);
+                                HangmanEmbedUtils.editMessageWithButtons(info, userId, hangmanGameRepository);
                                 hangmanGameRepository.deleteActiveGame(userId);
                                 HangmanRegistry.getInstance().removeHangman(userId);
                             }

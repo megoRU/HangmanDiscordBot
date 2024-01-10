@@ -1,7 +1,6 @@
 package main.core.events;
 
 import main.config.BotStartConfig;
-import main.controller.UpdateController;
 import main.enums.Buttons;
 import main.game.*;
 import main.game.core.HangmanRegistry;
@@ -41,7 +40,7 @@ public class HangmanCommand {
         this.hangmanResult = hangmanResult;
     }
 
-    public void hangman(@NotNull GenericCommandInteractionEvent event, UpdateController updateController) {
+    public void hangman(@NotNull GenericCommandInteractionEvent event) {
         long userIdLong = event.getUser().getIdLong();
         long channelIdLong = event.getMessageChannel().getIdLong();
         Long guildIdLong = null;
@@ -89,7 +88,6 @@ public class HangmanCommand {
             HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, guildIdLong, channelIdLong);
             HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder();
             hangmanBuilder.addHangmanPlayer(hangmanPlayer);
-            hangmanBuilder.setUpdateController(updateController);
             hangmanBuilder.setHangmanDataSaving(hangmanDataSaving);
             hangmanBuilder.setHangmanGameRepository(hangmanGameRepository);
             hangmanBuilder.setHangmanResult(hangmanResult);

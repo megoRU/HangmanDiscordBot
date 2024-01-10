@@ -42,4 +42,16 @@ public class HangmanResult {
         HangmanPlayer hangmanPlayer = hangmanPlayers[0];
         hangmanGameRepository.deleteActiveGame(hangmanPlayer.getUserId());
     }
+
+    public void save(long userId, boolean result, boolean isCompetitive) {
+        HangmanRegistry instance = HangmanRegistry.getInstance();
+        Game game = new Game();
+        game.setId(instance.getIdGame());
+        game.setResult(result);
+        game.setIsCompetitive(isCompetitive);
+        game.setGameDate(new Timestamp(Instant.now().toEpochMilli()));
+        game.setUserIdLong(userId);
+        gamesRepository.saveAndFlush(game);
+        hangmanGameRepository.deleteActiveGame(userId);
+    }
 }

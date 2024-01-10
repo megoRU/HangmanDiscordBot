@@ -67,13 +67,10 @@ public class CompetitiveCommand {
                         .queue();
             } else if (hangmanRegistry.hasHangman(userIdLong)) {
                 String youArePlayNow = jsonParsers.getLocale("you_are_play_now", event.getUser().getIdLong());
-                event.reply(youArePlayNow)
-                        .queue();
+                event.reply(youArePlayNow).queue();
             } else {
                 String alreadyInQueue = jsonParsers.getLocale("already_in_queue", event.getUser().getIdLong());
-
-                event.reply(alreadyInQueue)
-                        .queue();
+                event.reply(alreadyInQueue).queue();
             }
         }
     }
