@@ -57,9 +57,10 @@ public class HangmanUtils {
         return Button.primary(Buttons.BUTTON_MY_STATS.name(), buttonStatistics);
     }
 
-    public static Button getButtonPlayAgainWithUsers(long userIdLong, long secondUser) {
-        String multi = String.format("%s_%s_%s", Buttons.BUTTON_START_NEW_GAME.name(), userIdLong, secondUser);
-        return Button.success(multi, "Play again");
+    public static Button getButtonPlayAgainWithUsers(long userId, long secondUserId) {
+        String multi = String.format("%s_%s_%s", Buttons.BUTTON_START_NEW_GAME.name(), userId, secondUserId);
+        String buttonPlayAgain = JSON_BOT_PARSERS.getLocale("button_play_again", userId);
+        return Button.success(multi, buttonPlayAgain);
     }
 
     public static String getImage(int count) {

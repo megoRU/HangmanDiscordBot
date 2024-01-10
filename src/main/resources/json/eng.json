@@ -98,6 +98,6 @@
   "button_support": "Support",
   "button_play_competitive": "Play Matchmaking",
   "button_stop": "Finish game",
-  "button_leave": "Leave"
-
+  "button_leave": "Leave",
+  "button_play_again": "Play again"
 }
