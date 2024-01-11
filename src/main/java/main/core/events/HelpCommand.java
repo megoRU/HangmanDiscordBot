@@ -26,12 +26,12 @@ public class HelpCommand {
         info.setColor(Color.GREEN);
         info.addField("Slash Commands",
 
-                "</hg:940560633504604161> - " + " " + jsonParsers.getLocale("help_hg", userIdLong)
+                "</play:1194760100833939491> - " + " " + jsonParsers.getLocale("help_hg", userIdLong)
                         + "\n</competitive:1194054216013066240> - " + " " + jsonParsers.getLocale("help_competitive", userIdLong)
                         + "\n</multi:1024084212762038352> - " + " " + jsonParsers.getLocale("help_multi", userIdLong)
-                        + "\n</stop:940560633504604162> - " + " " + jsonParsers.getLocale("help_stop", userIdLong)
+                        + "\n</quit:1194760100833939492> - " + " " + jsonParsers.getLocale("help_stop", userIdLong)
                         + "\n</language:940560633504604160> - " + " " + jsonParsers.getLocale("help_language", userIdLong)
-                        + "\n</stats:940560633504604164> - " + " " + jsonParsers.getLocale("help_stats", userIdLong)
+                        + "\n</statistics:1194760100833939493> - " + " " + jsonParsers.getLocale("help_stats", userIdLong)
                         + "\n</category:1029784705073168486> - " + " " + jsonParsers.getLocale("help_category", userIdLong)
                         + "\n</mystats:940560633504604165> - " + " " + jsonParsers.getLocale("help_mystats", userIdLong)
                         + "\n</allstats:940560633504604166> - " + " " + jsonParsers.getLocale("help_allstats", userIdLong)

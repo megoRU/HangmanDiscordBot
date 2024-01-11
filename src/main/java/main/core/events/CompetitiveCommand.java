@@ -51,14 +51,14 @@ public class CompetitiveCommand {
             if (!hangmanRegistry.hasCompetitive(userId) && !hangmanRegistry.hasHangman(userId)) {
                 String addedToTheQueue = jsonParsers.getLocale("added_to_the_queue", event.getUser().getIdLong());
 
-                HangmanPlayer hangmanPlayer = new HangmanPlayer(userId, null, messageChannel, userGameLanguage);
-                hangmanRegistry.addCompetitiveQueue(hangmanPlayer);
-
                 CompetitiveQueue competitiveQueue = new CompetitiveQueue();
                 competitiveQueue.setUserIdLong(userId);
                 competitiveQueue.setGameLanguage(userGameLanguage);
                 competitiveQueue.setMessageChannel(messageChannel);
                 competitiveQueueRepository.save(competitiveQueue);
+
+                HangmanPlayer hangmanPlayer = new HangmanPlayer(userId, null, messageChannel, userGameLanguage);
+                hangmanRegistry.addCompetitiveQueue(hangmanPlayer);
 
                 event.reply(addedToTheQueue)
                         .setActionRow(HangmanUtils.getButtonLeaveSearch(userId))
