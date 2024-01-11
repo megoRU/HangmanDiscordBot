@@ -37,6 +37,7 @@
   "Hangman_Listener_You_Play": "Сейчас вы играете.\nЧтобы завершить игру нажмите на кнопку",
   "Hangman_Listener_Need_Set_Language": "Для начала Вам нужно установить язык для слов или режим игры.\nЭто можно сделать нажатием на кнопку с языком и режимом.\nЗатем нажмите на кнопку Play",
   "Hangman_Eng_game": "Вы завершили игру.",
+  "hangman_opponent_cansel_game": "Оппонент отменил игру.",
   "Hangman_You_Are_Not_Play": "Вы сейчас не играете.",
   "MessageStats_Your_Stats": "Ваша статистика",
   "MessageStats_Game_Count": ":video_game: Количество игр: `%s`\n",

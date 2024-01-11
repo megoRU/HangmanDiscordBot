@@ -40,11 +40,10 @@ public class StopCommand {
                 cancelCompetitiveGame(event, userIdLong, updateController);
                 Long againstPlayerId = hangman.getAgainstPlayerId();
                 cancelCompetitiveGame(event, againstPlayerId, updateController);
+                instance.removeHangman(userIdLong);
             } else {
                 HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
-                HangmanPlayer hangmanPlayer = hangmanPlayers[0];
-                long userId = hangmanPlayer.getUserId();
-
+                long userId = HangmanUtils.getHangmanFirstPlayer(hangmanPlayers);
                 String hangmanEngGame = jsonParsers.getLocale("Hangman_Eng_game", userId);
                 String hangmanEngGame1 = jsonGameParsers.getLocale("Hangman_Eng_game", userId);
 
@@ -69,22 +68,20 @@ public class StopCommand {
         }
     }
 
-    private void cancelCompetitiveGame(@NotNull Event event, long userIdLong, UpdateController updateController) {
-        HangmanRegistry instance = HangmanRegistry.getInstance();
-
+    private void cancelCompetitiveGame(@NotNull Event event, long userId, UpdateController updateController) {
         GenericCommandInteractionEvent genericCommandInteractionEvent = (GenericCommandInteractionEvent) event;
-        long userId = genericCommandInteractionEvent.getUser().getIdLong();
-
-        String hangmanEngGame = jsonParsers.getLocale("Hangman_Eng_game", userIdLong);
-
-        if (userId == userIdLong) {
+        long userIdFromEvent = genericCommandInteractionEvent.getUser().getIdLong();
+        if (userIdFromEvent == userId) {
+            String hangmanEngGame = jsonParsers.getLocale("Hangman_Eng_game", userId);
+            EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanLayout(userId, hangmanEngGame);
             updateController.sendMessage(event, hangmanEngGame);
+            HangmanEmbedUtils.editMessage(embedBuilder, userId, hangmanGameRepository);
+        } else {
+            String opponentCanselGame = jsonParsers.getLocale("hangman_opponent_cansel_game", userId);
+            EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanLayout(userId, opponentCanselGame);
+            HangmanEmbedUtils.editMessage(embedBuilder, userId, hangmanGameRepository);
         }
 
-        EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanLayout(userIdLong, hangmanEngGame);
-        HangmanEmbedUtils.editMessage(embedBuilder, userIdLong, hangmanGameRepository);
-        hangmanGameRepository.deleteActiveGame(userIdLong);
-
-        instance.removeHangman(userIdLong);
+        hangmanGameRepository.deleteActiveGame(userId);
     }
 }
