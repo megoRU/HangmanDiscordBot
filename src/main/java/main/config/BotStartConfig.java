@@ -28,8 +28,8 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.boticordjava.api.entity.bot.stats.BotStats;
 import org.boticordjava.api.impl.BotiCordAPI;
 import org.discordbots.api.client.DiscordBotListAPI;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -41,7 +41,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
@@ -284,15 +283,13 @@ public class BotStartConfig {
                 InputStream inputStream = new ClassPathResource("json/" + listLanguage + ".json").getInputStream();
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                JSONObject jsonObject = (JSONObject) new JSONParser().parse(reader);
+                JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
 
-                for (Object o : jsonObject.keySet()) {
-                    String key = (String) o;
-
+                for (String o : jsonObject.keySet()) {
                     if (listLanguage.equals("rus")) {
-                        ParserClass.russian.put(key, String.valueOf(jsonObject.get(key)));
+                        ParserClass.russian.put(o, String.valueOf(jsonObject.get(o)));
                     } else {
-                        ParserClass.english.put(key, String.valueOf(jsonObject.get(key)));
+                        ParserClass.english.put(o, String.valueOf(jsonObject.get(o)));
                     }
                 }
                 reader.close();

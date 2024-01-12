@@ -1,13 +1,11 @@
 package main.game;
 
-import main.controller.UpdateController;
 import main.enums.GameStatus;
 import main.jsonparser.JSONParsers;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import org.jetbrains.annotations.NotNull;
-import org.junit.internal.Checks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +28,7 @@ public class HangmanInputs {
         long userId = messages.getAuthor().getIdLong();
         try {
             MessageDeleting.addMessageToDelete(messages);
-            Checks.notNull(hangman.getWORD());
+            if (hangman.getWORD() == null) throw new NullPointerException();
             if (inputs.length() == 1) {
                 if (hangman.getWORD_HIDDEN().contains("_")) {
                     if (hangman.isLetterPresent(inputs.toUpperCase())) {
