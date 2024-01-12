@@ -1,4 +1,4 @@
-FROM maven:3.9.4-eclipse-temurin-20 as build
+FROM maven:3.9.6-amazoncorretto-21-debian
 
 WORKDIR /app
 
