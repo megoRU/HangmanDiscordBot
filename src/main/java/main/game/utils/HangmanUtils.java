@@ -6,7 +6,10 @@ import main.game.HangmanPlayer;
 import main.game.core.HangmanRegistry;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
+import main.service.UpdateStatisticsService;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -95,6 +98,22 @@ public class HangmanUtils {
         }
         buttonList.add(getButtonStatistics(userId));
         return buttonList;
+    }
+
+    public static void updateActivity(JDA jda) {
+        if (jda != null) {
+            HangmanRegistry instance = HangmanRegistry.getInstance();
+            int competitiveQueueSize = instance.getCompetitiveQueueSize();
+            if (competitiveQueueSize >= 1) {
+                jda.getPresence().setActivity(Activity.customStatus(
+                        String.format("/competitive : %s %s",
+                                competitiveQueueSize,
+                                competitiveQueueSize == 1 ? "player" : "players")));
+            } else {
+                UpdateStatisticsService updateStatisticsService = new UpdateStatisticsService();
+                updateStatisticsService.update(jda);
+            }
+        }
     }
 
     public static String getGuesses(Set<String> guesses) {

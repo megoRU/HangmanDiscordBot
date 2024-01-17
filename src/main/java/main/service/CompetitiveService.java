@@ -1,5 +1,6 @@
 package main.service;
 
+import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.controller.UpdateController;
 import main.game.*;
@@ -8,6 +9,7 @@ import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.model.repository.CompetitiveQueueRepository;
 import main.model.repository.HangmanGameRepository;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,32 +19,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Service
+@AllArgsConstructor
 public class CompetitiveService {
 
     private final CompetitiveQueueRepository competitiveQueueRepository;
     private final HangmanGameRepository hangmanGameRepository;
     private final HangmanDataSaving hangmanDataSaving;
-    private final UpdateController updateController;
     private final HangmanResult hangmanResult;
     private final HangmanAPI hangmanAPI;
 
     private static final Logger LOGGER = Logger.getLogger(CompetitiveService.class.getName());
 
-    @Autowired
-    public CompetitiveService(CompetitiveQueueRepository competitiveQueueRepository,
-                              HangmanGameRepository hangmanGameRepository,
-                              HangmanDataSaving hangmanDataSaving,
-                              UpdateController updateController,
-                              HangmanResult hangmanResult) {
-        this.competitiveQueueRepository = competitiveQueueRepository;
-        this.hangmanGameRepository = hangmanGameRepository;
-        this.hangmanDataSaving = hangmanDataSaving;
-        this.updateController = updateController;
-        this.hangmanResult = hangmanResult;
-        this.hangmanAPI = new HangmanAPI();
-    }
-
-    public void startGame() {
+    public void startGame(JDA jda) {
         HangmanRegistry hangmanRegistry = HangmanRegistry.getInstance();
         int competitiveQueueSize = hangmanRegistry.getCompetitiveQueueSize();
         if (competitiveQueueSize > 1) {
@@ -66,17 +54,16 @@ public class CompetitiveService {
                         Hangman hangman = hangmanBuilder.build();
                         HangmanRegistry.getInstance().setHangman(currentPlayerUserId, hangman);
 
-                        CacheRestAction<PrivateChannel> privateChannelCacheRestAction = BotStartConfig
-                                .jda
+                        CacheRestAction<PrivateChannel> privateChannelCacheRestAction = jda
                                 .retrieveUserById(currentPlayerUserId)
                                 .complete()
                                 .openPrivateChannel();
                         PrivateChannel complete = privateChannelCacheRestAction.complete();
                         hangman.startGame(complete, word);
+                        HangmanUtils.updateActivity(jda);
                     }
                 } catch (Exception e) {
-                    PrivateChannel privateChannel = BotStartConfig
-                            .jda
+                    PrivateChannel privateChannel = jda
                             .retrieveUserById(userId)
                             .complete()
                             .openPrivateChannel()

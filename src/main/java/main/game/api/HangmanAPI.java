@@ -6,9 +6,11 @@ import api.megoru.ru.impl.MegoruAPI;
 import main.config.BotStartConfig;
 import main.model.entity.UserSettings;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+@Service
 public class HangmanAPI {
 
     private final MegoruAPI megoruAPI;

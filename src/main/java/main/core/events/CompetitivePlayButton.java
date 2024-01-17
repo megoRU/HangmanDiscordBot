@@ -63,12 +63,16 @@ public class CompetitivePlayButton {
                 event.reply(addedToTheQueue)
                         .setActionRow(HangmanUtils.getButtonLeaveSearch(userId))
                         .queue();
+
+                HangmanUtils.updateActivity(event.getJDA());
             } else if (hangmanRegistry.hasHangman(userId)) {
                 String youArePlayNow = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
                 event.reply(youArePlayNow).queue();
+                HangmanUtils.updateActivity(event.getJDA());
             } else {
                 String alreadyInQueue = jsonParsers.getLocale("already_in_queue", event.getUser().getIdLong());
                 event.reply(alreadyInQueue).queue();
+                HangmanUtils.updateActivity(event.getJDA());
             }
         }
         event.editButton(event.getButton().asDisabled()).queue();
