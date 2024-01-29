@@ -34,6 +34,7 @@ public class HangmanButton {
 
     public void hangman(@NotNull ButtonInteractionEvent event) {
         event.editButton(event.getButton().asDisabled()).queue();
+        if (event.getButton().getId() == null) return;
 
         var userIdLong = event.getUser().getIdLong();
         var channelIdLong = event.getChannel().getIdLong();

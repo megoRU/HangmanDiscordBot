@@ -18,6 +18,8 @@ public class UpdateStatisticsService {
 
     private static final Logger LOGGER = Logger.getLogger(UpdateStatisticsService.class.getName());
 
+    public String activity;
+
     //API
     private final DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
             .token(Config.getTopGgApiToken())
@@ -36,8 +38,9 @@ public class UpdateStatisticsService {
             int serverCount = jda.getGuilds().size();
             TOP_GG_API.setStats(serverCount);
 
+            activity = BotStartConfig.activity + serverCount + " guilds";
             if (competitiveQueueSize == 0) {
-                jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
+                jda.getPresence().setActivity(Activity.playing(activity));
             }
 
             AtomicInteger usersCount = new AtomicInteger();
