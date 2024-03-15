@@ -112,9 +112,7 @@ public class HangmanUtils {
             } else {
                 UpdateStatisticsService updateStatisticsService = new UpdateStatisticsService();
                 String activity = updateStatisticsService.activity;
-                if (activity != null) {
-                    jda.getPresence().setActivity(Activity.playing(updateStatisticsService.activity));
-                }
+                jda.getPresence().setActivity(Activity.playing(activity));
             }
         }
     }

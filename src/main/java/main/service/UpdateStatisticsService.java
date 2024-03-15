@@ -18,7 +18,7 @@ public class UpdateStatisticsService {
 
     private static final Logger LOGGER = Logger.getLogger(UpdateStatisticsService.class.getName());
 
-    public String activity;
+    public static String activity = "Preparing a cake...";
 
     //API
     private final DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
