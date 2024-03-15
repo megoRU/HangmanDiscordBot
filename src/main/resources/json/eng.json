@@ -86,7 +86,7 @@
   "wins": "Wins: ",
   "already_in_queue": "You are already in the queue!",
   "added_to_the_queue": "Added you to the queue. As soon as a player is found, I will create a game!",
-  "available_only_pm": "This command is only available in private messages!",
+  "available_only_pm": "This command is only available in private messages! I'll try to send you a message at PM.",
   "you_are_search_now": "To play in single player mode, cancel the search for a competitive game.",
   "delete_competitive_search": "Cancelled your participation in the competitive game!",
   "competitive_game": "• Competitive game •",
@@ -100,5 +100,6 @@
   "button_play_competitive": "Play Matchmaking",
   "button_stop": "Finish game",
   "button_leave": "Leave",
-  "button_play_again": "Play again"
+  "button_play_again": "Play again",
+  "competitive_message": "You can use this command here: </competitive:1194054216013066240>"
 }

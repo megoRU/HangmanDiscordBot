@@ -1,7 +1,6 @@
 package main.controller;
 
 import lombok.Getter;
-import main.config.BotStartConfig;
 import main.core.ChecksClass;
 import main.core.CoreBot;
 import main.core.events.*;
@@ -15,6 +14,7 @@ import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
 import main.model.repository.UserSettingsRepository;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -22,13 +22,17 @@ import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEven
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.RestAction;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static main.config.BotStartConfig.jda;
 
 @Getter
 @Component
@@ -150,7 +154,7 @@ public class UpdateController {
         String message = event.getMessage().getContentRaw();
 
         if (message.equals("ping-test")) {
-            BotStartConfig.jda.getRestPing().queue((time) ->
+            jda.getRestPing().queue((time) ->
                     event.getChannel().sendMessageFormat("Ping: %d ms", time).queue()
             );
             return;
@@ -218,7 +222,7 @@ public class UpdateController {
             }
             case "competitive" -> {
                 CompetitiveCommand competitiveCommand = new CompetitiveCommand(competitiveQueueRepository);
-                competitiveCommand.competitive(event);
+                competitiveCommand.competitive(event, this);
             }
         }
     }
@@ -253,6 +257,20 @@ public class UpdateController {
                 buttonEvent.getHook().sendMessageEmbeds(build).addActionRow(buttonList).queue();
             else buttonEvent.replyEmbeds(build).addActionRow(buttonList).queue();
         }
+    }
+
+    public void sendMessage(String userId, String text) {
+        RestAction<User> action = jda.retrieveUserById(userId);
+        action.submit()
+                .thenCompose((user) -> user.openPrivateChannel().submit())
+                .thenCompose((channel) -> channel.sendMessage(text).submit())
+                .whenComplete((v, throwable) -> {
+                    if (throwable != null) {
+                        if (throwable.getMessage().contains("50007: Cannot send messages to this user")) {
+                            LOGGER.log(Level.SEVERE, "50007: Cannot send messages to this user", throwable);
+                        }
+                    }
+                });
     }
 
     private void joinEvent(@NotNull GuildJoinEvent event) {

@@ -110,8 +110,7 @@ public class HangmanUtils {
                                 competitiveQueueSize,
                                 competitiveQueueSize == 1 ? "player" : "players")));
             } else {
-                UpdateStatisticsService updateStatisticsService = new UpdateStatisticsService();
-                String activity = updateStatisticsService.activity;
+                String activity = UpdateStatisticsService.activity;
                 jda.getPresence().setActivity(Activity.playing(activity));
             }
         }

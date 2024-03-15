@@ -1,6 +1,7 @@
 package main.core.events;
 
 import main.config.BotStartConfig;
+import main.controller.UpdateController;
 import main.game.HangmanPlayer;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
@@ -24,16 +25,20 @@ public class CompetitiveCommand {
         this.competitiveQueueRepository = competitiveQueueRepository;
     }
 
-    public void competitive(@NotNull SlashCommandInteractionEvent event) {
+    public void competitive(@NotNull SlashCommandInteractionEvent event, UpdateController updateController) {
         var userId = event.getUser().getIdLong();
         boolean fromGuild = event.isFromGuild();
         long messageChannel = event.getMessageChannel().getIdLong();
 
         if (fromGuild) {
+            String competitiveMessage = jsonParsers.getLocale("competitive_message", event.getUser().getIdLong());
+
             String availableOnlyPm = jsonParsers.getLocale("available_only_pm", event.getUser().getIdLong());
             event.reply(availableOnlyPm)
                     .setEphemeral(true)
                     .queue();
+
+            updateController.sendMessage(String.valueOf(userId), competitiveMessage);
         } else {
             String gameLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getIdLong());
             UserSettings.GameLanguage userGameLanguage = BotStartConfig.getMapGameLanguages().get(userId);
