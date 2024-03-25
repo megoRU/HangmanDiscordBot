@@ -60,7 +60,6 @@ public class CompetitiveService {
                                 .openPrivateChannel();
                         PrivateChannel complete = privateChannelCacheRestAction.complete();
                         hangman.startGame(complete, word);
-                        HangmanUtils.updateActivity(jda);
                     }
                 } catch (Exception e) {
                     PrivateChannel privateChannel = jda
@@ -78,6 +77,7 @@ public class CompetitiveService {
                 //Удаляем из очереди
                 hangmanRegistry.removeFromCompetitiveQueue(competitivePlayers[0].getUserId());
                 hangmanRegistry.removeFromCompetitiveQueue(competitivePlayers[1].getUserId());
+                HangmanUtils.updateActivity(jda);
             }
         }
     }
