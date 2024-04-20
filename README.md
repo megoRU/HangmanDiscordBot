@@ -17,15 +17,17 @@ This work is licensed under a [GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.
 
 ## Technologies used
 
-- Java 11
-- MySQL
+- Java 20
+- MariaDB
 - Docker
+- Spring Boot
+- Hibernate
 - Maven
 
 ## Running on your server
 1. Move `docker-compose.yml` at the root `/root` VPS server.
 2. Fill it with your data.
-3. Import tables to your MySQL: `DiscordBotHangman_DB.sql`
+3. Import tables to your `MariaDB`! : `DiscordBotHangman.sql`
 4. Launch the container: `docker-compose up -d`
 5. If you need to update the repository: `docker-compose pull`
 6. If you need to stop: `docker-compose stop`
@@ -33,7 +35,6 @@ This work is licensed under a [GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.
 ## Copyright Notice
 
 1. The bot is made using the library: [JDA](https://github.com/DV8FromTheWorld/JDA)
-2. Used the library and slightly rewritten: [Statcord wrapper](https://github.com/pvhil/unofficial-statcord-wrapper)
 
 ## JETBRAINS
 

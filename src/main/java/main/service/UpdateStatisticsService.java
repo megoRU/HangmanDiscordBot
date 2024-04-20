@@ -20,18 +20,20 @@ public class UpdateStatisticsService {
 
     public static String activity = "Preparing a cake...";
 
-    //API
-    private final DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
-            .token(Config.getTopGgApiToken())
-            .botId(Config.getBotId())
-            .build();
-
-    private final BotiCordAPI api = new BotiCordAPI.Builder()
-            .token(System.getenv("BOTICORD"))
-            .build();
-
     public void update(JDA jda) {
         if (Config.isIsDev() && jda == null) return;
+        String boticord = System.getenv("BOTICORD");
+        String topGgApiToken = Config.getTopGgApiToken();
+
+        if (boticord == null || topGgApiToken == null) return;
+
+        final DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
+                .token(topGgApiToken)
+                .botId(Config.getBotId())
+                .build();
+
+        final BotiCordAPI api = new BotiCordAPI.Builder().token(boticord).build();
+
         try {
             HangmanRegistry instance = HangmanRegistry.getInstance();
             int competitiveQueueSize = instance.getCompetitiveQueueSize();

@@ -1,12 +1,13 @@
-version: '3.3'
+version: '3'
 
 services:
   hangman:
-    image: megoru/hangman
+    container_name: hangman_bot
+    image: megoru/hangman:latest
     restart: always
     environment:
-      PROD_TOKEN: YOUR_BOT_TOKEN //see https://discord.com/developers/applications
-      DATABASE_URL: jdbc:mysql:// YOUR_IP :3306/ YOUR_USER ?useSSL=false&serverTimezone=UTC&characterEncoding=utf8
+      PROD_TOKEN: YOUR_BOT_TOKEN #see https://discord.com/developers/applications
+      DATABASE_URL: jdbc:mariadb:// IP :3306/ YOUR_USER ?useSSL=false&serverTimezone=UTC&characterEncoding=utf8
       DATABASE_PASS: YOUR_PASSWORD
       DATABASE_USER: YOUR_USER
 
