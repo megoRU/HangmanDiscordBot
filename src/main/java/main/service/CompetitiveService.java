@@ -77,7 +77,6 @@ public class CompetitiveService {
                 //Удаляем из очереди
                 hangmanRegistry.removeFromCompetitiveQueue(competitivePlayers[0].getUserId());
                 hangmanRegistry.removeFromCompetitiveQueue(competitivePlayers[1].getUserId());
-                HangmanUtils.updateActivity(jda);
             }
         }
     }

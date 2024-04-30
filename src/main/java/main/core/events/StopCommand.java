@@ -8,7 +8,9 @@ import main.jsonparser.JSONParsers;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.Event;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +71,7 @@ public class StopCommand {
     }
 
     private void cancelCompetitiveGame(@NotNull Event event, long userId, UpdateController updateController) {
-        GenericCommandInteractionEvent genericCommandInteractionEvent = (GenericCommandInteractionEvent) event;
+        GenericInteractionCreateEvent genericCommandInteractionEvent = (GenericInteractionCreateEvent) event;
         long userIdFromEvent = genericCommandInteractionEvent.getUser().getIdLong();
         if (userIdFromEvent == userId) {
             String hangmanEngGame = jsonParsers.getLocale("Hangman_Eng_game", userId);

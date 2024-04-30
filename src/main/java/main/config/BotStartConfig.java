@@ -56,6 +56,7 @@ public class BotStartConfig {
     private final LanguageService languageService;
     private final HangmanGetService hangmanGetService;
     private final SlashService slashService;
+    private final CompetitiveGames competitiveGames;
     private final UpdateStatisticsService updateStatisticsService;
 
     //REPOSITORY
@@ -66,6 +67,15 @@ public class BotStartConfig {
     private void setLanguages() {
         try {
             languageService.language();
+        } catch (Exception e) {
+            LOGGER.info(e.getMessage());
+        }
+    }
+
+    @PostConstruct
+    private void setCompetitive() {
+        try {
+            competitiveGames.update();
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
         }
@@ -141,7 +151,7 @@ public class BotStartConfig {
         HangmanUtils.updateActivity(jda);
     }
 
-    @PostConstruct
+    @Scheduled(fixedDelay = 1, initialDelay = 1, timeUnit = TimeUnit.SECONDS)
     private void getCompetitiveQueue() {
         try {
             competitiveQueueService.queue(jda);

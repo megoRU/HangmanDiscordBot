@@ -101,14 +101,23 @@ public class HangmanUtils {
     }
 
     public static void updateActivity(JDA jda) {
+        update(jda, null);
+    }
+
+    public static void updateActivity(JDA jda, String string) {
+        update(jda, string);
+    }
+
+    private static void update(JDA jda, String string) {
         if (jda != null) {
             HangmanRegistry instance = HangmanRegistry.getInstance();
             int competitiveQueueSize = instance.getCompetitiveQueueSize();
-            if (competitiveQueueSize >= 1) {
+
+            if (string != null) {
                 jda.getPresence().setActivity(Activity.customStatus(
-                        String.format("/competitive : %s %s",
+                        String.format("/competitive : [%s] | %s",
                                 competitiveQueueSize,
-                                competitiveQueueSize == 1 ? "player" : "players")));
+                                string)));
             } else {
                 String activity = UpdateStatisticsService.activity;
                 jda.getPresence().setActivity(Activity.playing(activity));

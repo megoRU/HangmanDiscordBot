@@ -8,6 +8,7 @@ import main.model.entity.UserSettings;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,6 +85,10 @@ public class HangmanRegistry {
 
     public int getCompetitiveQueueSize() {
         return competitiveQueue.size();
+    }
+
+    public List<HangmanPlayer> getCompetitiveQueue() {
+        return new ArrayList<>(competitiveQueue.values());
     }
 
     public void removeFromCompetitiveQueue(long userIdLong) {
