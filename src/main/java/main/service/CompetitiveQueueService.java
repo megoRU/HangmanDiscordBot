@@ -53,7 +53,5 @@ public class CompetitiveQueueService {
                 HangmanUtils.updateActivity(jda);
             }
         }
-
-        System.out.println("getCompetitiveQueue()");
     }
 }

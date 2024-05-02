@@ -7,6 +7,7 @@ import main.game.*;
 import main.game.api.HangmanAPI;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
+import main.model.entity.UserSettings;
 import main.model.repository.CompetitiveQueueRepository;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.JDA;
@@ -42,6 +43,13 @@ public class CompetitiveService {
                     String word = hangmanAPI.getWord(userId);
                     for (HangmanPlayer competitiveCurrentPlayer : competitivePlayers) {
                         long currentPlayerUserId = competitiveCurrentPlayer.getUserId();
+                        UserSettings.GameLanguage gameLanguage = BotStartConfig.mapGameLanguages.get(currentPlayerUserId);
+
+                        if (gameLanguage == null) {
+                            competitiveQueueRepository.deleteById(currentPlayerUserId);
+                            hangmanRegistry.removeFromCompetitiveQueue(currentPlayerUserId);
+                            return;
+                        }
 
                         HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder();
                         hangmanBuilder.addHangmanPlayer(competitiveCurrentPlayer);
@@ -60,6 +68,10 @@ public class CompetitiveService {
                                 .openPrivateChannel();
                         PrivateChannel complete = privateChannelCacheRestAction.complete();
                         hangman.startGame(complete, word);
+
+                        //Удаляем из очереди
+                        competitiveQueueRepository.deleteById(currentPlayerUserId);
+                        hangmanRegistry.removeFromCompetitiveQueue(currentPlayerUserId);
                     }
                 } catch (Exception e) {
                     PrivateChannel privateChannel = jda
@@ -70,13 +82,6 @@ public class CompetitiveService {
                     HangmanUtils.handleAPIException(userId, privateChannel);
                     LOGGER.log(Level.SEVERE, e.getMessage());
                 }
-
-                competitiveQueueRepository.deleteById(competitivePlayers[0].getUserId());
-                competitiveQueueRepository.deleteById(competitivePlayers[1].getUserId());
-
-                //Удаляем из очереди
-                hangmanRegistry.removeFromCompetitiveQueue(competitivePlayers[0].getUserId());
-                hangmanRegistry.removeFromCompetitiveQueue(competitivePlayers[1].getUserId());
             }
         }
     }
