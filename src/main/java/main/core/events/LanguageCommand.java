@@ -1,6 +1,5 @@
 package main.core.events;
 
-import main.config.BotStartConfig;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
@@ -39,10 +38,6 @@ public class LanguageCommand {
             userSettings.setCategory(UserSettings.Category.ALL);
             userSettings.setGameLanguage(UserSettings.GameLanguage.EN);
             userSettings.setBotLanguage(UserSettings.BotLanguage.EN);
-
-            BotStartConfig.getMapGameCategory().put(userIdLong, UserSettings.Category.ALL);
-            BotStartConfig.getMapGameLanguages().put(userIdLong, UserSettings.GameLanguage.EN);
-            BotStartConfig.getMapLanguages().put(userIdLong, UserSettings.BotLanguage.EN);
         }
 
         //Если игрок сейчас играет сменить язык не даст
@@ -64,9 +59,6 @@ public class LanguageCommand {
 
             String opOne = event.getOptions().get(0).getAsString();
             String opTwo = event.getOptions().get(1).getAsString();
-
-            BotStartConfig.getMapGameLanguages().put(userIdLong, gameLanguage);
-            BotStartConfig.getMapLanguages().put(userIdLong, botLanguage);
 
             String slashLanguage = String.format(jsonParsers.getLocale("slash_language", userIdLong), opOne, opTwo);
 

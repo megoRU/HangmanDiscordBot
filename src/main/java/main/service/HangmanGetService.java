@@ -2,6 +2,7 @@ package main.service;
 
 import lombok.AllArgsConstructor;
 import main.game.*;
+import main.game.api.HangmanAPI;
 import main.game.core.HangmanRegistry;
 import main.model.entity.ActiveHangman;
 import main.model.repository.HangmanGameRepository;
@@ -17,6 +18,7 @@ public class HangmanGetService {
     private final HangmanGameRepository hangmanGameRepository;
     private final HangmanDataSaving hangmanDataSaving;
     private final HangmanResult hangmanResult;
+    private final HangmanAPI hangmanAPI;
 
     public void update() {
         List<ActiveHangman> activeHangmanList = hangmanGameRepository.findAll();
@@ -42,6 +44,7 @@ public class HangmanGetService {
                     .setHangmanGameRepository(hangmanGameRepository)
                     .setHangmanDataSaving(hangmanDataSaving)
                     .setHangmanResult(hangmanResult)
+                    .setHangmanAPI(hangmanAPI)
                     .addHangmanPlayer(hangmanPlayer)
                     .setHangmanErrors(hangmanErrors)
                     .setWord(word)

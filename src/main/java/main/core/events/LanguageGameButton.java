@@ -1,6 +1,5 @@
 package main.core.events;
 
-import main.config.BotStartConfig;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
@@ -53,14 +52,9 @@ public class LanguageGameButton {
                     userSettings.setCategory(UserSettings.Category.ALL);
                     userSettings.setGameLanguage(UserSettings.GameLanguage.EN);
                     userSettings.setBotLanguage(UserSettings.BotLanguage.EN);
-
-                    BotStartConfig.getMapGameCategory().put(userIdLong, UserSettings.Category.ALL);
-                    BotStartConfig.getMapGameLanguages().put(userIdLong, UserSettings.GameLanguage.EN);
-                    BotStartConfig.getMapLanguages().put(userIdLong, UserSettings.BotLanguage.EN);
                 }
 
                 userSettings.setGameLanguage(gameLanguage);
-                BotStartConfig.getMapGameLanguages().put(userIdLong, gameLanguage);
                 userSettingsRepository.save(userSettings);
             }
         }

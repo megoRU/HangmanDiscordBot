@@ -1,13 +1,14 @@
 package main.core.events;
 
-import main.config.BotStartConfig;
-import main.enums.Buttons;
+import lombok.AllArgsConstructor;
 import main.game.*;
+import main.game.api.HangmanAPI;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
 import main.model.repository.HangmanGameRepository;
+import main.service.UserSettingsService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -15,30 +16,21 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
-import java.util.Map;
 
 @Service
+@AllArgsConstructor
 public class HangmanCommand {
 
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final HangmanGameRepository hangmanGameRepository;
     private final HangmanDataSaving hangmanDataSaving;
     private final HangmanResult hangmanResult;
-
-    @Autowired
-    public HangmanCommand(HangmanGameRepository hangmanGameRepository,
-                          HangmanDataSaving hangmanDataSaving,
-                          HangmanResult hangmanResult) {
-        this.hangmanGameRepository = hangmanGameRepository;
-        this.hangmanDataSaving = hangmanDataSaving;
-        this.hangmanResult = hangmanResult;
-    }
+    private final UserSettingsService userSettingsService;
+    private final HangmanAPI hangmanAPI;
 
     public void hangman(@NotNull GenericCommandInteractionEvent event) {
         long userIdLong = event.getUser().getIdLong();
@@ -55,8 +47,8 @@ public class HangmanCommand {
 
         HangmanRegistry instance = HangmanRegistry.getInstance();
         //Проверяем установлен ли язык. Если нет - то возвращаем в чат ошибку
-        Map<Long, UserSettings.GameLanguage> mapGameLanguages = BotStartConfig.getMapGameLanguages();
-        if (!mapGameLanguages.containsKey(userIdLong)) {
+        UserSettings.GameLanguage userGameLanguage = userSettingsService.getUserGameLanguage(userIdLong);
+        if (userGameLanguage == null) {
             String hangmanListenerNeedSetLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", userIdLong);
 
             EmbedBuilder needSetLanguage = new EmbedBuilder();
@@ -91,6 +83,7 @@ public class HangmanCommand {
             hangmanBuilder.setHangmanDataSaving(hangmanDataSaving);
             hangmanBuilder.setHangmanGameRepository(hangmanGameRepository);
             hangmanBuilder.setHangmanResult(hangmanResult);
+            hangmanBuilder.setHangmanAPI(hangmanAPI);
 
             if (event.getName().equals("multi")) {
                 User user = null;

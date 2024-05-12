@@ -8,11 +8,13 @@ import main.enums.Buttons;
 import main.game.Hangman;
 import main.game.HangmanDataSaving;
 import main.game.HangmanResult;
+import main.game.api.HangmanAPI;
 import main.game.core.HangmanRegistry;
 import main.model.repository.CompetitiveQueueRepository;
 import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
 import main.model.repository.UserSettingsRepository;
+import main.service.UserSettingsService;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.Event;
@@ -45,6 +47,8 @@ public class UpdateController {
     private final CompetitiveQueueRepository competitiveQueueRepository;
     private final HangmanDataSaving hangmanDataSaving;
     private final HangmanResult hangmanResult;
+    private final UserSettingsService userSettingsService;
+    private final HangmanAPI hangmanAPI;
 
     //LOGGER
     private final static Logger LOGGER = Logger.getLogger(UpdateController.class.getName());
@@ -58,13 +62,17 @@ public class UpdateController {
                             UserSettingsRepository userSettingsRepository,
                             CompetitiveQueueRepository competitiveQueueRepository,
                             HangmanDataSaving hangmanDataSaving,
-                            HangmanResult hangmanResult) {
+                            HangmanResult hangmanResult,
+                            UserSettingsService userSettingsService,
+                            HangmanAPI hangmanAPI) {
         this.hangmanGameRepository = hangmanGameRepository;
         this.gamesRepository = gamesRepository;
         this.userSettingsRepository = userSettingsRepository;
         this.competitiveQueueRepository = competitiveQueueRepository;
         this.hangmanDataSaving = hangmanDataSaving;
         this.hangmanResult = hangmanResult;
+        this.userSettingsService = userSettingsService;
+        this.hangmanAPI = hangmanAPI;
     }
 
     public void registerBot(CoreBot coreBot) {
@@ -130,12 +138,12 @@ public class UpdateController {
         }
 
         if (Objects.equals(buttonId, Buttons.BUTTON_START_NEW_GAME.name()) || buttonId.matches("BUTTON_START_NEW_GAME_\\d+_\\d+")) {
-            HangmanButton hangmanCommand = new HangmanButton(hangmanGameRepository, hangmanDataSaving, hangmanResult);
+            HangmanButton hangmanCommand = new HangmanButton(hangmanGameRepository, hangmanDataSaving, hangmanResult, userSettingsService, hangmanAPI);
             hangmanCommand.hangman(event);
             return;
         }
         if (Objects.equals(buttonId, Buttons.BUTTON_COMPETITIVE_AGAIN.name())) {
-            CompetitivePlayButton competitivePlayButton = new CompetitivePlayButton(competitiveQueueRepository);
+            CompetitivePlayButton competitivePlayButton = new CompetitivePlayButton(competitiveQueueRepository, userSettingsService);
             competitivePlayButton.competitive(event);
         }
     }
@@ -144,7 +152,7 @@ public class UpdateController {
         boolean permission = ChecksClass.check(event);
         if (!permission) return;
 
-        HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult);
+        HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult, userSettingsService, hangmanAPI);
         hangmanCommand.hangman(event);
     }
 
@@ -213,7 +221,7 @@ public class UpdateController {
                 deleteCommand.delete(event);
             }
             case "hg", "multi", "play" -> {
-                HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult);
+                HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult, userSettingsService, hangmanAPI);
                 hangmanCommand.hangman(event);
             }
             case "category" -> {
@@ -221,7 +229,7 @@ public class UpdateController {
                 categoryCommand.category(event);
             }
             case "competitive" -> {
-                CompetitiveCommand competitiveCommand = new CompetitiveCommand(competitiveQueueRepository);
+                CompetitiveCommand competitiveCommand = new CompetitiveCommand(competitiveQueueRepository, userSettingsService);
                 competitiveCommand.competitive(event, this);
             }
         }
