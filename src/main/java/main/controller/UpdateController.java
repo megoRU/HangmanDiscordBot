@@ -8,7 +8,6 @@ import main.enums.Buttons;
 import main.game.Hangman;
 import main.game.HangmanDataSaving;
 import main.game.HangmanResult;
-import main.game.api.HangmanAPI;
 import main.game.core.HangmanRegistry;
 import main.model.repository.CompetitiveQueueRepository;
 import main.model.repository.GamesRepository;
@@ -48,7 +47,6 @@ public class UpdateController {
     private final HangmanDataSaving hangmanDataSaving;
     private final HangmanResult hangmanResult;
     private final UserSettingsService userSettingsService;
-    private final HangmanAPI hangmanAPI;
 
     //LOGGER
     private final static Logger LOGGER = Logger.getLogger(UpdateController.class.getName());
@@ -63,8 +61,7 @@ public class UpdateController {
                             CompetitiveQueueRepository competitiveQueueRepository,
                             HangmanDataSaving hangmanDataSaving,
                             HangmanResult hangmanResult,
-                            UserSettingsService userSettingsService,
-                            HangmanAPI hangmanAPI) {
+                            UserSettingsService userSettingsService) {
         this.hangmanGameRepository = hangmanGameRepository;
         this.gamesRepository = gamesRepository;
         this.userSettingsRepository = userSettingsRepository;
@@ -72,7 +69,6 @@ public class UpdateController {
         this.hangmanDataSaving = hangmanDataSaving;
         this.hangmanResult = hangmanResult;
         this.userSettingsService = userSettingsService;
-        this.hangmanAPI = hangmanAPI;
     }
 
     public void registerBot(CoreBot coreBot) {
@@ -138,7 +134,7 @@ public class UpdateController {
         }
 
         if (Objects.equals(buttonId, Buttons.BUTTON_START_NEW_GAME.name()) || buttonId.matches("BUTTON_START_NEW_GAME_\\d+_\\d+")) {
-            HangmanButton hangmanCommand = new HangmanButton(hangmanGameRepository, hangmanDataSaving, hangmanResult, userSettingsService, hangmanAPI);
+            HangmanButton hangmanCommand = new HangmanButton(hangmanGameRepository, hangmanDataSaving, hangmanResult, userSettingsService);
             hangmanCommand.hangman(event);
             return;
         }
@@ -152,7 +148,7 @@ public class UpdateController {
         boolean permission = ChecksClass.check(event);
         if (!permission) return;
 
-        HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult, userSettingsService, hangmanAPI);
+        HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult, userSettingsService);
         hangmanCommand.hangman(event);
     }
 
@@ -221,7 +217,7 @@ public class UpdateController {
                 deleteCommand.delete(event);
             }
             case "hg", "multi", "play" -> {
-                HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult, userSettingsService, hangmanAPI);
+                HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult, userSettingsService);
                 hangmanCommand.hangman(event);
             }
             case "category" -> {

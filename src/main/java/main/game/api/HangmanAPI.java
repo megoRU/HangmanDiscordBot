@@ -6,7 +6,6 @@ import api.megoru.ru.impl.MegoruAPI;
 import main.model.entity.UserSettings;
 import main.service.UserSettingsService;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -15,18 +14,15 @@ import java.io.IOException;
 public class HangmanAPI {
 
     private final MegoruAPI megoruAPI;
-    private final UserSettingsService userSettingsService;
 
-    @Autowired
-    public HangmanAPI(UserSettingsService userSettingsService) {
-        this.userSettingsService = userSettingsService;
+    public HangmanAPI() {
         this.megoruAPI = new MegoruAPI.Builder().build();
     }
 
     @NotNull
     public String getWord(long userId) throws UnsuccessfulHttpException, IOException, NullPointerException {
-        UserSettings.GameLanguage gameLanguage = userSettingsService.getUserGameLanguage(userId);
-        UserSettings.Category category = userSettingsService.getUserCategory(userId);
+        UserSettings.GameLanguage gameLanguage = UserSettingsService.getGameLanguage(userId);
+        UserSettings.Category category = UserSettingsService.getCategory(userId);
 
         if (gameLanguage != null && category != null) {
             GameWordLanguage gameWordLanguage = new GameWordLanguage();

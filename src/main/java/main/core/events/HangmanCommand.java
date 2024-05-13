@@ -2,7 +2,6 @@ package main.core.events;
 
 import lombok.AllArgsConstructor;
 import main.game.*;
-import main.game.api.HangmanAPI;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
@@ -30,7 +29,6 @@ public class HangmanCommand {
     private final HangmanDataSaving hangmanDataSaving;
     private final HangmanResult hangmanResult;
     private final UserSettingsService userSettingsService;
-    private final HangmanAPI hangmanAPI;
 
     public void hangman(@NotNull GenericCommandInteractionEvent event) {
         long userIdLong = event.getUser().getIdLong();
@@ -83,7 +81,6 @@ public class HangmanCommand {
             hangmanBuilder.setHangmanDataSaving(hangmanDataSaving);
             hangmanBuilder.setHangmanGameRepository(hangmanGameRepository);
             hangmanBuilder.setHangmanResult(hangmanResult);
-            hangmanBuilder.setHangmanAPI(hangmanAPI);
 
             if (event.getName().equals("multi")) {
                 User user = null;

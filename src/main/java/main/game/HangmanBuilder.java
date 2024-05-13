@@ -1,6 +1,5 @@
 package main.game;
 
-import main.game.api.HangmanAPI;
 import main.model.repository.HangmanGameRepository;
 
 import java.time.LocalDateTime;
@@ -15,7 +14,6 @@ public interface HangmanBuilder {
         private HangmanGameRepository hangmanGameRepository;
         private HangmanDataSaving hangmanDataSaving;
         private HangmanResult hangmanResult;
-        private HangmanAPI hangmanAPI;
 
         //User|Guild|Channel data
 
@@ -40,11 +38,6 @@ public interface HangmanBuilder {
                 hangmanPlayers[i] = hangmanPlayer;
             }
             return hangmanPlayers;
-        }
-
-        public Builder setHangmanAPI(HangmanAPI hangmanAPI) {
-            this.hangmanAPI = hangmanAPI;
-            return this;
         }
 
         public Builder setHangmanGameRepository(HangmanGameRepository hangmanGameRepository) {
@@ -117,10 +110,8 @@ public interface HangmanBuilder {
                 throw new IllegalArgumentException("The provided hangmanDataSaving cannot be null!");
             else if (hangmanResult == null)
                 throw new IllegalArgumentException("The provided hangmanResult cannot be null!");
-            else if (hangmanAPI == null)
-                throw new IllegalArgumentException("The provided hangmanAPI cannot be null!");
 
-            Hangman hangman = new Hangman(hangmanGameRepository, hangmanDataSaving, hangmanResult, hangmanAPI);
+            Hangman hangman = new Hangman(hangmanGameRepository, hangmanDataSaving, hangmanResult);
 
             if (word != null && currentHiddenWord != null) {
                 return hangman.update(

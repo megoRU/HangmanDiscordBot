@@ -42,7 +42,7 @@ public class Hangman {
     private final HangmanDataSaving hangmanDataSaving;
     private final HangmanResult hangmanResult;
 
-    private final HangmanAPI hangmanAPI;
+    private final HangmanAPI hangmanAPI = new HangmanAPI();
     private final Set<String> guesses;
     @Setter
     private HangmanPlayer[] hangmanPlayers;
@@ -66,12 +66,10 @@ public class Hangman {
     @Autowired
     public Hangman(HangmanGameRepository hangmanGameRepository,
                    HangmanDataSaving hangmanDataSaving,
-                   HangmanResult hangmanResult,
-                   HangmanAPI hangmanAPI) {
+                   HangmanResult hangmanResult) {
         this.hangmanGameRepository = hangmanGameRepository;
         this.hangmanDataSaving = hangmanDataSaving;
         this.hangmanResult = hangmanResult;
-        this.hangmanAPI = hangmanAPI;
         this.guesses = new LinkedHashSet<>();
         this.gameStatus = GameStatus.STARTING;
     }

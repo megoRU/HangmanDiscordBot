@@ -56,7 +56,6 @@ public class CompetitiveService {
                         hangmanBuilder.setHangmanGameRepository(hangmanGameRepository);
                         hangmanBuilder.setHangmanDataSaving(hangmanDataSaving);
                         hangmanBuilder.setHangmanResult(hangmanResult);
-                        hangmanBuilder.setHangmanAPI(hangmanAPI);
 
                         Hangman hangman = hangmanBuilder.build();
                         HangmanRegistry.getInstance().setHangman(currentPlayerUserId, hangman);
