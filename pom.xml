@@ -40,7 +40,7 @@
         <dependency>
             <groupId>com.github.megoRU</groupId>
             <artifactId>api.megoru.ru-wrapper</artifactId>
-            <version>5.0.3</version>
+            <version>5.0.4</version>
         </dependency>
 
         <dependency>
@@ -66,7 +66,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-beta.23</version>
+            <version>5.0.0-beta.24</version>
             <exclusions>
                 <exclusion>
                     <groupId>club.minnced</groupId>
