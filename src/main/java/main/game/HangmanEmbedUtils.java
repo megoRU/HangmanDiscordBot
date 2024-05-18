@@ -7,7 +7,6 @@ import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
 import main.model.repository.HangmanGameRepository;
-import main.service.UserSettingsService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
@@ -16,6 +15,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class HangmanEmbedUtils {
@@ -44,14 +44,10 @@ public class HangmanEmbedUtils {
             String word = hangman.getWORD().toUpperCase().replaceAll("", " ").trim();
             GameStatus gameStatus = hangman.getGameStatus();
 
-            UserSettings.GameLanguage gameLanguageLocal = UserSettingsService.getGameLanguage(userId);
-
-            if (gameLanguageLocal == null) {
-                throw new NullPointerException("Game language is not set");
-            }
+            Map<Long, UserSettings.GameLanguage> mapGameLanguages = BotStartConfig.getMapGameLanguages();
 
             String gameLanguage = jsonGameParsers.getLocale("Game_Language", userId);
-            String language = gameLanguageLocal
+            String language = mapGameLanguages.get(userId)
                     .name()
                     .equals("RU") ? "Кириллица\nКатег.: " + HangmanUtils.category(userId) : "Latin\nCateg.:" + HangmanUtils.category(userId);
 

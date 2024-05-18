@@ -1,5 +1,6 @@
 package main.core.events;
 
+import main.config.BotStartConfig;
 import main.controller.UpdateController;
 import main.game.HangmanPlayer;
 import main.game.core.HangmanRegistry;
@@ -8,7 +9,6 @@ import main.jsonparser.JSONParsers;
 import main.model.entity.CompetitiveQueue;
 import main.model.entity.UserSettings;
 import main.model.repository.CompetitiveQueueRepository;
-import main.service.UserSettingsService;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +18,11 @@ import org.springframework.stereotype.Service;
 public class CompetitiveCommand {
 
     private final CompetitiveQueueRepository competitiveQueueRepository;
-    private final UserSettingsService userSettingsService;
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
 
     @Autowired
-    public CompetitiveCommand(CompetitiveQueueRepository competitiveQueueRepository,
-                              UserSettingsService userSettingsService) {
+    public CompetitiveCommand(CompetitiveQueueRepository competitiveQueueRepository) {
         this.competitiveQueueRepository = competitiveQueueRepository;
-        this.userSettingsService = userSettingsService;
     }
 
     public void competitive(@NotNull SlashCommandInteractionEvent event, UpdateController updateController) {
@@ -44,7 +41,7 @@ public class CompetitiveCommand {
             updateController.sendMessage(String.valueOf(userId), competitiveMessage);
         } else {
             String gameLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getIdLong());
-            UserSettings.GameLanguage userGameLanguage = userSettingsService.getUserGameLanguage(userId);
+            UserSettings.GameLanguage userGameLanguage = BotStartConfig.getMapGameLanguages().get(userId);
 
             if (userGameLanguage == null) {
                 event.reply(gameLanguage)

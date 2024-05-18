@@ -13,7 +13,6 @@ import main.model.repository.CompetitiveQueueRepository;
 import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
 import main.model.repository.UserSettingsRepository;
-import main.service.UserSettingsService;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.Event;
@@ -46,7 +45,6 @@ public class UpdateController {
     private final CompetitiveQueueRepository competitiveQueueRepository;
     private final HangmanDataSaving hangmanDataSaving;
     private final HangmanResult hangmanResult;
-    private final UserSettingsService userSettingsService;
 
     //LOGGER
     private final static Logger LOGGER = Logger.getLogger(UpdateController.class.getName());
@@ -60,15 +58,13 @@ public class UpdateController {
                             UserSettingsRepository userSettingsRepository,
                             CompetitiveQueueRepository competitiveQueueRepository,
                             HangmanDataSaving hangmanDataSaving,
-                            HangmanResult hangmanResult,
-                            UserSettingsService userSettingsService) {
+                            HangmanResult hangmanResult) {
         this.hangmanGameRepository = hangmanGameRepository;
         this.gamesRepository = gamesRepository;
         this.userSettingsRepository = userSettingsRepository;
         this.competitiveQueueRepository = competitiveQueueRepository;
         this.hangmanDataSaving = hangmanDataSaving;
         this.hangmanResult = hangmanResult;
-        this.userSettingsService = userSettingsService;
     }
 
     public void registerBot(CoreBot coreBot) {
@@ -134,12 +130,12 @@ public class UpdateController {
         }
 
         if (Objects.equals(buttonId, Buttons.BUTTON_START_NEW_GAME.name()) || buttonId.matches("BUTTON_START_NEW_GAME_\\d+_\\d+")) {
-            HangmanButton hangmanCommand = new HangmanButton(hangmanGameRepository, hangmanDataSaving, hangmanResult, userSettingsService);
+            HangmanButton hangmanCommand = new HangmanButton(hangmanGameRepository, hangmanDataSaving, hangmanResult);
             hangmanCommand.hangman(event);
             return;
         }
         if (Objects.equals(buttonId, Buttons.BUTTON_COMPETITIVE_AGAIN.name())) {
-            CompetitivePlayButton competitivePlayButton = new CompetitivePlayButton(competitiveQueueRepository, userSettingsService);
+            CompetitivePlayButton competitivePlayButton = new CompetitivePlayButton(competitiveQueueRepository);
             competitivePlayButton.competitive(event);
         }
     }
@@ -148,7 +144,7 @@ public class UpdateController {
         boolean permission = ChecksClass.check(event);
         if (!permission) return;
 
-        HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult, userSettingsService);
+        HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult);
         hangmanCommand.hangman(event);
     }
 
@@ -217,7 +213,7 @@ public class UpdateController {
                 deleteCommand.delete(event);
             }
             case "hg", "multi", "play" -> {
-                HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult, userSettingsService);
+                HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult);
                 hangmanCommand.hangman(event);
             }
             case "category" -> {
@@ -225,7 +221,7 @@ public class UpdateController {
                 categoryCommand.category(event);
             }
             case "competitive" -> {
-                CompetitiveCommand competitiveCommand = new CompetitiveCommand(competitiveQueueRepository, userSettingsService);
+                CompetitiveCommand competitiveCommand = new CompetitiveCommand(competitiveQueueRepository);
                 competitiveCommand.competitive(event, this);
             }
         }

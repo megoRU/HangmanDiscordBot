@@ -1,6 +1,8 @@
 package main.service;
 
 import lombok.AllArgsConstructor;
+import main.config.BotStartConfig;
+import main.controller.UpdateController;
 import main.game.*;
 import main.game.api.HangmanAPI;
 import main.game.core.HangmanRegistry;
@@ -11,6 +13,7 @@ import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.logging.Level;
@@ -25,7 +28,6 @@ public class CompetitiveService {
     private final HangmanDataSaving hangmanDataSaving;
     private final HangmanResult hangmanResult;
     private final HangmanAPI hangmanAPI;
-    private final UserSettingsService userSettingsService;
 
     private static final Logger LOGGER = Logger.getLogger(CompetitiveService.class.getName());
 
@@ -41,7 +43,7 @@ public class CompetitiveService {
                     String word = hangmanAPI.getWord(userId);
                     for (HangmanPlayer competitiveCurrentPlayer : competitivePlayers) {
                         long currentPlayerUserId = competitiveCurrentPlayer.getUserId();
-                        UserSettings.GameLanguage gameLanguage = userSettingsService.getUserGameLanguage(currentPlayerUserId);
+                        UserSettings.GameLanguage gameLanguage = BotStartConfig.mapGameLanguages.get(currentPlayerUserId);
 
                         if (gameLanguage == null) {
                             competitiveQueueRepository.deleteById(currentPlayerUserId);

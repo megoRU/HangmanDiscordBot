@@ -1,5 +1,6 @@
 package main.core.events;
 
+import main.config.BotStartConfig;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
@@ -57,11 +58,13 @@ public class CategoryCommand {
         }
 
         if (categorySlash != null && categorySlash.equals("any")) {
+            BotStartConfig.mapGameCategory.put(userIdLong, UserSettings.Category.ALL);
             event.reply(gameCategory).setEphemeral(true).queue();
 
             userSettings.setCategory(UserSettings.Category.ALL);
             userSettingsRepository.save(userSettings);
         } else if (categorySlash != null) {
+            BotStartConfig.mapGameCategory.put(userIdLong, UserSettings.Category.valueOf(categorySlash.toUpperCase()));
             event.reply(gameCategory).setEphemeral(true).queue();
 
             userSettings.setCategory(UserSettings.Category.valueOf(categorySlash.toUpperCase()));

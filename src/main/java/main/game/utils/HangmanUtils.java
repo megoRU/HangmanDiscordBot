@@ -1,12 +1,12 @@
 package main.game.utils;
 
+import main.config.BotStartConfig;
 import main.enums.Buttons;
 import main.game.HangmanPlayer;
 import main.game.core.HangmanRegistry;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
 import main.service.UpdateStatisticsService;
-import main.service.UserSettingsService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Activity;
@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.stereotype.Service;
 
 import java.awt.*;
 import java.util.LinkedList;
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-@Service
 public class HangmanUtils {
 
     //Localisation
@@ -92,8 +90,8 @@ public class HangmanUtils {
 
     @NotNull
     private static List<Button> getButtons(long userId, List<Button> buttonList) {
-        UserSettings.GameLanguage gameLanguage = UserSettingsService.getGameLanguage(userId);
-        if (gameLanguage != null && gameLanguage.name().equals("EN")) {
+        UserSettings.GameLanguage language = BotStartConfig.getMapGameLanguages().get(userId);
+        if (language != null && language.name().equals("EN")) {
             buttonList.add(BUTTON_RUSSIAN);
         } else {
             buttonList.add(BUTTON_ENGLISH);
@@ -135,8 +133,8 @@ public class HangmanUtils {
     }
 
     public static String category(Long userId) {
-        UserSettings.Category category = UserSettingsService.getCategory(userId);
-        UserSettings.BotLanguage language = UserSettingsService.getLanguage(userId);
+        UserSettings.Category category = BotStartConfig.getMapGameCategory().get(userId);
+        UserSettings.BotLanguage language = BotStartConfig.getMapLanguages().get(userId);
 
         if (category == null) category = UserSettings.Category.ALL;
         if (language == null) language = UserSettings.BotLanguage.EN;

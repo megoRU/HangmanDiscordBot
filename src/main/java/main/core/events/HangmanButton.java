@@ -1,6 +1,6 @@
 package main.core.events;
 
-import lombok.AllArgsConstructor;
+import main.config.BotStartConfig;
 import main.enums.Buttons;
 import main.game.*;
 import main.game.core.HangmanRegistry;
@@ -8,22 +8,29 @@ import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
 import main.model.repository.HangmanGameRepository;
-import main.service.UserSettingsService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
 public class HangmanButton {
 
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final HangmanGameRepository hangmanGameRepository;
     private final HangmanDataSaving hangmanDataSaving;
     private final HangmanResult hangmanResult;
-    private final UserSettingsService userSettingsService;
+
+    @Autowired
+    public HangmanButton(HangmanGameRepository hangmanGameRepository,
+                         HangmanDataSaving hangmanDataSaving,
+                         HangmanResult hangmanResult) {
+        this.hangmanGameRepository = hangmanGameRepository;
+        this.hangmanDataSaving = hangmanDataSaving;
+        this.hangmanResult = hangmanResult;
+    }
 
     public void hangman(@NotNull ButtonInteractionEvent event) {
         event.editButton(event.getButton().asDisabled()).queue();
@@ -33,7 +40,7 @@ public class HangmanButton {
         var channelIdLong = event.getChannel().getIdLong();
 
         String gameLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getIdLong());
-        UserSettings.GameLanguage userGameLanguage = userSettingsService.getUserGameLanguage(userIdLong);
+        UserSettings.GameLanguage userGameLanguage = BotStartConfig.getMapGameLanguages().get(userIdLong);
 
         if (userGameLanguage == null) {
             event.getHook().sendMessage(gameLanguage)
