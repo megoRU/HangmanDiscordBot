@@ -139,7 +139,7 @@ public class HangmanUtils {
         if (category == null) category = UserSettings.Category.ALL;
         if (language == null) language = UserSettings.BotLanguage.EN;
 
-        return switch (category.name()) {
+        return switch (category.name().toLowerCase()) {
             case "colors" -> Objects.equals(language.name(), "EN") ? "`Colors`" : "`Цвета`";
             case "flowers" -> Objects.equals(language.name(), "EN") ? "`Flowers`" : "`Цветы`";
             case "fruits" -> Objects.equals(language.name(), "EN") ? "`Fruits`" : "`Фрукты`";
