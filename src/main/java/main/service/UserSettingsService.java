@@ -17,6 +17,7 @@ public class UserSettingsService {
     public void settings() {
         List<UserSettings> userSettingsList = userSettingsRepository.findAll();
 
+
         for (UserSettings userSettings : userSettingsList) {
             Long userIdLong = userSettings.getUserIdLong();
             UserSettings.BotLanguage botLanguage = userSettings.getBotLanguage();
