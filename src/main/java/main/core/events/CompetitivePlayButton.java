@@ -1,6 +1,5 @@
 package main.core.events;
 
-import main.config.BotStartConfig;
 import main.game.HangmanPlayer;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
@@ -8,6 +7,7 @@ import main.jsonparser.JSONParsers;
 import main.model.entity.CompetitiveQueue;
 import main.model.entity.UserSettings;
 import main.model.repository.CompetitiveQueueRepository;
+import main.service.UserSettingsService;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +17,14 @@ import org.springframework.stereotype.Service;
 public class CompetitivePlayButton {
 
     private final CompetitiveQueueRepository competitiveQueueRepository;
+    private final UserSettingsService userSettingsService;
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
 
     @Autowired
-    public CompetitivePlayButton(CompetitiveQueueRepository competitiveQueueRepository) {
+    public CompetitivePlayButton(CompetitiveQueueRepository competitiveQueueRepository,
+                                 UserSettingsService userSettingsService) {
         this.competitiveQueueRepository = competitiveQueueRepository;
+        this.userSettingsService = userSettingsService;
     }
 
     public void competitive(@NotNull ButtonInteractionEvent event) {
@@ -36,7 +39,7 @@ public class CompetitivePlayButton {
                     .queue();
         } else {
             String gameLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getIdLong());
-            UserSettings.GameLanguage userGameLanguage = BotStartConfig.getMapGameLanguages().get(userId);
+            UserSettings.GameLanguage userGameLanguage = userSettingsService.getUserGameLanguage(userId);
 
             if (userGameLanguage == null) {
                 event.reply(gameLanguage)

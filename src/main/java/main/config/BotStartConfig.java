@@ -7,7 +7,6 @@ import main.controller.UpdateController;
 import main.core.CoreBot;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
-import main.model.entity.UserSettings;
 import main.model.repository.HangmanGameRepository;
 import main.service.*;
 import net.dv8tion.jda.api.JDA;
@@ -37,12 +36,6 @@ public class BotStartConfig {
     //String - userLongId
     @Getter
     public static final Map<Long, String> secretCode = new HashMap<>();
-    @Getter
-    public static final Map<Long, UserSettings.BotLanguage> mapLanguages = new HashMap<>();
-    @Getter
-    public static final Map<Long, UserSettings.GameLanguage> mapGameLanguages = new HashMap<>();
-    @Getter
-    public static final Map<Long, UserSettings.Category> mapGameCategory = new HashMap<>();
 
     @Getter
     private static int idGame;
@@ -51,7 +44,6 @@ public class BotStartConfig {
 
     //Service
     private final CompetitiveService competitiveService;
-    private final UserSettingsService userSettingsService;
     private final CompetitiveQueueService competitiveQueueService;
     private final LanguageService languageService;
     private final HangmanGetService hangmanGetService;
@@ -76,15 +68,6 @@ public class BotStartConfig {
     private void setCompetitive() {
         try {
             competitiveGames.update();
-        } catch (Exception e) {
-            LOGGER.info(e.getMessage());
-        }
-    }
-
-    @PostConstruct
-    private void getUserSettings() {
-        try {
-            userSettingsService.settings();
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
         }

@@ -36,8 +36,6 @@ public class DeleteMessage {
             String restoreDataSuccess = jsonParsers.getLocale("restore_Data_Success", userIdLong);
 
             channel.sendMessage(restoreDataSuccess).queue();
-            BotStartConfig.getMapGameLanguages().remove(userIdLong);
-            BotStartConfig.getMapLanguages().remove(userIdLong);
             BotStartConfig.getSecretCode().remove(userIdLong);
             HangmanRegistry.getInstance().removeHangman(userIdLong);
 
