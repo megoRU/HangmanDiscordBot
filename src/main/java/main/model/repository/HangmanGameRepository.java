@@ -25,9 +25,6 @@ public interface HangmanGameRepository extends JpaRepository<ActiveHangman, Long
                     @Param("guesses") String guesses,
                     @Param("hangmanErrors") Integer hangmanErrors);
 
-    @Query(value = "SELECT MAX(id) AS id FROM Game")
-    Integer getCountGames();
-
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM ActiveHangman ah WHERE ah.userIdLong = :userIdLong")

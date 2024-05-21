@@ -44,8 +44,6 @@ public class BotStartConfig {
     @Getter
     public static final Map<Long, UserSettings.Category> mapGameCategory = new HashMap<>();
 
-    @Getter
-    private static int idGame;
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
 
@@ -102,11 +100,6 @@ public class BotStartConfig {
     @PostConstruct
     public void startBot() {
         try {
-            Integer countGames = hangmanGameRepository.getCountGames();
-            idGame = countGames == null ? 0 : countGames;
-            //Теперь HangmanRegistry знает количество игр и может отдавать правильное значение
-            HangmanRegistry.getInstance().setIdGame();
-
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
                             GatewayIntent.GUILD_MESSAGES,

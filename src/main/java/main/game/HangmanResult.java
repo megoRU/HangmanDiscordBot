@@ -1,6 +1,5 @@
 package main.game;
 
-import main.game.core.HangmanRegistry;
 import main.model.entity.Game;
 import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
@@ -24,11 +23,9 @@ public class HangmanResult {
     }
 
     public void save(HangmanPlayer[] hangmanPlayers, boolean result, boolean isCompetitive) {
-        HangmanRegistry instance = HangmanRegistry.getInstance();
         List<Game> gameList = new ArrayList<>();
         for (HangmanPlayer player : hangmanPlayers) {
             Game game = new Game();
-            game.setId(instance.getIdGame());
             game.setResult(result);
             game.setIsCompetitive(isCompetitive);
             game.setGameDate(new Timestamp(Instant.now().toEpochMilli()));
@@ -44,9 +41,7 @@ public class HangmanResult {
     }
 
     public void save(long userId, boolean result, boolean isCompetitive) {
-        HangmanRegistry instance = HangmanRegistry.getInstance();
         Game game = new Game();
-        game.setId(instance.getIdGame());
         game.setResult(result);
         game.setIsCompetitive(isCompetitive);
         game.setGameDate(new Timestamp(Instant.now().toEpochMilli()));

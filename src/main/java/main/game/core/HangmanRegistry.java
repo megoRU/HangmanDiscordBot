@@ -1,6 +1,5 @@
 package main.game.core;
 
-import main.config.BotStartConfig;
 import main.enums.GameStatus;
 import main.game.Hangman;
 import main.game.HangmanPlayer;
@@ -13,7 +12,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class HangmanRegistry {
 
@@ -21,9 +19,6 @@ public class HangmanRegistry {
     private static final ConcurrentMap<Long, Hangman> activeHangman = new ConcurrentHashMap<>();
     private static final ConcurrentMap<Hangman, Timestamp> hangmanTimer = new ConcurrentHashMap<>();
     private static final ConcurrentMap<Long, HangmanPlayer> competitiveQueue = new ConcurrentHashMap<>();
-
-    private final AtomicInteger idGame = new AtomicInteger();
-
     private static volatile HangmanRegistry hangmanRegistry;
 
     private HangmanRegistry() {
@@ -38,15 +33,6 @@ public class HangmanRegistry {
             }
         }
         return hangmanRegistry;
-    }
-
-    public int getIdGame() {
-        return idGame.incrementAndGet();
-    }
-
-    public void setIdGame() {
-        idGame.set(BotStartConfig.getIdGame());
-        System.out.println(idGame);
     }
 
     public Collection<Hangman> getAllGames() {
