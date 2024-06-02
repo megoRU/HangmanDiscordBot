@@ -32,7 +32,7 @@ public class BotStartConfig {
 
     private static final Logger LOGGER = Logger.getLogger(BotStartConfig.class.getName());
 
-    public static final String activity = "/help | ";
+    public static final String activity = "/play | ";
 
     //String - userLongId
     @Getter
