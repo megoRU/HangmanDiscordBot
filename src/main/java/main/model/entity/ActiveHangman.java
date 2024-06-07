@@ -23,8 +23,8 @@ public class ActiveHangman {
     @Column(name = "user_id_long", nullable = false)
     private Long userIdLong;
 
-    @Column(name = "second_user_id_long")
-    private Long secondUserIdLong;
+    @Column(name = "players_list")
+    private String playersList;
 
     @Column(name = "message_id_long", nullable = false)
     private Long messageIdLong;

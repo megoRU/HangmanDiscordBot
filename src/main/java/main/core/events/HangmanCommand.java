@@ -10,6 +10,7 @@ import main.model.entity.UserSettings;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Mentions;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -124,6 +126,28 @@ public class HangmanCommand {
                     HangmanPlayer hangmanPlayerSecond = new HangmanPlayer(user.getIdLong(), guildIdLong, channelIdLong);
                     hangmanBuilder.addHangmanPlayer(hangmanPlayerSecond);
                 }
+            } else if (event.getName().equals("multiple")) {
+                if (event instanceof SlashCommandInteractionEvent slashCommandInteractionEvent) {
+                    Mentions users = slashCommandInteractionEvent.getOption("users", OptionMapping::getMentions);
+                    if (users == null) {
+                        String usersMentionsNull = jsonParsers.getLocale("users_mentions_null", userIdLong);
+                        event.reply(usersMentionsNull).setEphemeral(true).queue();
+                        return;
+                    }
+
+                    List<User> usersList = users.getUsers()
+                            .stream()
+                            .filter(user -> !user.isBot())
+                            .filter(user -> !user.equals(event.getUser()))
+                            .distinct()
+                            .toList();
+
+                    for (User user : usersList) {
+                        long userId = user.getIdLong();
+                        HangmanPlayer hgPlayer = new HangmanPlayer(userId, guildIdLong, channelIdLong);
+                        hangmanBuilder.addHangmanPlayer(hgPlayer);
+                    }
+                }
             }
 
             String createGame = jsonParsers.getLocale("create_game", userIdLong);
@@ -132,12 +156,9 @@ public class HangmanCommand {
             Hangman hangman = hangmanBuilder.build();
 
             //Заполнение коллекции
-            instance.setHangman(userIdLong, hangman);
-
-            if (hangman.getHangmanPlayers().length > 1) {
-                HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
-                HangmanPlayer hangmanPlayerSecond = hangmanPlayers[1];
-                instance.setHangman(hangmanPlayerSecond.getUserId(), hangman);
+            HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
+            for (HangmanPlayer player : hangmanPlayers) {
+                instance.setHangman(player.getUserId(), hangman);
             }
 
             hangman.startGame(event.getMessageChannel());

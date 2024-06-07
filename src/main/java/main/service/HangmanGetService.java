@@ -24,7 +24,7 @@ public class HangmanGetService {
 
         for (ActiveHangman activeHangman : activeHangmanList) {
             Long userIdLong = activeHangman.getUserIdLong();
-            Long secondUserIdLong = activeHangman.getSecondUserIdLong();
+            String playersList = activeHangman.getPlayersList();
             Long messageIdLong = activeHangman.getMessageIdLong();
             Long channelIdLong = activeHangman.getChannelIdLong();
             Long guildLongId = activeHangman.getGuildLongId();
@@ -52,16 +52,22 @@ public class HangmanGetService {
                     .setAgainstPlayerId(againstPlayerId)
                     .setMessageId(messageIdLong);
 
-            if (secondUserIdLong == null) {
+            if (playersList == null) {
                 instance.setHangman(userIdLong, hangmanBuilder.build());
             } else {
-                HangmanPlayer hangmanPlayerSecond = new HangmanPlayer(secondUserIdLong, guildLongId, channelIdLong);
-                hangmanBuilder.addHangmanPlayer(hangmanPlayerSecond);
+                String[] userList = playersList.split(" ");
+
+                for (String userId : userList) {
+                    HangmanPlayer hangmanPlayerSecond = new HangmanPlayer(Long.parseLong(userId), guildLongId, channelIdLong);
+                    hangmanBuilder.addHangmanPlayer(hangmanPlayerSecond);
+                }
 
                 Hangman hangman = hangmanBuilder.build();
-
-                instance.setHangman(userIdLong, hangman);
-                instance.setHangman(secondUserIdLong, hangman);
+                //Заполнение коллекции
+                HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
+                for (HangmanPlayer player : hangmanPlayers) {
+                    instance.setHangman(player.getUserId(), hangman);
+                }
             }
         }
         System.out.println("setHangmanGetService()");

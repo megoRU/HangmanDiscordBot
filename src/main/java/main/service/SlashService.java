@@ -46,6 +46,13 @@ public class SlashService {
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "@Упомяните игрока, чтобы поиграть с ним")
             );
 
+            List<OptionData> multiple = new ArrayList<>();
+            multiple.add(new OptionData(STRING, "users", "@Mention the players separated by a space to play with them")
+                    .setRequired(true)
+                    .setName("users")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "@Упомяните игроков через пробел, чтобы поиграть с ними")
+            );
+
             List<OptionData> category = new ArrayList<>();
             category.add(new OptionData(STRING, "category", "Select a category")
                     .addChoice("any", "any")
@@ -56,6 +63,11 @@ public class SlashService {
                     .setName("category")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выбрать категорию")
             );
+
+            commands.addCommands(Commands.slash("multiple", "Play Hangman with your friends")
+                    .addOptions(multiple)
+                    .setGuildOnly(true)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Играйте в Hangman с друзьями"));
 
             commands.addCommands(Commands.slash("competitive", "Compete with other players")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Соревноваться с другими игроками"));
@@ -102,8 +114,8 @@ public class SlashService {
             //Context Menu
             commands.addCommands(Commands.context(Command.Type.USER, "Play multi")
                     .setName("multi")
-                    .setNameLocalization(DiscordLocale.RUSSIAN, "Играть вместе")
                     .setGuildOnly(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "Играть вместе")
             );
 
             commands.addCommands(Commands.slash("category", "Set a category for words")

@@ -51,7 +51,7 @@ public class HangmanTimer extends TimerTask {
                                 info.setColor(Color.GREEN);
                                 info.setTitle(gameOver);
                                 info.setDescription(timeIsOver);
-                                info.addField(gamePlayer, hangmanPlayer.getGame().getUserIdWithDiscord(), false);
+                                info.addField(gamePlayer, hangman.getUserIdWithDiscord(), false);
 
                                 HangmanEmbedUtils.editMessageWithButtons(info, userId, hangmanGameRepository);
                                 hangmanGameRepository.deleteActiveGame(userId);

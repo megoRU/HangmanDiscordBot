@@ -218,7 +218,11 @@ public class Hangman {
 
     String getUserIdWithDiscord() {
         if (hangmanPlayers.length > 1) {
-            return String.format("<@%s>\n<@%s>", hangmanPlayers[0].getUserId(), hangmanPlayers[1].getUserId());
+            StringBuilder stringBuilder = new StringBuilder();
+            for (HangmanPlayer hangmanPlayer : hangmanPlayers) {
+                stringBuilder.append(String.format("<@%s>\n", hangmanPlayer.getUserId()));
+            }
+            return stringBuilder.toString();
         } else {
             return String.format("<@%s>", hangmanPlayers[0].getUserId());
         }

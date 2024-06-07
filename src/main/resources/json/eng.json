@@ -101,5 +101,6 @@
   "button_stop": "Finish game",
   "button_leave": "Leave",
   "button_play_again": "Play again",
-  "competitive_message": "You can use this command here: </competitive:1194054216013066240>"
+  "competitive_message": "You can use this command here: </competitive:1194054216013066240>",
+  "multiple": "Couldn't find users"
 }

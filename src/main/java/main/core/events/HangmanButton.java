@@ -15,6 +15,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+
 @Service
 public class HangmanButton {
 
@@ -37,10 +39,12 @@ public class HangmanButton {
         if (event.getButton().getId() == null) return;
 
         var userIdLong = event.getUser().getIdLong();
+        var userIdString = event.getUser().getId();
         var channelIdLong = event.getChannel().getIdLong();
 
         String gameLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getIdLong());
         UserSettings.GameLanguage userGameLanguage = BotStartConfig.getMapGameLanguages().get(userIdLong);
+        HangmanRegistry instance = HangmanRegistry.getInstance();
 
         if (userGameLanguage == null) {
             event.getHook().sendMessage(gameLanguage)
@@ -51,7 +55,7 @@ public class HangmanButton {
             return;
         }
 
-        if (!HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+        if (!instance.hasHangman(userIdLong)) {
             event.getChannel().sendTyping().queue();
 
             HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder();
@@ -61,7 +65,7 @@ public class HangmanButton {
 
             Hangman hangman;
             //Guild Play
-            boolean matches = event.getButton().getId().matches("BUTTON_START_NEW_GAME_\\d+_\\d+");
+            boolean matches = event.getButton().getId().contains("BUTTON_START_NEW_GAME_");
 
             if (event.getGuild() != null) {
                 long guildIdLong = event.getGuild().getIdLong();
@@ -71,37 +75,29 @@ public class HangmanButton {
 
                 if (matches) {
                     String[] split = event.getButton().getId()
-                            .replace("BUTTON_START_NEW_GAME_", "")
+                            .replaceAll("BUTTON_START_NEW_GAME_", "")
                             .split("_");
 
-                    long secondUser = 0L;
-
-                    for (String userId : split) {
-                        System.out.println("Split users: " + userId);
-                        if (userIdLong != Long.parseLong(userId)) {
-                            secondUser = Long.parseLong(userId);
-                            boolean hasHangmanSecondUser = HangmanRegistry.getInstance().hasHangman(secondUser);
-                            if (hasHangmanSecondUser) {
-                                String secondPlayerAlreadyPlaying = jsonParsers.getLocale("second_player_already_playing", userIdLong);
-                                event.getHook().sendMessage(secondPlayerAlreadyPlaying).setEphemeral(true).queue();
-                                return;
-                            }
-                        }
-                    }
-
-                    HangmanPlayer hangmanPlayerSecond = new HangmanPlayer(secondUser, guildIdLong, channelIdLong);
-                    hangmanBuilder.addHangmanPlayer(hangmanPlayerSecond);
+                    Arrays.stream(split)
+                            .filter(user -> !user.equals(userIdString))
+                            .filter(user -> !instance.hasHangman(Long.parseLong(user)))
+                            .forEach(user -> {
+                                HangmanPlayer hangmanPlayerSecond = new HangmanPlayer(Long.parseLong(user), guildIdLong, channelIdLong);
+                                hangmanBuilder.addHangmanPlayer(hangmanPlayerSecond);
+                            });
 
                     hangman = hangmanBuilder.build();
 
-                    HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
-                    HangmanRegistry.getInstance().setHangman(secondUser, hangman);
+                    HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
+                    for (HangmanPlayer player : hangmanPlayers) {
+                        instance.setHangman(player.getUserId(), hangman);
+                    }
 
                     hangman.startGame(event.getChannel());
                 } else {
                     hangman = hangmanBuilder.build();
 
-                    HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
+                    instance.setHangman(userIdLong, hangman);
 
                     hangman.startGame(event.getChannel());
                 }
@@ -112,7 +108,7 @@ public class HangmanButton {
 
                 hangman = hangmanBuilder.build();
 
-                HangmanRegistry.getInstance().setHangman(userIdLong, hangman);
+                instance.setHangman(userIdLong, hangman);
                 hangman.startGame(event.getChannel());
             }
         } else {

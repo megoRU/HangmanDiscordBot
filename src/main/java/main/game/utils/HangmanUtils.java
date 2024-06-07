@@ -2,6 +2,7 @@ package main.game.utils;
 
 import main.config.BotStartConfig;
 import main.enums.Buttons;
+import main.game.Hangman;
 import main.game.HangmanPlayer;
 import main.game.core.HangmanRegistry;
 import main.jsonparser.JSONParsers;
@@ -16,10 +17,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 public class HangmanUtils {
 
@@ -60,10 +59,15 @@ public class HangmanUtils {
         return Button.primary(Buttons.BUTTON_MY_STATS.name(), buttonStatistics);
     }
 
-    public static Button getButtonPlayAgainWithUsers(long userId, long secondUserId) {
-        String multi = String.format("%s_%s_%s", Buttons.BUTTON_START_NEW_GAME.name(), userId, secondUserId);
-        String buttonPlayAgain = JSON_BOT_PARSERS.getLocale("button_play_again", userId);
-        return Button.success(multi, buttonPlayAgain);
+    public static Button getButtonPlayAgainWithUsers(List<Long> userList) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(Buttons.BUTTON_START_NEW_GAME.name());
+
+        for (long userId : userList) {
+            stringBuilder.append("_").append(userId);
+        }
+        String buttonPlayAgain = JSON_BOT_PARSERS.getLocale("button_play_again", userList.get(0));
+        return Button.success(stringBuilder.toString(), buttonPlayAgain);
     }
 
     public static String getImage(int count) {
@@ -76,16 +80,24 @@ public class HangmanUtils {
         return getButtons(userId, buttonList);
     }
 
+    public static List<Long> getListUsersFromHangmanPlayers(HangmanPlayer[] hangmanPlayers) {
+        return Arrays.stream(hangmanPlayers)
+                .toList()
+                .stream()
+                .map(HangmanPlayer::getUserId)
+                .toList();
+    }
+
     public static List<Button> getListCompetitiveButtons(long userId) {
         List<Button> buttonList = new LinkedList<>();
         buttonList.add(getButtonPlayCompetitiveAgain(userId));
         return buttonList;
     }
 
-    public static List<Button> getListButtons(long userId, long secondUserId) {
+    public static List<Button> getListButtons(List<Long> userList) {
         List<Button> buttonList = new LinkedList<>();
-        buttonList.add(getButtonPlayAgainWithUsers(userId, secondUserId));
-        return getButtons(userId, buttonList);
+        buttonList.add(getButtonPlayAgainWithUsers(userList));
+        return getButtons(userList.get(0), buttonList);
     }
 
     @NotNull

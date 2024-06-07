@@ -101,5 +101,6 @@
   "button_stop": "Завершить игру",
   "button_leave": "Покинуть",
   "button_play_again": "Играть снова",
-  "competitive_message": "Ты можешь использовать эту команду здесь: </competitive:1194054216013066240>"
+  "competitive_message": "Ты можешь использовать эту команду здесь: </competitive:1194054216013066240>",
+  "multiple": "Не смог найти пользователей"
 }

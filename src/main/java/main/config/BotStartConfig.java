@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import main.controller.UpdateController;
 import main.core.CoreBot;
-import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.model.entity.UserSettings;
 import main.model.repository.HangmanGameRepository;
@@ -139,7 +138,7 @@ public class BotStartConfig {
         System.out.println("IsDevMode: " + Config.isIsDev());
 
         //Обновить команды
-        //slashService.update(jda);
+        slashService.updateSlash(jda);
         System.out.println("15:15");
         HangmanUtils.updateActivity(jda);
     }

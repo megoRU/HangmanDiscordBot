@@ -37,7 +37,14 @@ public class HangmanDataSaving {
         activeHangman.setUserIdLong(userId);
         Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now().atZone(ZoneOffset.UTC).toLocalDateTime());
 
-        if (hangmanPlayers.length > 1) activeHangman.setSecondUserIdLong(hangmanPlayers[1].getUserId());
+        if (hangmanPlayers.length > 1) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (HangmanPlayer player : hangmanPlayers) {
+                if (player.getUserId() == userId) continue;
+                stringBuilder.append(player.getUserId()).append(" ");
+            }
+            activeHangman.setPlayersList(stringBuilder.toString().trim());
+        }
         activeHangman.setMessageIdLong(messageId);
         activeHangman.setChannelIdLong(channelId);
         activeHangman.setGuildLongId(guildId);

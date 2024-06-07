@@ -129,7 +129,7 @@ public class UpdateController {
             return;
         }
 
-        if (Objects.equals(buttonId, Buttons.BUTTON_START_NEW_GAME.name()) || buttonId.matches("BUTTON_START_NEW_GAME_\\d+_\\d+")) {
+        if (Objects.equals(buttonId, Buttons.BUTTON_START_NEW_GAME.name()) || buttonId.contains("BUTTON_START_NEW_GAME")) {
             HangmanButton hangmanCommand = new HangmanButton(hangmanGameRepository, hangmanDataSaving, hangmanResult);
             hangmanCommand.hangman(event);
             return;
@@ -212,7 +212,7 @@ public class UpdateController {
                 DeleteCommand deleteCommand = new DeleteCommand();
                 deleteCommand.delete(event);
             }
-            case "hg", "multi", "play" -> {
+            case "hg", "multi", "play", "multiple" -> {
                 HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult);
                 hangmanCommand.hangman(event);
             }
