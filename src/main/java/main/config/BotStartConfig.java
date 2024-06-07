@@ -138,7 +138,7 @@ public class BotStartConfig {
         System.out.println("IsDevMode: " + Config.isIsDev());
 
         //Обновить команды
-        slashService.updateSlash(jda);
+//        slashService.updateSlash(jda);
         System.out.println("15:15");
         HangmanUtils.updateActivity(jda);
     }
