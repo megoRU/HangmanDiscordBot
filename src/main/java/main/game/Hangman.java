@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,8 +56,9 @@ public class Hangman {
     private int hangmanErrors;
     @Setter
     private boolean isCompetitive;
-    @Setter
+    @Nullable
     private Long againstPlayerId;
+    private long againstPlayerEmbedded;
     private long channelId;
     private long messageId;
 
@@ -84,6 +86,7 @@ public class Hangman {
                    Long againstPlayerId,
                    HangmanPlayer... hangmanPlayers) {
         this.againstPlayerId = againstPlayerId;
+        this.againstPlayerEmbedded = againstPlayerId;
         this.isCompetitive = isCompetitive;
         this.gameStatus = GameStatus.STARTING;
         this.messageId = messageId;
@@ -229,10 +232,19 @@ public class Hangman {
     }
 
     String getAgainstPlayerWithDiscord() {
-        return String.format("<@%s>", againstPlayerId);
+        return String.format("<@%s>", againstPlayerEmbedded);
     }
 
     public int getPlayersCount() {
         return hangmanPlayers.length;
+    }
+
+    public void deleteAgainstPlayer() {
+        this.againstPlayerId = null;
+    }
+
+    public void setAgainstPlayerId(long againstPlayerId) {
+        this.againstPlayerId = againstPlayerId;
+        this.againstPlayerEmbedded = againstPlayerId;
     }
 }

@@ -127,7 +127,10 @@ public class HangmanRegistry {
         HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
         if (hangman.isCompetitive()) {
             if (hangman.getGameStatus().equals(GameStatus.WIN_GAME)) {
-                activeHangman.remove(hangman.getAgainstPlayerId());
+                Long againstPlayerId = hangman.getAgainstPlayerId();
+                if (againstPlayerId != null) {
+                    activeHangman.remove(hangman.getAgainstPlayerId());
+                }
             }
         }
         for (HangmanPlayer hangmanPlayer : hangmanPlayers) {
