@@ -139,6 +139,7 @@ public class HangmanCommand {
                             .stream()
                             .filter(user -> !user.isBot())
                             .filter(user -> !user.equals(event.getUser()))
+                            .filter(user -> !instance.hasHangman(user.getIdLong()))
                             .distinct()
                             .toList();
 

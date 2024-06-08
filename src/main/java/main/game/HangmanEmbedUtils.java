@@ -112,7 +112,7 @@ public class HangmanEmbedUtils {
             long channelId = hangmanPlayer.getChannelId();
             long messageId = hangman.getMessageId();
 
-            if (hangmanPlayer.isFromGuild()) {
+            if (hangmanPlayer.isFromGuild() && guildId != null) {
                 Guild guildById = BotStartConfig.jda.getGuildById(guildId);
                 if (guildById != null) {
 
@@ -185,7 +185,7 @@ public class HangmanEmbedUtils {
             long channelId = hangmanPlayer.getChannelId();
             long messageId = hangman.getMessageId();
 
-            if (hangmanPlayer.isFromGuild()) {
+            if (hangmanPlayer.isFromGuild() && guildId != null) {
                 Guild guildById = BotStartConfig.jda.getGuildById(guildId);
                 if (guildById != null) {
                     GuildMessageChannel textChannelById = guildById.getTextChannelById(channelId);

@@ -2,7 +2,6 @@ package main.game.utils;
 
 import main.config.BotStartConfig;
 import main.enums.Buttons;
-import main.game.Hangman;
 import main.game.HangmanPlayer;
 import main.game.core.HangmanRegistry;
 import main.jsonparser.JSONParsers;
@@ -17,8 +16,10 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.*;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 public class HangmanUtils {
 
@@ -66,20 +67,6 @@ public class HangmanUtils {
 
     public static String getImage(int count) {
         return String.format("https://megoru.ru/hangman/%s.png", count);
-    }
-
-//    public static List<Button> getListButtons(long userId) {
-//        List<Button> buttonList = new LinkedList<>();
-//        buttonList.add(getButtonPlayAgain(userId));
-//        return getButtons(userId, buttonList);
-//    }
-
-    public static List<Long> getListUsersFromHangmanPlayers(HangmanPlayer[] hangmanPlayers) {
-        return Arrays.stream(hangmanPlayers)
-                .toList()
-                .stream()
-                .map(HangmanPlayer::getUserId)
-                .toList();
     }
 
     public static List<Button> getListCompetitiveButtons(long userId) {
