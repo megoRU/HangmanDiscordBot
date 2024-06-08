@@ -9,6 +9,7 @@ import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -40,9 +41,9 @@ public class HangmanButton {
     }
 
     public void hangman(@NotNull ButtonInteractionEvent event) {
-        event.editButton(event.getButton().asDisabled()).queue();
         if (event.getButton().getId() == null) return;
 
+        Guild guild = event.getGuild();
         var userIdLong = event.getUser().getIdLong();
         var channelIdLong = event.getChannel().getIdLong();
 
@@ -62,7 +63,9 @@ public class HangmanButton {
         if (!instance.hasHangman(userIdLong)) {
             event.getChannel().sendTyping().queue();
 
+            HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, guild != null ? guild.getIdLong() : null, channelIdLong);
             HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder();
+            hangmanBuilder.addHangmanPlayer(hangmanPlayer);
             hangmanBuilder.setHangmanDataSaving(hangmanDataSaving);
             hangmanBuilder.setHangmanGameRepository(hangmanGameRepository);
             hangmanBuilder.setHangmanResult(hangmanResult);
@@ -92,8 +95,17 @@ public class HangmanButton {
                 }
             }
 
+            if (!usersList.contains(userIdLong)) {
+                String youCannotPressPlayAgain = jsonParsers.getLocale("you_cannot_press_play_again", userIdLong);
+                event.reply(youCannotPressPlayAgain).setEphemeral(true).queue();
+                return;
+            } else {
+                event.editButton(event.getButton().asDisabled()).queue();
+            }
+
             usersList.stream()
                     .filter(user -> !instance.hasHangman(user))
+                    .filter(user -> !user.equals(userIdLong))
                     .forEach(user -> {
                         Long guildIdLong = !guildId.equals("null") ? Long.parseLong(guildId) : null;
                         HangmanPlayer hangmanPlayerSecond = new HangmanPlayer(user, guildIdLong, channelIdLong);

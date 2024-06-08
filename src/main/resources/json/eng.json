@@ -102,5 +102,7 @@
   "button_leave": "Leave",
   "button_play_again": "Play again",
   "competitive_message": "You can use this command here: </competitive:1194054216013066240>",
-  "multiple": "Couldn't find users"
+  "multiple": "Couldn't find users",
+  "you_cannot_press_play_again": "You cannot start the game because you are not a member of it!"
+
 }

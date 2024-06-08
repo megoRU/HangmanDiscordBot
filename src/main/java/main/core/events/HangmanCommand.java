@@ -1,7 +1,6 @@
 package main.core.events;
 
 import main.config.BotStartConfig;
-import main.enums.Buttons;
 import main.game.*;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
@@ -9,6 +8,7 @@ import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Mentions;
 import net.dv8tion.jda.api.entities.User;
@@ -16,7 +16,6 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,11 +44,6 @@ public class HangmanCommand {
     public void hangman(@NotNull GenericCommandInteractionEvent event) {
         long userIdLong = event.getUser().getIdLong();
         long channelIdLong = event.getMessageChannel().getIdLong();
-        Long guildIdLong = null;
-
-        if (event.getGuild() != null) {
-            guildIdLong = event.getGuild().getIdLong();
-        }
 
         if (event instanceof SlashCommandInteractionEvent slashEvent) {
             slashEvent.getChannel().sendTyping().queue();
@@ -87,7 +81,9 @@ public class HangmanCommand {
             event.replyEmbeds(youPlay.build()).addActionRow(HangmanUtils.getButtonStop(userIdLong)).queue();
             //Если всё хорошо, создаем игру
         } else {
-            HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, guildIdLong, channelIdLong);
+            Guild guild = event.getGuild();
+
+            HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, guild != null ? guild.getIdLong() : null, channelIdLong);
             HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder();
             hangmanBuilder.addHangmanPlayer(hangmanPlayer);
             hangmanBuilder.setHangmanDataSaving(hangmanDataSaving);
@@ -107,7 +103,7 @@ public class HangmanCommand {
                     user = targetMember.getUser();
                 }
 
-                if (user == null || event.getGuild() == null) {
+                if (user == null || guild == null) {
                     event.reply("User is `null`").setEphemeral(true).queue();
                     return;
                 } else if (user.isBot()) {
@@ -123,7 +119,7 @@ public class HangmanCommand {
                     event.reply(secondPlayerAlreadyPlaying).setEphemeral(true).queue();
                     return;
                 } else {
-                    HangmanPlayer hangmanPlayerSecond = new HangmanPlayer(user.getIdLong(), guildIdLong, channelIdLong);
+                    HangmanPlayer hangmanPlayerSecond = new HangmanPlayer(user.getIdLong(), guild.getIdLong(), channelIdLong);
                     hangmanBuilder.addHangmanPlayer(hangmanPlayerSecond);
                 }
             } else if (event.getName().equals("multiple")) {
@@ -131,7 +127,7 @@ public class HangmanCommand {
                     Mentions users = slashCommandInteractionEvent.getOption("users", OptionMapping::getMentions);
                     if (users == null) {
                         String usersMentionsNull = jsonParsers.getLocale("users_mentions_null", userIdLong);
-                        event.reply(usersMentionsNull).setEphemeral(true).queue();
+                        slashCommandInteractionEvent.reply(usersMentionsNull).setEphemeral(true).queue();
                         return;
                     }
 
@@ -145,7 +141,7 @@ public class HangmanCommand {
 
                     for (User user : usersList) {
                         long userId = user.getIdLong();
-                        HangmanPlayer hgPlayer = new HangmanPlayer(userId, guildIdLong, channelIdLong);
+                        HangmanPlayer hgPlayer = new HangmanPlayer(userId, guild != null ? guild.getIdLong() : null, channelIdLong);
                         hangmanBuilder.addHangmanPlayer(hgPlayer);
                     }
                 }
