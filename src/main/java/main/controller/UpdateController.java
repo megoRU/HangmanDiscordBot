@@ -129,7 +129,7 @@ public class UpdateController {
             return;
         }
 
-        if (Objects.equals(buttonId, Buttons.BUTTON_START_NEW_GAME.name()) || buttonId.contains("BUTTON_START_NEW_GAME")) {
+        if (Objects.equals(buttonId, Buttons.BUTTON_START_NEW_GAME.name())) {
             HangmanButton hangmanCommand = new HangmanButton(hangmanGameRepository, hangmanDataSaving, hangmanResult);
             hangmanCommand.hangman(event);
             return;
