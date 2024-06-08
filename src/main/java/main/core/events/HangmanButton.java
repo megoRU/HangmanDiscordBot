@@ -9,13 +9,18 @@ import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class HangmanButton {
@@ -39,7 +44,6 @@ public class HangmanButton {
         if (event.getButton().getId() == null) return;
 
         var userIdLong = event.getUser().getIdLong();
-        var userIdString = event.getUser().getId();
         var channelIdLong = event.getChannel().getIdLong();
 
         String gameLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getIdLong());
@@ -64,60 +68,52 @@ public class HangmanButton {
             hangmanBuilder.setHangmanResult(hangmanResult);
 
             Hangman hangman;
-            //Guild Play
-            boolean matches = event.getButton().getId().contains("BUTTON_START_NEW_GAME_");
+            Message message = event.getMessage();
+            String guildId = event.getGuild() != null ? event.getGuild().getId() : "null";
 
-            if (event.getGuild() != null) {
-                long guildIdLong = event.getGuild().getIdLong();
+            List<Long> usersList = new ArrayList<>();
+            List<MessageEmbed> embeds = message.getEmbeds();
 
-                HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, guildIdLong, channelIdLong);
-                hangmanBuilder.addHangmanPlayer(hangmanPlayer);
-
-                if (matches) {
-                    String[] split = event.getButton().getId()
-                            .replaceAll("BUTTON_START_NEW_GAME_", "")
-                            .split("_");
-
-                    Arrays.stream(split)
-                            .filter(user -> !user.equals(userIdString))
-                            .filter(user -> !instance.hasHangman(Long.parseLong(user)))
-                            .forEach(user -> {
-                                HangmanPlayer hangmanPlayerSecond = new HangmanPlayer(Long.parseLong(user), guildIdLong, channelIdLong);
-                                hangmanBuilder.addHangmanPlayer(hangmanPlayerSecond);
-                            });
-
-                    hangman = hangmanBuilder.build();
-
-                    HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
-                    for (HangmanPlayer player : hangmanPlayers) {
-                        instance.setHangman(player.getUserId(), hangman);
+            for (MessageEmbed embed : embeds) {
+                List<MessageEmbed.Field> fields = embed.getFields();
+                for (MessageEmbed.Field field : fields) {
+                    if (field.getValue() != null) {
+                        String input = field.getValue();
+                        String regex = "<@\\d+>";
+                        Pattern pattern = Pattern.compile(regex);
+                        Matcher matcher = pattern.matcher(input);
+                        while (matcher.find()) {
+                            String userIdString = matcher.group()
+                                    .replaceAll("<@", "")
+                                    .replaceAll(">", "");
+                            usersList.add(Long.parseLong(userIdString));
+                        }
                     }
-
-                    hangman.startGame(event.getChannel());
-                } else {
-                    hangman = hangmanBuilder.build();
-
-                    instance.setHangman(userIdLong, hangman);
-
-                    hangman.startGame(event.getChannel());
                 }
-                //DM play
-            } else {
-                HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, null, channelIdLong);
-                hangmanBuilder.addHangmanPlayer(hangmanPlayer);
-
-                hangman = hangmanBuilder.build();
-
-                instance.setHangman(userIdLong, hangman);
-                hangman.startGame(event.getChannel());
             }
+
+            usersList.stream()
+                    .filter(user -> !instance.hasHangman(user))
+                    .forEach(user -> {
+                        Long guildIdLong = !guildId.equals("null") ? Long.parseLong(guildId) : null;
+                        HangmanPlayer hangmanPlayerSecond = new HangmanPlayer(user, guildIdLong, channelIdLong);
+                        hangmanBuilder.addHangmanPlayer(hangmanPlayerSecond);
+                    });
+
+            hangman = hangmanBuilder.build();
+
+            HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
+            for (HangmanPlayer player : hangmanPlayers) {
+                instance.setHangman(player.getUserId(), hangman);
+            }
+
+            hangman.startGame(event.getChannel());
         } else {
             String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
 
             EmbedBuilder youPlay = new EmbedBuilder();
             youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
             youPlay.setColor(0x00FF00);
-
             youPlay.setDescription(hangmanListenerYouPlay);
 
             event.getHook()
@@ -127,4 +123,3 @@ public class HangmanButton {
         }
     }
 }
-
