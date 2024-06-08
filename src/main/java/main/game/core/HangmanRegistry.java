@@ -125,7 +125,11 @@ public class HangmanRegistry {
         if (hangman == null) return;
         hangmanTimer.remove(hangman);
         HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
-        if (hangman.isCompetitive()) activeHangman.remove(hangman.getAgainstPlayerId());
+        if (hangman.isCompetitive()) {
+            if (hangman.getGameStatus().equals(GameStatus.WIN_GAME)) {
+                activeHangman.remove(hangman.getAgainstPlayerId());
+            }
+        }
         for (HangmanPlayer hangmanPlayer : hangmanPlayers) {
             activeHangman.remove(hangmanPlayer.getUserId());
         }
