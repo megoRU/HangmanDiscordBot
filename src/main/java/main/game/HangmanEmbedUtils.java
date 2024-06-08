@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.awt.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -175,13 +174,7 @@ public class HangmanEmbedUtils {
             HangmanPlayer hangmanPlayer = hangmanPlayers[0];
 
             if (playersCount > 1) {
-                List<Long> list = Arrays.stream(hangmanPlayers)
-                        .toList()
-                        .stream()
-                        .map(HangmanPlayer::getUserId)
-                        .toList();
-
-                listButtons = HangmanUtils.getListButtons(list);
+                listButtons = HangmanUtils.getListButtons(userId);
             } else if (playersCount == 1 && !isCompetitive) {
                 listButtons = HangmanUtils.getListButtons(userId);
             } else {

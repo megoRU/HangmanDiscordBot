@@ -51,14 +51,7 @@ public class StopCommand {
                 String hangmanEngGame = jsonParsers.getLocale("Hangman_Eng_game", userId);
                 String hangmanEngGame1 = jsonGameParsers.getLocale("Hangman_Eng_game", userId);
 
-                if (hangmanPlayers.length > 1) {
-                    List<Long> fromHangmanPlayers = HangmanUtils.getListUsersFromHangmanPlayers(hangmanPlayers);
-
-                    Button buttonPlayAgainWithUsers = HangmanUtils.getButtonPlayAgainWithUsers(fromHangmanPlayers);
-                    updateController.sendMessage(event, hangmanEngGame, buttonPlayAgainWithUsers);
-                } else {
-                    updateController.sendMessage(event, hangmanEngGame, HangmanUtils.getButtonPlayAgain(userId));
-                }
+                updateController.sendMessage(event, hangmanEngGame);
                 EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanLayout(userId, hangmanEngGame1);
 
                 HangmanEmbedUtils.editMessage(embedBuilder, userId, hangmanGameRepository);

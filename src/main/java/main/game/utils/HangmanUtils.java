@@ -59,26 +59,20 @@ public class HangmanUtils {
         return Button.primary(Buttons.BUTTON_MY_STATS.name(), buttonStatistics);
     }
 
-    public static Button getButtonPlayAgainWithUsers(List<Long> userList) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(Buttons.BUTTON_START_NEW_GAME.name());
-
-        for (long userId : userList) {
-            stringBuilder.append("_").append(userId);
-        }
-        String buttonPlayAgain = JSON_BOT_PARSERS.getLocale("button_play_again", userList.get(0));
-        return Button.success(stringBuilder.toString(), buttonPlayAgain);
+    public static Button getButtonPlayAgainWithUsers(long userId) {
+        String buttonPlayAgain = JSON_BOT_PARSERS.getLocale("button_play_again", userId);
+        return Button.success(Buttons.BUTTON_START_NEW_GAME.name(), buttonPlayAgain);
     }
 
     public static String getImage(int count) {
         return String.format("https://megoru.ru/hangman/%s.png", count);
     }
 
-    public static List<Button> getListButtons(long userId) {
-        List<Button> buttonList = new LinkedList<>();
-        buttonList.add(getButtonPlayAgain(userId));
-        return getButtons(userId, buttonList);
-    }
+//    public static List<Button> getListButtons(long userId) {
+//        List<Button> buttonList = new LinkedList<>();
+//        buttonList.add(getButtonPlayAgain(userId));
+//        return getButtons(userId, buttonList);
+//    }
 
     public static List<Long> getListUsersFromHangmanPlayers(HangmanPlayer[] hangmanPlayers) {
         return Arrays.stream(hangmanPlayers)
@@ -94,10 +88,10 @@ public class HangmanUtils {
         return buttonList;
     }
 
-    public static List<Button> getListButtons(List<Long> userList) {
+    public static List<Button> getListButtons(long userId) {
         List<Button> buttonList = new LinkedList<>();
-        buttonList.add(getButtonPlayAgainWithUsers(userList));
-        return getButtons(userList.get(0), buttonList);
+        buttonList.add(getButtonPlayAgainWithUsers(userId));
+        return getButtons(userId, buttonList);
     }
 
     @NotNull
