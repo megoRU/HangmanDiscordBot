@@ -243,8 +243,10 @@ public class Hangman {
         this.againstPlayerId = null;
     }
 
-    public void setAgainstPlayerId(long againstPlayerId) {
+    public void setAgainstPlayerId(@Nullable Long againstPlayerId) {
         this.againstPlayerId = againstPlayerId;
-        this.againstPlayerEmbedded = againstPlayerId;
+        if (againstPlayerId != null) {
+            this.againstPlayerEmbedded = againstPlayerId;
+        }
     }
 }
