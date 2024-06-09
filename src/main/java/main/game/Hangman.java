@@ -146,7 +146,7 @@ public class Hangman {
         setTimer(LocalDateTime.now());
     }
 
-    public synchronized void inputHandler(@NotNull final String inputs, @NotNull final Message messages) {
+    public void inputHandler(@NotNull final String inputs, @NotNull final Message messages) {
         HangmanInputs hangmanInputs = new HangmanInputs(hangmanGameRepository);
         hangmanInputs.handler(inputs, messages, this);
     }

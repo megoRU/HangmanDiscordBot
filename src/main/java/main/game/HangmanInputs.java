@@ -24,7 +24,7 @@ public class HangmanInputs {
         this.hangmanGameRepository = hangmanGameRepository;
     }
 
-    public synchronized void handler(@NotNull final String input, @NotNull final Message messages, Hangman hangman) {
+    public void handler(@NotNull final String input, @NotNull final Message messages, Hangman hangman) {
         long userId = messages.getAuthor().getIdLong();
         try {
             MessageDeleting.addMessageToDelete(messages);
