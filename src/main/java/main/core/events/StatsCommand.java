@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 public class StatsCommand {
@@ -21,6 +23,7 @@ public class StatsCommand {
     //Language
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private static final DecimalFormat df = new DecimalFormat("##.#");
+    private final static Logger LOGGER = Logger.getLogger(StatsCommand.class.getName());
 
     @Autowired
     public StatsCommand(GamesRepository gamesRepository) {
@@ -90,7 +93,7 @@ public class StatsCommand {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage());
         }
     }
 }

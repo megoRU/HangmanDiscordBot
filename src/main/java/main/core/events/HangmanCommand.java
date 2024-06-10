@@ -7,7 +7,6 @@ import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
 import main.model.repository.HangmanGameRepository;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Mentions;
@@ -20,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Map;
 
@@ -54,31 +52,24 @@ public class HangmanCommand {
         Map<Long, UserSettings.GameLanguage> mapGameLanguages = BotStartConfig.getMapGameLanguages();
         if (!mapGameLanguages.containsKey(userIdLong)) {
             String hangmanListenerNeedSetLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", userIdLong);
-
-            EmbedBuilder needSetLanguage = new EmbedBuilder();
-            needSetLanguage.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
-            needSetLanguage.setColor(Color.GREEN);
-            needSetLanguage.setDescription(hangmanListenerNeedSetLanguage);
-
-            event.replyEmbeds(needSetLanguage.build())
+            event.reply(hangmanListenerNeedSetLanguage)
                     .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
                     .addActionRow(HangmanUtils.getButtonPlayAgain(userIdLong))
+                    .setEphemeral(true)
                     .queue();
             //Проверяем если игрок уже играет. То присылаем в чат уведомление
         } else if (instance.hasCompetitive(userIdLong)) {
             String youArePlayNow = jsonParsers.getLocale("you_are_search_now", userIdLong);
             event.reply(youArePlayNow)
                     .setActionRow(HangmanUtils.getButtonLeaveSearch(userIdLong))
+                    .setEphemeral(true)
                     .queue();
         } else if (instance.hasHangman(userIdLong)) {
             String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", userIdLong);
-
-            EmbedBuilder youPlay = new EmbedBuilder();
-            youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
-            youPlay.setColor(Color.GREEN);
-            youPlay.setDescription(hangmanListenerYouPlay);
-
-            event.replyEmbeds(youPlay.build()).addActionRow(HangmanUtils.getButtonStop(userIdLong)).queue();
+            event.reply(hangmanListenerYouPlay)
+                    .setActionRow(HangmanUtils.getButtonStop(userIdLong))
+                    .setEphemeral(true)
+                    .queue();
             //Если всё хорошо, создаем игру
         } else {
             Guild guild = event.getGuild();
@@ -98,7 +89,9 @@ public class HangmanCommand {
                 userContext((UserContextInteractionEvent) event, hangmanBuilder);
             } else if (event.getName().equals("hg") || event.getName().equals("play")) {
                 String createGame = jsonParsers.getLocale("create_game", userIdLong);
-                event.reply(createGame).setEphemeral(true).queue();
+                event.reply(createGame)
+                        .setEphemeral(true)
+                        .queue();
 
                 startGame(event, hangmanBuilder);
             }

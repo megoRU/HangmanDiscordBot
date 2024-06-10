@@ -36,14 +36,10 @@ public class CategoryCommand {
         //Если игрок сейчас играет сменить язык не даст
         if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
             String reactionsButtonWhenPlay = jsonParsers.getLocale("ReactionsButton_When_Play", userIdLong);
-
-            EmbedBuilder whenPlay = new EmbedBuilder();
-
-            whenPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
-            whenPlay.setColor(Color.GREEN);
-            whenPlay.setDescription(reactionsButtonWhenPlay);
-
-            event.replyEmbeds(whenPlay.build()).addActionRow(HangmanUtils.getButtonStop(userIdLong)).queue();
+            event.reply(reactionsButtonWhenPlay)
+                    .setActionRow(HangmanUtils.getButtonStop(userIdLong))
+                    .setEphemeral(true)
+                    .queue();
             return;
         }
 

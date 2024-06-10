@@ -48,11 +48,10 @@ public class LanguageCommand {
         //Если игрок сейчас играет сменить язык не даст
         if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
             String reactionsButtonWhenPlay = jsonParsers.getLocale("ReactionsButton_When_Play", userIdLong);
-            EmbedBuilder whenPlay = new EmbedBuilder();
-            whenPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
-            whenPlay.setColor(Color.GREEN);
-            whenPlay.setDescription(reactionsButtonWhenPlay);
-            event.replyEmbeds(whenPlay.build()).addActionRow(HangmanUtils.getButtonStop(userIdLong)).setEphemeral(true).queue();
+            event.reply(reactionsButtonWhenPlay)
+                    .setActionRow(HangmanUtils.getButtonStop(userIdLong))
+                    .setEphemeral(true)
+                    .queue();
             return;
         } //0 - game | 1 - bot
         else if (event.getOptions().size() == 2) {
@@ -70,7 +69,10 @@ public class LanguageCommand {
 
             String slashLanguage = String.format(jsonParsers.getLocale("slash_language", userIdLong), opOne, opTwo);
 
-            event.reply(slashLanguage).addActionRow(HangmanUtils.getButtonPlayAgain(userIdLong)).queue();
+            event.reply(slashLanguage)
+                    .setActionRow(HangmanUtils.getButtonPlayAgain(userIdLong))
+                    .setEphemeral(true)
+                    .queue();
 
             userSettings.setBotLanguage(botLanguage);
             userSettings.setGameLanguage(gameLanguage);

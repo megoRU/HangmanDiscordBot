@@ -58,7 +58,7 @@ public class LeadboardCommand {
 
         embedBuilder.setDescription(String.format("""
                 %s
-                                
+                \s
                 %s
                 """, leadboad, stringBuilder));
 

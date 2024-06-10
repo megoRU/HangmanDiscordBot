@@ -30,11 +30,11 @@ public class LanguageGameButton {
 
         if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
             String reactionsButtonWhenPlay = jsonParsers.getLocale("ReactionsButton_When_Play", userIdLong);
-            EmbedBuilder youPlay = new EmbedBuilder();
-            youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
-            youPlay.setColor(0x00FF00);
-            youPlay.setDescription(reactionsButtonWhenPlay);
-            event.getHook().sendMessageEmbeds(youPlay.build()).setEphemeral(true).addActionRow(HangmanUtils.getButtonStop(userIdLong)).queue();
+            event.getHook()
+                    .sendMessage(reactionsButtonWhenPlay)
+                    .setEphemeral(true)
+                    .setActionRow(HangmanUtils.getButtonStop(userIdLong))
+                    .queue();
         } else {
             if (event.getButton().getEmoji() != null) {
                 String buttonName = event.getButton().getEmoji().getName().contains("\uD83C\uDDF7\uD83C\uDDFA") ? "RU" : "EN";
@@ -42,7 +42,10 @@ public class LanguageGameButton {
                 String reactionsButtonSave = String.format(reactionsButton, event.getButton().getLabel());
 
                 UserSettings.GameLanguage gameLanguage = UserSettings.GameLanguage.valueOf(buttonName);
-                event.getHook().sendMessage(reactionsButtonSave).setEphemeral(true).queue();
+                event.getHook()
+                        .sendMessage(reactionsButtonSave)
+                        .setEphemeral(true)
+                        .queue();
 
                 UserSettings userSettings = userSettingsRepository.getByUserIdLong(userIdLong);
 

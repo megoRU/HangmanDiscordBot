@@ -122,14 +122,10 @@ public class HangmanButton {
         } else {
             String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
 
-            EmbedBuilder youPlay = new EmbedBuilder();
-            youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
-            youPlay.setColor(0x00FF00);
-            youPlay.setDescription(hangmanListenerYouPlay);
-
             event.getHook()
-                    .sendMessageEmbeds(youPlay.build())
+                    .sendMessage(hangmanListenerYouPlay)
                     .setActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game"))
+                    .setEphemeral(true)
                     .queue();
         }
     }

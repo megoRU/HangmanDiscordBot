@@ -11,9 +11,13 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 public class JoinEvent {
+
+    private final static Logger LOGGER = Logger.getLogger(JoinEvent.class.getName());
 
     public void join(@NotNull GuildJoinEvent event) {
         try {
@@ -53,7 +57,7 @@ public class JoinEvent {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage());
         }
     }
 }

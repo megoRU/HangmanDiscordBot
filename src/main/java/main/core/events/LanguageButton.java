@@ -34,11 +34,10 @@ public class LanguageButton {
         boolean hasHangman = HangmanRegistry.getInstance().hasHangman(userId);
         if (hasHangman) {
             String reactionsButtonWhenPlay = jsonParsers.getLocale("ReactionsButton_When_Play", event.getUser().getIdLong());
-            EmbedBuilder youPlay = new EmbedBuilder();
-            youPlay.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
-            youPlay.setColor(0x00FF00);
-            youPlay.setDescription(reactionsButtonWhenPlay);
-            event.getHook().sendMessageEmbeds(youPlay.build()).setEphemeral(true).addActionRow(HangmanUtils.getButtonStop(userId)).queue();
+            event.getHook().sendMessage(reactionsButtonWhenPlay)
+                    .setEphemeral(true)
+                    .setActionRow(HangmanUtils.getButtonStop(userId))
+                    .queue();
             return;
         }
 

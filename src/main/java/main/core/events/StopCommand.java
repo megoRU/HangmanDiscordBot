@@ -9,13 +9,9 @@ import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Service
 public class StopCommand {
@@ -30,6 +26,7 @@ public class StopCommand {
         this.hangmanGameRepository = hangmanGameRepository;
     }
 
+    //TODO: Переделать всё
     public void stop(@NotNull Event event, UpdateController updateController) {
         var userIdLong = updateController.getUserId(event);
 
@@ -42,8 +39,10 @@ public class StopCommand {
                 //First player
                 cancelCompetitiveGame(event, userIdLong, updateController);
                 Long againstPlayerId = hangman.getAgainstPlayerId();
-                cancelCompetitiveGame(event, againstPlayerId, updateController);
-                instance.removeHangman(userIdLong);
+                if (againstPlayerId != null) {
+                    cancelCompetitiveGame(event, againstPlayerId, updateController);
+                    instance.removeHangman(userIdLong);
+                }
             } else {
                 HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
                 long userId = HangmanUtils.getHangmanFirstPlayer(hangmanPlayers);
