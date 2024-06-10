@@ -70,7 +70,6 @@ public class HangmanButton {
             hangmanBuilder.setHangmanGameRepository(hangmanGameRepository);
             hangmanBuilder.setHangmanResult(hangmanResult);
 
-            Hangman hangman;
             Message message = event.getMessage();
             String guildId = event.getGuild() != null ? event.getGuild().getId() : "null";
 
@@ -112,7 +111,7 @@ public class HangmanButton {
                         hangmanBuilder.addHangmanPlayer(hangmanPlayerSecond);
                     });
 
-            hangman = hangmanBuilder.build();
+            Hangman hangman = hangmanBuilder.build();
 
             HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
             for (HangmanPlayer player : hangmanPlayers) {
