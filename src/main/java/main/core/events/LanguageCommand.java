@@ -70,7 +70,6 @@ public class LanguageCommand {
             String slashLanguage = String.format(jsonParsers.getLocale("slash_language", userIdLong), opOne, opTwo);
 
             event.reply(slashLanguage)
-                    .setActionRow(HangmanUtils.getButtonPlayAgain(userIdLong))
                     .setEphemeral(true)
                     .queue();
 

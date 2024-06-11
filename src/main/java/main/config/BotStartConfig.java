@@ -7,7 +7,6 @@ import main.controller.UpdateController;
 import main.core.CoreBot;
 import main.game.utils.HangmanUtils;
 import main.model.entity.UserSettings;
-import main.model.repository.HangmanGameRepository;
 import main.service.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -58,7 +57,6 @@ public class BotStartConfig {
 
     //REPOSITORY
     private final UpdateController updateController;
-    private final HangmanGameRepository hangmanGameRepository;
 
     @PostConstruct
     private void setLanguages() {

@@ -54,7 +54,6 @@ public class HangmanCommand {
             String hangmanListenerNeedSetLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", userIdLong);
             event.reply(hangmanListenerNeedSetLanguage)
                     .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
-                    .addActionRow(HangmanUtils.getButtonPlayAgain(userIdLong))
                     .setEphemeral(true)
                     .queue();
             //Проверяем если игрок уже играет. То присылаем в чат уведомление

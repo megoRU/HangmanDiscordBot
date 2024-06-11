@@ -54,7 +54,6 @@ public class HangmanButton {
         if (userGameLanguage == null) {
             event.getHook().sendMessage(gameLanguage)
                     .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
-                    .addActionRow(HangmanUtils.getButtonPlayAgain(userIdLong))
                     .setEphemeral(true)
                     .queue();
             return;
