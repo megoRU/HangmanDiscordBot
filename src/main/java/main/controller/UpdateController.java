@@ -76,16 +76,19 @@ public class UpdateController {
     }
 
     private void distributeEventsByType(Object event) {
-        if (event instanceof SlashCommandInteractionEvent) {
-            slashEvent((SlashCommandInteractionEvent) event);
-        } else if (event instanceof MessageReceivedEvent) {
-            messageReceivedEvent((MessageReceivedEvent) event);
+        if (event instanceof SlashCommandInteractionEvent slashCommandInteractionEvent) {
+            LOGGER.log(Level.INFO, slashCommandInteractionEvent.getName());
+            slashEvent(slashCommandInteractionEvent);
+        } else if (event instanceof MessageReceivedEvent messageReceivedEvent) {
+            messageReceivedEvent(messageReceivedEvent);
         } else if (event instanceof GuildJoinEvent) {
             joinEvent((GuildJoinEvent) event);
-        } else if (event instanceof UserContextInteractionEvent) {
-            contextEvent((UserContextInteractionEvent) event);
-        } else if (event instanceof ButtonInteractionEvent) {
-            buttonEvent((ButtonInteractionEvent) event);
+        } else if (event instanceof UserContextInteractionEvent userContextInteractionEvent) {
+            LOGGER.log(Level.INFO, userContextInteractionEvent.getName());
+            contextEvent(userContextInteractionEvent);
+        } else if (event instanceof ButtonInteractionEvent buttonInteractionEvent) {
+            LOGGER.log(Level.INFO, buttonInteractionEvent.getInteraction().getButton().getLabel());
+            buttonEvent(buttonInteractionEvent);
         }
     }
 

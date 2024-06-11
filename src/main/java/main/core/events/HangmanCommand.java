@@ -81,7 +81,7 @@ public class HangmanCommand {
             hangmanBuilder.setHangmanGameRepository(hangmanGameRepository);
             hangmanBuilder.setHangmanResult(hangmanResult);
 
-            if (event.getName().equals("multi") && event instanceof SlashCommandInteractionEvent) {
+            if (event.getName().equals("multi") && event instanceof SlashCommandInteractionEvent s) {
                 multi((SlashCommandInteractionEvent) event, hangmanBuilder);
             } else if (event.getName().equals("multiple") && event instanceof SlashCommandInteractionEvent) {
                 multiple((SlashCommandInteractionEvent) event, hangmanBuilder);

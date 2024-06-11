@@ -60,7 +60,7 @@ public class StopCommand {
             //Если игрок не играет, а хочет завершить игру, то нужно ему это прислать уведомление, что он сейчас не играет
         } else {
             String hangmanYouAreNotPlay = jsonParsers.getLocale("Hangman_You_Are_Not_Play", userIdLong);
-            updateController.sendMessage(event, hangmanYouAreNotPlay, HangmanUtils.getButtonPlayAgain(userIdLong));
+            updateController.sendMessage(event, hangmanYouAreNotPlay);
         }
     }
 
