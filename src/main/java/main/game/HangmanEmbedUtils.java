@@ -59,11 +59,7 @@ public class HangmanEmbedUtils {
                 String against = jsonGameParsers.getLocale("against", userId);
                 String againstPlayerWithDiscord = hangman.getAgainstPlayerWithDiscord();
 
-                if (againstPlayerWithDiscord == null) {
-                    embedBuilder.addField(against, againstPlayerWithDiscord, true);
-                } else {
-                    embedBuilder.addField(against, againstPlayerWithDiscord, true);
-                }
+                embedBuilder.addField(against, againstPlayerWithDiscord, true);
             }
             //Game Language
             embedBuilder.addField(gameLanguage, language, true);
