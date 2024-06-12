@@ -52,7 +52,6 @@ public class LanguageCommand {
                     .setActionRow(HangmanUtils.getButtonStop(userIdLong))
                     .setEphemeral(true)
                     .queue();
-            return;
         } //0 - game | 1 - bot
         else if (event.getOptions().size() == 2) {
             UserSettings.GameLanguage gameLanguage = UserSettings.GameLanguage

@@ -60,7 +60,6 @@ public class ChecksClass {
         }
     }
 
-
     private static void sendMessage(@NotNull Event event, String checkPermissions, boolean canWrite) {
         if (event instanceof SlashCommandInteractionEvent slashEvent) {
             slashEvent.reply(checkPermissions).queue();

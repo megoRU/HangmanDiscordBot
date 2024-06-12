@@ -52,7 +52,7 @@ public class HangmanButton {
         HangmanRegistry instance = HangmanRegistry.getInstance();
 
         if (userGameLanguage == null) {
-            event.getHook().sendMessage(gameLanguage)
+            event.reply(gameLanguage)
                     .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
                     .setEphemeral(true)
                     .queue();
@@ -121,8 +121,7 @@ public class HangmanButton {
         } else {
             String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
 
-            event.getHook()
-                    .sendMessage(hangmanListenerYouPlay)
+            event.reply(hangmanListenerYouPlay)
                     .setActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game"))
                     .setEphemeral(true)
                     .queue();
