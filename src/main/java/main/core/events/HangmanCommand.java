@@ -1,12 +1,14 @@
 package main.core.events;
 
 import main.config.BotStartConfig;
-import main.game.*;
+import main.game.Hangman;
+import main.game.HangmanBuilder;
+import main.game.HangmanDataSaving;
+import main.game.HangmanPlayer;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
-import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Mentions;
@@ -26,18 +28,12 @@ import java.util.Map;
 public class HangmanCommand {
 
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
-    private final HangmanGameRepository hangmanGameRepository;
     private final HangmanDataSaving hangmanDataSaving;
-    private final HangmanResult hangmanResult;
     private final HangmanRegistry instance = HangmanRegistry.getInstance();
 
     @Autowired
-    public HangmanCommand(HangmanGameRepository hangmanGameRepository,
-                          HangmanDataSaving hangmanDataSaving,
-                          HangmanResult hangmanResult) {
-        this.hangmanGameRepository = hangmanGameRepository;
+    public HangmanCommand(HangmanDataSaving hangmanDataSaving) {
         this.hangmanDataSaving = hangmanDataSaving;
-        this.hangmanResult = hangmanResult;
     }
 
     public void hangman(@NotNull GenericCommandInteractionEvent event) {
@@ -76,16 +72,13 @@ public class HangmanCommand {
             HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, guild != null ? guild.getIdLong() : null, channelIdLong);
             HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder();
             hangmanBuilder.addHangmanPlayer(hangmanPlayer);
-            hangmanBuilder.setHangmanDataSaving(hangmanDataSaving);
-            hangmanBuilder.setHangmanGameRepository(hangmanGameRepository);
-            hangmanBuilder.setHangmanResult(hangmanResult);
 
-            if (event.getName().equals("multi") && event instanceof SlashCommandInteractionEvent s) {
-                multi((SlashCommandInteractionEvent) event, hangmanBuilder);
-            } else if (event.getName().equals("multiple") && event instanceof SlashCommandInteractionEvent) {
-                multiple((SlashCommandInteractionEvent) event, hangmanBuilder);
-            } else if (event.getName().equals("multi") && event instanceof UserContextInteractionEvent) {
-                userContext((UserContextInteractionEvent) event, hangmanBuilder);
+            if (event.getName().equals("multi") && event instanceof SlashCommandInteractionEvent slashCommandInteractionEvent) {
+                multi(slashCommandInteractionEvent, hangmanBuilder);
+            } else if (event.getName().equals("multiple") && event instanceof SlashCommandInteractionEvent slashCommandInteractionEvent) {
+                multiple(slashCommandInteractionEvent, hangmanBuilder);
+            } else if (event.getName().equals("multi") && event instanceof UserContextInteractionEvent userContextInteractionEvent) {
+                userContext(userContextInteractionEvent, hangmanBuilder);
             } else if (event.getName().equals("hg") || event.getName().equals("play")) {
                 String createGame = jsonParsers.getLocale("create_game", userIdLong);
                 event.reply(createGame)
@@ -106,7 +99,7 @@ public class HangmanCommand {
             instance.setHangman(player.getUserId(), hangman);
         }
 
-        hangman.startGame(event.getMessageChannel());
+        hangman.startGame(event.getMessageChannel(), hangmanDataSaving);
     }
 
     private void userContext(UserContextInteractionEvent userContextEvent, HangmanBuilder.Builder hangmanBuilder) {

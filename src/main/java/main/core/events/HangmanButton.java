@@ -2,13 +2,14 @@ package main.core.events;
 
 import main.config.BotStartConfig;
 import main.enums.Buttons;
-import main.game.*;
+import main.game.Hangman;
+import main.game.HangmanBuilder;
+import main.game.HangmanDataSaving;
+import main.game.HangmanPlayer;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
-import main.model.repository.HangmanGameRepository;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -27,17 +28,11 @@ import java.util.regex.Pattern;
 public class HangmanButton {
 
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
-    private final HangmanGameRepository hangmanGameRepository;
     private final HangmanDataSaving hangmanDataSaving;
-    private final HangmanResult hangmanResult;
 
     @Autowired
-    public HangmanButton(HangmanGameRepository hangmanGameRepository,
-                         HangmanDataSaving hangmanDataSaving,
-                         HangmanResult hangmanResult) {
-        this.hangmanGameRepository = hangmanGameRepository;
+    public HangmanButton(HangmanDataSaving hangmanDataSaving) {
         this.hangmanDataSaving = hangmanDataSaving;
-        this.hangmanResult = hangmanResult;
     }
 
     public void hangman(@NotNull ButtonInteractionEvent event) {
@@ -65,9 +60,6 @@ public class HangmanButton {
             HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, guild != null ? guild.getIdLong() : null, channelIdLong);
             HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder();
             hangmanBuilder.addHangmanPlayer(hangmanPlayer);
-            hangmanBuilder.setHangmanDataSaving(hangmanDataSaving);
-            hangmanBuilder.setHangmanGameRepository(hangmanGameRepository);
-            hangmanBuilder.setHangmanResult(hangmanResult);
 
             Message message = event.getMessage();
             String guildId = event.getGuild() != null ? event.getGuild().getId() : "null";
@@ -117,7 +109,7 @@ public class HangmanButton {
                 instance.setHangman(player.getUserId(), hangman);
             }
 
-            hangman.startGame(event.getChannel());
+            hangman.startGame(event.getChannel(), hangmanDataSaving);
         } else {
             String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
 

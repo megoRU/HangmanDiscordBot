@@ -20,16 +20,17 @@ public class HangmanGameEndHandler {
     private static final JSONParsers JSON_GAME_PARSERS = new JSONParsers(JSONParsers.Locale.GAME);
 
     private final HangmanGameRepository hangmanGameRepository;
+    private final HangmanResult hangmanResult;
 
     @Autowired
-    public HangmanGameEndHandler(HangmanGameRepository hangmanGameRepository) {
+    public HangmanGameEndHandler(HangmanGameRepository hangmanGameRepository, HangmanResult hangmanResult) {
         this.hangmanGameRepository = hangmanGameRepository;
+        this.hangmanResult = hangmanResult;
     }
 
     public void handleGameEnd(Hangman hangman, boolean result) {
         try {
             HangmanRegistry instance = HangmanRegistry.getInstance();
-            HangmanResult hangmanResult = hangman.getHangmanResult();
             long userId = HangmanUtils.getHangmanFirstPlayer(hangman.getHangmanPlayers());
             boolean isCompetitive = hangman.isCompetitive();
             Long againstPlayerId = hangman.getAgainstPlayerId();

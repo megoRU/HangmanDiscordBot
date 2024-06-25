@@ -7,6 +7,7 @@ import main.core.events.*;
 import main.enums.Buttons;
 import main.game.Hangman;
 import main.game.HangmanDataSaving;
+import main.game.HangmanInputs;
 import main.game.HangmanResult;
 import main.game.core.HangmanRegistry;
 import main.model.repository.CompetitiveQueueRepository;
@@ -45,6 +46,7 @@ public class UpdateController {
     private final CompetitiveQueueRepository competitiveQueueRepository;
     private final HangmanDataSaving hangmanDataSaving;
     private final HangmanResult hangmanResult;
+    private final HangmanInputs hangmanInputs;
 
     //LOGGER
     private final static Logger LOGGER = Logger.getLogger(UpdateController.class.getName());
@@ -58,13 +60,15 @@ public class UpdateController {
                             UserSettingsRepository userSettingsRepository,
                             CompetitiveQueueRepository competitiveQueueRepository,
                             HangmanDataSaving hangmanDataSaving,
-                            HangmanResult hangmanResult) {
+                            HangmanResult hangmanResult,
+                            HangmanInputs hangmanInputs) {
         this.hangmanGameRepository = hangmanGameRepository;
         this.gamesRepository = gamesRepository;
         this.userSettingsRepository = userSettingsRepository;
         this.competitiveQueueRepository = competitiveQueueRepository;
         this.hangmanDataSaving = hangmanDataSaving;
         this.hangmanResult = hangmanResult;
+        this.hangmanInputs = hangmanInputs;
     }
 
     public void registerBot(CoreBot coreBot) {
@@ -133,7 +137,7 @@ public class UpdateController {
         }
 
         if (Objects.equals(buttonId, Buttons.BUTTON_START_NEW_GAME.name())) {
-            HangmanButton hangmanCommand = new HangmanButton(hangmanGameRepository, hangmanDataSaving, hangmanResult);
+            HangmanButton hangmanCommand = new HangmanButton(hangmanDataSaving);
             hangmanCommand.hangman(event);
             return;
         }
@@ -147,7 +151,7 @@ public class UpdateController {
         boolean permission = ChecksClass.check(event);
         if (!permission) return;
 
-        HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult);
+        HangmanCommand hangmanCommand = new HangmanCommand(hangmanDataSaving);
         hangmanCommand.hangman(event);
     }
 
@@ -174,7 +178,7 @@ public class UpdateController {
             if (hangman != null) {
                 boolean permission = ChecksClass.check(event);
                 if (!permission) return;
-                hangman.inputHandler(message.toLowerCase(), event.getMessage());
+                hangmanInputs.handler(message.toLowerCase(), event.getMessage(), hangman);
             }
         }
     }
@@ -216,7 +220,7 @@ public class UpdateController {
                 deleteCommand.delete(event);
             }
             case "hg", "multi", "play", "multiple" -> {
-                HangmanCommand hangmanCommand = new HangmanCommand(hangmanGameRepository, hangmanDataSaving, hangmanResult);
+                HangmanCommand hangmanCommand = new HangmanCommand(hangmanDataSaving);
                 hangmanCommand.hangman(event);
             }
             case "category" -> {

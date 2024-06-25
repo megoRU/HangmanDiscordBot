@@ -2,18 +2,18 @@ package main.service;
 
 import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
-import main.controller.UpdateController;
-import main.game.*;
+import main.game.Hangman;
+import main.game.HangmanBuilder;
+import main.game.HangmanDataSaving;
+import main.game.HangmanPlayer;
 import main.game.api.HangmanAPI;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.model.entity.UserSettings;
 import main.model.repository.CompetitiveQueueRepository;
-import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.logging.Level;
@@ -24,9 +24,7 @@ import java.util.logging.Logger;
 public class CompetitiveService {
 
     private final CompetitiveQueueRepository competitiveQueueRepository;
-    private final HangmanGameRepository hangmanGameRepository;
     private final HangmanDataSaving hangmanDataSaving;
-    private final HangmanResult hangmanResult;
     private final HangmanAPI hangmanAPI;
 
     private static final Logger LOGGER = Logger.getLogger(CompetitiveService.class.getName());
@@ -55,9 +53,6 @@ public class CompetitiveService {
                         hangmanBuilder.addHangmanPlayer(competitiveCurrentPlayer);
                         hangmanBuilder.setCompetitive(true);
                         hangmanBuilder.setAgainstPlayerId(getAnotherUserId(currentPlayerUserId, competitivePlayers));
-                        hangmanBuilder.setHangmanGameRepository(hangmanGameRepository);
-                        hangmanBuilder.setHangmanDataSaving(hangmanDataSaving);
-                        hangmanBuilder.setHangmanResult(hangmanResult);
 
                         Hangman hangman = hangmanBuilder.build();
                         HangmanRegistry.getInstance().setHangman(currentPlayerUserId, hangman);
@@ -67,7 +62,7 @@ public class CompetitiveService {
                                 .complete()
                                 .openPrivateChannel();
                         PrivateChannel complete = privateChannelCacheRestAction.complete();
-                        hangman.startGame(complete, word);
+                        hangman.startGame(complete, word, hangmanDataSaving);
 
                         //Удаляем из очереди
                         competitiveQueueRepository.deleteById(currentPlayerUserId);

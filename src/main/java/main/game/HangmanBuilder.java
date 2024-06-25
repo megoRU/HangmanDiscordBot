@@ -1,7 +1,5 @@
 package main.game;
 
-import main.model.repository.HangmanGameRepository;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,14 +7,7 @@ import java.util.List;
 public interface HangmanBuilder {
 
     class Builder {
-
-        //Service
-        private HangmanGameRepository hangmanGameRepository;
-        private HangmanDataSaving hangmanDataSaving;
-        private HangmanResult hangmanResult;
-
         //User|Guild|Channel data
-
         private final List<HangmanPlayer> hangmanPlayerList = new ArrayList<>();
         private long messageId;
 
@@ -38,21 +29,6 @@ public interface HangmanBuilder {
                 hangmanPlayers[i] = hangmanPlayer;
             }
             return hangmanPlayers;
-        }
-
-        public Builder setHangmanGameRepository(HangmanGameRepository hangmanGameRepository) {
-            this.hangmanGameRepository = hangmanGameRepository;
-            return this;
-        }
-
-        public Builder setHangmanResult(HangmanResult hangmanResult) {
-            this.hangmanResult = hangmanResult;
-            return this;
-        }
-
-        public Builder setHangmanDataSaving(HangmanDataSaving hangmanDataSaving) {
-            this.hangmanDataSaving = hangmanDataSaving;
-            return this;
         }
 
         public Builder setMessageId(long messageId) {
@@ -104,14 +80,7 @@ public interface HangmanBuilder {
          * @throws IllegalArgumentException if hangmanGameRepository, playerRepository, gamesRepository, channelId == null
          */
         public Hangman build() {
-            if (hangmanGameRepository == null)
-                throw new IllegalArgumentException("The provided hangmanGameRepository cannot be null!");
-            else if (hangmanDataSaving == null)
-                throw new IllegalArgumentException("The provided hangmanDataSaving cannot be null!");
-            else if (hangmanResult == null)
-                throw new IllegalArgumentException("The provided hangmanResult cannot be null!");
-
-            Hangman hangman = new Hangman(hangmanGameRepository, hangmanDataSaving, hangmanResult);
+            Hangman hangman = new Hangman();
 
             if (word != null && currentHiddenWord != null) {
                 return hangman.update(

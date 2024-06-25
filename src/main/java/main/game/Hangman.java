@@ -7,13 +7,9 @@ import main.game.api.HangmanAPI;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
-import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -36,12 +32,6 @@ public class Hangman {
 
     //Localisation
     private static final JSONParsers JSON_GAME_PARSERS = new JSONParsers(JSONParsers.Locale.GAME);
-    private static final JSONParsers JSON_BOT_PARSERS = new JSONParsers(JSONParsers.Locale.BOT);
-
-    //Service
-    private final HangmanGameRepository hangmanGameRepository;
-    private final HangmanDataSaving hangmanDataSaving;
-    private final HangmanResult hangmanResult;
 
     private final HangmanAPI hangmanAPI = new HangmanAPI();
     private final Set<String> guesses;
@@ -65,13 +55,7 @@ public class Hangman {
     @Setter
     private volatile GameStatus gameStatus;
 
-    @Autowired
-    public Hangman(HangmanGameRepository hangmanGameRepository,
-                   HangmanDataSaving hangmanDataSaving,
-                   HangmanResult hangmanResult) {
-        this.hangmanGameRepository = hangmanGameRepository;
-        this.hangmanDataSaving = hangmanDataSaving;
-        this.hangmanResult = hangmanResult;
+    public Hangman() {
         this.guesses = new LinkedHashSet<>();
         this.gameStatus = GameStatus.STARTING;
     }
@@ -83,10 +67,12 @@ public class Hangman {
                    int hangmanErrors,
                    LocalDateTime localDateTime,
                    boolean isCompetitive,
-                   Long againstPlayerId,
+                   @Nullable Long againstPlayerId,
                    HangmanPlayer... hangmanPlayers) {
         this.againstPlayerId = againstPlayerId;
-        this.againstPlayerEmbedded = againstPlayerId;
+        if (againstPlayerId != null) {
+            this.againstPlayerEmbedded = againstPlayerId;
+        }
         this.isCompetitive = isCompetitive;
         this.gameStatus = GameStatus.STARTING;
         this.messageId = messageId;
@@ -104,7 +90,7 @@ public class Hangman {
         return this;
     }
 
-    public void startGame(MessageChannel textChannel, String word) {
+    public void startGame(MessageChannel textChannel, String word, HangmanDataSaving hangmanDataSaving) {
         long userId = HangmanUtils.getHangmanFirstPlayer(hangmanPlayers);
 
         try {
@@ -125,7 +111,7 @@ public class Hangman {
         setTimer(LocalDateTime.now());
     }
 
-    public void startGame(MessageChannel textChannel) {
+    public void startGame(MessageChannel textChannel, HangmanDataSaving hangmanDataSaving) {
         long userId = HangmanUtils.getHangmanFirstPlayer(hangmanPlayers);
 
         try {
@@ -144,16 +130,6 @@ public class Hangman {
 
         //Установка авто завершения
         setTimer(LocalDateTime.now());
-    }
-
-    public void inputHandler(@NotNull final String inputs, @NotNull final Message messages) {
-        HangmanInputs hangmanInputs = new HangmanInputs(hangmanGameRepository);
-        hangmanInputs.handler(inputs, messages, this);
-    }
-
-    void gameEnd(boolean result) {
-        HangmanGameEndHandler hangmanGameEndHandler = new HangmanGameEndHandler(hangmanGameRepository);
-        hangmanGameEndHandler.handleGameEnd(this, result);
     }
 
     //Создает скрытую линию из длины слова

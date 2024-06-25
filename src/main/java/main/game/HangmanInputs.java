@@ -18,10 +18,12 @@ public class HangmanInputs {
     //Localisation
     private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
     private final HangmanGameRepository hangmanGameRepository;
+    private final HangmanGameEndHandler hangmanGameEndHandler;
 
     @Autowired
-    public HangmanInputs(HangmanGameRepository hangmanGameRepository) {
+    public HangmanInputs(HangmanGameRepository hangmanGameRepository, HangmanGameEndHandler hangmanGameEndHandler) {
         this.hangmanGameRepository = hangmanGameRepository;
+        this.hangmanGameEndHandler = hangmanGameEndHandler;
     }
 
     public void handler(@NotNull final String input, @NotNull final Message messages, Hangman hangman) {
@@ -66,7 +68,7 @@ public class HangmanInputs {
             //Игрок угадал все буквы
             if (!result.contains("_")) {
                 hangman.setGameStatus(GameStatus.WIN_GAME);
-                hangman.gameEnd(true);
+                hangmanGameEndHandler.handleGameEnd(hangman, true);
             } else {
                 String gameYouGuessLetter = jsonGameParsers.getLocale("Game_You_Guess_Letter", userId);
                 EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanLayout(userId, gameYouGuessLetter);
@@ -77,7 +79,7 @@ public class HangmanInputs {
 
             if (hangman.getHangmanErrors() >= 8) {
                 hangman.setGameStatus(GameStatus.LOSE_GAME);
-                hangman.gameEnd(false);
+                hangmanGameEndHandler.handleGameEnd(hangman, false);
             } else {
                 hangman.setGameStatus(GameStatus.WRONG_LETTER);
                 String gameNoSuchLetter = jsonGameParsers.getLocale("Game_No_Such_Letter", userId);
@@ -90,13 +92,13 @@ public class HangmanInputs {
     private void handleWordInput(String input, long userId, Hangman hangman) {
         if (input.equals(hangman.getWORD())) {
             hangman.setGameStatus(GameStatus.WIN_GAME);
-            hangman.gameEnd(true);
+            hangmanGameEndHandler.handleGameEnd(hangman, true);
         } else {
             hangman.incrementHangmanErrors();
 
             if (hangman.getHangmanErrors() >= 8) {
                 hangman.setGameStatus(GameStatus.LOSE_GAME);
-                hangman.gameEnd(false);
+                hangmanGameEndHandler.handleGameEnd(hangman, false);
             } else {
                 hangman.setGameStatus(GameStatus.WRONG_WORD);
                 String gameNoSuchWord = jsonGameParsers.getLocale("Game_No_Such_Word", userId);

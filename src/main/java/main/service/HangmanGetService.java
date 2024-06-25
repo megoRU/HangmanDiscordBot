@@ -1,7 +1,9 @@
 package main.service;
 
 import lombok.AllArgsConstructor;
-import main.game.*;
+import main.game.Hangman;
+import main.game.HangmanBuilder;
+import main.game.HangmanPlayer;
 import main.game.core.HangmanRegistry;
 import main.model.entity.ActiveHangman;
 import main.model.repository.HangmanGameRepository;
@@ -15,8 +17,6 @@ import java.util.List;
 public class HangmanGetService {
 
     private final HangmanGameRepository hangmanGameRepository;
-    private final HangmanDataSaving hangmanDataSaving;
-    private final HangmanResult hangmanResult;
 
     public void update() {
         List<ActiveHangman> activeHangmanList = hangmanGameRepository.findAll();
@@ -39,9 +39,6 @@ public class HangmanGetService {
             HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, guildLongId, channelIdLong);
 
             HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder()
-                    .setHangmanGameRepository(hangmanGameRepository)
-                    .setHangmanDataSaving(hangmanDataSaving)
-                    .setHangmanResult(hangmanResult)
                     .addHangmanPlayer(hangmanPlayer)
                     .setHangmanErrors(hangmanErrors)
                     .setWord(word)
@@ -63,6 +60,7 @@ public class HangmanGetService {
                 }
 
                 Hangman hangman = hangmanBuilder.build();
+                instance.setHangman(userIdLong, hangman);
                 //Заполнение коллекции
                 HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
                 for (HangmanPlayer player : hangmanPlayers) {
