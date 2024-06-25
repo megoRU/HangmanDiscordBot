@@ -103,6 +103,7 @@
   "button_play_again": "Play again",
   "competitive_message": "You can use this command here: </competitive:1194054216013066240>",
   "multiple": "Couldn't find users",
-  "you_cannot_press_play_again": "You cannot start the game because you are not a member of it!"
-
+  "you_cannot_press_play_again": "You cannot start the game because you are not a member of it!",
+  "Game_Is_Not_Over": "Your game is not over, go on!",
+  "Game_Opponent_Lost": "Your opponent has lost!"
 }

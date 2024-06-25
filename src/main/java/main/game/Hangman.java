@@ -46,6 +46,9 @@ public class Hangman {
     private int hangmanErrors;
     @Setter
     private boolean isCompetitive;
+    @Getter
+    @Setter
+    private boolean isOpponentLose;
     @Nullable
     private Long againstPlayerId;
     private long againstPlayerEmbedded;
@@ -216,6 +219,7 @@ public class Hangman {
     }
 
     public void deleteAgainstPlayer() {
+        setOpponentLose(true); //нужно для того чтобы фронт мультиплеера понимал
         this.againstPlayerId = null;
     }
 

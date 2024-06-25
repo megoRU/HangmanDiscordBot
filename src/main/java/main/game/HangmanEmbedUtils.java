@@ -97,6 +97,12 @@ public class HangmanEmbedUtils {
                 String competitiveGame = jsonGameParsers.getLocale("competitive_game", userId);
                 embedBuilder.setFooter(competitiveGame);
             }
+
+            if (hangman.isOpponentLose()) {
+                String gameIsNotOver = jsonGameParsers.getLocale("Game_Is_Not_Over", userId);
+                String opponentLost = jsonGameParsers.getLocale("Game_Opponent_Lost", userId);
+                embedBuilder.addField(opponentLost, gameIsNotOver, false);
+            }
         }
 
         return embedBuilder;
