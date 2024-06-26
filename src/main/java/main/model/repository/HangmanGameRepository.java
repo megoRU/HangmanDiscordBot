@@ -27,6 +27,13 @@ public interface HangmanGameRepository extends JpaRepository<ActiveHangman, Long
 
     @Modifying
     @Transactional
+    @Query(value = "UPDATE ActiveHangman ah SET " +
+            "ah.isOpponentLose = true " +
+            "WHERE ah.userIdLong = :userId")
+    void updateGameOpponent(@Param("userId") Long userId);
+
+    @Modifying
+    @Transactional
     @Query(value = "DELETE FROM ActiveHangman ah WHERE ah.userIdLong = :userIdLong")
     void deleteActiveGame(@Param("userIdLong") Long userIdLong);
 

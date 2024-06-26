@@ -35,10 +35,12 @@ public class HangmanGameEndHandler {
             boolean isCompetitive = hangman.isCompetitive();
             Long againstPlayerId = hangman.getAgainstPlayerId();
 
+            //Это вроде чтобы двойное поражение не засчиталось
             if (!result && againstPlayerId != null) {
                 Hangman activeHangman = instance.getActiveHangman(againstPlayerId);
                 if (activeHangman != null) {
                     activeHangman.deleteAgainstPlayer();
+                    hangmanGameRepository.updateGameOpponent(againstPlayerId);
                 }
             }
 
@@ -67,12 +69,14 @@ public class HangmanGameEndHandler {
             //Люблю кастыли
             if (hangman.isCompetitive()) {
                 long hangmanFirstPlayer = HangmanUtils.getHangmanFirstPlayer(hangman.getHangmanPlayers());
-                hangmanResult.save(hangmanFirstPlayer, result, true);
+                hangmanResult.saveGame(hangmanFirstPlayer, result, true);
                 if (result && againstPlayerId != null) {
-                    hangmanResult.save(againstPlayerId, false, true);
+                    if (!hangman.isOpponentLose()) { //чтобы не было двойного поражения
+                        hangmanResult.saveGame(againstPlayerId, false, true);
+                    }
                 }
             } else {
-                hangmanResult.save(hangman.getHangmanPlayers(), result, false);
+                hangmanResult.saveGame(hangman.getHangmanPlayers(), result, false);
             }
             HangmanRegistry.getInstance().removeHangman(userId);
         } catch (Exception e) {

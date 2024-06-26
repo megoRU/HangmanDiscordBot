@@ -22,7 +22,7 @@ public class HangmanResult {
         this.gamesRepository = gamesRepository;
     }
 
-    public void save(HangmanPlayer[] hangmanPlayers, boolean result, boolean isCompetitive) {
+    public void saveGame(HangmanPlayer[] hangmanPlayers, boolean result, boolean isCompetitive) {
         List<Game> gameList = new ArrayList<>();
         for (HangmanPlayer player : hangmanPlayers) {
             Game game = new Game();
@@ -40,7 +40,7 @@ public class HangmanResult {
         hangmanGameRepository.deleteActiveGame(hangmanPlayer.getUserId());
     }
 
-    public void save(long userId, boolean result, boolean isCompetitive) {
+    public void saveGame(long userId, boolean result, boolean isCompetitive) {
         Game game = new Game();
         game.setResult(result);
         game.setIsCompetitive(isCompetitive);

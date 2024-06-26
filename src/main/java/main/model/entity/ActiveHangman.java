@@ -26,14 +26,14 @@ public class ActiveHangman {
     @Column(name = "players_list")
     private String playersList;
 
-    @Column(name = "message_id_long", nullable = false)
-    private Long messageIdLong;
+    @Column(name = "message_id", nullable = false)
+    private Long messageId;
 
-    @Column(name = "channel_id_long", nullable = false)
-    private Long channelIdLong;
+    @Column(name = "channel_id", nullable = false)
+    private Long channelId;
 
-    @Column(name = "guild_long_id")
-    private Long guildLongId;
+    @Column(name = "guild_id")
+    private Long guildId;
 
     @Column(name = "word")
     private String word;
@@ -55,4 +55,7 @@ public class ActiveHangman {
 
     @Column(name = "against_player_id")
     private Long againstPlayerId;
+
+    @Column(name = "is_opponent_lose")
+    private Boolean isOpponentLose;
 }

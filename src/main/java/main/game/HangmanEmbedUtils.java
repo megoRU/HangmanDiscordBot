@@ -108,7 +108,8 @@ public class HangmanEmbedUtils {
         return embedBuilder;
     }
 
-    public static void editMessage(EmbedBuilder embedBuilder, Long userIdLong, HangmanGameRepository hangmanGameRepository) {
+    //Синхронизация чтобы не было ошибок в верстке и пропаданию части слова
+    public static synchronized void editMessage(EmbedBuilder embedBuilder, Long userIdLong, HangmanGameRepository hangmanGameRepository) {
         if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
             Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
             if (hangman == null) return;

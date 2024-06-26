@@ -25,9 +25,9 @@ public class HangmanGetService {
         for (ActiveHangman activeHangman : activeHangmanList) {
             Long userIdLong = activeHangman.getUserIdLong();
             String playersList = activeHangman.getPlayersList();
-            Long messageIdLong = activeHangman.getMessageIdLong();
-            Long channelIdLong = activeHangman.getChannelIdLong();
-            Long guildLongId = activeHangman.getGuildLongId();
+            Long messageIdLong = activeHangman.getMessageId();
+            Long channelIdLong = activeHangman.getChannelId();
+            Long guildLongId = activeHangman.getGuildId();
             String word = activeHangman.getWord();
             String currentHiddenWord = activeHangman.getCurrentHiddenWord();
             String guesses = activeHangman.getGuesses();
@@ -35,6 +35,7 @@ public class HangmanGetService {
             LocalDateTime gameCreatedTime = activeHangman.getGameCreatedTime().toLocalDateTime();
             Boolean isCompetitive = activeHangman.getIsCompetitive();
             Long againstPlayerId = activeHangman.getAgainstPlayerId();
+            Boolean isOpponentLose = activeHangman.getIsOpponentLose();
 
             HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, guildLongId, channelIdLong);
 
@@ -47,6 +48,7 @@ public class HangmanGetService {
                     .setLocalDateTime(gameCreatedTime)
                     .setCompetitive(isCompetitive)
                     .setAgainstPlayerId(againstPlayerId)
+                    .setIsOpponentLose(isOpponentLose)
                     .setMessageId(messageIdLong);
 
             if (playersList == null) {

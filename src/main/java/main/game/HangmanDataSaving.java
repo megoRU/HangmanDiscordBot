@@ -45,9 +45,9 @@ public class HangmanDataSaving {
             }
             activeHangman.setPlayersList(stringBuilder.toString().trim());
         }
-        activeHangman.setMessageIdLong(messageId);
-        activeHangman.setChannelIdLong(channelId);
-        activeHangman.setGuildLongId(guildId);
+        activeHangman.setMessageId(messageId);
+        activeHangman.setChannelId(channelId);
+        activeHangman.setGuildId(guildId);
         activeHangman.setWord(word);
         activeHangman.setCurrentHiddenWord(wordHidden);
         activeHangman.setHangmanErrors(hangmanErrors);

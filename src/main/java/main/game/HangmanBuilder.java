@@ -1,8 +1,11 @@
 package main.game;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public interface HangmanBuilder {
 
@@ -19,6 +22,7 @@ public interface HangmanBuilder {
         private LocalDateTime localDateTime;
         private boolean isCompetitive;
         private Long againstPlayerId;
+        private boolean isOpponentLose;
 
         private HangmanPlayer[] hangmanPlayersArrays() {
             List<HangmanPlayer> list = hangmanPlayerList.stream().distinct().toList();
@@ -33,6 +37,11 @@ public interface HangmanBuilder {
 
         public Builder setMessageId(long messageId) {
             this.messageId = messageId;
+            return this;
+        }
+
+        public Builder setIsOpponentLose(@Nullable Boolean isOpponentLose) {
+            this.isOpponentLose = Objects.requireNonNullElse(isOpponentLose, false);
             return this;
         }
 
@@ -92,6 +101,7 @@ public interface HangmanBuilder {
                         localDateTime,
                         isCompetitive,
                         againstPlayerId,
+                        isOpponentLose,
                         hangmanPlayersArrays());
             } else {
                 hangman.setHangmanPlayers(hangmanPlayersArrays());

@@ -71,6 +71,7 @@ public class Hangman {
                    LocalDateTime localDateTime,
                    boolean isCompetitive,
                    @Nullable Long againstPlayerId,
+                   boolean isOpponentLose,
                    HangmanPlayer... hangmanPlayers) {
         this.againstPlayerId = againstPlayerId;
         if (againstPlayerId != null) {
@@ -81,6 +82,7 @@ public class Hangman {
         this.messageId = messageId;
         this.hangmanPlayers = hangmanPlayers;
         this.channelId = hangmanPlayers[0].getChannelId();
+        this.isOpponentLose = isOpponentLose;
         //Обновить параметры
         if (guesses != null) {
             this.guesses.addAll(Arrays.asList(guesses.split(", ")));
