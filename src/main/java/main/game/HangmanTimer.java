@@ -45,7 +45,12 @@ public class HangmanTimer extends TimerTask {
                             if (HangmanRegistry.getInstance().hasHangman(userId)) {
                                 String gameOver = jsonGameParsers.getLocale("gameOver", userId);
                                 String timeIsOver = jsonGameParsers.getLocale("timeIsOver", userId);
-                                String gamePlayer = jsonGameParsers.getLocale("Game_Player", userId);
+                                String gamePlayer;
+                                if (hangmanPlayers.length == 1) {
+                                    gamePlayer = jsonGameParsers.getLocale("Game_Player", userId);
+                                } else {
+                                    gamePlayer = jsonGameParsers.getLocale("Game_Players", userId);
+                                }
 
                                 EmbedBuilder info = new EmbedBuilder();
                                 info.setColor(Color.GREEN);
