@@ -5,8 +5,9 @@ import main.jsonparser.JSONParsers;
 import main.model.repository.GamesRepository;
 import main.statistic.CreatorGraph;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,68 +31,51 @@ public class StatsCommand {
         this.gamesRepository = gamesRepository;
     }
 
-    public void stats(@NotNull SlashCommandInteractionEvent event) {
-        event.deferReply().queue();
+    public void stats(@NotNull Event event) {
+        if (event instanceof SlashCommandInteractionEvent slashCommandInteractionEvent) {
+            slashCommandInteractionEvent.deferReply().setEphemeral(true).queue();
 
-        CreatorGraph creatorGraph = new CreatorGraph(
-                gamesRepository,
-                event.getUser().getId(),
-                event.getHook());
+            CreatorGraph creatorGraph = new CreatorGraph(gamesRepository,
+                    slashCommandInteractionEvent.getUser().getId(),
+                    slashCommandInteractionEvent.getHook());
 
-        switch (event.getName()) {
-            case "allstats" -> creatorGraph.createGraph(Statistic.GLOBAL);
-            case "mystats" -> creatorGraph.createGraph(Statistic.MY);
+            switch (slashCommandInteractionEvent.getName()) {
+                case "bot-statistics" -> creatorGraph.createGraph(Statistic.GLOBAL);
+                case "statistics" -> creatorGraph.createGraph(Statistic.MY);
+            }
+        } else if (event instanceof ButtonInteractionEvent buttonInteractionEvent) {
+            buttonInteractionEvent.editButton(buttonInteractionEvent.getButton().asDisabled()).queue();
+
+            CreatorGraph creatorGraph = new CreatorGraph(gamesRepository,
+                    buttonInteractionEvent.getUser().getId(),
+                    buttonInteractionEvent.getHook());
+            creatorGraph.createGraph(Statistic.MY);
         }
     }
 
-    public void stats(@NotNull InteractionHook interactionHook) {
-        var userIdLong = interactionHook.getInteraction().getUser().getIdLong();
-        var userName = interactionHook.getInteraction().getUser().getName();
-        var userAvatarUrl = interactionHook.getInteraction().getUser().getAvatarUrl();
-
+    public void stats(EmbedBuilder embedBuilder, Long userId) {
         try {
-            String[] statistic = gamesRepository.getStatistic(userIdLong).replaceAll(",", " ").split(" ");
+            String[] statistic = gamesRepository.getStatistic(userId).replaceAll(",", " ").split(" ");
 
             if (statistic.length == 3) {
                 //Формула:
                 //Количество побед / Общее количество * Максимальное количество процентов
                 if (Integer.parseInt(statistic[0]) == 0) {
-                    String messageStatsZeroDivide = jsonParsers.getLocale("MessageStats_Zero_Divide", userIdLong);
-
-                    EmbedBuilder needSetLanguage = new EmbedBuilder();
-
-                    needSetLanguage.setAuthor(userName, null, userAvatarUrl);
-                    needSetLanguage.setColor(0x00FF00);
-                    needSetLanguage.setDescription(messageStatsZeroDivide);
-
-                    interactionHook.sendMessageEmbeds(needSetLanguage.build()).queue();
+                    String messageStatsZeroDivide = jsonParsers.getLocale("MessageStats_Zero_Divide", userId);
+                    embedBuilder.setColor(0x00FF00);
+                    embedBuilder.setDescription(messageStatsZeroDivide);
                     return;
                 }
 
                 double percentage = (double) Integer.parseInt(statistic[2]) / Integer.parseInt(statistic[0]) * 100.0;
-                String avatarUrl = null;
 
-                if (userAvatarUrl == null) {
-                    avatarUrl = "https://cdn.discordapp.com/avatars/754093698681274369/dc4b416065569253bc6323efb6296703.png";
-                }
-                if (userAvatarUrl != null) {
-                    avatarUrl = userAvatarUrl;
-                }
+                String messageStatsGameCount = String.format(jsonParsers.getLocale("MessageStats_Game_Count", userId), statistic[0]);
+                String messageStatsGameWins = String.format(jsonParsers.getLocale("MessageStats_Game_Wins", userId), statistic[2]);
+                String messageStatsGamePercentage = String.format(jsonParsers.getLocale("MessageStats_Game_Percentage", userId), df.format(percentage), "%");
 
-                String messageStatsYourStats = jsonParsers.getLocale("MessageStats_Your_Stats", userIdLong);
-                String messageStatsGameCount = String.format(jsonParsers.getLocale("MessageStats_Game_Count", userIdLong), statistic[0]);
-                String messageStatsGameWins = String.format(jsonParsers.getLocale("MessageStats_Game_Wins", userIdLong), statistic[2]);
-                String messageStatsGamePercentage = String.format(jsonParsers.getLocale("MessageStats_Game_Percentage", userIdLong), df.format(percentage), "%");
-
-                EmbedBuilder stats = new EmbedBuilder();
-                stats.setColor(0x00FF00);
-                stats.setAuthor(userName, null, avatarUrl);
-                stats.setTitle(messageStatsYourStats);
-                stats.setDescription(messageStatsGameCount + messageStatsGameWins + messageStatsGamePercentage);
-
-                interactionHook.sendMessageEmbeds(stats.build()).queue();
+                embedBuilder.setColor(0x00FF00);
+                embedBuilder.setDescription(messageStatsGameCount + messageStatsGameWins + messageStatsGamePercentage);
             }
-
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage());
         }

@@ -110,9 +110,8 @@ public class UpdateController {
         }
 
         if (Objects.equals(buttonId, Buttons.BUTTON_MY_STATS.name())) {
-            event.editButton(event.getButton().asDisabled()).queue();
             StatsCommand statsCommand = new StatsCommand(gamesRepository);
-            statsCommand.stats(event.getHook());
+            statsCommand.stats(event);
             return;
         }
 
@@ -198,18 +197,13 @@ public class UpdateController {
                 LanguageCommand languageCommand = new LanguageCommand(userSettingsRepository);
                 languageCommand.language(event);
             }
-            case "mystats", "allstats" -> {
+            case "bot-statistics", "statistics" -> {
                 StatsCommand statsCommand = new StatsCommand(gamesRepository);
                 statsCommand.stats(event);
             }
             case "leadboard" -> {
                 LeadboardCommand leadboardCommand = new LeadboardCommand(gamesRepository);
                 leadboardCommand.board(event);
-            }
-            case "statistics" -> {
-                StatsCommand statsCommand = new StatsCommand(gamesRepository);
-                event.deferReply().queue();
-                statsCommand.stats(event.getHook());
             }
             case "stop", "quit" -> {
                 StopCommand stopCommand = new StopCommand(hangmanGameRepository);

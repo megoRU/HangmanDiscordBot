@@ -53,12 +53,14 @@ public class SlashService {
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "@Упомяните игроков через пробел, чтобы поиграть с ними")
             );
 
+            Command.Choice choiceAny = new Command.Choice("Any", "any").setNameLocalization(DiscordLocale.RUSSIAN, "Любая");
+            Command.Choice choiceColors = new Command.Choice("Colors", "COLORS").setNameLocalization(DiscordLocale.RUSSIAN, "Цвета");
+            Command.Choice choiceFruits = new Command.Choice("Fruits", "FRUITS").setNameLocalization(DiscordLocale.RUSSIAN, "Фрукты");
+            Command.Choice choiceFlowers = new Command.Choice("Flowers", "FLOWERS").setNameLocalization(DiscordLocale.RUSSIAN, "Цветы");
+
             List<OptionData> category = new ArrayList<>();
-            category.add(new OptionData(STRING, "category", "Select a category")
-                    .addChoice("any", "any")
-                    .addChoice("colors", "COLORS")
-                    .addChoice("fruits", "FRUITS")
-                    .addChoice("flowers", "FLOWERS")
+            category.add(new OptionData(STRING, "select", "Select a category")
+                    .addChoices(choiceAny, choiceColors, choiceFruits, choiceFlowers)
                     .setRequired(true)
                     .setName("category")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выбрать категорию")
@@ -97,10 +99,7 @@ public class SlashService {
             commands.addCommands(Commands.slash("statistics", "Get your statistics")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Получить свою статистику"));
 
-            commands.addCommands(Commands.slash("mystats", "Find out the number of your wins and losses")
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Узнайте количество ваших побед и поражений"));
-
-            commands.addCommands(Commands.slash("allstats", "Find out the statistics of all the bot games")
+            commands.addCommands(Commands.slash("bot-statistics", "Find out the statistics of all the bot games")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Узнайте статистику всех игр бота"));
 
             commands.addCommands(Commands.slash("delete", "Deleting your data")

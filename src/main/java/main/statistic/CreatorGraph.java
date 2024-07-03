@@ -1,6 +1,7 @@
 package main.statistic;
 
 import io.quickchart.QuickChart;
+import main.core.events.StatsCommand;
 import main.enums.Statistic;
 import main.jsonparser.JSONParsers;
 import main.model.repository.GamesRepository;
@@ -10,10 +11,13 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CreatorGraph {
 
     private static final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
+    private static final Logger LOGGER = Logger.getLogger(CreatorGraph.class.getName());
 
     private final GamesRepository gamesRepository;
 
@@ -41,38 +45,44 @@ public class CreatorGraph {
                 case GLOBAL -> {
                     List<StatisticGlobal> statisticList = gamesRepository.getAllStatistic();
                     for (int i = statisticList.size() - 1; i >= 0; i--) {
-                        date.append(date.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getGameDate(), 0, 7).append("-01").append("'");
-                        columnFirst.append(columnFirst.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getCount()).append("'");
+                        date.append(date.isEmpty() ? "" : ",").append("'").append(statisticList.get(i).getGameDate(), 0, 7).append("-01").append("'");
+                        columnFirst.append(columnFirst.isEmpty() ? "" : ",").append("'").append(statisticList.get(i).getCount()).append("'");
                     }
                     setImage(chart, statistic).getShortUrl();
                 }
                 case MY -> {
                     List<StatisticMy> statisticList = gamesRepository.getAllMyStatistic(userIdLong);
                     for (int i = statisticList.size() - 1; i >= 0; i--) {
-                        date.append(date.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getGameDate(), 0, 7).append("-01").append("'");
-                        columnFirst.append(columnFirst.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ONES()).append("'");
-                        columnSecond.append(columnSecond.length() == 0 ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ZEROS()).append("'");
+                        date.append(date.isEmpty() ? "" : ",").append("'").append(statisticList.get(i).getGameDate(), 0, 7).append("-01").append("'");
+                        columnFirst.append(columnFirst.isEmpty() ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ONES()).append("'");
+                        columnSecond.append(columnSecond.isEmpty() ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ZEROS()).append("'");
                     }
                     setImage(chart, statistic).getShortUrl();
                 }
             }
+
             EmbedBuilder globalStats = new EmbedBuilder();
-
             globalStats.setColor(0x00FF00);
-
-            globalStats.setTitle(jsonParsers.getLocale("MessageStats_All_Stats", Long.parseLong(userIdLong)));
             globalStats.setImage(chart.getShortUrl());
 
-            interactionHook.sendMessageEmbeds(globalStats.build()).queue();
+            if (statistic.equals(Statistic.MY)) {
+                String messageStatsYourStats = jsonParsers.getLocale("MessageStats_Your_Stats", Long.parseLong(userIdLong));
+                globalStats.setTitle(messageStatsYourStats);
+                StatsCommand statsCommand = new StatsCommand(gamesRepository);
+                statsCommand.stats(globalStats, Long.valueOf(userIdLong));
+                interactionHook.sendMessageEmbeds(globalStats.build()).queue();
+            } else {
+                globalStats.setTitle(jsonParsers.getLocale("MessageStats_All_Stats", Long.parseLong(userIdLong)));
+                interactionHook.sendMessageEmbeds(globalStats.build()).queue();
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
     private QuickChart setImage(QuickChart chart, Statistic statistic) {
         switch (statistic) {
-            case GLOBAL ->
-                    chart.setConfig("{" +
+            case GLOBAL -> chart.setConfig("{" +
                     "  type: 'line'," +
                     "  data: {" +
                     "    labels: [" + date + "]," +

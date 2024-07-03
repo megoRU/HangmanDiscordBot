@@ -31,10 +31,9 @@ public class HelpCommand {
                         + "\n</multi:1024084212762038352> - " + " " + jsonParsers.getLocale("help_multi", userIdLong)
                         + "\n</quit:1194760100833939492> - " + " " + jsonParsers.getLocale("help_stop", userIdLong)
                         + "\n</language:940560633504604160> - " + " " + jsonParsers.getLocale("help_language", userIdLong)
-                        + "\n</statistics:1194760100833939493> - " + " " + jsonParsers.getLocale("help_stats", userIdLong)
                         + "\n</category:1029784705073168486> - " + " " + jsonParsers.getLocale("help_category", userIdLong)
-                        + "\n</mystats:940560633504604165> - " + " " + jsonParsers.getLocale("help_mystats", userIdLong)
-                        + "\n</allstats:940560633504604166> - " + " " + jsonParsers.getLocale("help_allstats", userIdLong)
+                        + "\n</statistics:> - " + " " + jsonParsers.getLocale("help_mystats", userIdLong)
+                        + "\n</bot-statistics:> - " + " " + jsonParsers.getLocale("help_allstats", userIdLong)
                         + "\n</delete:940560633504604167> - " + " " + jsonParsers.getLocale("help_deleted", userIdLong)
                 , false);
 
