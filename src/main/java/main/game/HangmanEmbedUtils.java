@@ -8,6 +8,7 @@ import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
@@ -110,6 +111,7 @@ public class HangmanEmbedUtils {
 
     //Синхронизация чтобы не было ошибок в верстке и пропаданию части слова
     public static synchronized void editMessage(EmbedBuilder embedBuilder, Long userIdLong, HangmanGameRepository hangmanGameRepository) {
+        JDA jda = BotStartConfig.jda;
         if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
             Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
             if (hangman == null) return;
@@ -121,7 +123,7 @@ public class HangmanEmbedUtils {
             long messageId = hangman.getMessageId();
 
             if (hangmanPlayer.isFromGuild() && guildId != null) {
-                Guild guildById = BotStartConfig.jda.getGuildById(guildId);
+                Guild guildById = jda.getGuildById(guildId);
                 if (guildById != null) {
 
                     GuildMessageChannel textChannelById = guildById.getTextChannelById(channelId);
@@ -144,10 +146,9 @@ public class HangmanEmbedUtils {
                 }
             } else {
                 try {
-                    PrivateChannel privateChannelById = BotStartConfig.jda.getPrivateChannelById(channelId);
+                    PrivateChannel privateChannelById = jda.getPrivateChannelById(channelId);
                     if (privateChannelById == null) {
-                        BotStartConfig
-                                .jda
+                        jda
                                 .retrieveUserById(userIdLong)
                                 .complete()
                                 .openPrivateChannel()
@@ -171,6 +172,7 @@ public class HangmanEmbedUtils {
     }
 
     public static void editMessageWithButtons(EmbedBuilder embedBuilder, long userId, HangmanGameRepository hangmanGameRepository) {
+        JDA jda = BotStartConfig.jda;
         if (HangmanRegistry.getInstance().hasHangman(userId)) {
             Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userId);
             if (hangman == null) return;
@@ -194,7 +196,7 @@ public class HangmanEmbedUtils {
             long messageId = hangman.getMessageId();
 
             if (hangmanPlayer.isFromGuild() && guildId != null) {
-                Guild guildById = BotStartConfig.jda.getGuildById(guildId);
+                Guild guildById = jda.getGuildById(guildId);
                 if (guildById != null) {
                     GuildMessageChannel textChannelById = guildById.getTextChannelById(channelId);
                     if (textChannelById == null) textChannelById = guildById.getNewsChannelById(channelId);
@@ -219,10 +221,9 @@ public class HangmanEmbedUtils {
                 }
             } else {
                 try {
-                    PrivateChannel privateChannelById = BotStartConfig.jda.getPrivateChannelById(channelId);
+                    PrivateChannel privateChannelById = jda.getPrivateChannelById(channelId);
                     if (privateChannelById == null) {
-                        BotStartConfig
-                                .jda.retrieveUserById(userId).complete()
+                        jda.retrieveUserById(userId).complete()
                                 .openPrivateChannel()
                                 .flatMap(channel -> channel.editMessageEmbedsById(messageId, embedBuilder.build())
                                         .setActionRow(listButtons))
