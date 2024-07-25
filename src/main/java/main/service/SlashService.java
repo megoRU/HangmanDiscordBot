@@ -26,15 +26,15 @@ public class SlashService {
             List<OptionData> language = new ArrayList<>();
 
             language.add(new OptionData(STRING, "game", "Setting the Game language")
-                    .addChoice("english", "EN")
-                    .addChoice("russian", "RU")
+                    .addChoice("English", "EN")
+                    .addChoice("Русский", "RU")
                     .setRequired(true)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Настройка языка игры")
             );
 
             language.add(new OptionData(STRING, "bot", "Setting the bot language")
-                    .addChoice("english", "EN")
-                    .addChoice("russian", "RU")
+                    .addChoice("English", "EN")
+                    .addChoice("Русский", "RU")
                     .setRequired(true)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Настройка языка бота")
             );
@@ -77,9 +77,6 @@ public class SlashService {
             commands.addCommands(Commands.slash("language", "Setting language")
                     .addOptions(language)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Настройка языка"));
-
-            commands.addCommands(Commands.slash("hg", "Start the game (deprecated: use /play)")
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Начать игру (Устарело: используй /play)"));
 
             commands.addCommands(Commands.slash("play", "Play Hangman")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Играть в Виселицу"));

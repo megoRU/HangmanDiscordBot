@@ -213,7 +213,7 @@ public class UpdateController {
                 DeleteCommand deleteCommand = new DeleteCommand();
                 deleteCommand.delete(event);
             }
-            case "hg", "multi", "play", "multiple" -> {
+            case "multi", "play", "multiple" -> {
                 HangmanCommand hangmanCommand = new HangmanCommand(hangmanDataSaving);
                 hangmanCommand.hangman(event);
             }
