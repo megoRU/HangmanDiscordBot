@@ -5,6 +5,7 @@ import main.game.Hangman;
 import main.game.HangmanBuilder;
 import main.game.HangmanDataSaving;
 import main.game.HangmanPlayer;
+import main.game.api.HangmanAPI;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
@@ -30,10 +31,12 @@ public class HangmanCommand {
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final HangmanDataSaving hangmanDataSaving;
     private final HangmanRegistry instance = HangmanRegistry.getInstance();
+    private final HangmanAPI hangmanAPI;
 
     @Autowired
-    public HangmanCommand(HangmanDataSaving hangmanDataSaving) {
+    public HangmanCommand(HangmanDataSaving hangmanDataSaving, HangmanAPI hangmanAPI) {
         this.hangmanDataSaving = hangmanDataSaving;
+        this.hangmanAPI = hangmanAPI;
     }
 
     public void hangman(@NotNull GenericCommandInteractionEvent event) {
@@ -79,7 +82,9 @@ public class HangmanCommand {
                 multiple(slashCommandInteractionEvent, hangmanBuilder);
             } else if (event.getName().equals("multi") && event instanceof UserContextInteractionEvent userContextInteractionEvent) {
                 userContext(userContextInteractionEvent, hangmanBuilder);
-            } else if (event.getName().equals("hg") || event.getName().equals("play")) {
+            } else if (event.getName().equals("chatgpt") && event instanceof SlashCommandInteractionEvent slashCommandInteractionEvent) {
+                chatgpt(slashCommandInteractionEvent, hangmanBuilder);
+            } else if (event.getName().equals("play")) {
                 String createGame = jsonParsers.getLocale("create_game", userIdLong);
                 event.reply(createGame)
                         .setEphemeral(true)
@@ -122,6 +127,40 @@ public class HangmanCommand {
         userContextEvent.reply(createGame).setEphemeral(true).queue();
 
         startGame(userContextEvent, hangmanBuilder);
+    }
+
+    private void chatgpt(SlashCommandInteractionEvent slashCommandInteractionEvent, HangmanBuilder.Builder hangmanBuilder) {
+        try {
+            HangmanBuilder.Builder hangmanBuilderGPT = new HangmanBuilder.Builder();
+            hangmanBuilderGPT.setCompetitive(true);
+
+            long userIdLong = slashCommandInteractionEvent.getUser().getIdLong();
+            String word = hangmanAPI.getWord(userIdLong);
+
+            HangmanPlayer hangmanPlayerGPT = new HangmanPlayer(-userIdLong, null, null);
+
+            hangmanBuilder.setAgainstPlayerId(-userIdLong);
+            hangmanBuilder.setCompetitive(true);
+
+            //
+            hangmanBuilderGPT.setAgainstPlayerId(userIdLong);
+            hangmanBuilderGPT.addHangmanPlayer(hangmanPlayerGPT);
+
+            //Build
+            Hangman build = hangmanBuilder.build();
+            Hangman buildGPT = hangmanBuilderGPT.build();
+
+            instance.setHangman(userIdLong, build);
+            instance.setHangman(-userIdLong, buildGPT);
+
+            build.startGame(slashCommandInteractionEvent.getMessageChannel(), word, hangmanDataSaving);
+            buildGPT.startGame(word, hangmanDataSaving);
+
+            String createGame = jsonParsers.getLocale("create_game", userIdLong);
+            slashCommandInteractionEvent.reply(createGame).setEphemeral(true).queue();
+        } catch (Exception ignore) {
+            ignore.printStackTrace();
+        }
     }
 
     private void multi(SlashCommandInteractionEvent slashCommandInteractionEvent, HangmanBuilder.Builder hangmanBuilder) {

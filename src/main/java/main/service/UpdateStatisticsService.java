@@ -8,15 +8,16 @@ import net.dv8tion.jda.api.entities.Activity;
 import org.boticordjava.api.entity.bot.stats.BotStats;
 import org.boticordjava.api.impl.BotiCordAPI;
 import org.discordbots.api.client.DiscordBotListAPI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 
 @Service
 public class UpdateStatisticsService {
 
-    private static final Logger LOGGER = Logger.getLogger(UpdateStatisticsService.class.getName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(UpdateStatisticsService.class.getName());
 
     public static String activity = "Preparing a cake...";
 
@@ -51,7 +52,7 @@ public class UpdateStatisticsService {
             BotStats botStats = new BotStats(usersCount.get(), serverCount, 1);
             api.setBotStats(Config.getBotId(), botStats);
         } catch (Exception e) {
-            LOGGER.info(e.getMessage());
+            LOGGER.error(e.getMessage(), e);
         }
     }
 }

@@ -26,10 +26,10 @@ public class ActiveHangman {
     @Column(name = "players_list")
     private String playersList;
 
-    @Column(name = "message_id", nullable = false)
+    @Column(name = "message_id")
     private Long messageId;
 
-    @Column(name = "channel_id", nullable = false)
+    @Column(name = "channel_id")
     private Long channelId;
 
     @Column(name = "guild_id")

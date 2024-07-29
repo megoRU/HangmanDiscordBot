@@ -46,7 +46,6 @@ public class HangmanGameEndHandler {
 
             String gameStopWin = JSON_GAME_PARSERS.getLocale("Game_Stop_Win", userId);
             String gameYouLose = JSON_GAME_PARSERS.getLocale("Game_You_Lose", userId);
-            String gameCompetitiveYouLose = JSON_GAME_PARSERS.getLocale("Game_Competitive_You_Lose", userId);
 
             //Чтобы было показано слово которое было
             if (result && isCompetitive && againstPlayerId != null) {
@@ -59,6 +58,7 @@ public class HangmanGameEndHandler {
             if (hangman.getHangmanPlayers().length == 1) {
                 HangmanEmbedUtils.editMessageWithButtons(result ? win : lose, userId, hangmanGameRepository);
                 if (hangman.isCompetitive() && result && againstPlayerId != null) {
+                    String gameCompetitiveYouLose = JSON_GAME_PARSERS.getLocale("Game_Competitive_You_Lose", againstPlayerId);
                     EmbedBuilder competitiveLose = HangmanEmbedUtils.hangmanLayout(againstPlayerId, gameCompetitiveYouLose);
                     HangmanEmbedUtils.editMessageWithButtons(competitiveLose, againstPlayerId, hangmanGameRepository);
                 }

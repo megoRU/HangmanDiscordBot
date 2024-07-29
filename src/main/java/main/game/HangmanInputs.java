@@ -46,6 +46,24 @@ public class HangmanInputs {
         }
     }
 
+    public void handler(@NotNull final String input, final long userId, Hangman hangman) {
+        try {
+            if (hangman.getWORD() == null) throw new NullPointerException();
+
+            if (hangman.isLetterPresent(input.toUpperCase())) {
+                handleLetterPresentInput(userId, hangman);
+            } else if (input.length() == 1 && hangman.getWORD_HIDDEN().contains("_")) {
+                handleSingleLetterInput(input, userId, hangman);
+            } else if (input.length() == hangman.getLengthWord()) {
+                handleWordInput(input, userId, hangman);
+            } else if (input.length() != hangman.getLengthWord()) {
+                handleWordWrongLengthInput(userId, hangman);
+            }
+        } catch (Exception e) {
+            LOGGER.info(e.getMessage());
+        }
+    }
+
     private void handleLetterPresentInput(long userId, Hangman hangman) {
         if (hangman.getGameStatus() == GameStatus.SAME_LETTER) return;
         hangman.setGameStatus(GameStatus.SAME_LETTER);

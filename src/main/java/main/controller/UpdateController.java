@@ -9,6 +9,7 @@ import main.game.Hangman;
 import main.game.HangmanDataSaving;
 import main.game.HangmanInputs;
 import main.game.HangmanResult;
+import main.game.api.HangmanAPI;
 import main.game.core.HangmanRegistry;
 import main.model.repository.CompetitiveQueueRepository;
 import main.model.repository.GamesRepository;
@@ -47,6 +48,7 @@ public class UpdateController {
     private final HangmanDataSaving hangmanDataSaving;
     private final HangmanResult hangmanResult;
     private final HangmanInputs hangmanInputs;
+    private final HangmanAPI hangmanAPI;
 
     //LOGGER
     private final static Logger LOGGER = Logger.getLogger(UpdateController.class.getName());
@@ -61,7 +63,8 @@ public class UpdateController {
                             CompetitiveQueueRepository competitiveQueueRepository,
                             HangmanDataSaving hangmanDataSaving,
                             HangmanResult hangmanResult,
-                            HangmanInputs hangmanInputs) {
+                            HangmanInputs hangmanInputs,
+                            HangmanAPI hangmanAPI) {
         this.hangmanGameRepository = hangmanGameRepository;
         this.gamesRepository = gamesRepository;
         this.userSettingsRepository = userSettingsRepository;
@@ -69,6 +72,7 @@ public class UpdateController {
         this.hangmanDataSaving = hangmanDataSaving;
         this.hangmanResult = hangmanResult;
         this.hangmanInputs = hangmanInputs;
+        this.hangmanAPI = hangmanAPI;
     }
 
     public void registerBot(CoreBot coreBot) {
@@ -122,6 +126,13 @@ public class UpdateController {
             return;
         }
 
+        if (Objects.equals(buttonId, Buttons.BUTTON_START_GAME_GPT.name())) {
+//            event.editButton(event.getButton().asDisabled()).queue();
+            CompetitivePlayGPT competitivePlayGPT = new CompetitivePlayGPT(hangmanAPI, hangmanDataSaving);
+            competitivePlayGPT.competitive(event);
+            return;
+        }
+
         if (Objects.equals(buttonId, Buttons.BUTTON_STOP.name())) {
             event.editButton(event.getButton().asDisabled()).queue();
             StopCommand stopCommand = new StopCommand(hangmanGameRepository);
@@ -150,7 +161,7 @@ public class UpdateController {
         boolean permission = ChecksClass.check(event);
         if (!permission) return;
 
-        HangmanCommand hangmanCommand = new HangmanCommand(hangmanDataSaving);
+        HangmanCommand hangmanCommand = new HangmanCommand(hangmanDataSaving, hangmanAPI);
         hangmanCommand.hangman(event);
     }
 
@@ -213,8 +224,8 @@ public class UpdateController {
                 DeleteCommand deleteCommand = new DeleteCommand();
                 deleteCommand.delete(event);
             }
-            case "multi", "play", "multiple" -> {
-                HangmanCommand hangmanCommand = new HangmanCommand(hangmanDataSaving);
+            case "multi", "play", "multiple", "chatgpt" -> {
+                HangmanCommand hangmanCommand = new HangmanCommand(hangmanDataSaving, hangmanAPI);
                 hangmanCommand.hangman(event);
             }
             case "category" -> {

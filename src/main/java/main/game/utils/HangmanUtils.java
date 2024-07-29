@@ -81,6 +81,11 @@ public class HangmanUtils {
         return getButtons(userId, buttonList);
     }
 
+    public static Button getButtonGPT(long userId) {
+        String buttonPlayGpt = JSON_BOT_PARSERS.getLocale("button_play_gpt", userId);
+        return Button.success(Buttons.BUTTON_START_GAME_GPT.name(), buttonPlayGpt);
+    }
+
     @NotNull
     private static List<Button> getButtons(long userId, List<Button> buttonList) {
         UserSettings.GameLanguage language = BotStartConfig.getMapGameLanguages().get(userId);
@@ -99,6 +104,10 @@ public class HangmanUtils {
 
     public static void updateActivity(JDA jda, String string) {
         update(jda, string);
+    }
+
+    public static boolean isChatGPT(long userId) {
+        return String.valueOf(userId).contains("-");
     }
 
     private static void update(JDA jda, String string) {

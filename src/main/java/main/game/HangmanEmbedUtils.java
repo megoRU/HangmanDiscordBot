@@ -28,7 +28,7 @@ public class HangmanEmbedUtils {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userId);
 
-        if (hangman != null) {
+        if (hangman != null && !hangman.isChatGPT()) {
             HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
             userId = HangmanUtils.getHangmanFirstPlayer(hangmanPlayers);
             String gamePlayer;
@@ -114,7 +114,7 @@ public class HangmanEmbedUtils {
         JDA jda = BotStartConfig.jda;
         if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
             Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
-            if (hangman == null) return;
+            if (hangman == null || hangman.isChatGPT()) return;
             HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
             HangmanPlayer hangmanPlayer = hangmanPlayers[0];
 
@@ -175,7 +175,7 @@ public class HangmanEmbedUtils {
         JDA jda = BotStartConfig.jda;
         if (HangmanRegistry.getInstance().hasHangman(userId)) {
             Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userId);
-            if (hangman == null) return;
+            if (hangman == null || hangman.isChatGPT()) return;
             boolean isCompetitive = hangman.isCompetitive();
             int playersCount = hangman.getPlayersCount();
             List<Button> listButtons;
@@ -187,13 +187,15 @@ public class HangmanEmbedUtils {
                 listButtons = HangmanUtils.getListButtons(userId);
             } else if (playersCount == 1 && !isCompetitive) {
                 listButtons = HangmanUtils.getListButtons(userId);
+            } else if (HangmanUtils.isChatGPT(hangman.getAgainstPlayerEmbedded())) {
+                listButtons = List.of(HangmanUtils.getButtonGPT(userId));
             } else {
                 listButtons = HangmanUtils.getListCompetitiveButtons(userId);
             }
 
             Long guildId = hangmanPlayer.getGuildId();
-            long channelId = hangmanPlayer.getChannelId();
-            long messageId = hangman.getMessageId();
+            Long channelId = hangmanPlayer.getChannelId();
+            Long messageId = hangman.getMessageId();
 
             if (hangmanPlayer.isFromGuild() && guildId != null) {
                 Guild guildById = jda.getGuildById(guildId);

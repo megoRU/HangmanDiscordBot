@@ -52,8 +52,9 @@ public class Hangman {
     @Nullable
     private Long againstPlayerId;
     private long againstPlayerEmbedded;
-    private long channelId;
-    private long messageId;
+    private Long channelId;
+    private Long messageId;
+    private boolean isChatGPT = false;
 
     @Setter
     private volatile GameStatus gameStatus;
@@ -63,7 +64,7 @@ public class Hangman {
         this.gameStatus = GameStatus.STARTING;
     }
 
-    Hangman update(long messageId,
+    Hangman update(Long messageId,
                    String guesses,
                    String word,
                    String WORD_HIDDEN,
@@ -82,6 +83,9 @@ public class Hangman {
         this.messageId = messageId;
         this.hangmanPlayers = hangmanPlayers;
         this.channelId = hangmanPlayers[0].getChannelId();
+        if (HangmanUtils.isChatGPT(hangmanPlayers[0].getUserId())) {
+            this.isChatGPT = true;
+        }
         this.isOpponentLose = isOpponentLose;
         //Обновить параметры
         if (guesses != null) {
@@ -93,6 +97,23 @@ public class Hangman {
         this.WORD_OF_CHARS = word.split("");
         setTimer(localDateTime);
         return this;
+    }
+
+    public void startGame(String word, HangmanDataSaving hangmanDataSaving) {
+        isChatGPT = true;
+
+        try {
+            WORD = word;
+            WORD_OF_CHARS = WORD.toLowerCase().split(""); // Преобразуем строку str в массив символов (char)
+            hideWord(WORD.length());
+        } catch (Exception e) {
+            return;
+        }
+
+        hangmanDataSaving.saveGame(this);
+
+        //Установка авто завершения
+        setTimer(LocalDateTime.now());
     }
 
     public void startGame(MessageChannel textChannel, String word, HangmanDataSaving hangmanDataSaving) {
@@ -213,7 +234,11 @@ public class Hangman {
     }
 
     String getAgainstPlayerWithDiscord() {
-        return String.format("<@%s>", againstPlayerEmbedded);
+        if (HangmanUtils.isChatGPT(againstPlayerEmbedded)) {
+            return "ChatGPT";
+        } else {
+            return String.format("<@%s>", againstPlayerEmbedded);
+        }
     }
 
     public int getPlayersCount() {
