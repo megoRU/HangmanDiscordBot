@@ -19,6 +19,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,7 @@ import java.util.Map;
 @Service
 public class HangmanCommand {
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(HangmanCommand.class.getName());
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final HangmanDataSaving hangmanDataSaving;
     private final HangmanRegistry instance = HangmanRegistry.getInstance();
@@ -158,8 +161,8 @@ public class HangmanCommand {
 
             String createGame = jsonParsers.getLocale("create_game", userIdLong);
             slashCommandInteractionEvent.reply(createGame).setEphemeral(true).queue();
-        } catch (Exception ignore) {
-            ignore.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
