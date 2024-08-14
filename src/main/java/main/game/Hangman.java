@@ -99,6 +99,9 @@ public class Hangman {
         return this;
     }
 
+    /*
+      ChatGPT
+     */
     public void startGame(String word, HangmanDataSaving hangmanDataSaving) {
         isChatGPT = true;
 

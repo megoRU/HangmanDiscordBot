@@ -13,12 +13,16 @@ import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 
 @Service
 @AllArgsConstructor
 public class CompetitivePlayGPT {
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(CompetitivePlayGPT.class.getName());
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final HangmanAPI hangmanAPI;
     private final HangmanDataSaving hangmanDataSaving;
@@ -31,26 +35,23 @@ public class CompetitivePlayGPT {
         UserSettings.GameLanguage userGameLanguage = BotStartConfig.getMapGameLanguages().get(userId);
 
         if (userGameLanguage == null) {
-            event.reply(gameLanguage)
+            event.getHook().sendMessage(gameLanguage)
                     .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
                     .addActionRow(HangmanUtils.getButtonPlayCompetitiveAgain(userId))
                     .setEphemeral(true)
                     .queue();
             return;
         }
-        HangmanRegistry hangmanRegistry = HangmanRegistry.getInstance();
 
+        HangmanRegistry hangmanRegistry = HangmanRegistry.getInstance();
 
         if (!hangmanRegistry.hasHangman(userId) && !hangmanRegistry.hasHangman(-userId)) {
             HangmanBuilder.Builder hangmanUser = new HangmanBuilder.Builder();
-
-
             try {
                 String word = hangmanAPI.getWord(userId);
-
                 HangmanBuilder.Builder hangmanBuilderGPT = new HangmanBuilder.Builder();
-                HangmanPlayer hangmanPlayerGPT = new HangmanPlayer(-userId, null, null);
-                HangmanPlayer hangmanPlayer = new HangmanPlayer(userId, null, messageChannel, userGameLanguage);
+                HangmanPlayer hangmanPlayerGPT = new HangmanPlayer(-userId, null, null, userGameLanguage);
+                HangmanPlayer hangmanPlayer = new HangmanPlayer(userId, event.getGuild() != null ? event.getGuild().getIdLong() : null, messageChannel, userGameLanguage);
 
                 hangmanBuilderGPT.setCompetitive(true);
                 hangmanBuilderGPT.addHangmanPlayer(hangmanPlayerGPT);
@@ -67,24 +68,23 @@ public class CompetitivePlayGPT {
                 hangmanRegistry.setHangman(userId, build);
                 hangmanRegistry.setHangman(-userId, buildGPT);
 
-
                 String createGame = jsonParsers.getLocale("create_game", userId);
-                event.reply(createGame).queue();
+                event.getHook().sendMessage(createGame).complete();
 
                 build.startGame(event.getMessageChannel(), word, hangmanDataSaving);
                 buildGPT.startGame(word, hangmanDataSaving);
-            } catch (Exception ignore) {
-                ignore.printStackTrace();
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
             }
         } else if (hangmanRegistry.hasHangman(userId)) {
             String youArePlayNow = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
-            event.reply(youArePlayNow)
+            event.getHook().sendMessage(youArePlayNow)
                     .setActionRow(HangmanUtils.getButtonStop(userId))
                     .queue();
         } else if (hangmanRegistry.hasHangman(-userId)) {
             String hangmanBotPlay = jsonParsers.getLocale("hangman_bot_play", event.getUser().getIdLong());
-            event.reply(hangmanBotPlay)
-                    .setActionRow(HangmanUtils.getButtonStop(userId))
+            event.getHook().sendMessage(hangmanBotPlay)
+                    .setActionRow(HangmanUtils.getButtonGPT(userId))
                     .queue();
         }
     }

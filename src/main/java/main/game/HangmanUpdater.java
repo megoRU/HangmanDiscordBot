@@ -3,19 +3,20 @@ package main.game;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.model.repository.HangmanGameRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Logger;
 
 @Service
 public class HangmanUpdater extends TimerTask {
 
     private final HangmanGameRepository hangmanGameRepository;
-    private final Logger LOGGER = Logger.getLogger(HangmanUpdater.class.getName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(HangmanUpdater.class.getName());
 
     @Autowired
     public HangmanUpdater(HangmanGameRepository hangmanGameRepository) {

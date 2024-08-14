@@ -6,16 +6,16 @@ import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Service
 public class HangmanGameEndHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(HangmanGameEndHandler.class.getName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(HangmanGameEndHandler.class.getName());
     //Localisation
     private static final JSONParsers JSON_GAME_PARSERS = new JSONParsers(JSONParsers.Locale.GAME);
 
@@ -80,7 +80,7 @@ public class HangmanGameEndHandler {
             }
             HangmanRegistry.getInstance().removeHangman(userId);
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error in handleGameEnd", e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 }

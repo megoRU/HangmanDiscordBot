@@ -1,7 +1,9 @@
 package main.core.events;
 
 import main.controller.UpdateController;
-import main.game.*;
+import main.game.Hangman;
+import main.game.HangmanEmbedUtils;
+import main.game.HangmanPlayer;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
@@ -38,11 +40,9 @@ public class StopCommand {
             if (competitive) {
                 //First player
                 cancelCompetitiveGame(event, userIdLong, updateController);
-                Long againstPlayerId = hangman.getAgainstPlayerId();
-                if (againstPlayerId != null) {
-                    cancelCompetitiveGame(event, againstPlayerId, updateController);
-                    instance.removeHangman(userIdLong);
-                }
+                long againstPlayerId = hangman.getAgainstPlayerEmbedded();
+                cancelCompetitiveGame(event, againstPlayerId, updateController);
+                instance.removeHangman(userIdLong);
             } else {
                 HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
                 long userId = HangmanUtils.getHangmanFirstPlayer(hangmanPlayers);

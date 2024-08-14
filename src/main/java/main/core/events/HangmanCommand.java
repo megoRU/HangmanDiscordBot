@@ -75,7 +75,7 @@ public class HangmanCommand {
         } else {
             Guild guild = event.getGuild();
 
-            HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, guild != null ? guild.getIdLong() : null, channelIdLong);
+            HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, guild != null ? guild.getIdLong() : null, channelIdLong, mapGameLanguages.get(userIdLong));
             HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder();
             hangmanBuilder.addHangmanPlayer(hangmanPlayer);
 
@@ -86,7 +86,7 @@ public class HangmanCommand {
             } else if (event.getName().equals("multi") && event instanceof UserContextInteractionEvent userContextInteractionEvent) {
                 userContext(userContextInteractionEvent, hangmanBuilder);
             } else if (event.getName().equals("chatgpt") && event instanceof SlashCommandInteractionEvent slashCommandInteractionEvent) {
-                chatgpt(slashCommandInteractionEvent, hangmanBuilder);
+                chatgpt(slashCommandInteractionEvent, hangmanBuilder, mapGameLanguages.get(userIdLong));
             } else if (event.getName().equals("play")) {
                 String createGame = jsonParsers.getLocale("create_game", userIdLong);
                 event.reply(createGame)
@@ -132,15 +132,17 @@ public class HangmanCommand {
         startGame(userContextEvent, hangmanBuilder);
     }
 
-    private void chatgpt(SlashCommandInteractionEvent slashCommandInteractionEvent, HangmanBuilder.Builder hangmanBuilder) {
+    private void chatgpt(SlashCommandInteractionEvent slashCommandInteractionEvent,
+                         HangmanBuilder.Builder hangmanBuilder,
+                         UserSettings.GameLanguage gameLanguage) {
         try {
-            HangmanBuilder.Builder hangmanBuilderGPT = new HangmanBuilder.Builder();
-            hangmanBuilderGPT.setCompetitive(true);
-
             long userIdLong = slashCommandInteractionEvent.getUser().getIdLong();
             String word = hangmanAPI.getWord(userIdLong);
 
-            HangmanPlayer hangmanPlayerGPT = new HangmanPlayer(-userIdLong, null, null);
+            HangmanBuilder.Builder hangmanBuilderGPT = new HangmanBuilder.Builder();
+            hangmanBuilderGPT.setCompetitive(true);
+
+            HangmanPlayer hangmanPlayerGPT = new HangmanPlayer(-userIdLong, null, null, gameLanguage);
 
             hangmanBuilder.setAgainstPlayerId(-userIdLong);
             hangmanBuilder.setCompetitive(true);

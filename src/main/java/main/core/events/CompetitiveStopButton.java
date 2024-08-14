@@ -25,8 +25,7 @@ public class CompetitiveStopButton {
         HangmanRegistry instance = HangmanRegistry.getInstance();
         instance.removeFromCompetitiveQueue(userIdLong);
         String deleteCompetitiveSearch = jsonParsers.getLocale("delete_competitive_search", userIdLong);
-        event.reply(deleteCompetitiveSearch).queue();
+        event.getHook().sendMessage(deleteCompetitiveSearch).queue();
         competitiveQueueRepository.deleteById(userIdLong);
-        event.editButton(event.getButton().asDisabled()).queue();
     }
 }

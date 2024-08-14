@@ -1,4 +1,4 @@
-package main.gptunnel;
+package main.GPT;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -61,6 +61,8 @@ public class ChatCompletion {
 
         @JsonProperty("content")
         private String content;
+
+        private String refusal;
     }
 
     @Getter

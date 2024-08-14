@@ -1,24 +1,26 @@
 package main.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import main.GPT.ChatCompletion;
+import main.GPT.GPTRequest;
+import main.GPT.Request;
+import main.enums.GameStatus;
 import main.game.Hangman;
+import main.game.HangmanGameEndHandler;
 import main.game.HangmanInputs;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
-import main.gptunnel.ChatCompletion;
-import main.gptunnel.Request;
+import main.model.entity.UserSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static main.config.BotStartConfig.mapGameCategory;
+import static main.config.BotStartConfig.mapGameLanguages;
 
 @Service
 @AllArgsConstructor
@@ -27,57 +29,55 @@ public class ChatGPTService {
 
     private static final HangmanRegistry hangmanRegistry = HangmanRegistry.getInstance();
     private final HangmanInputs hangmanInputs;
+    private final HangmanGameEndHandler hangmanGameEndHandler;
 
     public void request() {
-
         Collection<Hangman> allGames = hangmanRegistry.getAllGames();
         allGames.stream().filter(Hangman::isChatGPT).forEach(hangman -> {
-            Request request = new Request();
-            String guesses = HangmanUtils.getGuesses(hangman.getGuesses()).replaceAll(" ", "");
+            GPTRequest request = new GPTRequest();
+            String guesses = HangmanUtils.getGuesses(hangman.getGuesses());
             String wordHidden = hangman.getWORD_HIDDEN().replaceAll(" ", "");
 
-            Request.Message systemMessage = new Request.Message(Request.Role.SYSTEM, Request.Message.howToPlay + guesses);
-            Request.Message userMessage = new Request.Message(Request.Role.USER, Request.Message.guesses + wordHidden);
+            long againstPlayerEmbedded = hangman.getAgainstPlayerEmbedded();
+            UserSettings.GameLanguage gameLanguage = mapGameLanguages.get(againstPlayerEmbedded);
+            UserSettings.Category gameCategory = mapGameCategory.get(againstPlayerEmbedded);
 
-            System.out.println(Request.Message.guesses + wordHidden);
+            String gptPrompt = HangmanUtils.getGPTPrompt(gameLanguage, gameCategory, guesses, wordHidden);
 
-            List<Request.Message> messagesList = new ArrayList<>(List.of(systemMessage, userMessage));
-            request.setMessages(messagesList);
+            List<GPTRequest.Content> content = new ArrayList<>();
 
+            GPTRequest.Content gptContent = new GPTRequest.Content("text", gptPrompt, null);
+            content.add(gptContent);
+
+            GPTRequest.Message userMessage = new GPTRequest.Message(GPTRequest.Role.USER, content);
+            userMessage.setContent(content);
+
+            request.setMessages(List.of(userMessage));
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                String requestBody = objectMapper.writeValueAsString(request);
+                ChatCompletion chatCompletion = Request.send(request);
+                String letter = chatCompletion.getChoices()[0].getMessage().getContent().toLowerCase();
 
-                HttpClient client = HttpClient.newHttpClient();
-                HttpRequest httpRequest = HttpRequest.newBuilder()
-                        .uri(URI.create("https://gptunnel.ru/v1/chat/completions")) // замените на нужный URL
-                        .header("Content-Type", "application/json")
-                        .header("Authorization", "")
-                        .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                        .build();
+                double completionCost = chatCompletion.getUsage().getCompletionCost();
+                double totalCost = chatCompletion.getUsage().getTotalCost();
+                double totalTokens = chatCompletion.getUsage().getTotalTokens();
 
-                // Отправка запроса и получение ответа
-                HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+                System.out.println("completionCost " + completionCost);
+                System.out.println("totalCost " + totalCost);
+                System.out.println("totalTokens " + totalTokens);
 
-                if (response.statusCode() == 200) {
-                    ChatCompletion chatCompletion = objectMapper.readValue(response.body(), ChatCompletion.class);
-                    String letter = chatCompletion.getChoices()[0].getMessage().getContent().toLowerCase();
+                boolean contains = hangman.getGuesses().contains(letter);
 
-                    int completionTokens = chatCompletion.getUsage().getCompletionTokens();
-                    double totalCost = chatCompletion.getUsage().getTotalCost();
-
-                    System.out.println("totalCost " + totalCost);
-                    System.out.println("completionTokens " + completionTokens);
-
-                    long userId = HangmanUtils.getHangmanFirstPlayer(hangman.getHangmanPlayers());
-                    hangmanInputs.handler(letter, userId, hangman);
-
-                    System.out.println(chatCompletion.getChoices()[0].getMessage().getContent());
+                if (contains) {
+                    hangman.setGameStatus(GameStatus.LOSE_GAME);
+                    hangmanGameEndHandler.handleGameEnd(hangman, false);
+                    return;
                 }
+
+                long userId = HangmanUtils.getHangmanFirstPlayer(hangman.getHangmanPlayers());
+                hangmanInputs.handler(letter, userId, hangman);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
             }
         });
-
     }
 }
