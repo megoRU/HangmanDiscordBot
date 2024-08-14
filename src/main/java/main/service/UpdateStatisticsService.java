@@ -33,7 +33,7 @@ public class UpdateStatisticsService {
                 .botId(Config.getBotId())
                 .build();
 
-        BotiCordAPI api = new BotiCordAPI.Builder().enableDevMode().token(boticord).build();
+        BotiCordAPI api = new BotiCordAPI.Builder().token(boticord).build();
 
         try {
             HangmanRegistry instance = HangmanRegistry.getInstance();
