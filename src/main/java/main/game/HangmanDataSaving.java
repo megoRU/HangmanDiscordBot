@@ -21,7 +21,7 @@ public class HangmanDataSaving {
 
     public void saveGame(Hangman hangman) {
         HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
-        long messageId = hangman.getMessageId();
+        Long messageId = hangman.getMessageId();
         String word = hangman.getWORD();
         String wordHidden = hangman.getWORD_HIDDEN();
         int hangmanErrors = hangman.getHangmanErrors();
@@ -31,7 +31,7 @@ public class HangmanDataSaving {
         HangmanPlayer hangmanPlayer = hangmanPlayers[0];
         long userId = hangmanPlayer.getUserId();
         Long guildId = hangmanPlayer.getGuildId(); //Nullable is fine
-        long channelId = hangmanPlayer.getChannelId();
+        Long channelId = hangmanPlayer.getChannelId();
 
         ActiveHangman activeHangman = new ActiveHangman();
         activeHangman.setUserIdLong(userId);

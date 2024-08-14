@@ -12,7 +12,7 @@ public interface HangmanBuilder {
     class Builder {
         //User|Guild|Channel data
         private final List<HangmanPlayer> hangmanPlayerList = new ArrayList<>();
-        private long messageId;
+        private Long messageId;
 
         //For restoring
         private String guesses;
@@ -35,7 +35,7 @@ public interface HangmanBuilder {
             return hangmanPlayers;
         }
 
-        public Builder setMessageId(long messageId) {
+        public Builder setMessageId(Long messageId) {
             this.messageId = messageId;
             return this;
         }

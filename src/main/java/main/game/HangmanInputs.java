@@ -6,15 +6,16 @@ import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.logging.Logger;
 
 @Service
 public class HangmanInputs {
 
-    private final Logger LOGGER = Logger.getLogger(HangmanInputs.class.getName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(HangmanInputs.class.getName());
     //Localisation
     private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
     private final HangmanGameRepository hangmanGameRepository;
@@ -28,21 +29,32 @@ public class HangmanInputs {
 
     public void handler(@NotNull final String input, @NotNull final Message messages, Hangman hangman) {
         long userId = messages.getAuthor().getIdLong();
+        MessageDeleting.addMessageToDelete(messages);
+        handleInput(input, userId, hangman);
+    }
+
+    public void handler(@NotNull final String input, final long userId, Hangman hangman) {
+        handleInput(input, userId, hangman);
+    }
+
+    private void handleInput(@NotNull final String input, final long userId, Hangman hangman) {
         try {
-            MessageDeleting.addMessageToDelete(messages);
-            if (hangman.getWORD() == null) throw new NullPointerException();
+            String word = hangman.getWORD();
+            if (word == null) throw new NullPointerException();
 
             if (hangman.isLetterPresent(input.toUpperCase())) {
                 handleLetterPresentInput(userId, hangman);
             } else if (input.length() == 1 && hangman.getWORD_HIDDEN().contains("_")) {
                 handleSingleLetterInput(input, userId, hangman);
-            } else if (input.length() == hangman.getLengthWord()) {
+            } else if (input.length() == word.length()) {
                 handleWordInput(input, userId, hangman);
-            } else if (input.length() != hangman.getLengthWord()) {
+            } else {
                 handleWordWrongLengthInput(userId, hangman);
             }
+        } catch (NullPointerException e) {
+            LOGGER.error("WORD is null", e);
         } catch (Exception e) {
-            LOGGER.info(e.getMessage());
+            LOGGER.error(e.getMessage(), e);
         }
     }
 

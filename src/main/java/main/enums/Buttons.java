@@ -2,6 +2,7 @@ package main.enums;
 
 public enum Buttons {
     BUTTON_START_NEW_GAME,
+    BUTTON_START_GAME_GPT,
     BUTTON_CHANGE_GAME_LANGUAGE,
     BUTTON_MY_STATS,
     BUTTON_HELP,

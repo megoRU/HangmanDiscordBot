@@ -15,20 +15,22 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
+
 
 @Configuration
 @EnableScheduling
 @AllArgsConstructor
 public class BotStartConfig {
 
-    private static final Logger LOGGER = Logger.getLogger(BotStartConfig.class.getName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(BotStartConfig.class.getName());
 
     public static final String activity = "/play | ";
 
@@ -54,6 +56,7 @@ public class BotStartConfig {
     private final SlashService slashService;
     private final CompetitiveGames competitiveGames;
     private final UpdateStatisticsService updateStatisticsService;
+    private final ChatGPTService chatGPTService;
 
     //REPOSITORY
     private final UpdateController updateController;
@@ -63,7 +66,7 @@ public class BotStartConfig {
         try {
             languageService.language();
         } catch (Exception e) {
-            LOGGER.info(e.getMessage());
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -72,7 +75,7 @@ public class BotStartConfig {
         try {
             competitiveGames.update();
         } catch (Exception e) {
-            LOGGER.info(e.getMessage());
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -81,7 +84,7 @@ public class BotStartConfig {
         try {
             userSettingsService.settings();
         } catch (Exception e) {
-            LOGGER.info(e.getMessage());
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -90,7 +93,7 @@ public class BotStartConfig {
         try {
             hangmanGetService.update();
         } catch (Exception e) {
-            LOGGER.info(e.getMessage());
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -136,7 +139,7 @@ public class BotStartConfig {
         System.out.println("IsDevMode: " + Config.isIsDev());
 
         //Обновить команды
-//        slashService.updateSlash(jda);
+        slashService.updateSlash(jda);
         System.out.println("15:15");
         HangmanUtils.updateActivity(jda);
     }
@@ -146,7 +149,16 @@ public class BotStartConfig {
         try {
             competitiveQueueService.queue(jda);
         } catch (Exception e) {
-            LOGGER.info(e.getMessage());
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
+
+    @Scheduled(fixedDelay = 5, initialDelay = 1, timeUnit = TimeUnit.SECONDS)
+    private void setChatGPTService() {
+        try {
+            chatGPTService.request();
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -155,7 +167,7 @@ public class BotStartConfig {
         try {
             updateStatisticsService.update(jda);
         } catch (Exception e) {
-            LOGGER.info(e.getMessage());
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -164,7 +176,7 @@ public class BotStartConfig {
         try {
             competitiveService.startGame(jda);
         } catch (Exception e) {
-            LOGGER.info(e.getMessage());
+            LOGGER.error(e.getMessage(), e);
         }
     }
 }

@@ -11,16 +11,16 @@ public class HangmanPlayer {
     private final long userId;
     @Nullable
     private final Long guildId;
-    private final long channelId;
+    private final Long channelId;
     private UserSettings.GameLanguage gameLanguage;
 
-    public HangmanPlayer(long userId, @Nullable Long guildId, long channelId) {
+    public HangmanPlayer(long userId, @Nullable Long guildId, Long channelId) {
         this.userId = userId;
         this.guildId = guildId;
         this.channelId = channelId;
     }
 
-    public HangmanPlayer(long userId, @Nullable Long guildId, long channelId, UserSettings.GameLanguage gameLanguage) {
+    public HangmanPlayer(long userId, @Nullable Long guildId, Long channelId, UserSettings.GameLanguage gameLanguage) {
         this.userId = userId;
         this.guildId = guildId;
         this.channelId = channelId;

@@ -16,10 +16,9 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class HangmanUtils {
 
@@ -81,6 +80,11 @@ public class HangmanUtils {
         return getButtons(userId, buttonList);
     }
 
+    public static Button getButtonGPT(long userId) {
+        String buttonPlayGpt = JSON_BOT_PARSERS.getLocale("button_play_gpt", userId);
+        return Button.success(Buttons.BUTTON_START_GAME_GPT.name(), buttonPlayGpt);
+    }
+
     @NotNull
     private static List<Button> getButtons(long userId, List<Button> buttonList) {
         UserSettings.GameLanguage language = BotStartConfig.getMapGameLanguages().get(userId);
@@ -99,6 +103,85 @@ public class HangmanUtils {
 
     public static void updateActivity(JDA jda, String string) {
         update(jda, string);
+    }
+
+    public static boolean isChatGPT(long userId) {
+        return String.valueOf(userId).contains("-");
+    }
+
+    public static String getGPTPrompt(@NotNull UserSettings.GameLanguage gameLanguage,
+                                      UserSettings.Category gameCategory,
+                                      String usedLetters,
+                                      String hiddenWord) {
+        List<String> lettersList = Arrays.stream(usedLetters.split(", ")).toList();
+
+        if (gameLanguage == UserSettings.GameLanguage.RU) {
+            List<Character> cyrillicLetters = new ArrayList<>(Arrays.asList(
+                    'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И',
+                    'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т',
+                    'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь',
+                    'Э', 'Ю', 'Я'
+            ));
+
+            if (!usedLetters.isEmpty()) {
+                List<Character> usedCharacters = lettersList.stream()
+                        .map(s -> s.charAt(0))
+                        .toList();
+                cyrillicLetters.removeAll(usedCharacters);
+            }
+            if (usedLetters.isEmpty()) usedLetters = "Ты ещё не использовал никакие буквы";
+
+            return String.format("""
+                    Отвечай одной буквой без дополнительного текста.
+                    Игра Виселица Тебе нужно хорошо угадывать буквы в слове.
+                    Черточки это скрытые буквы которые ты ещё не отгадал.
+                    
+                    Текущее слово: %s
+                    Категория: %s
+                    Слово состоит из %s букв
+                    Использованные буквы: %s
+                    Неиспользованные буквы: %s
+                    """,
+                    hiddenWord,
+                    gameCategory.name(),
+                    hiddenWord.length(),
+                    usedLetters,
+                    cyrillicLetters.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(", ")));
+        }
+        List<Character> latinLetters = new ArrayList<>(Arrays.asList(
+                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+                'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+                'U', 'V', 'W', 'X', 'Y', 'Z'
+        ));
+
+        if (!usedLetters.isEmpty()) {
+            List<Character> usedCharacters = lettersList.stream()
+                    .map(s -> s.charAt(0))
+                    .toList();
+            latinLetters.removeAll(usedCharacters);
+        }
+        if (usedLetters.isEmpty()) usedLetters = "You haven't used any letters yet";
+
+        return String.format("""
+                Answer with one letter without additional text.
+                The Gallows game You need to guess the letters in the word well.
+                Dashes are hidden letters that you haven't guessed yet.
+                
+                Current word: %s
+                Category: %s
+                The word consists of %s letters
+                Letters used: %s
+                Unused letters: %s
+                """,
+                hiddenWord,
+                gameCategory.name(),
+                hiddenWord.length(),
+                usedLetters,
+                latinLetters.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(", ")));
     }
 
     private static void update(JDA jda, String string) {

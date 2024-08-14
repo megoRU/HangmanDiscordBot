@@ -5,6 +5,8 @@ import main.game.core.HangmanRegistry;
 import main.jsonparser.JSONParsers;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,14 +15,13 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Logger;
 
 @Service
 public class HangmanTimer extends TimerTask {
 
     private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
     private final HangmanGameRepository hangmanGameRepository;
-    private final Logger LOGGER = Logger.getLogger(HangmanTimer.class.getName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(HangmanTimer.class.getName());
 
     @Autowired
     public HangmanTimer(HangmanGameRepository hangmanGameRepository) {
@@ -63,7 +64,7 @@ public class HangmanTimer extends TimerTask {
                                 HangmanRegistry.getInstance().removeHangman(userId);
                             }
                         } catch (Exception e) {
-                            LOGGER.info(e.getMessage());
+                            LOGGER.error(e.getMessage(), e);
                         }
                     }
                 }

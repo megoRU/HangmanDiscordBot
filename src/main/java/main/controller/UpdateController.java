@@ -1,6 +1,7 @@
 package main.controller;
 
 import lombok.Getter;
+import main.config.BotStartConfig;
 import main.core.ChecksClass;
 import main.core.CoreBot;
 import main.core.events.*;
@@ -9,6 +10,7 @@ import main.game.Hangman;
 import main.game.HangmanDataSaving;
 import main.game.HangmanInputs;
 import main.game.HangmanResult;
+import main.game.api.HangmanAPI;
 import main.game.core.HangmanRegistry;
 import main.model.repository.CompetitiveQueueRepository;
 import main.model.repository.GamesRepository;
@@ -25,13 +27,13 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static main.config.BotStartConfig.jda;
 
@@ -47,9 +49,10 @@ public class UpdateController {
     private final HangmanDataSaving hangmanDataSaving;
     private final HangmanResult hangmanResult;
     private final HangmanInputs hangmanInputs;
+    private final HangmanAPI hangmanAPI;
 
     //LOGGER
-    private final static Logger LOGGER = Logger.getLogger(UpdateController.class.getName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(BotStartConfig.class.getName());
 
     //CORE
     private CoreBot coreBot;
@@ -61,7 +64,8 @@ public class UpdateController {
                             CompetitiveQueueRepository competitiveQueueRepository,
                             HangmanDataSaving hangmanDataSaving,
                             HangmanResult hangmanResult,
-                            HangmanInputs hangmanInputs) {
+                            HangmanInputs hangmanInputs,
+                            HangmanAPI hangmanAPI) {
         this.hangmanGameRepository = hangmanGameRepository;
         this.gamesRepository = gamesRepository;
         this.userSettingsRepository = userSettingsRepository;
@@ -69,6 +73,7 @@ public class UpdateController {
         this.hangmanDataSaving = hangmanDataSaving;
         this.hangmanResult = hangmanResult;
         this.hangmanInputs = hangmanInputs;
+        this.hangmanAPI = hangmanAPI;
     }
 
     public void registerBot(CoreBot coreBot) {
@@ -81,17 +86,17 @@ public class UpdateController {
 
     private void distributeEventsByType(Object event) {
         if (event instanceof SlashCommandInteractionEvent slashCommandInteractionEvent) {
-            LOGGER.log(Level.INFO, slashCommandInteractionEvent.getName());
+            LOGGER.info(slashCommandInteractionEvent.getName());
             slashEvent(slashCommandInteractionEvent);
         } else if (event instanceof MessageReceivedEvent messageReceivedEvent) {
             messageReceivedEvent(messageReceivedEvent);
         } else if (event instanceof GuildJoinEvent) {
             joinEvent((GuildJoinEvent) event);
         } else if (event instanceof UserContextInteractionEvent userContextInteractionEvent) {
-            LOGGER.log(Level.INFO, userContextInteractionEvent.getName());
+            LOGGER.info(userContextInteractionEvent.getName());
             contextEvent(userContextInteractionEvent);
         } else if (event instanceof ButtonInteractionEvent buttonInteractionEvent) {
-            LOGGER.log(Level.INFO, buttonInteractionEvent.getInteraction().getButton().getLabel());
+            LOGGER.info(buttonInteractionEvent.getInteraction().getButton().getLabel());
             buttonEvent(buttonInteractionEvent);
         }
     }
@@ -122,6 +127,13 @@ public class UpdateController {
             return;
         }
 
+        if (Objects.equals(buttonId, Buttons.BUTTON_START_GAME_GPT.name())) {
+            event.editButton(event.getButton().asDisabled()).queue();
+            CompetitivePlayGPT competitivePlayGPT = new CompetitivePlayGPT(hangmanAPI, hangmanDataSaving);
+            competitivePlayGPT.competitive(event);
+            return;
+        }
+
         if (Objects.equals(buttonId, Buttons.BUTTON_STOP.name())) {
             event.editButton(event.getButton().asDisabled()).queue();
             StopCommand stopCommand = new StopCommand(hangmanGameRepository);
@@ -130,6 +142,7 @@ public class UpdateController {
         }
 
         if (Objects.equals(buttonId, Buttons.BUTTON_COMPETITIVE_STOP.name())) {
+            event.editButton(event.getButton().asDisabled()).queue();
             CompetitiveStopButton competitiveStopButton = new CompetitiveStopButton(competitiveQueueRepository);
             competitiveStopButton.stop(event);
             return;
@@ -150,7 +163,7 @@ public class UpdateController {
         boolean permission = ChecksClass.check(event);
         if (!permission) return;
 
-        HangmanCommand hangmanCommand = new HangmanCommand(hangmanDataSaving);
+        HangmanCommand hangmanCommand = new HangmanCommand(hangmanDataSaving, hangmanAPI);
         hangmanCommand.hangman(event);
     }
 
@@ -213,8 +226,8 @@ public class UpdateController {
                 DeleteCommand deleteCommand = new DeleteCommand();
                 deleteCommand.delete(event);
             }
-            case "multi", "play", "multiple" -> {
-                HangmanCommand hangmanCommand = new HangmanCommand(hangmanDataSaving);
+            case "multi", "play", "multiple", "chatgpt" -> {
+                HangmanCommand hangmanCommand = new HangmanCommand(hangmanDataSaving, hangmanAPI);
                 hangmanCommand.hangman(event);
             }
             case "category" -> {
@@ -268,7 +281,7 @@ public class UpdateController {
                 .whenComplete((v, throwable) -> {
                     if (throwable != null) {
                         if (throwable.getMessage().contains("50007: Cannot send messages to this user")) {
-                            LOGGER.log(Level.SEVERE, "50007: Cannot send messages to this user", throwable);
+                            LOGGER.error("50007: Cannot send messages to this user", throwable);
                         }
                     }
                 });
