@@ -28,6 +28,7 @@ public class HelpCommand {
 
                 "</play:1194760100833939491> - " + " " + jsonParsers.getLocale("help_hg", userIdLong)
                         + "\n</competitive:1194054216013066240> - " + " " + jsonParsers.getLocale("help_competitive", userIdLong)
+                        + "\n</chatgpt:1273289261864452136> - " + " " + jsonParsers.getLocale("help_gpt", userIdLong)
                         + "\n</multi:1024084212762038352> - " + " " + jsonParsers.getLocale("help_multi", userIdLong)
                         + "\n</quit:1194760100833939492> - " + " " + jsonParsers.getLocale("help_stop", userIdLong)
                         + "\n</language:940560633504604160> - " + " " + jsonParsers.getLocale("help_language", userIdLong)

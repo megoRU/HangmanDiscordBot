@@ -107,5 +107,6 @@
   "Game_Is_Not_Over": "Your game is not over, go on!",
   "Game_Opponent_Lost": "Your opponent has lost!",
   "button_play_gpt": "Play against ChatGPT",
-  "hangman_bot_play": "The bot is still playing, try again later."
+  "hangman_bot_play": "The bot is still playing, try again later.",
+  "help_gpt": "Play hangman vs bot"
 }
