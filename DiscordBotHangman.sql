@@ -10,8 +10,8 @@ DROP TABLE IF EXISTS `active_hangman`;
 CREATE TABLE `active_hangman` (
   `user_id_long` bigint(30) NOT NULL,
   `second_user_id_long` bigint(30) DEFAULT NULL,
-  `message_id_long` bigint(30) NOT NULL,
-  `channel_id_long` bigint(30) NOT NULL,
+  `message_id_long` bigint(30),
+  `channel_id_long` bigint(30),
   `guild_long_id` bigint(30) DEFAULT NULL,
   `word` varchar(255) DEFAULT NULL,
   `current_hidden_word` varchar(255) DEFAULT NULL,
