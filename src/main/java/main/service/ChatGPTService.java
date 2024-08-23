@@ -56,15 +56,6 @@ public class ChatGPTService {
             try {
                 ChatCompletion chatCompletion = Request.send(request);
                 String letter = chatCompletion.getChoices()[0].getMessage().getContent().toLowerCase();
-
-                double completionCost = chatCompletion.getUsage().getCompletionCost();
-                double totalCost = chatCompletion.getUsage().getTotalCost();
-                double totalTokens = chatCompletion.getUsage().getTotalTokens();
-
-                System.out.println("completionCost " + completionCost);
-                System.out.println("totalCost " + totalCost);
-                System.out.println("totalTokens " + totalTokens);
-
                 boolean contains = hangman.getGuesses().contains(letter);
 
                 if (contains) {

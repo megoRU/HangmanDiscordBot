@@ -90,8 +90,8 @@ public class UpdateController {
             slashEvent(slashCommandInteractionEvent);
         } else if (event instanceof MessageReceivedEvent messageReceivedEvent) {
             messageReceivedEvent(messageReceivedEvent);
-        } else if (event instanceof GuildJoinEvent) {
-            joinEvent((GuildJoinEvent) event);
+        } else if (event instanceof GuildJoinEvent guildJoinEvent) {
+            joinEvent(guildJoinEvent);
         } else if (event instanceof UserContextInteractionEvent userContextInteractionEvent) {
             LOGGER.info(userContextInteractionEvent.getName());
             contextEvent(userContextInteractionEvent);
