@@ -1,9 +1,7 @@
 package main.service;
 
 import lombok.AllArgsConstructor;
-import main.GPT.ChatCompletion;
-import main.GPT.GPTRequest;
-import main.GPT.Request;
+import main.config.Config;
 import main.enums.GameStatus;
 import main.game.Hangman;
 import main.game.HangmanGameEndHandler;
@@ -11,11 +9,13 @@ import main.game.HangmanInputs;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.model.entity.UserSettings;
+import org.gpttunnel.entity.api.ChatRequest;
+import org.gpttunnel.entity.api.response.ChatCompletion;
+import org.gpttunnel.tunnel.GPTTunnelAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -34,7 +34,12 @@ public class ChatGPTService {
     public void request() {
         Collection<Hangman> allGames = hangmanRegistry.getAllGames();
         allGames.stream().filter(Hangman::isChatGPT).forEach(hangman -> {
-            GPTRequest request = new GPTRequest();
+            GPTTunnelAPI gptTunnelAPI = new GPTTunnelAPI.Builder()
+                    .setToken(Config.getGPT_TOKEN())
+                    .build();
+
+            ChatRequest chatRequest = new ChatRequest();
+
             String guesses = HangmanUtils.getGuesses(hangman.getGuesses());
             String wordHidden = hangman.getWORD_HIDDEN().replaceAll(" ", "");
 
@@ -44,17 +49,12 @@ public class ChatGPTService {
 
             String gptPrompt = HangmanUtils.getGPTPrompt(gameLanguage, gameCategory, guesses, wordHidden);
 
-            List<GPTRequest.Content> content = new ArrayList<>();
+            ChatRequest.Content gptContent = new ChatRequest.Content("text", gptPrompt, null);
+            ChatRequest.Message userMessage = new ChatRequest.Message(ChatRequest.Role.USER, List.of(gptContent));
+            chatRequest.setMessages(List.of(userMessage));
 
-            GPTRequest.Content gptContent = new GPTRequest.Content("text", gptPrompt, null);
-            content.add(gptContent);
-
-            GPTRequest.Message userMessage = new GPTRequest.Message(GPTRequest.Role.USER, content);
-            userMessage.setContent(content);
-
-            request.setMessages(List.of(userMessage));
             try {
-                ChatCompletion chatCompletion = Request.send(request);
+                ChatCompletion chatCompletion = gptTunnelAPI.chatCompletion(chatRequest);
                 String letter = chatCompletion.getChoices()[0].getMessage().getContent().toLowerCase();
                 boolean contains = hangman.getGuesses().contains(letter);
 
