@@ -49,8 +49,7 @@ public class ChatGPTService {
 
             String gptPrompt = HangmanUtils.getGPTPrompt(gameLanguage, gameCategory, guesses, wordHidden);
 
-            ChatRequest.Content gptContent = new ChatRequest.Content("text", gptPrompt, null);
-            ChatRequest.Message userMessage = new ChatRequest.Message(ChatRequest.Role.USER, List.of(gptContent));
+            ChatRequest.Message userMessage = new ChatRequest.Message(ChatRequest.Role.USER, gptPrompt);
             chatRequest.setMessages(List.of(userMessage));
 
             try {
