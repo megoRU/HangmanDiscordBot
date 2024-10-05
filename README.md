@@ -36,10 +36,6 @@ This work is licensed under a [GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.
 
 1. The bot is made using the library: [JDA](https://github.com/DV8FromTheWorld/JDA)
 
-## JETBRAINS
-
-[<img src="https://github.com/megoRU/GiveawayDiscordBot/blob/main/.github/jetbrains-logo.png?raw=true">](https://jb.gg/OpenSource)
-
 ## Privacy Policy
 
 Here you can read more about what we store and how we store it. [Privacy Policy](https://github.com/megoRU/HangmanDiscordBot/blob/main/.github/privacy.md)
