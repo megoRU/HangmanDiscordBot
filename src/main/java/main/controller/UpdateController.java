@@ -1,7 +1,6 @@
 package main.controller;
 
 import lombok.Getter;
-import main.config.BotStartConfig;
 import main.core.ChecksClass;
 import main.core.CoreBot;
 import main.core.events.*;
@@ -52,7 +51,7 @@ public class UpdateController {
     private final HangmanAPI hangmanAPI;
 
     //LOGGER
-    private final static Logger LOGGER = LoggerFactory.getLogger(BotStartConfig.class.getName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(UpdateController.class.getName());
 
     //CORE
     private CoreBot coreBot;
