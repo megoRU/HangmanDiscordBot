@@ -139,12 +139,12 @@ public class BotStartConfig {
         System.out.println("IsDevMode: " + Config.isIsDev());
 
         //Обновить команды
-//        slashService.updateSlash(jda);
+        slashService.updateSlash(jda);
         System.out.println("17:37");
         HangmanUtils.updateActivity(jda);
     }
 
-    @Scheduled(fixedDelay = 1, initialDelay = 1, timeUnit = TimeUnit.SECONDS)
+    @Scheduled(fixedDelay = 2, initialDelay = 1, timeUnit = TimeUnit.SECONDS)
     private void getCompetitiveQueue() {
         try {
             competitiveQueueService.queue(jda);
@@ -171,7 +171,7 @@ public class BotStartConfig {
         }
     }
 
-    @Scheduled(fixedDelay = (200), initialDelay = 15000)
+    @Scheduled(fixedDelay = (1000), initialDelay = 15000)
     private void competitiveHandler() {
         try {
             competitiveService.startGame(jda);
