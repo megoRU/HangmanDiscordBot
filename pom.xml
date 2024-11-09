@@ -66,12 +66,6 @@
             <version>3.5.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.github.megoRU</groupId>
-            <artifactId>boticordjava</artifactId>
-            <version>v6.0.1</version>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/net.dv8tion/JDA -->
         <dependency>
             <groupId>net.dv8tion</groupId>
@@ -97,12 +91,6 @@
             <groupId>io.quickchart</groupId>
             <artifactId>QuickChart</artifactId>
             <version>1.2.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.discordbotlist</groupId>
-            <artifactId>dbl-java-library</artifactId>
-            <version>2.1.2</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.jetbrains/annotations -->
