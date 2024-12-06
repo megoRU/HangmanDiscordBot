@@ -8,3 +8,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+
+logging:
+  level:
+    ROOT: INFO
+    org.hibernate.orm.connections.pooling: WARN
