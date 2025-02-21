@@ -69,6 +69,17 @@ public class HangmanRegistry {
         return hangmanPlayer != null;
     }
 
+    @Nullable
+    public Hangman isMessageIdHas(long messageId) {
+        Collection<Hangman> allGames = getAllGames();
+        for (Hangman hangman : allGames) {
+            if (hangman.getMessageId() == messageId) {
+                return hangman;
+            }
+        }
+        return null;
+    }
+
     public int getCompetitiveQueueSize() {
         return competitiveQueue.size();
     }

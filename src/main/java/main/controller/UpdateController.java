@@ -22,6 +22,7 @@ import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -97,7 +98,15 @@ public class UpdateController {
         } else if (event instanceof ButtonInteractionEvent buttonInteractionEvent) {
             LOGGER.info(buttonInteractionEvent.getInteraction().getButton().getLabel());
             buttonEvent(buttonInteractionEvent);
+        } else if (event instanceof MessageDeleteEvent messageDeleteEvent) {
+            LOGGER.info("Deleted messageId: {}", messageDeleteEvent.getMessageId());
+            messageDeleteEvent(messageDeleteEvent);
         }
+    }
+
+    private void messageDeleteEvent(MessageDeleteEvent messageDeleteEvent) {
+        DeleteEvent deleteEvent = new DeleteEvent(hangmanGameRepository);
+        deleteEvent.handle(messageDeleteEvent);
     }
 
     private void buttonEvent(@NotNull ButtonInteractionEvent event) {

@@ -53,6 +53,7 @@ public class Hangman {
     private Long againstPlayerId;
     private long againstPlayerEmbedded;
     private Long channelId;
+    @Getter
     private Long messageId;
     private boolean isChatGPT = false;
 
