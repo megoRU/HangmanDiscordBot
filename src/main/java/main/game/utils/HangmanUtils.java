@@ -65,7 +65,7 @@ public class HangmanUtils {
     }
 
     public static String getImage(int count) {
-        return String.format("https://megoru.ru/hangman/%s.png", count);
+        return String.format("https://api.megoru.ru/hangman/%s.png", count);
     }
 
     public static List<Button> getListCompetitiveButtons(long userId) {
