@@ -99,7 +99,6 @@ public class UpdateController {
             LOGGER.info(buttonInteractionEvent.getInteraction().getButton().getLabel());
             buttonEvent(buttonInteractionEvent);
         } else if (event instanceof MessageDeleteEvent messageDeleteEvent) {
-            LOGGER.info("Deleted messageId: {}", messageDeleteEvent.getMessageId());
             messageDeleteEvent(messageDeleteEvent);
         }
     }
