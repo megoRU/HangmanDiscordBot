@@ -1,5 +1,6 @@
 package main.core.events;
 
+import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.enums.Buttons;
 import main.game.core.HangmanRegistry;
@@ -7,25 +8,19 @@ import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
 import main.model.repository.UserSettingsRepository;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
 @Service
+@AllArgsConstructor
 public class LanguageButton {
 
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
 
     private final UserSettingsRepository userSettingsRepository;
-
-    @Autowired
-    public LanguageButton(UserSettingsRepository userSettingsRepository) {
-        this.userSettingsRepository = userSettingsRepository;
-    }
 
     public void language(@NotNull ButtonInteractionEvent event) {
         event.editButton(event.getButton().asDisabled()).queue();

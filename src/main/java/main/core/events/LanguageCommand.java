@@ -1,31 +1,24 @@
 package main.core.events;
 
+import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
 import main.model.repository.UserSettingsRepository;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
-
 @Service
+@AllArgsConstructor
 public class LanguageCommand {
 
     //Language
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
 
     private final UserSettingsRepository userSettingsRepository;
-
-    @Autowired
-    public LanguageCommand(UserSettingsRepository userSettingsRepository) {
-        this.userSettingsRepository = userSettingsRepository;
-    }
 
     public void language(@NotNull SlashCommandInteractionEvent event) {
         var userIdLong = event.getUser().getIdLong();
