@@ -225,7 +225,7 @@ public class UpdateController {
                 LeadboardCommand leadboardCommand = new LeadboardCommand(gamesRepository);
                 leadboardCommand.board(event);
             }
-            case "stop", "quit" -> {
+            case "quit" -> {
                 StopCommand stopCommand = new StopCommand(hangmanGameRepository);
                 stopCommand.stop(event, this);
             }

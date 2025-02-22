@@ -84,9 +84,6 @@ public class SlashService {
             commands.addCommands(Commands.slash("chatgpt", "Play Hangman vs bot")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Играть в Виселицу против бота"));
 
-            commands.addCommands(Commands.slash("stop", "Stop the game (deprecated: use /quit)")
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Остановить игру (Устарело: используй /quit)"));
-
             commands.addCommands(Commands.slash("quit", "Leave from singleplayer/multiplayer game")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выход из одиночной/многопользовательской игры"));
 

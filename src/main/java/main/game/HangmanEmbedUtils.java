@@ -19,9 +19,11 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class HangmanEmbedUtils {
 
+    private static final ConcurrentHashMap<Long, Object> locks = new ConcurrentHashMap<>();
     private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
     private final static Logger LOGGER = LoggerFactory.getLogger(HangmanEmbedUtils.class.getName());
 
@@ -48,10 +50,18 @@ public class HangmanEmbedUtils {
 
             Map<Long, UserSettings.GameLanguage> mapGameLanguages = BotStartConfig.getMapGameLanguages();
 
-            String gameLanguage = jsonGameParsers.getLocale("Game_Language", userId);
+            String gameSettings = jsonGameParsers.getLocale("Game_Settings", userId);
             String language = mapGameLanguages.get(userId)
                     .name()
-                    .equals("RU") ? "Кириллица\nКатег.: " + HangmanUtils.category(userId) : "Latin\nCateg.:" + HangmanUtils.category(userId);
+                    .equals("RU") ?
+                    String.format("""
+                            Язык: `Кириллица`
+                            Катег.: %s
+                            """, HangmanUtils.category(userId)) :
+                    String.format("""
+                            Lang.: `Latin`
+                            Categ.: %s
+                            """, HangmanUtils.category(userId));
 
             embedBuilder.setColor(Color.GREEN);
             if (!hangman.isCompetitive()) {
@@ -63,8 +73,8 @@ public class HangmanEmbedUtils {
 
                 embedBuilder.addField(against, againstPlayerWithDiscord, true);
             }
-            //Game Language
-            embedBuilder.addField(gameLanguage, language, true);
+            //Game Settings
+            embedBuilder.addField(gameSettings, language, true);
             //Image
             embedBuilder.setThumbnail(HangmanUtils.getImage(hangmanErrors));
 
@@ -110,53 +120,58 @@ public class HangmanEmbedUtils {
         return embedBuilder;
     }
 
-    //Синхронизация чтобы не было ошибок в верстке и пропаданию части слова
-    public static synchronized void editMessage(EmbedBuilder embedBuilder, Long userIdLong, HangmanGameRepository hangmanGameRepository) {
+    public static void editMessage(EmbedBuilder embedBuilder, Long userIdLong, HangmanGameRepository hangmanGameRepository) {
+        locks.putIfAbsent(userIdLong, new Object()); // Добавляем блокировку, если её нет
         JDA jda = BotStartConfig.jda;
-        if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-            Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
-            if (hangman == null || hangman.isChatGPT()) return;
-            HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
-            HangmanPlayer hangmanPlayer = hangmanPlayers[0];
+        synchronized (locks.get(userIdLong)) {
+            if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+                Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
+                if (hangman == null || hangman.isChatGPT()) return;
+                HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
+                HangmanPlayer hangmanPlayer = hangmanPlayers[0];
 
-            Long guildId = hangmanPlayer.getGuildId();
-            long channelId = hangmanPlayer.getChannelId();
-            long messageId = hangman.getMessageId();
+                Long guildId = hangmanPlayer.getGuildId();
+                long channelId = hangmanPlayer.getChannelId();
+                long messageId = hangman.getMessageId();
 
-            try {
-                if (hangmanPlayer.isFromGuild() && guildId != null) {
-                    Guild guildById = jda.getGuildById(guildId);
-                    if (guildById != null) {
-                        GuildMessageChannel textChannelById = guildById.getTextChannelById(channelId);
+                try {
+                    if (hangmanPlayer.isFromGuild() && guildId != null) {
+                        Guild guildById = jda.getGuildById(guildId);
+                        if (guildById != null) {
+                            GuildMessageChannel textChannelById = guildById.getTextChannelById(channelId);
 
-                        if (textChannelById == null) textChannelById = guildById.getNewsChannelById(channelId);
-                        if (textChannelById == null) textChannelById = guildById.getThreadChannelById(channelId);
-                        if (textChannelById != null) {
-                            textChannelById.editMessageEmbedsById(messageId, embedBuilder.build()).submit().get();
+                            if (textChannelById == null) textChannelById = guildById.getNewsChannelById(channelId);
+                            if (textChannelById == null) textChannelById = guildById.getThreadChannelById(channelId);
+                            if (textChannelById != null) {
+                                textChannelById.editMessageEmbedsById(messageId, embedBuilder.build()).submit().get();
+                            }
+                        }
+                    } else {
+                        PrivateChannel privateChannelById = jda.getPrivateChannelById(channelId);
+
+                        if (privateChannelById == null) {
+                            jda
+                                    .retrieveUserById(userIdLong)
+                                    .complete()
+                                    .openPrivateChannel()
+                                    .flatMap(channel -> channel.editMessageEmbedsById(messageId, embedBuilder.build()))
+                                    .submit()
+                                    .get();
+                        } else {
+                            privateChannelById.editMessageEmbedsById(messageId, embedBuilder.build()).submit().get();
                         }
                     }
-                } else {
-                    PrivateChannel privateChannelById = jda.getPrivateChannelById(channelId);
-
-                    if (privateChannelById == null) {
-                        jda
-                                .retrieveUserById(userIdLong)
-                                .complete()
-                                .openPrivateChannel()
-                                .flatMap(channel -> channel.editMessageEmbedsById(messageId, embedBuilder.build()))
-                                .submit().get();
-                    } else {
-                        privateChannelById.editMessageEmbedsById(messageId, embedBuilder.build()).submit().get();
+                } catch (Exception e) {
+                    if (e.getMessage().contains("Unknown Message")
+                            || e.getMessage().contains("Unknown Channel")
+                            || e.getMessage().contains("Missing Access")
+                            || e.getMessage().contains("Cannot edit a message authored by another user")) {
+                        hangmanGameRepository.deleteActiveGame(userIdLong);
+                        HangmanRegistry.getInstance().removeHangman(userIdLong);
+                        LOGGER.info("editMessage(): {}", e.getMessage());
                     }
-                }
-            } catch (Exception e) {
-                if (e.getMessage().contains("Unknown Message")
-                        || e.getMessage().contains("Unknown Channel")
-                        || e.getMessage().contains("Missing Access")
-                        || e.getMessage().contains("Cannot edit a message authored by another user")) {
-                    hangmanGameRepository.deleteActiveGame(userIdLong);
-                    HangmanRegistry.getInstance().removeHangman(userIdLong);
-                    LOGGER.info("editMessage(): {}", e.getMessage());
+                } finally {
+                    locks.remove(userIdLong); // Удаляем блокировку после завершения
                 }
             }
         }
@@ -200,7 +215,8 @@ public class HangmanEmbedUtils {
                             textChannelById
                                     .editMessageEmbedsById(messageId, embedBuilder.build())
                                     .setActionRow(listButtons)
-                                    .submit().get();
+                                    .submit()
+                                    .get();
                         }
                     }
                 } else {
@@ -211,12 +227,14 @@ public class HangmanEmbedUtils {
                                 .openPrivateChannel()
                                 .flatMap(channel -> channel.editMessageEmbedsById(messageId, embedBuilder.build())
                                         .setActionRow(listButtons))
-                                .submit().get();
+                                .submit()
+                                .get();
                     } else {
                         privateChannelById
                                 .editMessageEmbedsById(messageId, embedBuilder.build())
                                 .setActionRow(listButtons)
-                                .submit().get();
+                                .submit()
+                                .get();
                     }
                 }
             } catch (Exception e) {
