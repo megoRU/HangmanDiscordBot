@@ -2,6 +2,7 @@ package main.service;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
+import net.dv8tion.jda.api.interactions.InteractionContextType;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -68,7 +69,7 @@ public class SlashService {
 
             commands.addCommands(Commands.slash("multiple", "Play Hangman with your friends")
                     .addOptions(multiple)
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Играйте в Hangman с друзьями"));
 
             commands.addCommands(Commands.slash("competitive", "Compete with other players")
@@ -103,14 +104,14 @@ public class SlashService {
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Удаление ваших данных"));
 
             commands.addCommands(Commands.slash("multi", "Play Hangman with another player")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .addOptions(multi)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Играйте в Hangman с другим игроком"));
 
             //Context Menu
             commands.addCommands(Commands.context(Command.Type.USER, "Play multi")
                     .setName("multi")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .setNameLocalization(DiscordLocale.RUSSIAN, "Играть вместе")
             );
 
