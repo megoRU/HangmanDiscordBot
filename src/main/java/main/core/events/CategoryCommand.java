@@ -27,7 +27,7 @@ public class CategoryCommand {
     public void category(@NotNull SlashCommandInteractionEvent event) {
         var userIdLong = event.getUser().getIdLong();
 
-        String categorySlash = event.getOption("category", OptionMapping::getAsString);
+        String categorySlash = event.getOption("select", OptionMapping::getAsString);
         String gameCategory = jsonParsers.getLocale("game_category", userIdLong);
 
         //Если игрок сейчас играет сменить язык не даст

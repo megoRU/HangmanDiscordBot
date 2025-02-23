@@ -32,7 +32,7 @@ public class SlashService {
                     .addChoice("English", "EN")
                     .addChoice("Русский", "RU")
                     .setRequired(true)
-                    .setNameLocalization(DiscordLocale.RUSSIAN, "язык-игры")
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "игры")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Настройка языка игры")
             );
 
