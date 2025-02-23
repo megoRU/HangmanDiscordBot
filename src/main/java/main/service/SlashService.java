@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.InteractionContextType;
 import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -24,12 +25,14 @@ public class SlashService {
     public void updateSlash(JDA jda) {
         try {
             CommandListUpdateAction commands = jda.updateCommands();
+
             List<OptionData> language = new ArrayList<>();
 
             language.add(new OptionData(STRING, "game", "Setting the Game language")
                     .addChoice("English", "EN")
                     .addChoice("Русский", "RU")
                     .setRequired(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "язык-игры")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Настройка языка игры")
             );
 
@@ -37,6 +40,7 @@ public class SlashService {
                     .addChoice("English", "EN")
                     .addChoice("Русский", "RU")
                     .setRequired(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "бот")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Настройка языка бота")
             );
 
@@ -44,6 +48,7 @@ public class SlashService {
             multi.add(new OptionData(USER, "user", "@Mention player to play with him")
                     .setRequired(true)
                     .setName("user")
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "пользователь")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "@Упомяните игрока, чтобы поиграть с ним")
             );
 
@@ -51,6 +56,7 @@ public class SlashService {
             multiple.add(new OptionData(STRING, "users", "@Mention the players separated by a space to play with them")
                     .setRequired(true)
                     .setName("users")
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "пользователи")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "@Упомяните игроков через пробел, чтобы поиграть с ними")
             );
 
@@ -64,62 +70,71 @@ public class SlashService {
                     .addChoices(choiceAny, choiceColors, choiceFruits, choiceFlowers)
                     .setRequired(true)
                     .setName("category")
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "выбрать")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выбрать категорию")
             );
 
-            commands.addCommands(Commands.slash("multiple", "Play Hangman with your friends")
+            /*
+             * Команды
+             */
+
+            CommandData multipleCommand = Commands.slash("multiple", "Play Hangman with your friends")
                     .addOptions(multiple)
                     .setContexts(InteractionContextType.GUILD)
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Играйте в Hangman с друзьями"));
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Играйте в Hangman с друзьями");
 
-            commands.addCommands(Commands.slash("competitive", "Compete with other players")
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Соревноваться с другими игроками"));
+            CommandData competitiveCommand = Commands.slash("competitive", "Compete with other players")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Соревноваться с другими игроками");
 
-            commands.addCommands(Commands.slash("language", "Setting language")
+            CommandData languageCommand = Commands.slash("language", "Setting language")
                     .addOptions(language)
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Настройка языка"));
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Настройка языка");
 
-            commands.addCommands(Commands.slash("play", "Play Hangman")
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Играть в Виселицу"));
+            CommandData playCommand = Commands.slash("play", "Play Hangman")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Играть в Виселицу");
 
-            commands.addCommands(Commands.slash("chatgpt", "Play Hangman vs bot")
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Играть в Виселицу против бота"));
+            CommandData chatgptCommand = Commands.slash("chatgpt", "Play Hangman vs bot")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Играть в Виселицу против бота");
 
-            commands.addCommands(Commands.slash("quit", "Leave from singleplayer/multiplayer game")
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выход из одиночной/многопользовательской игры"));
+            CommandData quitCommand = Commands.slash("quit", "Leave from singleplayer/multiplayer game")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выход из одиночной/многопользовательской игры");
 
-            commands.addCommands(Commands.slash("help", "Bot commands")
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Команды бота"));
+            CommandData helpCommand = Commands.slash("help", "Bot commands")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Команды бота");
 
-            commands.addCommands(Commands.slash("leadboard", "Leadboard")
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Доска почёта"));
+            CommandData leadboardCommand = Commands.slash("leadboard", "Leadboard")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Доска почёта");
 
-            commands.addCommands(Commands.slash("statistics", "Get your statistics")
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Получить свою статистику"));
+            CommandData statisticsCommand = Commands.slash("statistics", "Get your statistics")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Получить свою статистику");
 
-            commands.addCommands(Commands.slash("bot-statistics", "Find out the statistics of all the bot games")
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Узнайте статистику всех игр бота"));
+            CommandData botStatisticsCommand = Commands.slash("bot-statistics", "Find out the statistics of all the bot games")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Узнайте статистику всех игр бота");
 
-            commands.addCommands(Commands.slash("delete", "Deleting your data")
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Удаление ваших данных"));
+            CommandData deleteCommand = Commands.slash("delete", "Deleting your data")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Удаление ваших данных");
 
-            commands.addCommands(Commands.slash("multi", "Play Hangman with another player")
+            CommandData multiCommand = Commands.slash("multi", "Play Hangman with another player")
                     .setContexts(InteractionContextType.GUILD)
                     .addOptions(multi)
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Играйте в Hangman с другим игроком"));
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Играйте в Hangman с другим игроком");
 
             //Context Menu
-            commands.addCommands(Commands.context(Command.Type.USER, "Play multi")
+            CommandData playContextCommand = Commands.context(Command.Type.USER, "Play multi")
                     .setName("multi")
                     .setContexts(InteractionContextType.GUILD)
-                    .setNameLocalization(DiscordLocale.RUSSIAN, "Играть вместе")
-            );
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "Играть вместе");
 
-            commands.addCommands(Commands.slash("category", "Set a category for words")
+            CommandData categoryCommand = Commands.slash("category", "Set a category for words")
                     .addOptions(category)
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установите категорию для слов"));
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установите категорию для слов");
 
-            commands.queue();
+            commands.addCommands(
+                            multipleCommand, competitiveCommand, languageCommand,
+                            playCommand, chatgptCommand, quitCommand, helpCommand,
+                            leadboardCommand, statisticsCommand, botStatisticsCommand, deleteCommand,
+                            multiCommand, categoryCommand, playContextCommand)
+                    .queue();
         } catch (Exception e) {
             LOGGER.info(e.getMessage());
         }
