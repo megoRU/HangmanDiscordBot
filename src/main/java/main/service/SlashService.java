@@ -69,7 +69,7 @@ public class SlashService {
             category.add(new OptionData(STRING, "select", "Select a category")
                     .addChoices(choiceAny, choiceColors, choiceFruits, choiceFlowers)
                     .setRequired(true)
-                    .setName("category")
+                    .setName("select")
                     .setNameLocalization(DiscordLocale.RUSSIAN, "выбрать")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выбрать категорию")
             );
