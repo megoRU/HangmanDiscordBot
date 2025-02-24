@@ -100,6 +100,9 @@ public class BotStartConfig {
     @PostConstruct
     public void startBot() {
         try {
+            CoreBot coreBot = new CoreBot(updateController);
+            coreBot.init();
+
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
                             GatewayIntent.GUILD_MESSAGES,
