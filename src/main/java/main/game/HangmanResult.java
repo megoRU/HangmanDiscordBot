@@ -1,5 +1,6 @@
 package main.game;
 
+import lombok.AllArgsConstructor;
 import main.model.entity.Game;
 import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
@@ -11,16 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class HangmanResult {
 
     //Repo
     private final HangmanGameRepository hangmanGameRepository;
     private final GamesRepository gamesRepository;
-
-    public HangmanResult(HangmanGameRepository hangmanGameRepository, GamesRepository gamesRepository) {
-        this.hangmanGameRepository = hangmanGameRepository;
-        this.gamesRepository = gamesRepository;
-    }
 
     public void saveGame(HangmanPlayer[] hangmanPlayers, boolean result, boolean isCompetitive) {
         List<Game> gameList = new ArrayList<>();

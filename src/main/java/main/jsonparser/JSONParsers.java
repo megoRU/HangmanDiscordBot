@@ -2,10 +2,13 @@ package main.jsonparser;
 
 import main.config.BotStartConfig;
 import main.model.entity.UserSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JSONParsers {
 
     private final Locale locale;
+    private final static Logger LOGGER = LoggerFactory.getLogger(JSONParsers.class.getName());
 
     public JSONParsers(Locale locale) {
         this.locale = locale;
@@ -25,7 +28,7 @@ public class JSONParsers {
             }
             return ParserClass.getInstance().getTranslation(key, language);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         return ParserClass.getInstance().getTranslation(key, "EN");
     }

@@ -14,10 +14,9 @@ import main.model.repository.CompetitiveQueueRepository;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Service
 @AllArgsConstructor
@@ -27,7 +26,7 @@ public class CompetitiveService {
     private final HangmanDataSaving hangmanDataSaving;
     private final HangmanAPI hangmanAPI;
 
-    private static final Logger LOGGER = Logger.getLogger(CompetitiveService.class.getName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(CompetitiveService.class.getName());
 
     public void startGame(JDA jda) {
         HangmanRegistry hangmanRegistry = HangmanRegistry.getInstance();
@@ -75,7 +74,7 @@ public class CompetitiveService {
                             .openPrivateChannel()
                             .complete();
                     HangmanUtils.handleAPIException(userId, privateChannel);
-                    LOGGER.log(Level.SEVERE, e.getMessage());
+                    LOGGER.error(e.getMessage());
                 }
             }
         }

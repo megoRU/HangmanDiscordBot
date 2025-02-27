@@ -8,11 +8,12 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import static net.dv8tion.jda.api.interactions.commands.OptionType.STRING;
 import static net.dv8tion.jda.api.interactions.commands.OptionType.USER;
@@ -20,7 +21,7 @@ import static net.dv8tion.jda.api.interactions.commands.OptionType.USER;
 @Service
 public class SlashService {
 
-    private static final Logger LOGGER = Logger.getLogger(SlashService.class.getName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(SlashService.class.getName());
 
     public void updateSlash(JDA jda) {
         try {
@@ -136,7 +137,7 @@ public class SlashService {
                             multiCommand, categoryCommand, playContextCommand)
                     .queue();
         } catch (Exception e) {
-            LOGGER.info(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 }

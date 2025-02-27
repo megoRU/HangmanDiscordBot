@@ -24,7 +24,7 @@ public class MessageDeleting extends TimerTask {
         messageList.forEach((channelId, messages) -> {
             int messageSize = messages.size();
             if (messageSize >= 2) {
-                Message message = messages.get(0);
+                Message message = messages.getFirst();
                 GuildMessageChannelUnion guildChannel = message.getGuildChannel();
                 boolean hasPermission = message.getGuild().getSelfMember().hasPermission(guildChannel, Permission.MESSAGE_MANAGE);
                 if (hasPermission) {

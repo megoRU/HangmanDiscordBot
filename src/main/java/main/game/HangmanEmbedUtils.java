@@ -124,9 +124,9 @@ public class HangmanEmbedUtils {
         locks.putIfAbsent(userIdLong, new Object()); // Добавляем блокировку, если её нет
         JDA jda = BotStartConfig.jda;
         synchronized (locks.get(userIdLong)) {
-            if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
-                Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
-                if (hangman == null || hangman.isChatGPT()) return;
+            Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userIdLong);
+            if (hangman != null) {
+                if (hangman.isChatGPT()) return;
                 HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
                 HangmanPlayer hangmanPlayer = hangmanPlayers[0];
 
@@ -179,9 +179,10 @@ public class HangmanEmbedUtils {
 
     public static void editMessageWithButtons(EmbedBuilder embedBuilder, long userId, HangmanGameRepository hangmanGameRepository) {
         JDA jda = BotStartConfig.jda;
-        if (HangmanRegistry.getInstance().hasHangman(userId)) {
-            Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userId);
-            if (hangman == null || hangman.isChatGPT()) return;
+        Hangman hangman = HangmanRegistry.getInstance().getActiveHangman(userId);
+
+        if (hangman != null) {
+            if (hangman.isChatGPT()) return;
             boolean isCompetitive = hangman.isCompetitive();
             int playersCount = hangman.getPlayersCount();
             List<Button> listButtons;

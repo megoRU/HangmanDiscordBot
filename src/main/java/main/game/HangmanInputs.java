@@ -1,5 +1,6 @@
 package main.game;
 
+import lombok.AllArgsConstructor;
 import main.enums.GameStatus;
 import main.jsonparser.JSONParsers;
 import main.model.repository.HangmanGameRepository;
@@ -8,11 +9,10 @@ import net.dv8tion.jda.api.entities.Message;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 @Service
+@AllArgsConstructor
 public class HangmanInputs {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(HangmanInputs.class.getName());
@@ -20,12 +20,6 @@ public class HangmanInputs {
     private static final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
     private final HangmanGameRepository hangmanGameRepository;
     private final HangmanGameEndHandler hangmanGameEndHandler;
-
-    @Autowired
-    public HangmanInputs(HangmanGameRepository hangmanGameRepository, HangmanGameEndHandler hangmanGameEndHandler) {
-        this.hangmanGameRepository = hangmanGameRepository;
-        this.hangmanGameEndHandler = hangmanGameEndHandler;
-    }
 
     public void handler(@NotNull final String input, @NotNull final Message messages, Hangman hangman) {
         long userId = messages.getAuthor().getIdLong();

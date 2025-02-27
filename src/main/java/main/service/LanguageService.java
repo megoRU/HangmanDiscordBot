@@ -3,6 +3,8 @@ package main.service;
 import main.jsonparser.ParserClass;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -11,12 +13,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 @Service
 public class LanguageService {
 
-    private static final Logger LOGGER = Logger.getLogger(LanguageService.class.getName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(LanguageService.class.getName());
 
     public void language() {
         try {
@@ -43,7 +44,7 @@ public class LanguageService {
             }
             System.out.println("setLanguages()");
         } catch (Exception e) {
-            LOGGER.info(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 }
