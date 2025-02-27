@@ -44,7 +44,7 @@ public class LanguageService {
             }
             System.out.println("setLanguages()");
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error(e.getMessage(), e);
         }
     }
 }

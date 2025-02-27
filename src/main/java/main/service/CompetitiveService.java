@@ -74,7 +74,7 @@ public class CompetitiveService {
                             .openPrivateChannel()
                             .complete();
                     HangmanUtils.handleAPIException(userId, privateChannel);
-                    LOGGER.error(e.getMessage());
+                    LOGGER.error(e.getMessage(), e);
                 }
             }
         }

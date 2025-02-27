@@ -137,7 +137,7 @@ public class SlashService {
                             multiCommand, categoryCommand, playContextCommand)
                     .queue();
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error(e.getMessage(), e);
         }
     }
 }

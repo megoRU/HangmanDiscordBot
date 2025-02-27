@@ -28,7 +28,7 @@ public class JSONParsers {
             }
             return ParserClass.getInstance().getTranslation(key, language);
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error(e.getMessage(), e);
         }
         return ParserClass.getInstance().getTranslation(key, "EN");
     }

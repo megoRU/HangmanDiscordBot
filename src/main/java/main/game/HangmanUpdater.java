@@ -45,7 +45,7 @@ public class HangmanUpdater extends TimerTask {
                     }
             );
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error(e.getMessage(), e);
         }
     }
 }
