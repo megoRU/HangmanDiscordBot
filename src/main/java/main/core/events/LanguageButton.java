@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -19,7 +20,6 @@ import java.util.Objects;
 public class LanguageButton {
 
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
-
     private final UserSettingsRepository userSettingsRepository;
 
     public void language(@NotNull ButtonInteractionEvent event) {
@@ -50,24 +50,21 @@ public class LanguageButton {
     }
 
     private void setGameLanguage(long userId, String language) {
+
+        Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
+        UserSettings userSettings = userSettingsMap.get(userId);
+
         UserSettings.GameLanguage gameLanguage = UserSettings.GameLanguage.valueOf(language);
-        UserSettings userSettings = userSettingsRepository.getByUserIdLong(userId);
 
         if (userSettings == null) {
             userSettings = new UserSettings();
             userSettings.setUserIdLong(userId);
-
             userSettings.setCategory(UserSettings.Category.ALL);
-            userSettings.setGameLanguage(UserSettings.GameLanguage.EN);
             userSettings.setBotLanguage(UserSettings.BotLanguage.EN);
-
-            BotStartConfig.getMapGameCategory().put(userId, UserSettings.Category.ALL);
-            BotStartConfig.getMapGameLanguages().put(userId, UserSettings.GameLanguage.EN);
-            BotStartConfig.getMapLanguages().put(userId, UserSettings.BotLanguage.EN);
         }
 
         userSettings.setGameLanguage(gameLanguage);
-        BotStartConfig.getMapGameLanguages().put(userId, gameLanguage);
+        userSettingsMap.put(userId, userSettings);
         userSettingsRepository.save(userSettings);
     }
 }

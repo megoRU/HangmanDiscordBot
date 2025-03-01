@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 @AllArgsConstructor
 public class CompetitiveService {
@@ -40,9 +42,11 @@ public class CompetitiveService {
                     String word = hangmanAPI.getWord(userId);
                     for (HangmanPlayer competitiveCurrentPlayer : competitivePlayers) {
                         long currentPlayerUserId = competitiveCurrentPlayer.getUserId();
-                        UserSettings.GameLanguage gameLanguage = BotStartConfig.mapGameLanguages.get(currentPlayerUserId);
 
-                        if (gameLanguage == null) {
+                        Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
+                        UserSettings userSettings = userSettingsMap.get(userId);
+
+                        if (userSettings == null) {
                             competitiveQueueRepository.deleteById(currentPlayerUserId);
                             hangmanRegistry.removeFromCompetitiveQueue(currentPlayerUserId);
                             return;

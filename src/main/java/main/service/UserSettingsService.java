@@ -7,6 +7,7 @@ import main.model.repository.UserSettingsRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @AllArgsConstructor
@@ -16,16 +17,11 @@ public class UserSettingsService {
 
     public void settings() {
         List<UserSettings> userSettingsList = userSettingsRepository.findAll();
+        Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
 
         for (UserSettings userSettings : userSettingsList) {
             Long userIdLong = userSettings.getUserIdLong();
-            UserSettings.BotLanguage botLanguage = userSettings.getBotLanguage();
-            UserSettings.GameLanguage gameLanguage = userSettings.getGameLanguage();
-            UserSettings.Category category = userSettings.getCategory();
-
-            BotStartConfig.mapLanguages.put(userIdLong, botLanguage);
-            BotStartConfig.mapGameLanguages.put(userIdLong, gameLanguage);
-            BotStartConfig.mapGameCategory.put(userIdLong, category);
+            userSettingsMap.put(userIdLong, userSettings);
         }
         System.out.println("getUserSettings()");
     }

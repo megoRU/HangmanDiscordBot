@@ -11,31 +11,28 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 @AllArgsConstructor
 public class LanguageCommand {
 
     //Language
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
-
     private final UserSettingsRepository userSettingsRepository;
 
     public void language(@NotNull SlashCommandInteractionEvent event) {
         var userIdLong = event.getUser().getIdLong();
 
-        UserSettings userSettings = userSettingsRepository.getByUserIdLong(userIdLong);
+        Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
+        UserSettings userSettings = userSettingsMap.get(userIdLong);
 
         if (userSettings == null) {
             userSettings = new UserSettings();
             userSettings.setUserIdLong(userIdLong);
-
             userSettings.setCategory(UserSettings.Category.ALL);
             userSettings.setGameLanguage(UserSettings.GameLanguage.EN);
             userSettings.setBotLanguage(UserSettings.BotLanguage.EN);
-
-            BotStartConfig.getMapGameCategory().put(userIdLong, UserSettings.Category.ALL);
-            BotStartConfig.getMapGameLanguages().put(userIdLong, UserSettings.GameLanguage.EN);
-            BotStartConfig.getMapLanguages().put(userIdLong, UserSettings.BotLanguage.EN);
         }
 
         //Если игрок сейчас играет сменить язык не даст
@@ -55,18 +52,14 @@ public class LanguageCommand {
 
             String opOne = event.getOptions().get(0).getAsString();
             String opTwo = event.getOptions().get(1).getAsString();
-
-            BotStartConfig.getMapGameLanguages().put(userIdLong, gameLanguage);
-            BotStartConfig.getMapLanguages().put(userIdLong, botLanguage);
-
             String slashLanguage = String.format(jsonParsers.getLocale("slash_language", userIdLong), opOne, opTwo);
 
-            event.reply(slashLanguage)
-                    .setEphemeral(true)
-                    .queue();
+            event.reply(slashLanguage).setEphemeral(true).queue();
 
             userSettings.setBotLanguage(botLanguage);
             userSettings.setGameLanguage(gameLanguage);
+            userSettingsMap.put(userIdLong, userSettings);
+
             userSettingsRepository.save(userSettings);
         }
     }

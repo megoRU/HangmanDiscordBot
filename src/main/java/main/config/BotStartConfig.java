@@ -37,12 +37,9 @@ public class BotStartConfig {
     //String - userLongId
     @Getter
     public static final Map<Long, String> secretCode = new HashMap<>();
+
     @Getter
-    public static final Map<Long, UserSettings.BotLanguage> mapLanguages = new HashMap<>();
-    @Getter
-    public static final Map<Long, UserSettings.GameLanguage> mapGameLanguages = new HashMap<>();
-    @Getter
-    public static final Map<Long, UserSettings.Category> mapGameCategory = new HashMap<>();
+    public static final Map<Long, UserSettings> userSettingsMap = new HashMap<>();
 
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());

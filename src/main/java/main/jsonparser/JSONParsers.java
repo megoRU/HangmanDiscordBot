@@ -5,6 +5,8 @@ import main.model.entity.UserSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+
 public class JSONParsers {
 
     private final Locale locale;
@@ -16,14 +18,19 @@ public class JSONParsers {
 
     public String getLocale(String key, long userIdLong) {
         try {
+            Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
+            UserSettings userSettings = userSettingsMap.get(userIdLong);
+
             String language = UserSettings.GameLanguage.EN.name();
             if (locale.equals(Locale.GAME)) {
-                if (BotStartConfig.getMapGameLanguages().get(userIdLong) != null) {
-                    language = BotStartConfig.getMapGameLanguages().get(userIdLong).name();
+                if (userSettings != null) {
+                    UserSettings.GameLanguage gameLanguage = userSettings.getGameLanguage();
+                    language = gameLanguage.name();
                 }
             } else {
-                if (BotStartConfig.getMapLanguages().get(userIdLong) != null) {
-                    language = BotStartConfig.getMapLanguages().get(userIdLong).name();
+                UserSettings.BotLanguage userLanguage = userSettings.getBotLanguage();
+                if (userLanguage != null) {
+                    language = userLanguage.name();
                 }
             }
             return ParserClass.getInstance().getTranslation(key, language);

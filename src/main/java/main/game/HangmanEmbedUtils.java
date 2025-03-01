@@ -48,10 +48,13 @@ public class HangmanEmbedUtils {
             String word = hangman.getWORD().toUpperCase().replaceAll("", " ").trim();
             GameStatus gameStatus = hangman.getGameStatus();
 
-            Map<Long, UserSettings.GameLanguage> mapGameLanguages = BotStartConfig.getMapGameLanguages();
+            Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
+            UserSettings userSettings = userSettingsMap.get(userId);
+
+            UserSettings.GameLanguage mapGameLanguages = userSettings.getGameLanguage();
 
             String gameSettings = jsonGameParsers.getLocale("Game_Settings", userId);
-            String language = mapGameLanguages.get(userId)
+            String language = mapGameLanguages
                     .name()
                     .equals("RU") ?
                     String.format("""

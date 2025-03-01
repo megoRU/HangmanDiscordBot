@@ -16,8 +16,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class HangmanUtils {
@@ -87,7 +87,10 @@ public class HangmanUtils {
 
     @NotNull
     private static List<Button> getButtons(long userId, List<Button> buttonList) {
-        UserSettings.GameLanguage language = BotStartConfig.getMapGameLanguages().get(userId);
+        Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
+        UserSettings userSettings = userSettingsMap.get(userId);
+
+        UserSettings.GameLanguage language = userSettings.getGameLanguage();
         if (language != null && language.name().equals("EN")) {
             buttonList.add(BUTTON_RUSSIAN);
         } else {
@@ -132,23 +135,23 @@ public class HangmanUtils {
             if (usedLetters.isEmpty()) usedLetters = "Ты ещё не использовал никакие буквы";
 
             return String.format("""
-                    Отвечай одной буквой без дополнительного текста.
-                    Игра Виселица Тебе нужно хорошо угадывать буквы в слове.
-                    Черточки это скрытые буквы которые ты ещё не отгадал.
-                    
-                    Текущее слово: %s
-                    Категория: %s
-                    Слово состоит из %s букв
-                    Использованные буквы: %s
-                    Неиспользованные буквы: %s
-                    """,
+                            Отвечай одной буквой без дополнительного текста.
+                            Игра Виселица Тебе нужно хорошо угадывать буквы в слове.
+                            Черточки это скрытые буквы которые ты ещё не отгадал.
+                            
+                            Текущее слово: %s
+                            Категория: %s
+                            Слово состоит из %s букв
+                            Использованные буквы: %s
+                            Неиспользованные буквы: %s
+                            """,
                     hiddenWord,
                     gameCategory.name(),
                     hiddenWord.length(),
                     usedLetters,
                     cyrillicLetters.stream()
-                    .map(String::valueOf)
-                    .collect(Collectors.joining(", ")));
+                            .map(String::valueOf)
+                            .collect(Collectors.joining(", ")));
         }
         List<Character> latinLetters = new ArrayList<>(Arrays.asList(
                 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
@@ -165,23 +168,23 @@ public class HangmanUtils {
         if (usedLetters.isEmpty()) usedLetters = "You haven't used any letters yet";
 
         return String.format("""
-                Answer with one letter without additional text.
-                The Gallows game You need to guess the letters in the word well.
-                Dashes are hidden letters that you haven't guessed yet.
-                
-                Current word: %s
-                Category: %s
-                The word consists of %s letters
-                Letters used: %s
-                Unused letters: %s
-                """,
+                        Answer with one letter without additional text.
+                        The Gallows game You need to guess the letters in the word well.
+                        Dashes are hidden letters that you haven't guessed yet.
+                        
+                        Current word: %s
+                        Category: %s
+                        The word consists of %s letters
+                        Letters used: %s
+                        Unused letters: %s
+                        """,
                 hiddenWord,
                 gameCategory.name(),
                 hiddenWord.length(),
                 usedLetters,
                 latinLetters.stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining(", ")));
+                        .map(String::valueOf)
+                        .collect(Collectors.joining(", ")));
     }
 
     private static void update(JDA jda, String string) {
@@ -209,8 +212,11 @@ public class HangmanUtils {
     }
 
     public static String category(Long userId) {
-        UserSettings.Category category = BotStartConfig.getMapGameCategory().get(userId);
-        UserSettings.BotLanguage language = BotStartConfig.getMapLanguages().get(userId);
+        Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
+        UserSettings userSettings = userSettingsMap.get(userId);
+
+        UserSettings.Category category = userSettings.getCategory();
+        UserSettings.BotLanguage language = userSettings.getBotLanguage();
 
         if (category == null) category = UserSettings.Category.ALL;
         if (language == null) language = UserSettings.BotLanguage.EN;

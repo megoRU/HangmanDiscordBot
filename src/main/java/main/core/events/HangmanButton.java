@@ -1,5 +1,6 @@
 package main.core.events;
 
+import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.enums.Buttons;
 import main.game.Hangman;
@@ -21,19 +22,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@AllArgsConstructor
 public class HangmanButton {
 
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final HangmanDataSaving hangmanDataSaving;
-
-    @Autowired
-    public HangmanButton(HangmanDataSaving hangmanDataSaving) {
-        this.hangmanDataSaving = hangmanDataSaving;
-    }
 
     public void hangman(@NotNull ButtonInteractionEvent event) {
         if (event.getButton().getId() == null) return;
@@ -43,10 +41,12 @@ public class HangmanButton {
         var channelIdLong = event.getChannel().getIdLong();
 
         String gameLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getIdLong());
-        UserSettings.GameLanguage userGameLanguage = BotStartConfig.getMapGameLanguages().get(userIdLong);
+        Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
+        UserSettings userSettings = userSettingsMap.get(userIdLong);
+
         HangmanRegistry instance = HangmanRegistry.getInstance();
 
-        if (userGameLanguage == null) {
+        if (userSettings == null) {
             event.reply(gameLanguage)
                     .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
                     .setEphemeral(true)

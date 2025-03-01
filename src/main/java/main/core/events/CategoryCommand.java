@@ -1,5 +1,6 @@
 package main.core.events;
 
+import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
@@ -9,20 +10,16 @@ import main.model.repository.UserSettingsRepository;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
+@AllArgsConstructor
 public class CategoryCommand {
 
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
-
     private final UserSettingsRepository userSettingsRepository;
-
-    @Autowired
-    public CategoryCommand(UserSettingsRepository userSettingsRepository) {
-        this.userSettingsRepository = userSettingsRepository;
-    }
 
     public void category(@NotNull SlashCommandInteractionEvent event) {
         var userIdLong = event.getUser().getIdLong();
@@ -40,7 +37,9 @@ public class CategoryCommand {
             return;
         }
 
-        UserSettings userSettings = userSettingsRepository.getByUserIdLong(userIdLong);
+        Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
+
+        UserSettings userSettings = userSettingsMap.get(userIdLong);
 
         if (userSettings == null) {
             userSettings = new UserSettings();
@@ -51,16 +50,16 @@ public class CategoryCommand {
         }
 
         if (categorySlash != null && categorySlash.equals("any")) {
-            BotStartConfig.mapGameCategory.put(userIdLong, UserSettings.Category.ALL);
-            event.reply(gameCategory).setEphemeral(true).queue();
-
             userSettings.setCategory(UserSettings.Category.ALL);
+            userSettingsMap.put(userIdLong, userSettings);
+
+            event.reply(gameCategory).setEphemeral(true).queue();
             userSettingsRepository.save(userSettings);
         } else if (categorySlash != null) {
-            BotStartConfig.mapGameCategory.put(userIdLong, UserSettings.Category.valueOf(categorySlash.toUpperCase()));
-            event.reply(gameCategory).setEphemeral(true).queue();
-
             userSettings.setCategory(UserSettings.Category.valueOf(categorySlash.toUpperCase()));
+            userSettingsMap.put(userIdLong, userSettings);
+
+            event.reply(gameCategory).setEphemeral(true).queue();
             userSettingsRepository.save(userSettings);
         }
     }

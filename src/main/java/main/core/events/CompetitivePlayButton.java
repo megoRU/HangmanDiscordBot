@@ -13,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 public class CompetitivePlayButton {
 
@@ -36,9 +38,11 @@ public class CompetitivePlayButton {
                     .queue();
         } else {
             String gameLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getIdLong());
-            UserSettings.GameLanguage userGameLanguage = BotStartConfig.getMapGameLanguages().get(userId);
 
-            if (userGameLanguage == null) {
+            Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
+            UserSettings userSettings = userSettingsMap.get(userId);
+
+            if (userSettings == null) {
                 event.reply(gameLanguage)
                         .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
                         .addActionRow(HangmanUtils.getButtonPlayCompetitiveAgain(userId))
@@ -46,6 +50,9 @@ public class CompetitivePlayButton {
                         .queue();
                 return;
             }
+
+            UserSettings.GameLanguage userGameLanguage = userSettings.getGameLanguage();
+
             HangmanRegistry hangmanRegistry = HangmanRegistry.getInstance();
 
             if (!hangmanRegistry.hasCompetitive(userId) && !hangmanRegistry.hasHangman(userId)) {

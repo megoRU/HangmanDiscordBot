@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 
 @Service
 @AllArgsConstructor
@@ -32,9 +34,11 @@ public class CompetitivePlayGPT {
         long messageChannel = event.getMessageChannel().getIdLong();
 
         String gameLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getIdLong());
-        UserSettings.GameLanguage userGameLanguage = BotStartConfig.getMapGameLanguages().get(userId);
 
-        if (userGameLanguage == null) {
+        Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
+        UserSettings userSettings = userSettingsMap.get(userId);
+
+        if (userSettings == null) {
             event.getHook().sendMessage(gameLanguage)
                     .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
                     .addActionRow(HangmanUtils.getButtonPlayCompetitiveAgain(userId))
@@ -42,6 +46,7 @@ public class CompetitivePlayGPT {
                     .queue();
             return;
         }
+        UserSettings.GameLanguage userGameLanguage = userSettings.getGameLanguage();
 
         HangmanRegistry hangmanRegistry = HangmanRegistry.getInstance();
 

@@ -1,6 +1,7 @@
 package main.service;
 
 import lombok.AllArgsConstructor;
+import main.config.BotStartConfig;
 import main.config.Config;
 import main.enums.GameStatus;
 import main.game.Hangman;
@@ -18,9 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
-
-import static main.config.BotStartConfig.mapGameCategory;
-import static main.config.BotStartConfig.mapGameLanguages;
+import java.util.Map;
 
 @Service
 @AllArgsConstructor
@@ -31,6 +30,7 @@ public class ChatGPTService {
     private final HangmanInputs hangmanInputs;
     private final HangmanGameEndHandler hangmanGameEndHandler;
 
+    //TODO: NPE Language
     public void request() {
         Collection<Hangman> allGames = hangmanRegistry.getAllGames();
         allGames.stream().filter(Hangman::isChatGPT).forEach(hangman -> {
@@ -44,10 +44,14 @@ public class ChatGPTService {
             String wordHidden = hangman.getWORD_HIDDEN().replaceAll(" ", "");
 
             long againstPlayerEmbedded = hangman.getAgainstPlayerEmbedded();
-            UserSettings.GameLanguage gameLanguage = mapGameLanguages.get(againstPlayerEmbedded);
-            UserSettings.Category gameCategory = mapGameCategory.get(againstPlayerEmbedded);
 
-            String gptPrompt = HangmanUtils.getGPTPrompt(gameLanguage, gameCategory, guesses, wordHidden);
+            Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
+            UserSettings userSettings = userSettingsMap.get(againstPlayerEmbedded);
+
+            UserSettings.GameLanguage gameLanguage = userSettings.getGameLanguage();
+            UserSettings.Category category = userSettings.getCategory();
+
+            String gptPrompt = HangmanUtils.getGPTPrompt(gameLanguage, category, guesses, wordHidden);
 
             ChatRequest.Message userMessage = new ChatRequest.Message(ChatRequest.Role.USER, gptPrompt);
             chatRequest.setMessages(List.of(userMessage));

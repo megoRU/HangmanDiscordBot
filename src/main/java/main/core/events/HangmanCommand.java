@@ -1,5 +1,6 @@
 package main.core.events;
 
+import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.game.Hangman;
 import main.game.HangmanBuilder;
@@ -21,13 +22,13 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 
 @Service
+@AllArgsConstructor
 public class HangmanCommand {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(HangmanCommand.class.getName());
@@ -35,12 +36,6 @@ public class HangmanCommand {
     private final HangmanDataSaving hangmanDataSaving;
     private final HangmanRegistry instance = HangmanRegistry.getInstance();
     private final HangmanAPI hangmanAPI;
-
-    @Autowired
-    public HangmanCommand(HangmanDataSaving hangmanDataSaving, HangmanAPI hangmanAPI) {
-        this.hangmanDataSaving = hangmanDataSaving;
-        this.hangmanAPI = hangmanAPI;
-    }
 
     public void hangman(@NotNull GenericCommandInteractionEvent event) {
         long userIdLong = event.getUser().getIdLong();
@@ -51,8 +46,10 @@ public class HangmanCommand {
         }
 
         //Проверяем установлен ли язык. Если нет - то возвращаем в чат ошибку
-        Map<Long, UserSettings.GameLanguage> mapGameLanguages = BotStartConfig.getMapGameLanguages();
-        if (!mapGameLanguages.containsKey(userIdLong)) {
+        Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
+        UserSettings userSettings = userSettingsMap.get(userIdLong);
+
+        if (userSettings == null) {
             String hangmanListenerNeedSetLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", userIdLong);
             event.reply(hangmanListenerNeedSetLanguage)
                     .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
@@ -75,7 +72,9 @@ public class HangmanCommand {
         } else {
             Guild guild = event.getGuild();
 
-            HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, guild != null ? guild.getIdLong() : null, channelIdLong, mapGameLanguages.get(userIdLong));
+            UserSettings.GameLanguage userGameLanguage = userSettings.getGameLanguage();
+
+            HangmanPlayer hangmanPlayer = new HangmanPlayer(userIdLong, guild != null ? guild.getIdLong() : null, channelIdLong, userGameLanguage);
             HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder();
             hangmanBuilder.addHangmanPlayer(hangmanPlayer);
 
@@ -86,7 +85,7 @@ public class HangmanCommand {
             } else if (event.getName().equals("multi") && event instanceof UserContextInteractionEvent userContextInteractionEvent) {
                 userContext(userContextInteractionEvent, hangmanBuilder);
             } else if (event.getName().equals("chatgpt") && event instanceof SlashCommandInteractionEvent slashCommandInteractionEvent) {
-                chatgpt(slashCommandInteractionEvent, hangmanBuilder, mapGameLanguages.get(userIdLong));
+                chatgpt(slashCommandInteractionEvent, hangmanBuilder, userGameLanguage);
             } else if (event.getName().equals("play")) {
                 String createGame = jsonParsers.getLocale("create_game", userIdLong);
                 event.reply(createGame)

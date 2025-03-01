@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Map;
 
 @Service
 public class HangmanAPI {
@@ -19,10 +20,14 @@ public class HangmanAPI {
         this.megoruAPI = new MegoruAPI.Builder().build();
     }
 
+    //TODO: NPE Language
     @NotNull
     public String getWord(long userId) throws UnsuccessfulHttpException, IOException, NullPointerException {
-        UserSettings.GameLanguage gameLanguage = BotStartConfig.getMapGameLanguages().get(userId);
-        UserSettings.Category category = BotStartConfig.getMapGameCategory().get(userId);
+        Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
+        UserSettings userSettings = userSettingsMap.get(userId);
+
+        UserSettings.GameLanguage gameLanguage = userSettings.getGameLanguage();
+        UserSettings.Category category = userSettings.getCategory();
 
         GameWordLanguage gameWordLanguage = new GameWordLanguage();
         gameWordLanguage.setLanguage(gameLanguage.name());
