@@ -21,19 +21,16 @@ public class JSONParsers {
             Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
             UserSettings userSettings = userSettingsMap.get(userIdLong);
 
-            String language = UserSettings.GameLanguage.EN.name();
             if (locale.equals(Locale.GAME)) {
                 if (userSettings != null) {
-                    UserSettings.GameLanguage gameLanguage = userSettings.getGameLanguage();
-                    language = gameLanguage.name();
+                    return userSettings.getGameLanguage().name();
                 }
             } else {
-                UserSettings.BotLanguage userLanguage = userSettings.getBotLanguage();
-                if (userLanguage != null) {
-                    language = userLanguage.name();
+                if (userSettings != null) {
+                    return userSettings.getBotLanguage().name();
                 }
             }
-            return ParserClass.getInstance().getTranslation(key, language);
+            return ParserClass.getInstance().getTranslation(key, "EN");
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
