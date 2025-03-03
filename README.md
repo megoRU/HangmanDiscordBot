@@ -1,19 +1,15 @@
 # HangmanDiscordBot
 [![Java CI](https://github.com/megoRU/HangmanDiscordBot/actions/workflows/ci_cd.yml/badge.svg)](https://github.com/megoRU/HangmanDiscordBot/actions/workflows/ci_cd.yml)
 [![Discord](https://img.shields.io/discord/779317239722672128?label=Discord)](https://discord.gg/UrWG3R683d)
-[![Add](https://img.shields.io/badge/invite-Hangman-blue?logo=discord)](https://top.gg/bot/845974873682608129/invite/)
-[![top](https://img.shields.io/badge/TOP.GG-pink?logo=discord)](https://top.gg/bot/845974873682608129) 
-[![Discord Bots](https://top.gg/api/widget/servers/845974873682608129.svg)](https://top.gg/bot/845974873682608129)
 [![Docker Pulls](https://badgen.net/docker/pulls/megoru/hangman?icon=docker&label=pulls)](https://hub.docker.com/r/megoru/hangman/)
 [![Docker Image Size](https://badgen.net/docker/size/megoru/hangman?icon=docker&label=image%20size)](https://hub.docker.com/r/megoru/hangman)
-
 
 ## LICENSE
 
 This work is licensed under a [GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 ## Add bot to your guild
-[![Discord Bots](https://top.gg/api/widget/845974873682608129.svg)](https://top.gg/bot/845974873682608129)
+[Add Hangman](https://discord.com/oauth2/authorize?client_id=845974873682608129)
 
 ## Technologies used
 
