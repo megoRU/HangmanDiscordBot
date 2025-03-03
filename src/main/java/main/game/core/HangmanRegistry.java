@@ -73,8 +73,11 @@ public class HangmanRegistry {
     public Hangman isMessageIdHas(long messageId) {
         Collection<Hangman> allGames = getAllGames();
         for (Hangman hangman : allGames) {
-            if (hangman.getMessageId() == messageId) {
-                return hangman;
+            if (hangman != null) {
+                Long hangmanMessageId = hangman.getMessageId();
+                if (hangmanMessageId != null && hangmanMessageId == messageId) {
+                    return hangman;
+                }
             }
         }
         return null;
