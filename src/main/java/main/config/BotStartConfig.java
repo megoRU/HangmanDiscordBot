@@ -59,46 +59,15 @@ public class BotStartConfig {
     private final UpdateController updateController;
 
     @PostConstruct
-    private void setLanguages() {
-        try {
-            languageService.language();
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-    }
-
-    @PostConstruct
-    private void setCompetitive() {
-        try {
-            competitiveGames.update();
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-    }
-
-    @PostConstruct
-    private void getUserSettings() {
-        try {
-            userSettingsService.settings();
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-    }
-
-    @PostConstruct
-    private void setHangmanGetService() {
-        try {
-            hangmanGetService.update();
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-    }
-
-    @PostConstruct
     public void startBot() {
         try {
             CoreBot coreBot = new CoreBot(updateController);
             coreBot.init();
+
+            languageService.language();
+            userSettingsService.settings();
+            hangmanGetService.update();
+            competitiveGames.update();
 
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
@@ -171,7 +140,7 @@ public class BotStartConfig {
         }
     }
 
-    @Scheduled(fixedDelay = (1000), initialDelay = 15000)
+    @Scheduled(fixedDelay = (1), initialDelay = 15, timeUnit = TimeUnit.SECONDS)
     private void competitiveHandler() {
         try {
             competitiveService.startGame(jda);

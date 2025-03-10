@@ -248,16 +248,6 @@ public class UpdateController {
         }
     }
 
-    public void sendMessage(Event event, String text, Button button) {
-        if (event instanceof SlashCommandInteractionEvent slashEvent) {
-            if (slashEvent.isAcknowledged()) slashEvent.getHook().sendMessage(text).addActionRow(button).queue();
-            else slashEvent.reply(text).addActionRow(button).queue();
-        } else if (event instanceof ButtonInteractionEvent buttonEvent) {
-            if (buttonEvent.isAcknowledged()) buttonEvent.getHook().sendMessage(text).addActionRow(button).queue();
-            else buttonEvent.reply(text).addActionRow(button).queue();
-        }
-    }
-
     public void sendMessage(Event event, String text) {
         if (event instanceof SlashCommandInteractionEvent slashEvent) {
             if (slashEvent.isAcknowledged()) slashEvent.getHook().sendMessage(text).queue();
