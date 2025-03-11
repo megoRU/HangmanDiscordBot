@@ -150,7 +150,12 @@ public class HangmanEmbedUtils {
     }
 
     private static List<Button> getButtons(Hangman hangman, long userId) {
-        if (hangman.getPlayersCount() > 1 || (!hangman.isCompetitive() && hangman.getPlayersCount() == 1)) {
+        int playersCount = hangman.getPlayersCount();
+        boolean competitive = hangman.isCompetitive();
+
+        if (playersCount > 1) {
+            return HangmanUtils.getListButtons(userId);
+        } else if (playersCount == 1 && !competitive) {
             return HangmanUtils.getListButtons(userId);
         } else if (HangmanUtils.isChatGPT(hangman.getAgainstPlayerEmbedded())) {
             return List.of(HangmanUtils.getButtonGPT(userId));
@@ -189,7 +194,7 @@ public class HangmanEmbedUtils {
                                         MessageEditAction action = userChannel.editMessageEmbedsById(messageId, embedBuilder.build());
                                         if (buttons != null) action.setActionRow(buttons);
                                         action.queue(null, throwable -> handleEditException(throwable, userId, hangmanGameRepository));
-                                    }
+                                    }, throwable -> handleEditException(throwable, userId, hangmanGameRepository)
                             )
                     );
         } else {
