@@ -30,10 +30,11 @@ public class CompetitivePlayButton {
         var userId = event.getUser().getIdLong();
         boolean fromGuild = event.isFromGuild();
         long messageChannel = event.getMessageChannel().getIdLong();
+        event.editButton(event.getButton().asDisabled()).queue();
 
         if (fromGuild) {
             String availableOnlyPm = jsonParsers.getLocale("available_only_pm", event.getUser().getIdLong());
-            event.reply(availableOnlyPm)
+            event.getHook().sendMessage(availableOnlyPm)
                     .setEphemeral(true)
                     .queue();
         } else {
@@ -43,7 +44,7 @@ public class CompetitivePlayButton {
             UserSettings userSettings = userSettingsMap.get(userId);
 
             if (userSettings == null) {
-                event.reply(gameLanguage)
+                event.getHook().sendMessage(gameLanguage)
                         .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
                         .addActionRow(HangmanUtils.getButtonPlayCompetitiveAgain(userId))
                         .setEphemeral(true)
@@ -67,18 +68,17 @@ public class CompetitivePlayButton {
                 HangmanPlayer hangmanPlayer = new HangmanPlayer(userId, null, messageChannel, userGameLanguage);
                 hangmanRegistry.addCompetitiveQueue(hangmanPlayer);
 
-                event.reply(addedToTheQueue)
+                event.getHook().sendMessage(addedToTheQueue)
                         .setActionRow(HangmanUtils.getButtonLeaveSearch(userId))
                         .queue();
 
             } else if (hangmanRegistry.hasHangman(userId)) {
                 String youArePlayNow = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
-                event.reply(youArePlayNow).queue();
+                event.getHook().sendMessage(youArePlayNow).queue();
             } else {
                 String alreadyInQueue = jsonParsers.getLocale("already_in_queue", event.getUser().getIdLong());
-                event.reply(alreadyInQueue).queue();
+                event.getHook().sendMessage(alreadyInQueue).queue();
             }
         }
-        event.editButton(event.getButton().asDisabled()).queue();
     }
 }

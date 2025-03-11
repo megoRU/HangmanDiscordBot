@@ -160,6 +160,7 @@ public class UpdateController {
             hangmanCommand.hangman(event);
             return;
         }
+
         if (Objects.equals(buttonId, Buttons.BUTTON_COMPETITIVE_AGAIN.name())) {
             CompetitivePlayButton competitivePlayButton = new CompetitivePlayButton(competitiveQueueRepository);
             competitivePlayButton.competitive(event);
