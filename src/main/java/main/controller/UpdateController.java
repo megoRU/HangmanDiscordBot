@@ -281,7 +281,13 @@ public class UpdateController {
                             LOGGER.error("50007: Cannot send messages to this user", throwable);
                         }
                     }
-                })));
+                })), throwable -> {
+            if (throwable != null) {
+                if (throwable.getMessage().contains("50007: Cannot send messages to this user")) {
+                    LOGGER.error("50007: Cannot send messages to this user", throwable);
+                }
+            }
+        });
     }
 
     private void joinEvent(@NotNull GuildJoinEvent event) {
