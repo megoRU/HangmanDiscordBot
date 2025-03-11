@@ -34,6 +34,7 @@ public class HangmanButton {
 
     public void hangman(@NotNull ButtonInteractionEvent event) {
         if (event.getButton().getId() == null) return;
+        event.editButton(event.getButton().asDisabled()).queue();
 
         Guild guild = event.getGuild();
         var userIdLong = event.getUser().getIdLong();
@@ -46,7 +47,7 @@ public class HangmanButton {
         HangmanRegistry instance = HangmanRegistry.getInstance();
 
         if (userSettings == null) {
-            event.reply(gameLanguage)
+            event.getHook().sendMessage(gameLanguage)
                     .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
                     .setEphemeral(true)
                     .queue();
@@ -86,10 +87,8 @@ public class HangmanButton {
 
             if (!usersList.contains(userIdLong)) {
                 String youCannotPressPlayAgain = jsonParsers.getLocale("you_cannot_press_play_again", userIdLong);
-                event.reply(youCannotPressPlayAgain).setEphemeral(true).queue();
+                event.getHook().sendMessage(youCannotPressPlayAgain).setEphemeral(true).queue();
                 return;
-            } else {
-                event.editButton(event.getButton().asDisabled()).queue();
             }
 
             usersList.stream()
@@ -112,7 +111,7 @@ public class HangmanButton {
         } else {
             String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
 
-            event.reply(hangmanListenerYouPlay)
+            event.getHook().sendMessage(hangmanListenerYouPlay)
                     .setActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game"))
                     .setEphemeral(true)
                     .queue();
