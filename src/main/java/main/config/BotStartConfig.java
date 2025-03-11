@@ -102,13 +102,21 @@ public class BotStartConfig {
             LOGGER.info(e.getMessage());
         }
 
-        List<Command> complete = jda.retrieveCommands().complete();
-        complete.forEach(command -> System.out.println(command.toString()));
-
         System.out.println("IsDevMode: " + Config.isIsDev());
 
         //Обновить команды
         slashService.updateSlash(jda);
+
+        jda.retrieveCommands().queue(
+                list -> {
+                    for (Command command : list) {
+                        String name = command.getName();
+                        long id = command.getIdLong();
+                        System.out.printf("%s [%s]%n", id, name);
+                    }
+                }
+        );
+
         System.out.println("17:37");
         HangmanUtils.updateActivity(jda);
     }

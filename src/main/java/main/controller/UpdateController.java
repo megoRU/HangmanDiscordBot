@@ -273,16 +273,15 @@ public class UpdateController {
 
     public void sendMessage(String userId, String text) {
         RestAction<User> action = jda.retrieveUserById(userId);
-        action.submit()
-                .thenCompose((user) -> user.openPrivateChannel().submit())
-                .thenCompose((channel) -> channel.sendMessage(text).submit())
-                .whenComplete((v, throwable) -> {
+
+        action.queue(user -> user.openPrivateChannel().queue(channel ->
+                channel.sendMessage(text).queue(null, throwable -> {
                     if (throwable != null) {
                         if (throwable.getMessage().contains("50007: Cannot send messages to this user")) {
                             LOGGER.error("50007: Cannot send messages to this user", throwable);
                         }
                     }
-                });
+                })));
     }
 
     private void joinEvent(@NotNull GuildJoinEvent event) {

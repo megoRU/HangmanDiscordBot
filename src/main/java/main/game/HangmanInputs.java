@@ -57,14 +57,14 @@ public class HangmanInputs {
         hangman.setGameStatus(GameStatus.SAME_LETTER);
         String gameYouUseThisLetter = jsonGameParsers.getLocale("Game_You_Use_This_Letter", userId);
         EmbedBuilder info = HangmanEmbedUtils.hangmanLayout(userId, gameYouUseThisLetter);
-        HangmanEmbedUtils.editMessage(info, userId, hangmanGameRepository);
+        HangmanEmbedUtils.editMessage(info, userId, false, hangmanGameRepository);
     }
 
     private void handleWordWrongLengthInput(long userId, Hangman hangman) {
         hangman.setGameStatus(GameStatus.WRONG_WORD);
         String wrongLengthJson = jsonGameParsers.getLocale("wrongLength", userId);
         EmbedBuilder wrongLength = HangmanEmbedUtils.hangmanLayout(userId, wrongLengthJson);
-        HangmanEmbedUtils.editMessage(wrongLength, userId, hangmanGameRepository);
+        HangmanEmbedUtils.editMessage(wrongLength, userId, false, hangmanGameRepository);
     }
 
     private void handleSingleLetterInput(String input, long userId, Hangman hangman) {
@@ -78,7 +78,7 @@ public class HangmanInputs {
             } else {
                 String gameYouGuessLetter = jsonGameParsers.getLocale("Game_You_Guess_Letter", userId);
                 EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanLayout(userId, gameYouGuessLetter);
-                HangmanEmbedUtils.editMessage(embedBuilder, userId, hangmanGameRepository);
+                HangmanEmbedUtils.editMessage(embedBuilder, userId, false, hangmanGameRepository);
             }
         } else {
             hangman.incrementHangmanErrors();
@@ -90,7 +90,7 @@ public class HangmanInputs {
                 hangman.setGameStatus(GameStatus.WRONG_LETTER);
                 String gameNoSuchLetter = jsonGameParsers.getLocale("Game_No_Such_Letter", userId);
                 EmbedBuilder wordNotFound = HangmanEmbedUtils.hangmanLayout(userId, gameNoSuchLetter);
-                HangmanEmbedUtils.editMessage(wordNotFound, userId, hangmanGameRepository);
+                HangmanEmbedUtils.editMessage(wordNotFound, userId, false, hangmanGameRepository);
             }
         }
     }
@@ -109,7 +109,7 @@ public class HangmanInputs {
                 hangman.setGameStatus(GameStatus.WRONG_WORD);
                 String gameNoSuchWord = jsonGameParsers.getLocale("Game_No_Such_Word", userId);
                 EmbedBuilder wordNotFound = HangmanEmbedUtils.hangmanLayout(userId, gameNoSuchWord);
-                HangmanEmbedUtils.editMessage(wordNotFound, userId, hangmanGameRepository);
+                HangmanEmbedUtils.editMessage(wordNotFound, userId, false, hangmanGameRepository);
             }
         }
     }

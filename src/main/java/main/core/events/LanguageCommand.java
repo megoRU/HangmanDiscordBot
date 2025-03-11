@@ -50,15 +50,15 @@ public class LanguageCommand {
             UserSettings.BotLanguage botLanguage = UserSettings.BotLanguage
                     .valueOf(event.getOptions().get(1).getAsString().toUpperCase());
 
+            userSettings.setBotLanguage(botLanguage);
+            userSettings.setGameLanguage(gameLanguage);
+            userSettingsMap.put(userIdLong, userSettings);
+
             String opOne = event.getOptions().get(0).getAsString();
             String opTwo = event.getOptions().get(1).getAsString();
             String slashLanguage = String.format(jsonParsers.getLocale("slash_language", userIdLong), opOne, opTwo);
 
             event.reply(slashLanguage).setEphemeral(true).queue();
-
-            userSettings.setBotLanguage(botLanguage);
-            userSettings.setGameLanguage(gameLanguage);
-            userSettingsMap.put(userIdLong, userSettings);
 
             userSettingsRepository.save(userSettings);
         }

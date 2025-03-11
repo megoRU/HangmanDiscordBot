@@ -53,7 +53,7 @@ public class StopCommand {
                 updateController.sendMessage(event, hangmanEngGame);
                 EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanLayout(userId, hangmanEngGame1);
 
-                HangmanEmbedUtils.editMessage(embedBuilder, userId, hangmanGameRepository);
+                HangmanEmbedUtils.editMessage(embedBuilder, userId, false, hangmanGameRepository);
                 instance.removeHangman(userId);
                 hangmanGameRepository.deleteActiveGame(userId);
             }
@@ -71,11 +71,11 @@ public class StopCommand {
             String hangmanEngGame = jsonParsers.getLocale("Hangman_Eng_game", userId);
             EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanLayout(userId, hangmanEngGame);
             updateController.sendMessage(event, hangmanEngGame);
-            HangmanEmbedUtils.editMessageWithButtons(embedBuilder, userId, hangmanGameRepository);
+            HangmanEmbedUtils.editMessage(embedBuilder, userId, true, hangmanGameRepository);
         } else {
             String opponentCanselGame = jsonParsers.getLocale("hangman_opponent_cansel_game", userId);
             EmbedBuilder embedBuilder = HangmanEmbedUtils.hangmanLayout(userId, opponentCanselGame);
-            HangmanEmbedUtils.editMessageWithButtons(embedBuilder, userId, hangmanGameRepository);
+            HangmanEmbedUtils.editMessage(embedBuilder, userId, true, hangmanGameRepository);
         }
 
         hangmanGameRepository.deleteActiveGame(userId);

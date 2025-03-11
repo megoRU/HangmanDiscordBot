@@ -56,14 +56,14 @@ public class HangmanGameEndHandler {
             EmbedBuilder lose = HangmanEmbedUtils.hangmanLayout(userId, gameYouLose);
 
             if (hangman.getHangmanPlayers().length == 1) {
-                HangmanEmbedUtils.editMessageWithButtons(result ? win : lose, userId, hangmanGameRepository);
+                HangmanEmbedUtils.editMessage(result ? win : lose, userId, true, hangmanGameRepository);
                 if (hangman.isCompetitive() && result && againstPlayerId != null) {
                     String gameCompetitiveYouLose = JSON_GAME_PARSERS.getLocale("Game_Competitive_You_Lose", againstPlayerId);
                     EmbedBuilder competitiveLose = HangmanEmbedUtils.hangmanLayout(againstPlayerId, gameCompetitiveYouLose);
-                    HangmanEmbedUtils.editMessageWithButtons(competitiveLose, againstPlayerId, hangmanGameRepository);
+                    HangmanEmbedUtils.editMessage(competitiveLose, againstPlayerId, true, hangmanGameRepository);
                 }
             } else {
-                HangmanEmbedUtils.editMessageWithButtons(result ? win : lose, userId, hangmanGameRepository);
+                HangmanEmbedUtils.editMessage(result ? win : lose, userId, true, hangmanGameRepository);
             }
 
             //Люблю кастыли
