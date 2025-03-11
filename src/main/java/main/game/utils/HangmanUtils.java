@@ -216,10 +216,10 @@ public class HangmanUtils {
         UserSettings userSettings = userSettingsMap.get(userId);
 
         UserSettings.Category category = userSettings.getCategory();
-        UserSettings.BotLanguage language = userSettings.getBotLanguage();
+        UserSettings.GameLanguage language = userSettings.getGameLanguage();
 
         if (category == null) category = UserSettings.Category.ALL;
-        if (language == null) language = UserSettings.BotLanguage.EN;
+        if (language == null) language = UserSettings.GameLanguage.EN;
 
         return switch (category.name().toLowerCase()) {
             case "colors" -> Objects.equals(language.name(), "EN") ? "`Colors`" : "`Цвета`";
