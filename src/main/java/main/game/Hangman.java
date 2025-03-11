@@ -134,8 +134,10 @@ public class Hangman {
 
         String gameStart = JSON_GAME_PARSERS.getLocale("Game_Start", userId);
         EmbedBuilder start = HangmanEmbedUtils.hangmanLayout(userId, gameStart);
-        messageId = textChannel.sendMessageEmbeds(start.build()).complete().getIdLong();
-        hangmanDataSaving.saveGame(this);
+        textChannel.sendMessageEmbeds(start.build()).queue(message -> {
+            messageId = message.getIdLong();
+            hangmanDataSaving.saveGame(this);
+        });
 
         //Установка авто завершения
         setTimer(LocalDateTime.now());

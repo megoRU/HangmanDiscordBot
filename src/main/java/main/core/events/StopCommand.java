@@ -39,10 +39,13 @@ public class StopCommand {
             boolean competitive = hangman.isCompetitive();
             if (competitive) {
                 //First player
-                cancelCompetitiveGame(event, userIdLong, updateController);
                 long againstPlayerId = hangman.getAgainstPlayerEmbedded();
+
+                cancelCompetitiveGame(event, userIdLong, updateController);
                 cancelCompetitiveGame(event, againstPlayerId, updateController);
+
                 instance.removeHangman(userIdLong);
+                instance.removeHangman(againstPlayerId);
             } else {
                 HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
                 long userId = HangmanUtils.getHangmanFirstPlayer(hangmanPlayers);

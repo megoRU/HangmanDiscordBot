@@ -24,7 +24,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-
 @Configuration
 @EnableScheduling
 @AllArgsConstructor
@@ -148,7 +147,7 @@ public class BotStartConfig {
         }
     }
 
-    @Scheduled(fixedDelay = (1), initialDelay = 15, timeUnit = TimeUnit.SECONDS)
+    @Scheduled(fixedDelay = 1, initialDelay = 15, timeUnit = TimeUnit.SECONDS)
     private void competitiveHandler() {
         try {
             competitiveService.startGame(jda);

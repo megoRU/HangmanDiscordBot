@@ -12,8 +12,6 @@ import main.game.utils.HangmanUtils;
 import main.model.entity.UserSettings;
 import main.model.repository.CompetitiveQueueRepository;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
-import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -52,32 +50,30 @@ public class CompetitiveService {
                             return;
                         }
 
+                        long anotherUserId = getAnotherUserId(currentPlayerUserId, competitivePlayers);
+
                         HangmanBuilder.Builder hangmanBuilder = new HangmanBuilder.Builder();
                         hangmanBuilder.addHangmanPlayer(competitiveCurrentPlayer);
                         hangmanBuilder.setCompetitive(true);
-                        hangmanBuilder.setAgainstPlayerId(getAnotherUserId(currentPlayerUserId, competitivePlayers));
+                        hangmanBuilder.setAgainstPlayerId(anotherUserId);
 
                         Hangman hangman = hangmanBuilder.build();
                         HangmanRegistry.getInstance().setHangman(currentPlayerUserId, hangman);
 
-                        CacheRestAction<PrivateChannel> privateChannelCacheRestAction = jda
-                                .retrieveUserById(currentPlayerUserId)
-                                .complete()
-                                .openPrivateChannel();
-                        PrivateChannel complete = privateChannelCacheRestAction.complete();
-                        hangman.startGame(complete, word, hangmanDataSaving);
+                        jda.retrieveUserById(currentPlayerUserId)
+                                .queue(user -> user.openPrivateChannel()
+                                        .queue(channel -> hangman.startGame(channel, word, hangmanDataSaving)));
 
                         //Удаляем из очереди
                         competitiveQueueRepository.deleteById(currentPlayerUserId);
                         hangmanRegistry.removeFromCompetitiveQueue(currentPlayerUserId);
                     }
                 } catch (Exception e) {
-                    PrivateChannel privateChannel = jda
-                            .retrieveUserById(userId)
-                            .complete()
-                            .openPrivateChannel()
-                            .complete();
-                    HangmanUtils.handleAPIException(userId, privateChannel);
+                    jda.retrieveUserById(userId)
+                            .queue(user -> user.openPrivateChannel()
+                                            .queue(channel -> HangmanUtils.handleAPIException(userId, channel),
+                                                    throwable -> LOGGER.error(throwable.getMessage(), throwable)),
+                                    throwable -> LOGGER.error(throwable.getMessage(), throwable));
                     LOGGER.error(e.getMessage(), e);
                 }
             }

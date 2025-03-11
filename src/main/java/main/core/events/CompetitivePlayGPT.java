@@ -74,7 +74,7 @@ public class CompetitivePlayGPT {
                 hangmanRegistry.setHangman(-userId, buildGPT);
 
                 String createGame = jsonParsers.getLocale("create_game", userId);
-                event.getHook().sendMessage(createGame).complete();
+                event.getHook().sendMessage(createGame).queue();
 
                 build.startGame(event.getMessageChannel(), word, hangmanDataSaving);
                 buildGPT.startGame(word, hangmanDataSaving);
