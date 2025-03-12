@@ -62,7 +62,9 @@ public class CompetitiveService {
 
                         jda.retrieveUserById(currentPlayerUserId)
                                 .queue(user -> user.openPrivateChannel()
-                                        .queue(channel -> hangman.startGame(channel, word, hangmanDataSaving)));
+                                                .queue(channel -> hangman.startGame(channel, word, hangmanDataSaving),
+                                                        throwable -> LOGGER.error(throwable.getMessage(), throwable)),
+                                        throwable -> LOGGER.error(throwable.getMessage(), throwable));
 
                         //Удаляем из очереди
                         competitiveQueueRepository.deleteById(currentPlayerUserId);

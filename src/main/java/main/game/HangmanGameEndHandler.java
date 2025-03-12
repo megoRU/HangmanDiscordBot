@@ -47,7 +47,7 @@ public class HangmanGameEndHandler {
             String gameStopWin = JSON_GAME_PARSERS.getLocale("Game_Stop_Win", userId);
             String gameYouLose = JSON_GAME_PARSERS.getLocale("Game_You_Lose", userId);
 
-            //Чтобы было показано слово которое было
+            //Чтобы было показано слово, которое было
             if (result && isCompetitive && againstPlayerId != null) {
                 instance.setHangmanStatus(againstPlayerId, GameStatus.LOSE_GAME);
             }
