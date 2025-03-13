@@ -32,9 +32,9 @@ import java.util.Map;
 public class HangmanCommand {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(HangmanCommand.class.getName());
-    private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
+    private final static JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final HangmanDataSaving hangmanDataSaving;
-    private final HangmanRegistry instance = HangmanRegistry.getInstance();
+    private final static HangmanRegistry instance = HangmanRegistry.getInstance();
     private final HangmanAPI hangmanAPI;
 
     public void hangman(@NotNull GenericCommandInteractionEvent event) {
@@ -157,11 +157,11 @@ public class HangmanCommand {
             instance.setHangman(userIdLong, build);
             instance.setHangman(-userIdLong, buildGPT);
 
-            build.startGame(slashCommandInteractionEvent.getMessageChannel(), word, hangmanDataSaving);
-            buildGPT.startGame(word, hangmanDataSaving);
-
             String createGame = jsonParsers.getLocale("create_game", userIdLong);
             slashCommandInteractionEvent.reply(createGame).setEphemeral(true).queue();
+
+            build.startGame(slashCommandInteractionEvent.getMessageChannel(), word, hangmanDataSaving);
+            buildGPT.startGame(word, hangmanDataSaving);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
