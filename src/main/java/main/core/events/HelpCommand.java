@@ -41,11 +41,8 @@ public class HelpCommand {
         String messagesEventsLinks = jsonParsers.getLocale("messages_events_Links", userIdLong);
         String messagesEventsSite = jsonParsers.getLocale("messages_events_Site", userIdLong);
         String messagesEventsAddMeToOtherGuilds = jsonParsers.getLocale("messages_events_Add_Me_To_Other_Guilds", userIdLong);
-        String messagesEventsBotCreator = jsonParsers.getLocale("messages_events_Bot_Creator", userIdLong);
-        String messagesEventsBotCreatorUrlSteam = jsonParsers.getLocale("messages_events_Bot_Creator_Url_Steam", userIdLong);
 
         info.addField(messagesEventsLinks, messagesEventsSite + messagesEventsAddMeToOtherGuilds, false);
-        info.addField(messagesEventsBotCreator, messagesEventsBotCreatorUrlSteam, false);
 
         List<Button> buttons = new ArrayList<>();
         buttons.add(HangmanUtils.getButtonSupport(userIdLong));

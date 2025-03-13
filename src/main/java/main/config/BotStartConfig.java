@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -39,6 +40,8 @@ public class BotStartConfig {
 
     @Getter
     public static final Map<Long, UserSettings> userSettingsMap = new HashMap<>();
+
+    private final static Map<String, Long> commandMap = new HashMap<>();
 
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
@@ -111,6 +114,7 @@ public class BotStartConfig {
                     for (Command command : list) {
                         String name = command.getName();
                         long id = command.getIdLong();
+                        commandMap.put(name, id);
                         System.out.printf("%s [%s]%n", id, name);
                     }
                 }
@@ -154,5 +158,10 @@ public class BotStartConfig {
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
+    }
+
+    @Nullable
+    public static Long getCommandId(String commandName) {
+        return commandMap.get(commandName);
     }
 }

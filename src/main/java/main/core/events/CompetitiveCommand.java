@@ -33,7 +33,9 @@ public class CompetitiveCommand {
         long messageChannel = event.getMessageChannel().getIdLong();
 
         if (fromGuild) {
-            String competitiveMessage = jsonParsers.getLocale("competitive_message", event.getUser().getIdLong());
+            Long competitive = BotStartConfig.getCommandId("competitive");
+
+            String competitiveMessage = String.format(jsonParsers.getLocale("competitive_message", event.getUser().getIdLong()), competitive);
 
             String availableOnlyPm = jsonParsers.getLocale("available_only_pm", event.getUser().getIdLong());
             event.reply(availableOnlyPm)
