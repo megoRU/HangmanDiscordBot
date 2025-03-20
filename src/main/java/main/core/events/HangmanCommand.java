@@ -136,6 +136,10 @@ public class HangmanCommand {
                          UserSettings.GameLanguage gameLanguage) {
         try {
             long userIdLong = slashCommandInteractionEvent.getUser().getIdLong();
+
+            String createGame = jsonParsers.getLocale("create_game", userIdLong);
+            slashCommandInteractionEvent.reply(createGame).setEphemeral(true).queue();
+
             String word = hangmanAPI.getWord(userIdLong);
 
             HangmanBuilder.Builder hangmanBuilderGPT = new HangmanBuilder.Builder();
@@ -156,9 +160,6 @@ public class HangmanCommand {
 
             instance.setHangman(userIdLong, build);
             instance.setHangman(-userIdLong, buildGPT);
-
-            String createGame = jsonParsers.getLocale("create_game", userIdLong);
-            slashCommandInteractionEvent.reply(createGame).setEphemeral(true).queue();
 
             build.startGame(slashCommandInteractionEvent.getMessageChannel(), word, hangmanDataSaving);
             buildGPT.startGame(word, hangmanDataSaving);
