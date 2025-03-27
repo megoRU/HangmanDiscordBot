@@ -9,6 +9,7 @@ import main.jsonparser.JSONParsers;
 import main.model.entity.CompetitiveQueue;
 import main.model.entity.UserSettings;
 import main.model.repository.CompetitiveQueueRepository;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,23 +29,24 @@ public class CompetitiveCommand {
     }
 
     public void competitive(@NotNull SlashCommandInteractionEvent event, UpdateController updateController) {
-        var userId = event.getUser().getIdLong();
+        User user = event.getUser();
+        var userId = user.getIdLong();
         boolean fromGuild = event.isFromGuild();
         long messageChannel = event.getMessageChannel().getIdLong();
 
         if (fromGuild) {
             Long competitive = BotStartConfig.getCommandId("competitive");
 
-            String competitiveMessage = String.format(jsonParsers.getLocale("competitive_message", event.getUser().getIdLong()), competitive);
+            String competitiveMessage = String.format(jsonParsers.getLocale("competitive_message", user.getIdLong()), competitive);
 
-            String availableOnlyPm = jsonParsers.getLocale("available_only_pm", event.getUser().getIdLong());
+            String availableOnlyPm = jsonParsers.getLocale("available_only_pm", user.getIdLong());
             event.reply(availableOnlyPm)
                     .setEphemeral(true)
                     .queue();
 
-            updateController.sendMessage(String.valueOf(userId), competitiveMessage);
+            updateController.sendMessage(user, competitiveMessage);
         } else {
-            String gameLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getIdLong());
+            String gameLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", user.getIdLong());
 
             Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
             UserSettings userSettings = userSettingsMap.get(userId);
@@ -63,7 +65,7 @@ public class CompetitiveCommand {
             HangmanRegistry hangmanRegistry = HangmanRegistry.getInstance();
 
             if (!hangmanRegistry.hasCompetitive(userId) && !hangmanRegistry.hasHangman(userId)) {
-                String addedToTheQueue = jsonParsers.getLocale("added_to_the_queue", event.getUser().getIdLong());
+                String addedToTheQueue = jsonParsers.getLocale("added_to_the_queue", user.getIdLong());
 
                 CompetitiveQueue competitiveQueue = new CompetitiveQueue();
                 competitiveQueue.setUserIdLong(userId);
@@ -79,12 +81,12 @@ public class CompetitiveCommand {
                         .queue();
 
             } else if (hangmanRegistry.hasHangman(userId)) {
-                String youArePlayNow = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
+                String youArePlayNow = jsonParsers.getLocale("Hangman_Listener_You_Play", user.getIdLong());
                 event.reply(youArePlayNow)
                         .setActionRow(HangmanUtils.getButtonStop(userId))
                         .queue();
             } else {
-                String alreadyInQueue = jsonParsers.getLocale("already_in_queue", event.getUser().getIdLong());
+                String alreadyInQueue = jsonParsers.getLocale("already_in_queue", user.getIdLong());
                 event.reply(alreadyInQueue).queue();
             }
         }

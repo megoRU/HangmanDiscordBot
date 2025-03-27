@@ -25,7 +25,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.RestAction;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -271,23 +270,15 @@ public class UpdateController {
         }
     }
 
-    public void sendMessage(String userId, String text) {
-        RestAction<User> action = jda.retrieveUserById(userId);
-
-        action.queue(user -> user.openPrivateChannel().queue(channel ->
+    public void sendMessage(User user, String text) {
+        user.openPrivateChannel().queue(channel ->
                 channel.sendMessage(text).queue(null, throwable -> {
                     if (throwable != null) {
                         if (throwable.getMessage().contains("50007: Cannot send messages to this user")) {
                             LOGGER.error("50007: Cannot send messages to this user", throwable);
                         }
                     }
-                })), throwable -> {
-            if (throwable != null) {
-                if (throwable.getMessage().contains("50007: Cannot send messages to this user")) {
-                    LOGGER.error("50007: Cannot send messages to this user", throwable);
-                }
-            }
-        });
+                }));
     }
 
     private void joinEvent(@NotNull GuildJoinEvent event) {
