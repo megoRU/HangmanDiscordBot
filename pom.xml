@@ -50,14 +50,14 @@
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>3.5.2</version>
+            <version>3.5.3</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/net.dv8tion/JDA -->
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.3.1</version>
+            <version>5.3.2</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.json/json -->

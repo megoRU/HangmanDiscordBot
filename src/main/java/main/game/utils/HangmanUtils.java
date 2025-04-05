@@ -152,39 +152,40 @@ public class HangmanUtils {
                     cyrillicLetters.stream()
                             .map(String::valueOf)
                             .collect(Collectors.joining(", ")));
-        }
-        List<Character> latinLetters = new ArrayList<>(Arrays.asList(
-                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-                'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-                'U', 'V', 'W', 'X', 'Y', 'Z'
-        ));
+        } else {
+            List<Character> latinLetters = new ArrayList<>(Arrays.asList(
+                    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+                    'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+                    'U', 'V', 'W', 'X', 'Y', 'Z'
+            ));
 
-        if (!usedLetters.isEmpty()) {
-            List<Character> usedCharacters = lettersList.stream()
-                    .map(s -> s.charAt(0))
-                    .toList();
-            latinLetters.removeAll(usedCharacters);
-        }
-        if (usedLetters.isEmpty()) usedLetters = "You haven't used any letters yet";
+            if (!usedLetters.isEmpty()) {
+                List<Character> usedCharacters = lettersList.stream()
+                        .map(s -> s.charAt(0))
+                        .toList();
+                latinLetters.removeAll(usedCharacters);
+            }
+            if (usedLetters.isEmpty()) usedLetters = "You haven't used any letters yet";
 
-        return String.format("""
-                        Answer with one letter without additional text.
-                        The Gallows game You need to guess the letters in the word well.
-                        Dashes are hidden letters that you haven't guessed yet.
-                        
-                        Current word: %s
-                        Category: %s
-                        The word consists of %s letters
-                        Letters used: %s
-                        Unused letters: %s
-                        """,
-                hiddenWord,
-                gameCategory.name(),
-                hiddenWord.length(),
-                usedLetters,
-                latinLetters.stream()
-                        .map(String::valueOf)
-                        .collect(Collectors.joining(", ")));
+            return String.format("""
+                            Answer with one letter without additional text.
+                            The Gallows game You need to guess the letters in the word well.
+                            Dashes are hidden letters that you haven't guessed yet.
+                            
+                            Current word: %s
+                            Category: %s
+                            The word consists of %s letters
+                            Letters used: %s
+                            Unused letters: %s
+                            """,
+                    hiddenWord,
+                    gameCategory.name(),
+                    hiddenWord.length(),
+                    usedLetters,
+                    latinLetters.stream()
+                            .map(String::valueOf)
+                            .collect(Collectors.joining(", ")));
+        }
     }
 
     private static void update(JDA jda, String string) {
