@@ -96,7 +96,7 @@ public class BotStartConfig {
             jdaBuilder.enableIntents(intents);
             jdaBuilder.setActivity(Activity.playing("Starting..."));
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
-            jdaBuilder.addEventListeners(new CoreBot(updateController));
+            jdaBuilder.addEventListeners(coreBot);
             jda = jdaBuilder.build();
 
             jda.awaitReady();
