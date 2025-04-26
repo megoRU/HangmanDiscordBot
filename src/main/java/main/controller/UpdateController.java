@@ -2,7 +2,6 @@ package main.controller;
 
 import lombok.Getter;
 import main.core.ChecksClass;
-import main.core.CoreBot;
 import main.core.events.*;
 import main.enums.Buttons;
 import main.game.Hangman;
@@ -53,9 +52,6 @@ public class UpdateController {
     //LOGGER
     private final static Logger LOGGER = LoggerFactory.getLogger(UpdateController.class.getName());
 
-    //CORE
-    private CoreBot coreBot;
-
     @Autowired
     public UpdateController(HangmanGameRepository hangmanGameRepository,
                             GamesRepository gamesRepository,
@@ -73,10 +69,6 @@ public class UpdateController {
         this.hangmanResult = hangmanResult;
         this.hangmanInputs = hangmanInputs;
         this.hangmanAPI = hangmanAPI;
-    }
-
-    public void registerBot(CoreBot coreBot) {
-        this.coreBot = coreBot;
     }
 
     public void processEvent(Object event) {

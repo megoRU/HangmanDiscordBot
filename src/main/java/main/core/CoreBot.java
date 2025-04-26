@@ -23,10 +23,6 @@ public class CoreBot extends ListenerAdapter {
         this.updateController = updateController;
     }
 
-    public void init() {
-        updateController.registerBot(this);
-    }
-
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         updateController.processEvent(event);

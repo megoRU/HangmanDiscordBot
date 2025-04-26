@@ -64,7 +64,6 @@ public class BotStartConfig {
     public void startBot() {
         try {
             CoreBot coreBot = new CoreBot(updateController);
-            coreBot.init();
 
             languageService.language();
             userSettingsService.settings();
