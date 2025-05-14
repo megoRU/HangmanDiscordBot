@@ -24,13 +24,15 @@ public class CategoryCommand {
     public void category(@NotNull SlashCommandInteractionEvent event) {
         var userIdLong = event.getUser().getIdLong();
 
+        event.deferReply().setEphemeral(true).queue();
+
         String categorySlash = event.getOption("select", OptionMapping::getAsString);
         String gameCategory = jsonParsers.getLocale("game_category", userIdLong);
 
         //Если игрок сейчас играет сменить язык не даст
         if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
             String reactionsButtonWhenPlay = jsonParsers.getLocale("ReactionsButton_When_Play", userIdLong);
-            event.reply(reactionsButtonWhenPlay)
+            event.getHook().sendMessage(reactionsButtonWhenPlay)
                     .setActionRow(HangmanUtils.getButtonStop(userIdLong))
                     .setEphemeral(true)
                     .queue();
@@ -53,13 +55,13 @@ public class CategoryCommand {
             userSettings.setCategory(UserSettings.Category.ALL);
             userSettingsMap.put(userIdLong, userSettings);
 
-            event.reply(gameCategory).setEphemeral(true).queue();
+            event.getHook().sendMessage(gameCategory).setEphemeral(true).queue();
             userSettingsRepository.save(userSettings);
         } else if (categorySlash != null) {
             userSettings.setCategory(UserSettings.Category.valueOf(categorySlash.toUpperCase()));
             userSettingsMap.put(userIdLong, userSettings);
 
-            event.reply(gameCategory).setEphemeral(true).queue();
+            event.getHook().sendMessage(gameCategory).setEphemeral(true).queue();
             userSettingsRepository.save(userSettings);
         }
     }
