@@ -1,37 +1,72 @@
 # HangmanDiscordBot
+
 [![Java CI](https://github.com/megoRU/HangmanDiscordBot/actions/workflows/ci_cd.yml/badge.svg)](https://github.com/megoRU/HangmanDiscordBot/actions/workflows/ci_cd.yml)
 [![Discord](https://img.shields.io/discord/779317239722672128?label=Discord)](https://discord.gg/UrWG3R683d)
-[![Docker Pulls](https://badgen.net/docker/pulls/megoru/hangman?icon=docker&label=pulls)](https://hub.docker.com/r/megoru/hangman/)
-[![Docker Image Size](https://badgen.net/docker/size/megoru/hangman?icon=docker&label=image%20size)](https://hub.docker.com/r/megoru/hangman)
+[![Docker Pulls](https://badgen.net/docker/pulls/megoru/hangman?icon=docker\&label=pulls)](https://hub.docker.com/r/megoru/hangman/)
+[![Docker Image Size](https://badgen.net/docker/size/megoru/hangman?icon=docker\&label=image%20size)](https://hub.docker.com/r/megoru/hangman)
 
-## LICENSE
+A Discord bot that brings the classic Hangman game to your server.
 
-This work is licensed under a [GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.en.html)
+---
 
-## Add bot to your guild
-[Add Hangman](https://discord.com/oauth2/authorize?client_id=845974873682608129)
+## ✨ Features
 
-## Technologies used
+* Multiplayer Hangman game in Discord
+* Persistent game state with MariaDB
+* Dockerized for easy deployment
+* CI/CD via GitHub Actions
 
-- Java 20
-- MariaDB
-- Docker
-- Spring Boot
-- Hibernate
-- Maven
+---
 
-## Running on your server
-1. Move `docker-compose.yml` at the root `/root` VPS server.
-2. Fill it with your data.
-3. Import tables to your `MariaDB`! : `DiscordBotHangman.sql`
-4. Launch the container: `docker-compose up -d`
-5. If you need to update the repository: `docker-compose pull`
-6. If you need to stop: `docker-compose stop`
+## 🚀 Quick Start
 
-## Copyright Notice
+### Add the bot to your server
 
-1. The bot is made using the library: [JDA](https://github.com/DV8FromTheWorld/JDA)
+[Click here to invite](https://discord.com/oauth2/authorize?client_id=845974873682608129)
 
-## Privacy Policy
+### Run with Docker
 
-Here you can read more about what we store and how we store it. [Privacy Policy](https://github.com/megoRU/HangmanDiscordBot/blob/main/.github/privacy.md)
+1. Place `docker-compose.yml` at the root of your VPS (`/root` or other).
+2. Fill in your configuration values (DB credentials, tokens, etc.).
+3. Import `DiscordBotHangman.sql` into your MariaDB instance.
+4. Start the container:
+
+```bash
+docker-compose up -d
+```
+
+5. Update the bot (pull latest image):
+
+```bash
+docker-compose pull && docker-compose up -d
+```
+
+6. Stop the bot:
+
+```bash
+docker-compose stop
+```
+
+---
+
+## 🛠 Tech Stack
+
+* Java 20
+* Spring Boot
+* Hibernate
+* MariaDB
+* Docker
+* Maven
+* [JDA](https://github.com/DV8FromTheWorld/JDA)
+
+---
+
+## 📄 License
+
+This project is licensed under the [GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.en.html).
+
+---
+
+## 🔒 Privacy
+
+Details on data storage and usage are described in the [Privacy Policy](https://github.com/megoRU/HangmanDiscordBot/blob/main/.github/privacy.md).
