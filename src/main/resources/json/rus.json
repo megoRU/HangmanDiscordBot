@@ -106,5 +106,7 @@
   "Game_Opponent_Lost": "Ваш соперник проиграл!",
   "button_play_gpt": "Играть против ChatGPT",
   "hangman_bot_play": "Бот ещё играет попробуйте позже.",
-  "help_gpt": "Играть в Виселицу против бота"
+  "help_gpt": "Играть в Виселицу против бота",
+  "leaderboard_lose": "Поражений: ",
+  "leaderboard_games": "Игр: "
 }

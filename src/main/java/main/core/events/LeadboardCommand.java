@@ -2,7 +2,7 @@ package main.core.events;
 
 import main.jsonparser.JSONParsers;
 import main.model.repository.GamesRepository;
-import main.model.repository.impl.PlayerWins;
+import main.model.repository.impl.PlayerStats;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
@@ -23,44 +23,46 @@ public class LeadboardCommand {
     }
 
     public void board(@NotNull SlashCommandInteractionEvent event) {
-        var userIdLong = event.getUser().getIdLong();
+        long userIdLong = event.getUser().getIdLong();
         event.getInteraction().deferReply().queue();
-        List<PlayerWins> gameList = gamesRepository.findGamesForCurrentMonth();
 
-        StringBuilder stringBuilder = new StringBuilder();
-
-        String gamePlayer = jsonParsers.getLocale("Game_Player", userIdLong);
-        String winsLocale = jsonParsers.getLocale("wins", userIdLong);
-
-
-        for (int i = 0; i < gameList.size(); i++) {
-            PlayerWins playerWins = gameList.get(i);
-            Long wins = playerWins.getWins();
-            Long playerId = playerWins.getId();
-
-            stringBuilder
-                    .append(i + 1)
-                    .append(". ")
-                    .append(gamePlayer)
-                    .append(": <@")
-                    .append(playerId)
-                    .append("> | ")
-                    .append(winsLocale)
-                    .append(wins)
-                    .append("\n");
-        }
+        List<PlayerStats> gameList = gamesRepository.findStatsForCurrentMonth();
 
         String leadboad = jsonParsers.getLocale("leadboad", userIdLong);
+        String leaderboardLose = jsonParsers.getLocale("leaderboard_lose", userIdLong);
+        String wins = jsonParsers.getLocale("wins", userIdLong);
+        String leaderboardGames = jsonParsers.getLocale("leaderboard_games", userIdLong);
 
-        EmbedBuilder embedBuilder = new EmbedBuilder();
-        embedBuilder.setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl());
-        embedBuilder.setColor(0x00FF00);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("🏆 ").append(leadboad).append("\n\n");
 
-        embedBuilder.setDescription(String.format("""
-                %s
-                \s
-                %s
-                """, leadboad, stringBuilder));
+        for (int i = 0; i < gameList.size(); i++) {
+            PlayerStats stats = gameList.get(i);
+
+            String medal = switch (i) {
+                case 0 -> "🥇";
+                case 1 -> "🥈";
+                case 2 -> "🥉";
+                default -> String.format("%d.", i + 1);
+            };
+
+            stringBuilder
+                    .append(medal).append(" <@").append(stats.getId()).append(">\n")
+                    .append("✅ ").append(wins).append(stats.getWins()).append(" | ")
+                    .append("❌ ").append(leaderboardLose).append(stats.getLosses()).append("\n")
+                    .append("📊 Winrate: ").append(stats.getWinrate()).append("% | ")
+                    .append("🎮 ").append(leaderboardGames).append(stats.getTotalGames()).append("\n");
+
+            // Добавляем разделитель только если это не последний игрок
+            if (i != gameList.size() - 1) {
+                stringBuilder.append("─────────────────────────────\n\n");
+            }
+        }
+
+        EmbedBuilder embedBuilder = new EmbedBuilder()
+                .setAuthor(event.getUser().getName(), null, event.getUser().getAvatarUrl())
+                .setColor(0x00FF00)
+                .setDescription(stringBuilder.toString());
 
         event.getHook()
                 .sendMessageEmbeds(embedBuilder.build())

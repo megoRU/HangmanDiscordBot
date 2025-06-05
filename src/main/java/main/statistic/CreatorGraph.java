@@ -10,6 +10,8 @@ import main.model.repository.impl.StatisticMy;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,6 +20,7 @@ public class CreatorGraph {
 
     private static final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private static final Logger LOGGER = Logger.getLogger(CreatorGraph.class.getName());
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     private final GamesRepository gamesRepository;
 
@@ -45,7 +48,10 @@ public class CreatorGraph {
                 case GLOBAL -> {
                     List<StatisticGlobal> statisticList = gamesRepository.getAllStatistic();
                     for (int i = statisticList.size() - 1; i >= 0; i--) {
-                        date.append(date.isEmpty() ? "" : ",").append("'").append(statisticList.get(i).getGameDate(), 0, 7).append("-01").append("'");
+                        String gameDate = statisticList.get(i).getGameDate();
+                        LocalDate localDate = LocalDate.parse(gameDate.substring(0, 7).concat("-01"));
+
+                        date.append(date.isEmpty() ? "" : ",").append("'").append(localDate.format(dateTimeFormatter)).append("'");
                         columnFirst.append(columnFirst.isEmpty() ? "" : ",").append("'").append(statisticList.get(i).getCount()).append("'");
                     }
                     setImage(chart, statistic).getShortUrl();
@@ -53,7 +59,10 @@ public class CreatorGraph {
                 case MY -> {
                     List<StatisticMy> statisticList = gamesRepository.getAllMyStatistic(userIdLong);
                     for (int i = statisticList.size() - 1; i >= 0; i--) {
-                        date.append(date.isEmpty() ? "" : ",").append("'").append(statisticList.get(i).getGameDate(), 0, 7).append("-01").append("'");
+                        String gameDate = statisticList.get(i).getGameDate();
+                        LocalDate localDate = LocalDate.parse(gameDate.substring(0, 7).concat("-01"));
+
+                        date.append(date.isEmpty() ? "" : ",").append("'").append(localDate.format(dateTimeFormatter)).append("'");
                         columnFirst.append(columnFirst.isEmpty() ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ONES()).append("'");
                         columnSecond.append(columnSecond.isEmpty() ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ZEROS()).append("'");
                     }
