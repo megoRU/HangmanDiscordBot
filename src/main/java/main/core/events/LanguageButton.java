@@ -21,13 +21,13 @@ public class LanguageButton {
 
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final UserSettingsRepository userSettingsRepository;
+    private final static HangmanRegistry instance = HangmanRegistry.getInstance();
 
     public void language(@NotNull ButtonInteractionEvent event) {
         event.editButton(event.getButton().asDisabled()).queue();
         var userId = event.getUser().getIdLong();
 
-        boolean hasHangman = HangmanRegistry.getInstance().hasHangman(userId);
-        if (hasHangman) {
+        if (instance.hasHangman(userId)) {
             String reactionsButtonWhenPlay = jsonParsers.getLocale("ReactionsButton_When_Play", event.getUser().getIdLong());
             event.getHook().sendMessage(reactionsButtonWhenPlay)
                     .setEphemeral(true)
@@ -50,7 +50,6 @@ public class LanguageButton {
     }
 
     private void setGameLanguage(long userId, String language) {
-
         Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
         UserSettings userSettings = userSettingsMap.get(userId);
 

@@ -25,14 +25,14 @@ public class CompetitiveService {
     private final CompetitiveQueueRepository competitiveQueueRepository;
     private final HangmanDataSaving hangmanDataSaving;
     private final HangmanAPI hangmanAPI;
+    private final static HangmanRegistry instance = HangmanRegistry.getInstance();
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CompetitiveService.class.getName());
 
     public void startGame(JDA jda) {
-        HangmanRegistry hangmanRegistry = HangmanRegistry.getInstance();
-        int competitiveQueueSize = hangmanRegistry.getCompetitiveQueueSize();
+        int competitiveQueueSize = instance.getCompetitiveQueueSize();
         if (competitiveQueueSize > 1) {
-            HangmanPlayer[] competitivePlayers = hangmanRegistry.getCompetitivePlayers();
+            HangmanPlayer[] competitivePlayers = instance.getCompetitivePlayers();
             if (competitivePlayers.length > 1) {
                 long userId = competitivePlayers[0].getUserId();
 
@@ -46,7 +46,7 @@ public class CompetitiveService {
 
                         if (userSettings == null) {
                             competitiveQueueRepository.deleteById(currentPlayerUserId);
-                            hangmanRegistry.removeFromCompetitiveQueue(currentPlayerUserId);
+                            instance.removeFromCompetitiveQueue(currentPlayerUserId);
                             return;
                         }
 
@@ -58,7 +58,7 @@ public class CompetitiveService {
                         hangmanBuilder.setAgainstPlayerId(anotherUserId);
 
                         Hangman hangman = hangmanBuilder.build();
-                        HangmanRegistry.getInstance().setHangman(currentPlayerUserId, hangman);
+                        instance.setHangman(currentPlayerUserId, hangman);
 
                         jda.retrieveUserById(currentPlayerUserId)
                                 .queue(user -> user.openPrivateChannel()
@@ -68,7 +68,7 @@ public class CompetitiveService {
 
                         //Удаляем из очереди
                         competitiveQueueRepository.deleteById(currentPlayerUserId);
-                        hangmanRegistry.removeFromCompetitiveQueue(currentPlayerUserId);
+                        instance.removeFromCompetitiveQueue(currentPlayerUserId);
                     }
                 } catch (Exception e) {
                     jda.retrieveUserById(userId)

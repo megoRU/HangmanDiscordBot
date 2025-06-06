@@ -28,6 +28,7 @@ public class CompetitivePlayGPT {
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final HangmanAPI hangmanAPI;
     private final HangmanDataSaving hangmanDataSaving;
+    private final static HangmanRegistry instance = HangmanRegistry.getInstance();
 
     public void competitive(@NotNull ButtonInteractionEvent event) {
         var userId = event.getUser().getIdLong();
@@ -48,9 +49,7 @@ public class CompetitivePlayGPT {
         }
         UserSettings.GameLanguage userGameLanguage = userSettings.getGameLanguage();
 
-        HangmanRegistry hangmanRegistry = HangmanRegistry.getInstance();
-
-        if (!hangmanRegistry.hasHangman(userId) && !hangmanRegistry.hasHangman(-userId)) {
+        if (!instance.hasHangman(userId) && !instance.hasHangman(-userId)) {
             HangmanBuilder.Builder hangmanUser = new HangmanBuilder.Builder();
             try {
                 String word = hangmanAPI.getWord(userId);
@@ -70,8 +69,8 @@ public class CompetitivePlayGPT {
                 Hangman build = hangmanUser.build();
                 Hangman buildGPT = hangmanBuilderGPT.build();
 
-                hangmanRegistry.setHangman(userId, build);
-                hangmanRegistry.setHangman(-userId, buildGPT);
+                instance.setHangman(userId, build);
+                instance.setHangman(-userId, buildGPT);
 
                 String createGame = jsonParsers.getLocale("create_game", userId);
                 event.getHook().sendMessage(createGame).queue();
@@ -81,12 +80,12 @@ public class CompetitivePlayGPT {
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
             }
-        } else if (hangmanRegistry.hasHangman(userId)) {
+        } else if (instance.hasHangman(userId)) {
             String youArePlayNow = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
             event.getHook().sendMessage(youArePlayNow)
                     .setActionRow(HangmanUtils.getButtonStop(userId))
                     .queue();
-        } else if (hangmanRegistry.hasHangman(-userId)) {
+        } else if (instance.hasHangman(-userId)) {
             String hangmanBotPlay = jsonParsers.getLocale("hangman_bot_play", event.getUser().getIdLong());
             event.getHook().sendMessage(hangmanBotPlay)
                     .setActionRow(HangmanUtils.getButtonGPT(userId))

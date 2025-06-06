@@ -61,72 +61,92 @@ public class ChecksClass {
     }
 
     private static void sendMessage(@NotNull Event event, String checkPermissions, boolean canWrite) {
-        if (event instanceof SlashCommandInteractionEvent slashEvent) {
-            slashEvent.reply(checkPermissions).queue();
-        } else if (event instanceof UserContextInteractionEvent contextEvent) {
-            contextEvent.reply(checkPermissions).queue();
-        } else if (event instanceof ButtonInteractionEvent buttonInteractionEvent) {
-            buttonInteractionEvent.reply(checkPermissions).queue();
-        } else {
-            if (canWrite) {
-                MessageReceivedEvent messageReceivedEvent = (MessageReceivedEvent) event;
-                messageReceivedEvent.getChannel().sendMessage(checkPermissions).queue();
+        switch (event) {
+            case SlashCommandInteractionEvent slashEvent -> slashEvent.reply(checkPermissions).queue();
+            case UserContextInteractionEvent contextEvent -> contextEvent.reply(checkPermissions).queue();
+            case ButtonInteractionEvent buttonInteractionEvent ->
+                    buttonInteractionEvent.reply(checkPermissions).queue();
+            default -> {
+                if (canWrite) {
+                    MessageReceivedEvent messageReceivedEvent = (MessageReceivedEvent) event;
+                    messageReceivedEvent.getChannel().sendMessage(checkPermissions).queue();
+                }
             }
         }
     }
 
     private static MessageChannelUnion getChannel(@NotNull Event event) {
-        if (event instanceof SlashCommandInteractionEvent slashEvent) {
-            return slashEvent.getChannel();
-        } else if (event instanceof UserContextInteractionEvent contextEvent) {
-            return (MessageChannelUnion) contextEvent.getMessageChannel();
-        } else if (event instanceof ButtonInteractionEvent buttonInteractionEvent) {
-            return buttonInteractionEvent.getChannel();
-        } else {
-            MessageReceivedEvent messageReceivedEvent = (MessageReceivedEvent) event;
-            return messageReceivedEvent.getChannel();
+        switch (event) {
+            case SlashCommandInteractionEvent slashEvent -> {
+                return slashEvent.getChannel();
+            }
+            case UserContextInteractionEvent contextEvent -> {
+                return (MessageChannelUnion) contextEvent.getMessageChannel();
+            }
+            case ButtonInteractionEvent buttonInteractionEvent -> {
+                return buttonInteractionEvent.getChannel();
+            }
+            default -> {
+                MessageReceivedEvent messageReceivedEvent = (MessageReceivedEvent) event;
+                return messageReceivedEvent.getChannel();
+            }
         }
     }
 
     private static User getUser(@NotNull Event event) {
-        if (event instanceof SlashCommandInteractionEvent slashEvent) {
-            return slashEvent.getUser();
-        } else if (event instanceof UserContextInteractionEvent contextEvent) {
-            return contextEvent.getUser();
-        } else if (event instanceof ButtonInteractionEvent buttonInteractionEvent) {
-            return buttonInteractionEvent.getUser();
-        } else {
-            MessageReceivedEvent messageReceivedEvent = (MessageReceivedEvent) event;
-            return messageReceivedEvent.getAuthor();
+        switch (event) {
+            case SlashCommandInteractionEvent slashEvent -> {
+                return slashEvent.getUser();
+            }
+            case UserContextInteractionEvent contextEvent -> {
+                return contextEvent.getUser();
+            }
+            case ButtonInteractionEvent buttonInteractionEvent -> {
+                return buttonInteractionEvent.getUser();
+            }
+            default -> {
+                MessageReceivedEvent messageReceivedEvent = (MessageReceivedEvent) event;
+                return messageReceivedEvent.getAuthor();
+            }
         }
     }
 
     @Nullable
     private static Guild getGuild(@NotNull Event event) {
-        if (event instanceof SlashCommandInteractionEvent slashEvent) {
-            return slashEvent.getGuild();
-        } else if (event instanceof UserContextInteractionEvent contextEvent) {
-            return contextEvent.getGuild();
-        } else if (event instanceof ButtonInteractionEvent buttonInteractionEvent) {
-            return buttonInteractionEvent.getGuild();
-        } else {
-            MessageReceivedEvent messageReceivedEvent = (MessageReceivedEvent) event;
-            boolean isFromGuild = messageReceivedEvent.isFromGuild();
-            if (isFromGuild) return messageReceivedEvent.getGuild();
-            else return null;
+        switch (event) {
+            case SlashCommandInteractionEvent slashEvent -> {
+                return slashEvent.getGuild();
+            }
+            case UserContextInteractionEvent contextEvent -> {
+                return contextEvent.getGuild();
+            }
+            case ButtonInteractionEvent buttonInteractionEvent -> {
+                return buttonInteractionEvent.getGuild();
+            }
+            default -> {
+                MessageReceivedEvent messageReceivedEvent = (MessageReceivedEvent) event;
+                boolean isFromGuild = messageReceivedEvent.isFromGuild();
+                if (isFromGuild) return messageReceivedEvent.getGuild();
+                else return null;
+            }
         }
     }
 
     private static ChannelType getType(@NotNull Event event) {
-        if (event instanceof SlashCommandInteractionEvent slashEvent) {
-            return slashEvent.getChannelType();
-        } else if (event instanceof UserContextInteractionEvent contextEvent) {
-            return contextEvent.getChannelType();
-        } else if (event instanceof ButtonInteractionEvent buttonInteractionEvent) {
-            return buttonInteractionEvent.getChannelType();
-        } else {
-            MessageReceivedEvent messageReceivedEvent = (MessageReceivedEvent) event;
-            return messageReceivedEvent.getChannelType();
+        switch (event) {
+            case SlashCommandInteractionEvent slashEvent -> {
+                return slashEvent.getChannelType();
+            }
+            case UserContextInteractionEvent contextEvent -> {
+                return contextEvent.getChannelType();
+            }
+            case ButtonInteractionEvent buttonInteractionEvent -> {
+                return buttonInteractionEvent.getChannelType();
+            }
+            default -> {
+                MessageReceivedEvent messageReceivedEvent = (MessageReceivedEvent) event;
+                return messageReceivedEvent.getChannelType();
+            }
         }
     }
 

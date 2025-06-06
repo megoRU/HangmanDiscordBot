@@ -20,7 +20,7 @@ public class StopCommand {
 
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final JSONParsers jsonGameParsers = new JSONParsers(JSONParsers.Locale.GAME);
-
+    private final static HangmanRegistry instance = HangmanRegistry.getInstance();
     private final HangmanGameRepository hangmanGameRepository;
 
     @Autowired
@@ -33,8 +33,8 @@ public class StopCommand {
         var userIdLong = updateController.getUserId(event);
 
         //Проверяем играет ли сейчас игрок. Если да удаляем игру.
-        HangmanRegistry instance = HangmanRegistry.getInstance();
         Hangman hangman = instance.getActiveHangman(userIdLong);
+
         if (hangman != null) {
             boolean competitive = hangman.isCompetitive();
             if (competitive) {

@@ -20,6 +20,7 @@ public class LanguageCommand {
     //Language
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final UserSettingsRepository userSettingsRepository;
+    private final static HangmanRegistry instance = HangmanRegistry.getInstance();
 
     public void language(@NotNull SlashCommandInteractionEvent event) {
         var userIdLong = event.getUser().getIdLong();
@@ -36,7 +37,7 @@ public class LanguageCommand {
         }
 
         //Если игрок сейчас играет сменить язык не даст
-        if (HangmanRegistry.getInstance().hasHangman(userIdLong)) {
+        if (instance.hasHangman(userIdLong)) {
             String reactionsButtonWhenPlay = jsonParsers.getLocale("ReactionsButton_When_Play", userIdLong);
             event.reply(reactionsButtonWhenPlay)
                     .setActionRow(HangmanUtils.getButtonStop(userIdLong))

@@ -31,6 +31,7 @@ public class HangmanButton {
 
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
     private final HangmanDataSaving hangmanDataSaving;
+    private final static HangmanRegistry instance = HangmanRegistry.getInstance();
 
     public void hangman(@NotNull ButtonInteractionEvent event) {
         if (event.getButton().getId() == null) return;
@@ -43,8 +44,6 @@ public class HangmanButton {
         String gameLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", event.getUser().getIdLong());
         Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
         UserSettings userSettings = userSettingsMap.get(userIdLong);
-
-        HangmanRegistry instance = HangmanRegistry.getInstance();
 
         if (userSettings == null) {
             event.getHook().sendMessage(gameLanguage)

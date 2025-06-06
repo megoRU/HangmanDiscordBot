@@ -17,10 +17,10 @@ import java.util.List;
 public class HangmanGetService {
 
     private final HangmanGameRepository hangmanGameRepository;
+    private final static HangmanRegistry instance = HangmanRegistry.getInstance();
 
     public void update() {
         List<ActiveHangman> activeHangmanList = hangmanGameRepository.findAll();
-        HangmanRegistry instance = HangmanRegistry.getInstance();
 
         for (ActiveHangman activeHangman : activeHangmanList) {
             Long userIdLong = activeHangman.getUserIdLong();

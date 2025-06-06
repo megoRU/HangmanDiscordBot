@@ -22,6 +22,7 @@ public class DeleteMessage {
 
     private final GamesRepository gamesRepository;
     private final UserSettingsRepository userSettingsRepository;
+    private final static HangmanRegistry instance = HangmanRegistry.getInstance();
 
     public void delete(@NotNull MessageReceivedEvent event) {
         String message = event.getMessage().getContentRaw();
@@ -38,7 +39,7 @@ public class DeleteMessage {
 
             userSettingsMap.remove(userIdLong);
             BotStartConfig.getSecretCode().remove(userIdLong);
-            HangmanRegistry.getInstance().removeHangman(userIdLong);
+            instance.removeHangman(userIdLong);
 
             gamesRepository.deleteGameByUserIdLong(userIdLong);
             userSettingsRepository.deleteByUserIdLong(userIdLong);

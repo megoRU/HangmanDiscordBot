@@ -14,6 +14,7 @@ public class CompetitiveStopButton {
 
     private final CompetitiveQueueRepository competitiveQueueRepository;
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
+    private final static HangmanRegistry instance = HangmanRegistry.getInstance();
 
     @Autowired
     public CompetitiveStopButton(CompetitiveQueueRepository competitiveQueueRepository) {
@@ -22,7 +23,6 @@ public class CompetitiveStopButton {
 
     public void stop(@NotNull ButtonInteractionEvent event) {
         long userIdLong = event.getUser().getIdLong();
-        HangmanRegistry instance = HangmanRegistry.getInstance();
         instance.removeFromCompetitiveQueue(userIdLong);
         String deleteCompetitiveSearch = jsonParsers.getLocale("delete_competitive_search", userIdLong);
         event.getHook().sendMessage(deleteCompetitiveSearch).queue();

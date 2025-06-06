@@ -17,13 +17,13 @@ public class DeleteEvent {
 
     private final HangmanGameRepository hangmanGameRepository;
     private final static Logger LOGGER = LoggerFactory.getLogger(DeleteEvent.class.getName());
+    private final static HangmanRegistry instance = HangmanRegistry.getInstance();
 
     public void handle(@NotNull MessageDeleteEvent event) {
         var messageId = event.getMessageIdLong();
         boolean fromGuild = event.isFromGuild();
 
         if (fromGuild) {
-            HangmanRegistry instance = HangmanRegistry.getInstance();
             Hangman hangman = instance.isMessageIdHas(messageId);
 
             if (hangman != null) {

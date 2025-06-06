@@ -13,14 +13,13 @@ import org.springframework.stereotype.Service;
 public class UpdateStatisticsService {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(UpdateStatisticsService.class.getName());
-
+    private final static HangmanRegistry instance = HangmanRegistry.getInstance();
     public static String activity = "Preparing a cake...";
 
     public void update(JDA jda) {
         if (Config.isIsDev() && jda == null) return;
 
         try {
-            HangmanRegistry instance = HangmanRegistry.getInstance();
             int competitiveQueueSize = instance.getCompetitiveQueueSize();
             int serverCount = jda.getGuilds().size();
 

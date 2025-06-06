@@ -20,6 +20,7 @@ public class CompetitivePlayButton {
 
     private final CompetitiveQueueRepository competitiveQueueRepository;
     private final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
+    private final static HangmanRegistry instance = HangmanRegistry.getInstance();
 
     @Autowired
     public CompetitivePlayButton(CompetitiveQueueRepository competitiveQueueRepository) {
@@ -54,9 +55,7 @@ public class CompetitivePlayButton {
 
             UserSettings.GameLanguage userGameLanguage = userSettings.getGameLanguage();
 
-            HangmanRegistry hangmanRegistry = HangmanRegistry.getInstance();
-
-            if (!hangmanRegistry.hasCompetitive(userId) && !hangmanRegistry.hasHangman(userId)) {
+            if (!instance.hasCompetitive(userId) && !instance.hasHangman(userId)) {
                 String addedToTheQueue = jsonParsers.getLocale("added_to_the_queue", event.getUser().getIdLong());
 
                 CompetitiveQueue competitiveQueue = new CompetitiveQueue();
@@ -66,13 +65,13 @@ public class CompetitivePlayButton {
                 competitiveQueueRepository.save(competitiveQueue);
 
                 HangmanPlayer hangmanPlayer = new HangmanPlayer(userId, null, messageChannel, userGameLanguage);
-                hangmanRegistry.addCompetitiveQueue(hangmanPlayer);
+                instance.addCompetitiveQueue(hangmanPlayer);
 
                 event.getHook().sendMessage(addedToTheQueue)
                         .setActionRow(HangmanUtils.getButtonLeaveSearch(userId))
                         .queue();
 
-            } else if (hangmanRegistry.hasHangman(userId)) {
+            } else if (instance.hasHangman(userId)) {
                 String youArePlayNow = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
                 event.getHook().sendMessage(youArePlayNow).queue();
             } else {
