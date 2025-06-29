@@ -1,6 +1,7 @@
 package main.game;
 
 import main.config.BotStartConfig;
+import main.core.ChecksClass;
 import main.enums.GameStatus;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
@@ -169,10 +170,13 @@ public class HangmanEmbedUtils {
         if (guild == null) return;
 
         GuildMessageChannel channel = getGuildChannel(guild, channelId);
+
         if (channel != null) {
-            MessageEditAction action = channel.editMessageEmbedsById(messageId, embedBuilder.build());
-            if (buttons != null) action.setActionRow(buttons);
-            action.queue(null, throwable -> handleEditException(throwable, userId, hangmanGameRepository));
+            if (ChecksClass.check(channel)) {
+                MessageEditAction action = channel.editMessageEmbedsById(messageId, embedBuilder.build());
+                if (buttons != null) action.setActionRow(buttons);
+                action.queue(null, throwable -> handleEditException(throwable, userId, hangmanGameRepository));
+            }
         }
     }
 

@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -20,13 +21,15 @@ public class ChecksClass {
 
     public static final JSONParsers jsonParsers = new JSONParsers(JSONParsers.Locale.BOT);
 
+    public static boolean check(@NotNull GuildMessageChannel channel) {
+        return hasPermission(channel);
+    }
+
     public static boolean check(@NotNull Event event) {
         Guild guild = getGuild(event);
         if (guild == null || getType(event) == ChannelType.PRIVATE) return true;
 
-        Member selfMember = guild.getSelfMember();
         StringBuilder stringBuilder = new StringBuilder();
-
         MessageChannelUnion channel = getChannel(event);
 
         boolean canWrite = true;
@@ -35,17 +38,17 @@ public class ChecksClass {
 
         switch (channel.getType()) {
             case NEWS -> {
-                canWrite = canWrite(channel.asNewsChannel(), selfMember, stringBuilder);
-                permissions = hasPermission(channel.asNewsChannel(), selfMember, stringBuilder);
+                canWrite = canWrite(channel.asNewsChannel(), stringBuilder);
+                permissions = hasPermission(channel.asNewsChannel(), stringBuilder);
             }
             case TEXT -> {
-                canWrite = canWrite(channel.asTextChannel(), selfMember, stringBuilder);
-                permissions = hasPermission(channel.asTextChannel(), selfMember, stringBuilder);
+                canWrite = canWrite(channel.asTextChannel(), stringBuilder);
+                permissions = hasPermission(channel.asTextChannel(), stringBuilder);
             }
             case GUILD_PUBLIC_THREAD, GUILD_NEWS_THREAD, GUILD_PRIVATE_THREAD -> {
-                canWrite = canWrite(channel.asThreadChannel(), selfMember, stringBuilder);
-                canWriteThreads = canWriteThreads(channel.asThreadChannel(), selfMember, stringBuilder);
-                permissions = hasPermission(channel.asThreadChannel(), selfMember, stringBuilder);
+                canWrite = canWrite(channel.asThreadChannel(), stringBuilder);
+                canWriteThreads = canWriteThreads(channel.asThreadChannel(), stringBuilder);
+                permissions = hasPermission(channel.asThreadChannel(), stringBuilder);
             }
         }
 
@@ -150,8 +153,9 @@ public class ChecksClass {
         }
     }
 
-    private static boolean canWriteThreads(GuildChannel channel, Member selfMember, StringBuilder stringBuilder) {
+    private static boolean canWriteThreads(GuildChannel channel, StringBuilder stringBuilder) {
         boolean canWrite = true;
+        Member selfMember = channel.getGuild().getSelfMember();
 
         if (!selfMember.hasPermission(channel, Permission.MESSAGE_SEND_IN_THREADS)) {
             stringBuilder.append(stringBuilder.isEmpty() ? "`Permission.MESSAGE_SEND_IN_THREADS`" : ",\n`Permission.MESSAGE_SEND_IN_THREADS`");
@@ -161,8 +165,9 @@ public class ChecksClass {
         return canWrite;
     }
 
-    private static boolean canWrite(GuildChannel channel, Member selfMember, StringBuilder stringBuilder) {
+    private static boolean canWrite(GuildChannel channel, StringBuilder stringBuilder) {
         boolean canWrite = true;
+        Member selfMember = channel.getGuild().getSelfMember();
 
         if (!selfMember.hasPermission(channel, Permission.MESSAGE_SEND)) {
             stringBuilder.append(stringBuilder.isEmpty() ? "`Permission.MESSAGE_SEND`" : ",\n`Permission.MESSAGE_SEND`");
@@ -177,8 +182,14 @@ public class ChecksClass {
         return canWrite;
     }
 
-    private static boolean hasPermission(GuildChannel channel, Member selfMember, StringBuilder stringBuilder) {
+    private static boolean hasPermission(GuildChannel channel) {
+        Member selfMember = channel.getGuild().getSelfMember();
+        return selfMember.hasPermission(channel, Permission.VIEW_CHANNEL);
+    }
+
+    private static boolean hasPermission(GuildChannel channel, StringBuilder stringBuilder) {
         boolean bool = true;
+        Member selfMember = channel.getGuild().getSelfMember();
 
         if (!selfMember.hasPermission(channel, Permission.MESSAGE_HISTORY)) {
             stringBuilder.append(stringBuilder.isEmpty() ? "`Permission.MESSAGE_HISTORY`" : ",\n`Permission.MESSAGE_HISTORY`");
@@ -187,6 +198,11 @@ public class ChecksClass {
 
         if (!selfMember.hasPermission(channel, Permission.MESSAGE_EMBED_LINKS)) {
             stringBuilder.append(stringBuilder.isEmpty() ? "`Permission.MESSAGE_EMBED_LINKS`" : ",\n`Permission.MESSAGE_EMBED_LINKS`");
+            bool = false;
+        }
+
+        if (!selfMember.hasPermission(channel, Permission.VIEW_CHANNEL)) {
+            stringBuilder.append(stringBuilder.isEmpty() ? "`Permission.VIEW_CHANNEL`" : ",\n`Permission.VIEW_CHANNEL`");
             bool = false;
         }
 
