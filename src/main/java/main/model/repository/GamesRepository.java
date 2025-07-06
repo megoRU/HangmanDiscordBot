@@ -42,7 +42,8 @@ public interface GamesRepository extends JpaRepository<Game, Long> {
             "COUNT(*) AS total_games, " +
             "ROUND(SUM(result = true) / COUNT(*) * 100, 0) AS winrate " +
             "FROM games " +
-            "WHERE MONTH(game_date) = MONTH(NOW()) " +
+            "WHERE user_id_long > 0 " +
+            "MONTH(game_date) = MONTH(NOW()) " +
             "AND YEAR(game_date) = YEAR(NOW()) " +
             "GROUP BY user_id_long " +
             "ORDER BY wins DESC LIMIT 10", nativeQuery = true)
