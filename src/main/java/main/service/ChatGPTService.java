@@ -39,6 +39,8 @@ public class ChatGPTService {
                     .build();
 
             ChatRequest chatRequest = new ChatRequest();
+            chatRequest.setModel("gpt-5-mini");
+            chatRequest.setMaxTokens(null);
 
             String guesses = HangmanUtils.getGuesses(hangman.getGuesses());
             String wordHidden = hangman.getWORD_HIDDEN().replaceAll(" ", "");
