@@ -37,7 +37,7 @@
         <dependency>
             <groupId>com.github.megoRU</groupId>
             <artifactId>api.megoru.ru-wrapper</artifactId>
-            <version>5.0.4</version>
+            <version>5.1.1</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
