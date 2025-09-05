@@ -9,7 +9,7 @@ import main.model.entity.ActiveHangman;
 import main.model.repository.HangmanGameRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -32,7 +32,7 @@ public class HangmanGetService {
             String currentHiddenWord = activeHangman.getCurrentHiddenWord();
             String guesses = activeHangman.getGuesses();
             Integer hangmanErrors = activeHangman.getHangmanErrors();
-            LocalDateTime gameCreatedTime = activeHangman.getGameCreatedTime().toLocalDateTime();
+            Instant gameCreatedTime = activeHangman.getGameCreatedTime();
             Boolean isCompetitive = activeHangman.getIsCompetitive();
             Long againstPlayerId = activeHangman.getAgainstPlayerId();
             Boolean isOpponentLose = activeHangman.getIsOpponentLose();

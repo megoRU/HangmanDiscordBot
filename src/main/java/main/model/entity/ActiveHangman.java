@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -48,7 +48,7 @@ public class ActiveHangman {
     private Integer hangmanErrors;
 
     @Column(name = "game_created_time", nullable = false)
-    private Timestamp gameCreatedTime;
+    private Instant gameCreatedTime;
 
     @Column(name = "is_competitive", nullable = false)
     private Boolean isCompetitive;

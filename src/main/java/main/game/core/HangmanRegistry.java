@@ -6,7 +6,7 @@ import main.game.HangmanPlayer;
 import main.model.entity.UserSettings;
 import org.jetbrains.annotations.Nullable;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +17,7 @@ public class HangmanRegistry {
 
     //Long это UserIdLong
     private static final ConcurrentMap<Long, Hangman> activeHangman = new ConcurrentHashMap<>();
-    private static final ConcurrentMap<Hangman, Timestamp> hangmanTimer = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Hangman, Instant> hangmanTimer = new ConcurrentHashMap<>();
     private static final ConcurrentMap<Long, HangmanPlayer> competitiveQueue = new ConcurrentHashMap<>();
     private static volatile HangmanRegistry hangmanRegistry;
 
@@ -56,7 +56,7 @@ public class HangmanRegistry {
         }
     }
 
-    public void setHangmanTimer(Hangman hangman, Timestamp timestamp) {
+    public void setHangmanTimer(Hangman hangman, Instant timestamp) {
         hangmanTimer.put(hangman, timestamp);
     }
 
@@ -125,7 +125,7 @@ public class HangmanRegistry {
         }
     }
 
-    public Timestamp getHangmanTimer(Hangman hangman) {
+    public Instant getHangmanTimer(Hangman hangman) {
         return hangmanTimer.get(hangman);
     }
 

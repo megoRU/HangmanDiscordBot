@@ -12,9 +12,8 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Objects;
@@ -70,7 +69,7 @@ public class Hangman {
                    String word,
                    String WORD_HIDDEN,
                    int hangmanErrors,
-                   LocalDateTime localDateTime,
+                   Instant instant,
                    boolean isCompetitive,
                    @Nullable Long againstPlayerId,
                    boolean isOpponentLose,
@@ -96,7 +95,7 @@ public class Hangman {
         this.WORD_HIDDEN = WORD_HIDDEN;
         this.hangmanErrors = hangmanErrors;
         this.WORD_OF_CHARS = word.split("");
-        setTimer(localDateTime);
+        setTimer(instant);
         return this;
     }
 
@@ -117,7 +116,7 @@ public class Hangman {
         hangmanDataSaving.saveGame(this);
 
         //Установка авто завершения
-        setTimer(LocalDateTime.now());
+        setTimer(Instant.now());
     }
 
     public void startGame(MessageChannel textChannel, String word, HangmanDataSaving hangmanDataSaving) {
@@ -140,7 +139,7 @@ public class Hangman {
         });
 
         //Установка авто завершения
-        setTimer(LocalDateTime.now());
+        setTimer(Instant.now());
     }
 
     public void startGame(MessageChannel textChannel, HangmanDataSaving hangmanDataSaving) {
@@ -161,7 +160,7 @@ public class Hangman {
         hangmanDataSaving.saveGame(this);
 
         //Установка авто завершения
-        setTimer(LocalDateTime.now());
+        setTimer(Instant.now());
     }
 
     //Создает скрытую линию из длины слова
@@ -222,9 +221,9 @@ public class Hangman {
         return WORD != null ? WORD.length() : 0;
     }
 
-    private void setTimer(LocalDateTime ldt) {
-        Timestamp timestamp = Timestamp.valueOf(ldt.atZone(ZoneOffset.UTC).toLocalDateTime().plusMinutes(AUTO_FINISH_MINUTES));
-        HangmanRegistry.getInstance().setHangmanTimer(this, timestamp);
+    private void setTimer(Instant instant) {
+        Instant instantPlus10Minutes = instant.plus(AUTO_FINISH_MINUTES, ChronoUnit.MINUTES);
+        HangmanRegistry.getInstance().setHangmanTimer(this, instantPlus10Minutes);
     }
 
     String getUserIdWithDiscord() {

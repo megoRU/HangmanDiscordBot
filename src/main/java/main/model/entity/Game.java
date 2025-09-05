@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -28,7 +28,7 @@ public class Game {
     private Boolean isCompetitive;
 
     @Column(name = "game_date", nullable = false)
-    private Timestamp gameDate;
+    private Instant gameDate;
 
     @Column(name = "user_id_long", nullable = false)
     private Long userIdLong;

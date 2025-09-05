@@ -5,9 +5,7 @@ import main.model.repository.HangmanGameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.Instant;
 
 @Service
 public class HangmanDataSaving {
@@ -35,7 +33,6 @@ public class HangmanDataSaving {
 
         ActiveHangman activeHangman = new ActiveHangman();
         activeHangman.setUserIdLong(userId);
-        Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now().atZone(ZoneOffset.UTC).toLocalDateTime());
 
         if (hangmanPlayers.length > 1) {
             StringBuilder stringBuilder = new StringBuilder();
@@ -53,7 +50,7 @@ public class HangmanDataSaving {
         activeHangman.setHangmanErrors(hangmanErrors);
         activeHangman.setIsCompetitive(competitive);
         activeHangman.setAgainstPlayerId(againstPlayerId);
-        activeHangman.setGameCreatedTime(timestamp);
+        activeHangman.setGameCreatedTime(Instant.now());
         hangmanGameRepository.saveAndFlush(activeHangman);
     }
 }

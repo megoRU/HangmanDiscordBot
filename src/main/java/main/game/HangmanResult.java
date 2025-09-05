@@ -6,7 +6,6 @@ import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,7 @@ public class HangmanResult {
             Game game = new Game();
             game.setResult(result);
             game.setIsCompetitive(isCompetitive);
-            game.setGameDate(new Timestamp(Instant.now().toEpochMilli()));
+            game.setGameDate(Instant.now());
             game.setUserIdLong(player.getUserId());
 
             gameList.add(game);
@@ -41,7 +40,7 @@ public class HangmanResult {
         Game game = new Game();
         game.setResult(result);
         game.setIsCompetitive(isCompetitive);
-        game.setGameDate(new Timestamp(Instant.now().toEpochMilli()));
+        game.setGameDate(Instant.now());
         game.setUserIdLong(userId);
         gamesRepository.saveAndFlush(game);
         hangmanGameRepository.deleteActiveGame(userId);

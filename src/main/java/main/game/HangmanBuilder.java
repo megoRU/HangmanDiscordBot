@@ -2,7 +2,7 @@ package main.game;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -19,7 +19,7 @@ public interface HangmanBuilder {
         private String word;
         private String currentHiddenWord;
         private int hangmanErrors;
-        private LocalDateTime localDateTime;
+        private Instant localDateTime;
         private boolean isCompetitive;
         private Long againstPlayerId;
         private boolean isOpponentLose;
@@ -75,7 +75,7 @@ public interface HangmanBuilder {
             return this;
         }
 
-        public Builder setLocalDateTime(LocalDateTime localDateTime) {
+        public Builder setLocalDateTime(Instant localDateTime) {
             this.localDateTime = localDateTime;
             return this;
         }

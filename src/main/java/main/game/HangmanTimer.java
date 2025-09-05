@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -34,9 +34,10 @@ public class HangmanTimer extends TimerTask {
     public void run() {
         Collection<Hangman> allGames = HangmanRegistry.getInstance().getAllGames();
         allGames.forEach(hangman -> {
-                    Timestamp localTimestamp = new Timestamp(System.currentTimeMillis());
-                    Timestamp hangmanTimestamp = HangmanRegistry.getInstance().getHangmanTimer(hangman);
-                    if (hangmanTimestamp != null && localTimestamp.after(hangmanTimestamp)) {
+                    Instant now = Instant.now();
+                    Instant hangmanTimestamp = HangmanRegistry.getInstance().getHangmanTimer(hangman);
+
+                    if (hangmanTimestamp != null && now.isAfter(hangmanTimestamp)) {
                         hangman.setGameStatus(GameStatus.TIME_OVER);
                         try {
                             HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
