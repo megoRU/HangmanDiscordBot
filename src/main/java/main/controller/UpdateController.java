@@ -14,10 +14,12 @@ import main.model.repository.CompetitiveQueueRepository;
 import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
 import main.model.repository.UserSettingsRepository;
+import main.service.UpdateStatisticsService;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -48,6 +50,7 @@ public class UpdateController {
     private final HangmanResult hangmanResult;
     private final HangmanInputs hangmanInputs;
     private final HangmanAPI hangmanAPI;
+    private final UpdateStatisticsService updateStatisticsService;
 
     //LOGGER
     private final static Logger LOGGER = LoggerFactory.getLogger(UpdateController.class.getName());
@@ -60,7 +63,8 @@ public class UpdateController {
                             HangmanDataSaving hangmanDataSaving,
                             HangmanResult hangmanResult,
                             HangmanInputs hangmanInputs,
-                            HangmanAPI hangmanAPI) {
+                            HangmanAPI hangmanAPI,
+                            UpdateStatisticsService updateStatisticsService) {
         this.hangmanGameRepository = hangmanGameRepository;
         this.gamesRepository = gamesRepository;
         this.userSettingsRepository = userSettingsRepository;
@@ -69,6 +73,7 @@ public class UpdateController {
         this.hangmanResult = hangmanResult;
         this.hangmanInputs = hangmanInputs;
         this.hangmanAPI = hangmanAPI;
+        this.updateStatisticsService = updateStatisticsService;
     }
 
     public void processEvent(Object event) {
@@ -83,6 +88,8 @@ public class UpdateController {
             messageReceivedEvent(messageReceivedEvent);
         } else if (event instanceof GuildJoinEvent guildJoinEvent) {
             joinEvent(guildJoinEvent);
+        } else if (event instanceof GuildLeaveEvent guildLeaveEvent) {
+            leaveEvent(guildLeaveEvent);
         } else if (event instanceof UserContextInteractionEvent userContextInteractionEvent) {
             LOGGER.info(userContextInteractionEvent.getName());
             contextEvent(userContextInteractionEvent);
@@ -92,6 +99,11 @@ public class UpdateController {
         } else if (event instanceof MessageDeleteEvent messageDeleteEvent) {
             messageDeleteEvent(messageDeleteEvent);
         }
+    }
+
+    private void leaveEvent(GuildLeaveEvent guildLeaveEvent) {
+        LeaveEvent leaveEvent = new LeaveEvent(updateStatisticsService);
+        leaveEvent.leave(guildLeaveEvent);
     }
 
     private void messageDeleteEvent(MessageDeleteEvent messageDeleteEvent) {
@@ -274,7 +286,7 @@ public class UpdateController {
     }
 
     private void joinEvent(@NotNull GuildJoinEvent event) {
-        JoinEvent joinEvent = new JoinEvent();
+        JoinEvent joinEvent = new JoinEvent(updateStatisticsService);
         joinEvent.join(event);
     }
 

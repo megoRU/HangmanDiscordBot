@@ -119,6 +119,8 @@ public class BotStartConfig {
                 }
         );
 
+        updateStatistics();
+
         System.out.println("17:37");
         HangmanUtils.updateActivity(jda);
     }
@@ -141,8 +143,7 @@ public class BotStartConfig {
         }
     }
 
-    @Scheduled(fixedDelay = 900, initialDelay = 8, timeUnit = TimeUnit.SECONDS)
-    private void updateStatistics() {
+    public void updateStatistics() {
         try {
             updateStatisticsService.update(jda);
         } catch (Exception e) {

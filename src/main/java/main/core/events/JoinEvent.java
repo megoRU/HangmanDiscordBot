@@ -1,6 +1,8 @@
 package main.core.events;
 
+import lombok.AllArgsConstructor;
 import main.game.utils.HangmanUtils;
+import main.service.UpdateStatisticsService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
@@ -15,9 +17,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Service
+@AllArgsConstructor
 public class JoinEvent {
 
     private final static Logger LOGGER = Logger.getLogger(JoinEvent.class.getName());
+    private final UpdateStatisticsService updateStatisticsService;
 
     public void join(@NotNull GuildJoinEvent event) {
         try {
@@ -56,6 +60,8 @@ public class JoinEvent {
                     }
                 }
             }
+
+            updateStatisticsService.update(event.getJDA());
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
