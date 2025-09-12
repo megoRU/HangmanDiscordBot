@@ -28,7 +28,7 @@ public class DeleteMessage {
         String message = event.getMessage().getContentRaw();
         var userIdLong = event.getAuthor().getIdLong();
         MessageChannelUnion channel = event.getChannel();
-        String[] split = message.split(" ", 2);
+        String[] split = message.split("\\s", 2);
         String secretCode = BotStartConfig.getSecretCode().get(userIdLong);
 
         if (secretCode != null && secretCode.length() > 1 && secretCode.equals(split[1])) {
