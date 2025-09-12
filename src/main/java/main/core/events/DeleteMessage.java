@@ -31,7 +31,7 @@ public class DeleteMessage {
         String[] split = message.split(" ", 2);
         String secretCode = BotStartConfig.getSecretCode().get(userIdLong);
 
-        if (secretCode != null && secretCode.equals(split[1])) {
+        if (secretCode != null && secretCode.length() > 1 && secretCode.equals(split[1])) {
             String restoreDataSuccess = jsonParsers.getLocale("restore_Data_Success", userIdLong);
             channel.sendMessage(restoreDataSuccess).queue();
 
@@ -43,6 +43,9 @@ public class DeleteMessage {
 
             gamesRepository.deleteGameByUserIdLong(userIdLong);
             userSettingsRepository.deleteByUserIdLong(userIdLong);
+        } else {
+            String errorsTitle = jsonParsers.getLocale("errors_title", userIdLong);
+            channel.sendMessage(errorsTitle).queue();
         }
     }
 }
