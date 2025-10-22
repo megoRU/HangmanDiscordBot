@@ -15,6 +15,8 @@ import main.model.repository.GamesRepository;
 import main.model.repository.HangmanGameRepository;
 import main.model.repository.UserSettingsRepository;
 import main.service.UpdateStatisticsService;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.Event;
@@ -25,7 +27,6 @@ import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEven
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +116,7 @@ public class UpdateController {
         boolean permission = ChecksClass.check(event);
         if (!permission) return;
 
-        String buttonId = event.getButton().getId();
+        String buttonId = event.getButton().getCustomId();
         if (buttonId == null) return;
 
         if (Objects.equals(buttonId, Buttons.BUTTON_RUS.name()) || Objects.equals(buttonId, Buttons.BUTTON_ENG.name())) {
@@ -265,12 +266,12 @@ public class UpdateController {
     public void sendMessage(@NotNull Event event, MessageEmbed build, List<Button> buttonList) {
         if (event instanceof SlashCommandInteractionEvent slashEvent) {
             if (slashEvent.isAcknowledged())
-                slashEvent.getHook().sendMessageEmbeds(build).addActionRow(buttonList).queue();
-            else slashEvent.replyEmbeds(build).addActionRow(buttonList).queue();
+                slashEvent.getHook().sendMessageEmbeds(build).setComponents(ActionRow.of(buttonList)).queue();
+            else slashEvent.replyEmbeds(build).setComponents(ActionRow.of(buttonList)).queue();
         } else if (event instanceof ButtonInteractionEvent buttonEvent) {
             if (buttonEvent.isAcknowledged())
-                buttonEvent.getHook().sendMessageEmbeds(build).addActionRow(buttonList).queue();
-            else buttonEvent.replyEmbeds(build).addActionRow(buttonList).queue();
+                buttonEvent.getHook().sendMessageEmbeds(build).setComponents(ActionRow.of(buttonList)).queue();
+            else buttonEvent.replyEmbeds(build).setComponents(ActionRow.of(buttonList)).queue();
         }
     }
 

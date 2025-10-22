@@ -7,6 +7,7 @@ import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
 import main.model.repository.UserSettingsRepository;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class LanguageCommand {
         if (instance.hasHangman(userIdLong)) {
             String reactionsButtonWhenPlay = jsonParsers.getLocale("ReactionsButton_When_Play", userIdLong);
             event.reply(reactionsButtonWhenPlay)
-                    .setActionRow(HangmanUtils.getButtonStop(userIdLong))
+                    .setComponents(ActionRow.of(HangmanUtils.getButtonStop(userIdLong)))
                     .setEphemeral(true)
                     .queue();
         } //0 - game | 1 - bot

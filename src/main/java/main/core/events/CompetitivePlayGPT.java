@@ -11,6 +11,7 @@ import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -41,8 +42,8 @@ public class CompetitivePlayGPT {
 
         if (userSettings == null) {
             event.getHook().sendMessage(gameLanguage)
-                    .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
-                    .addActionRow(HangmanUtils.getButtonPlayCompetitiveAgain(userId))
+                    .addComponents(ActionRow.of(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH))
+                    .addComponents(ActionRow.of(HangmanUtils.getButtonPlayCompetitiveAgain(userId)))
                     .setEphemeral(true)
                     .queue();
             return;
@@ -83,12 +84,12 @@ public class CompetitivePlayGPT {
         } else if (instance.hasHangman(userId)) {
             String youArePlayNow = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
             event.getHook().sendMessage(youArePlayNow)
-                    .setActionRow(HangmanUtils.getButtonStop(userId))
+                    .setComponents(ActionRow.of(HangmanUtils.getButtonStop(userId)))
                     .queue();
         } else if (instance.hasHangman(-userId)) {
             String hangmanBotPlay = jsonParsers.getLocale("hangman_bot_play", event.getUser().getIdLong());
             event.getHook().sendMessage(hangmanBotPlay)
-                    .setActionRow(HangmanUtils.getButtonGPT(userId))
+                    .setComponents(ActionRow.of(HangmanUtils.getButtonGPT(userId)))
                     .queue();
         }
     }

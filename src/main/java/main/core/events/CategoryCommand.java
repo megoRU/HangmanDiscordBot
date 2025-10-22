@@ -7,6 +7,7 @@ import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
 import main.model.repository.UserSettingsRepository;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +35,7 @@ public class CategoryCommand {
         if (instance.hasHangman(userIdLong)) {
             String reactionsButtonWhenPlay = jsonParsers.getLocale("ReactionsButton_When_Play", userIdLong);
             event.getHook().sendMessage(reactionsButtonWhenPlay)
-                    .setActionRow(HangmanUtils.getButtonStop(userIdLong))
+                    .setComponents(ActionRow.of(HangmanUtils.getButtonStop(userIdLong)))
                     .setEphemeral(true)
                     .queue();
             return;

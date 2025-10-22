@@ -5,6 +5,7 @@ import main.game.utils.HangmanUtils;
 import main.service.UpdateStatisticsService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
@@ -55,7 +56,7 @@ public class JoinEvent {
                     if (messageChannel != null) {
                         messageChannel
                                 .sendMessageEmbeds(welcome.build())
-                                .setActionRow(HangmanUtils.BUTTON_HELP, HangmanUtils.getButtonSupport(0L))
+                                .setComponents(ActionRow.of(HangmanUtils.BUTTON_HELP, HangmanUtils.getButtonSupport(0L)))
                                 .queue();
                     }
                 }

@@ -4,8 +4,8 @@ import main.controller.UpdateController;
 import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.Event;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 

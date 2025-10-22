@@ -10,10 +10,11 @@ import main.model.entity.UserSettings;
 import main.model.repository.HangmanGameRepository;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,7 +175,7 @@ public class HangmanEmbedUtils {
         if (channel != null) {
             if (ChecksClass.check(channel)) {
                 MessageEditAction action = channel.editMessageEmbedsById(messageId, embedBuilder.build());
-                if (buttons != null) action.setActionRow(buttons);
+                if (buttons != null) action.setComponents(ActionRow.of(buttons));
                 action.queue(null, throwable -> handleEditException(throwable, userId, hangmanGameRepository));
             }
         }
@@ -196,14 +197,14 @@ public class HangmanEmbedUtils {
                             user.openPrivateChannel().queue(
                                     userChannel -> {
                                         MessageEditAction action = userChannel.editMessageEmbedsById(messageId, embedBuilder.build());
-                                        if (buttons != null) action.setActionRow(buttons);
+                                        if (buttons != null) action.setComponents(ActionRow.of(buttons));
                                         action.queue(null, throwable -> handleEditException(throwable, userId, hangmanGameRepository));
                                     }, throwable -> handleEditException(throwable, userId, hangmanGameRepository)
                             )
                     );
         } else {
             MessageEditAction action = channel.editMessageEmbedsById(messageId, embedBuilder.build());
-            if (buttons != null) action.setActionRow(buttons);
+            if (buttons != null) action.setComponents(ActionRow.of(buttons));
             action.queue(null, throwable -> handleEditException(throwable, userId, hangmanGameRepository));
         }
     }

@@ -8,6 +8,7 @@ import main.jsonparser.JSONParsers;
 import main.model.entity.CompetitiveQueue;
 import main.model.entity.UserSettings;
 import main.model.repository.CompetitiveQueueRepository;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +47,8 @@ public class CompetitivePlayButton {
 
             if (userSettings == null) {
                 event.getHook().sendMessage(gameLanguage)
-                        .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
-                        .addActionRow(HangmanUtils.getButtonPlayCompetitiveAgain(userId))
+                        .addComponents(ActionRow.of(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH))
+                        .addComponents(ActionRow.of(HangmanUtils.getButtonPlayCompetitiveAgain(userId)))
                         .setEphemeral(true)
                         .queue();
                 return;
@@ -68,7 +69,7 @@ public class CompetitivePlayButton {
                 instance.addCompetitiveQueue(hangmanPlayer);
 
                 event.getHook().sendMessage(addedToTheQueue)
-                        .setActionRow(HangmanUtils.getButtonLeaveSearch(userId))
+                        .setComponents(ActionRow.of(HangmanUtils.getButtonLeaveSearch(userId)))
                         .queue();
 
             } else if (instance.hasHangman(userId)) {

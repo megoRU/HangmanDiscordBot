@@ -11,6 +11,7 @@ import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Mentions;
@@ -52,20 +53,20 @@ public class HangmanCommand {
         if (userSettings == null) {
             String hangmanListenerNeedSetLanguage = jsonParsers.getLocale("Hangman_Listener_Need_Set_Language", userIdLong);
             event.reply(hangmanListenerNeedSetLanguage)
-                    .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
+                    .setComponents(ActionRow.of(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH))
                     .setEphemeral(true)
                     .queue();
             //Проверяем если игрок уже играет. То присылаем в чат уведомление
         } else if (instance.hasCompetitive(userIdLong)) {
             String youArePlayNow = jsonParsers.getLocale("you_are_search_now", userIdLong);
             event.reply(youArePlayNow)
-                    .setActionRow(HangmanUtils.getButtonLeaveSearch(userIdLong))
+                    .setComponents(ActionRow.of(HangmanUtils.getButtonLeaveSearch(userIdLong)))
                     .setEphemeral(true)
                     .queue();
         } else if (instance.hasHangman(userIdLong)) {
             String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", userIdLong);
             event.reply(hangmanListenerYouPlay)
-                    .setActionRow(HangmanUtils.getButtonStop(userIdLong))
+                    .setComponents(ActionRow.of(HangmanUtils.getButtonStop(userIdLong)))
                     .setEphemeral(true)
                     .queue();
             //Если всё хорошо, создаем игру

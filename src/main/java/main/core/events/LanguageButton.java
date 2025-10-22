@@ -8,6 +8,7 @@ import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
 import main.model.repository.UserSettingsRepository;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -31,13 +32,13 @@ public class LanguageButton {
             String reactionsButtonWhenPlay = jsonParsers.getLocale("ReactionsButton_When_Play", event.getUser().getIdLong());
             event.getHook().sendMessage(reactionsButtonWhenPlay)
                     .setEphemeral(true)
-                    .setActionRow(HangmanUtils.getButtonStop(userId))
+                    .setComponents(ActionRow.of(HangmanUtils.getButtonStop(userId)))
                     .queue();
             return;
         }
 
         String languageChangeLang;
-        if (Objects.equals(event.getButton().getId(), Buttons.BUTTON_RUS.name())) {
+        if (Objects.equals(event.getButton().getCustomId(), Buttons.BUTTON_RUS.name())) {
             setGameLanguage(userId, "RU");
             String languageChange = jsonParsers.getLocale("language_change_lang", event.getUser().getIdLong());
             languageChangeLang = String.format(languageChange, "Кириллица");

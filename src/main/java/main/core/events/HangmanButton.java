@@ -11,11 +11,12 @@ import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.jsonparser.JSONParsers;
 import main.model.entity.UserSettings;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +35,7 @@ public class HangmanButton {
     private final static HangmanRegistry instance = HangmanRegistry.getInstance();
 
     public void hangman(@NotNull ButtonInteractionEvent event) {
-        if (event.getButton().getId() == null) return;
+        if (event.getButton().getCustomId() == null) return;
         event.editButton(event.getButton().asDisabled()).queue();
 
         Guild guild = event.getGuild();
@@ -47,7 +48,7 @@ public class HangmanButton {
 
         if (userSettings == null) {
             event.getHook().sendMessage(gameLanguage)
-                    .addActionRow(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH)
+                    .setComponents(ActionRow.of(HangmanUtils.BUTTON_RUSSIAN, HangmanUtils.BUTTON_ENGLISH))
                     .setEphemeral(true)
                     .queue();
             return;
@@ -111,7 +112,7 @@ public class HangmanButton {
             String hangmanListenerYouPlay = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
 
             event.getHook().sendMessage(hangmanListenerYouPlay)
-                    .setActionRow(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game"))
+                    .setComponents(ActionRow.of(Button.danger(Buttons.BUTTON_STOP.name(), "Stop game")))
                     .setEphemeral(true)
                     .queue();
         }
