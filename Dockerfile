@@ -5,7 +5,7 @@ COPY . .
 RUN ["mvn", "install", "-Dmaven.test.skip=true"]
 
 # Этап запуска приложения
-FROM openjdk:25
+FROM amazoncorretto:25-jdk
 ENV LANG=C.UTF-8
 WORKDIR /app
 COPY --from=builder /app/target/HangmanDiscordBot-0.0.1-SNAPSHOT.jar .
