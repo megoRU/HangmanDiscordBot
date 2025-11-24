@@ -1,5 +1,5 @@
 # Этап сборки приложения
-FROM maven:3.9.9-amazoncorretto-21-al2023 AS builder
+FROM maven:3.9.11-amazoncorretto-25-al2023 AS builder
 WORKDIR /app
 COPY . .
 RUN ["mvn", "install", "-Dmaven.test.skip=true"]
