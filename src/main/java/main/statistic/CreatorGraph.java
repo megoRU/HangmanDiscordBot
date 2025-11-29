@@ -49,10 +49,9 @@ public class CreatorGraph {
                 case GLOBAL -> {
                     List<StatisticGlobal> statisticList = gamesRepository.getAllStatistic();
                     for (int i = statisticList.size() - 1; i >= 0; i--) {
-                        String gameDate = statisticList.get(i).getGameDate();
-                        LocalDate localDate = LocalDate.parse(gameDate.substring(0, 7).concat("-01"));
+                        LocalDateTime gameDate = statisticList.get(i).getGameDate();
 
-                        date.append(date.isEmpty() ? "" : ",").append("'").append(localDate.format(dateTimeFormatter)).append("'");
+                        date.append(date.isEmpty() ? "" : ",").append("'").append(gameDate.toLocalDate().format(dateTimeFormatter)).append("'");
                         columnFirst.append(columnFirst.isEmpty() ? "" : ",").append("'").append(statisticList.get(i).getCount()).append("'");
                     }
                     setImage(chart, statistic).getShortUrl();
@@ -62,7 +61,7 @@ public class CreatorGraph {
                     for (int i = statisticList.size() - 1; i >= 0; i--) {
                         LocalDateTime gameDate = statisticList.get(i).getGameDate();
 
-                        date.append(date.isEmpty() ? "" : ",").append("'").append(gameDate.toLocalTime().format(dateTimeFormatter)).append("'");
+                        date.append(date.isEmpty() ? "" : ",").append("'").append(gameDate.toLocalDate().format(dateTimeFormatter)).append("'");
                         columnFirst.append(columnFirst.isEmpty() ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ONES()).append("'");
                         columnSecond.append(columnSecond.isEmpty() ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ZEROS()).append("'");
                     }
