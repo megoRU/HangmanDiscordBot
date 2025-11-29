@@ -1,8 +1,10 @@
 package main.model.repository.impl;
 
+import java.time.LocalDateTime;
+
 public interface StatisticMy {
 
-    String getGameDate();
+    LocalDateTime getGameDate();
 
     Integer getTOTAL_ZEROS();
 

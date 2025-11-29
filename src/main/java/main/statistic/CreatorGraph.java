@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Level;
@@ -59,10 +60,9 @@ public class CreatorGraph {
                 case MY -> {
                     List<StatisticMy> statisticList = gamesRepository.getAllMyStatistic(userIdLong);
                     for (int i = statisticList.size() - 1; i >= 0; i--) {
-                        String gameDate = statisticList.get(i).getGameDate();
-                        LocalDate localDate = LocalDate.parse(gameDate.substring(0, 7).concat("-01"));
+                        LocalDateTime gameDate = statisticList.get(i).getGameDate();
 
-                        date.append(date.isEmpty() ? "" : ",").append("'").append(localDate.format(dateTimeFormatter)).append("'");
+                        date.append(date.isEmpty() ? "" : ",").append("'").append(gameDate.toLocalTime().format(dateTimeFormatter)).append("'");
                         columnFirst.append(columnFirst.isEmpty() ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ONES()).append("'");
                         columnSecond.append(columnSecond.isEmpty() ? "" : ",").append("'").append(statisticList.get(i).getTOTAL_ZEROS()).append("'");
                     }
