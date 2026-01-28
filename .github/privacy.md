@@ -22,8 +22,5 @@
 ### 4. Why does it store the data?
 #### To provide you with statistics and for the convenience of using the bot.
 
-### 5. I have a question.
-#### Feel free to join my [Discord server](https://discord.gg/UrWG3R683d)
-
 ### Please note, that we can change this policy without any warning at any given time.
-#### **Last changed:** `03.04.2022`
+#### **Last changed:** `28.01.2026`

@@ -46,7 +46,7 @@ public class HangmanUtils {
 
     public static Button getButtonSupport(long userId) {
         String buttonSupport = JSON_BOT_PARSERS.getLocale("button_support", userId);
-        return Button.link("https://discord.gg/UrWG3R683d", buttonSupport);
+        return Button.link("https://discord.gg/MhEzJNDf", buttonSupport);
     }
 
     public static Button getButtonPlayCompetitiveAgain(long userId) {
