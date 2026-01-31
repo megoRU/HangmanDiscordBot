@@ -2,6 +2,7 @@ package main.game.core;
 
 import main.enums.GameStatus;
 import main.game.Hangman;
+import main.game.HangmanEmbedUtils;
 import main.game.HangmanPlayer;
 import main.model.entity.UserSettings;
 import org.jetbrains.annotations.Nullable;
@@ -136,9 +137,12 @@ public class HangmanRegistry {
 
     public void removeHangman(long userIdLong) {
         Hangman hangman = getActiveHangman(userIdLong);
+
         if (hangman == null) return;
         hangmanTimer.remove(hangman);
+
         HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
+
         if (hangman.isCompetitive()) {
             if (hangman.getGameStatus().equals(GameStatus.WIN_GAME)) {
                 Long againstPlayerId = hangman.getAgainstPlayerId();
@@ -147,9 +151,12 @@ public class HangmanRegistry {
                 }
             }
         }
-        for (HangmanPlayer hangmanPlayer : hangmanPlayers) {
-            activeHangman.remove(hangmanPlayer.getUserId());
-        }
 
+        for (HangmanPlayer hangmanPlayer : hangmanPlayers) {
+            long userId = hangmanPlayer.getUserId();
+
+            activeHangman.remove(userId);
+            HangmanEmbedUtils.removeLocks(userId);
+        }
     }
 }

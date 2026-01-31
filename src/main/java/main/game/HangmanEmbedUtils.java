@@ -146,8 +146,6 @@ public class HangmanEmbedUtils {
             } else {
                 editPrivateMessage(jda, embedBuilder, userId, channelId, messageId, buttons, hangmanGameRepository);
             }
-
-            locks.remove(userId);
         }
     }
 
@@ -215,6 +213,16 @@ public class HangmanEmbedUtils {
             HangmanRegistry.getInstance().removeHangman(userId);
             hangmanGameRepository.deleteActiveGame(userId);
             LOGGER.info("editMessage: {}", message);
+        }
+    }
+
+    private static void removeLock(Long userId) {
+        locks.remove(userId);
+    }
+
+    public static void removeLocks(Long... userId) {
+        for (Long user : userId) {
+            removeLock(user);
         }
     }
 }

@@ -32,7 +32,7 @@ public class Hangman {
     //Localisation
     private static final JSONParsers JSON_GAME_PARSERS = new JSONParsers(JSONParsers.Locale.GAME);
 
-    private final HangmanAPI hangmanAPI = new HangmanAPI();
+    private static final HangmanAPI hangmanAPI = new HangmanAPI();
     private final Set<String> guesses;
     @Setter
     private HangmanPlayer[] hangmanPlayers;
@@ -215,10 +215,6 @@ public class Hangman {
 
     public int getGuessesSize() {
         return guesses.size();
-    }
-
-    public int getLengthWord() {
-        return WORD != null ? WORD.length() : 0;
     }
 
     private void setTimer(Instant instant) {
