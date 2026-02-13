@@ -19,7 +19,7 @@ public class CompetitiveQueue {
     private Long userIdLong;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "game_language", columnDefinition = "enum ('EN', 'RU'")
+    @Column(name = "game_language", columnDefinition = "enum ('EN', 'RU'", nullable = false)
     private UserSettings.GameLanguage gameLanguage;
 
     @Column(name = "message_channel", nullable = false)

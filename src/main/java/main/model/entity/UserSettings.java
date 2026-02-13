@@ -19,15 +19,15 @@ public class UserSettings {
     private Long userIdLong;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "bot_language", nullable = false, columnDefinition = "enum ('EN', 'RU'")
+    @Column(name = "bot_language", columnDefinition = "enum ('EN', 'RU'", nullable = false)
     private BotLanguage botLanguage;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "game_language", columnDefinition = "enum ('EN', 'RU'")
+    @Column(name = "game_language", columnDefinition = "enum ('EN', 'RU'", nullable = false)
     private GameLanguage gameLanguage;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "category", columnDefinition = "enum ('FRUITS', 'FLOWERS', 'ALL', 'COLORS')")
+    @Column(name = "category", columnDefinition = "enum ('FRUITS', 'FLOWERS', 'ALL', 'COLORS')", nullable = false)
     private Category category;
 
     public enum BotLanguage {
