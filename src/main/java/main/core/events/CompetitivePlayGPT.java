@@ -2,10 +2,7 @@ package main.core.events;
 
 import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
-import main.game.Hangman;
-import main.game.HangmanBuilder;
 import main.game.HangmanDataSaving;
-import main.game.HangmanPlayer;
 import main.game.api.HangmanAPI;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
@@ -47,49 +44,52 @@ public class CompetitivePlayGPT {
                     .queue();
             return;
         }
-        UserSettings.GameLanguage userGameLanguage = userSettings.getGameLanguage();
+//        UserSettings.GameLanguage userGameLanguage = userSettings.getGameLanguage();
 
-        if (!instance.hasHangman(userId) && !instance.hasHangman(-userId)) {
-            HangmanBuilder.Builder hangmanUser = new HangmanBuilder.Builder();
-            try {
-                String word = hangmanAPI.getWord(userId);
-                HangmanBuilder.Builder hangmanBuilderGPT = new HangmanBuilder.Builder();
-                HangmanPlayer hangmanPlayerGPT = new HangmanPlayer(-userId, null, null, userGameLanguage);
-                HangmanPlayer hangmanPlayer = new HangmanPlayer(userId, event.getGuild() != null ? event.getGuild().getIdLong() : null, messageChannel, userGameLanguage);
+        String chatGptDisabled = jsonParsers.getLocale("chat_gpt_disabled", event.getUser().getIdLong());
+        event.getHook().sendMessage(chatGptDisabled).queue();
 
-                hangmanBuilderGPT.setCompetitive(true);
-                hangmanBuilderGPT.addHangmanPlayer(hangmanPlayerGPT);
-                hangmanBuilderGPT.setAgainstPlayerId(userId);
-
-                hangmanUser.addHangmanPlayer(hangmanPlayer);
-                hangmanUser.setAgainstPlayerId(-userId);
-                hangmanUser.setCompetitive(true);
-
-                //Build
-                Hangman build = hangmanUser.build();
-                Hangman buildGPT = hangmanBuilderGPT.build();
-
-                instance.setHangman(userId, build);
-                instance.setHangman(-userId, buildGPT);
-
-                String createGame = jsonParsers.getLocale("create_game", userId);
-                event.getHook().sendMessage(createGame).queue();
-
-                build.startGame(event.getMessageChannel(), word, hangmanDataSaving);
-                buildGPT.startGame(word, hangmanDataSaving);
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
-            }
-        } else if (instance.hasHangman(userId)) {
-            String youArePlayNow = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
-            event.getHook().sendMessage(youArePlayNow)
-                    .setComponents(ActionRow.of(HangmanUtils.getButtonStop(userId)))
-                    .queue();
-        } else if (instance.hasHangman(-userId)) {
-            String hangmanBotPlay = jsonParsers.getLocale("hangman_bot_play", event.getUser().getIdLong());
-            event.getHook().sendMessage(hangmanBotPlay)
-                    .setComponents(ActionRow.of(HangmanUtils.getButtonGPT(userId)))
-                    .queue();
-        }
+//        if (!instance.hasHangman(userId) && !instance.hasHangman(-userId)) {
+//            HangmanBuilder.Builder hangmanUser = new HangmanBuilder.Builder();
+//            try {
+//                String word = hangmanAPI.getWord(userId);
+//                HangmanBuilder.Builder hangmanBuilderGPT = new HangmanBuilder.Builder();
+//                HangmanPlayer hangmanPlayerGPT = new HangmanPlayer(-userId, null, null, userGameLanguage);
+//                HangmanPlayer hangmanPlayer = new HangmanPlayer(userId, event.getGuild() != null ? event.getGuild().getIdLong() : null, messageChannel, userGameLanguage);
+//
+//                hangmanBuilderGPT.setCompetitive(true);
+//                hangmanBuilderGPT.addHangmanPlayer(hangmanPlayerGPT);
+//                hangmanBuilderGPT.setAgainstPlayerId(userId);
+//
+//                hangmanUser.addHangmanPlayer(hangmanPlayer);
+//                hangmanUser.setAgainstPlayerId(-userId);
+//                hangmanUser.setCompetitive(true);
+//
+//                //Build
+//                Hangman build = hangmanUser.build();
+//                Hangman buildGPT = hangmanBuilderGPT.build();
+//
+//                instance.setHangman(userId, build);
+//                instance.setHangman(-userId, buildGPT);
+//
+//                String createGame = jsonParsers.getLocale("create_game", userId);
+//                event.getHook().sendMessage(createGame).queue();
+//
+//                build.startGame(event.getMessageChannel(), word, hangmanDataSaving);
+//                buildGPT.startGame(word, hangmanDataSaving);
+//            } catch (Exception e) {
+//                LOGGER.error(e.getMessage(), e);
+//            }
+//        } else if (instance.hasHangman(userId)) {
+//            String youArePlayNow = jsonParsers.getLocale("Hangman_Listener_You_Play", event.getUser().getIdLong());
+//            event.getHook().sendMessage(youArePlayNow)
+//                    .setComponents(ActionRow.of(HangmanUtils.getButtonStop(userId)))
+//                    .queue();
+//        } else if (instance.hasHangman(-userId)) {
+//            String hangmanBotPlay = jsonParsers.getLocale("hangman_bot_play", event.getUser().getIdLong());
+//            event.getHook().sendMessage(hangmanBotPlay)
+//                    .setComponents(ActionRow.of(HangmanUtils.getButtonGPT(userId)))
+//                    .queue();
+//        }
     }
 }

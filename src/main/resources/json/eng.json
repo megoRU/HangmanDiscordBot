@@ -108,5 +108,6 @@
   "hangman_bot_play": "The bot is still playing, try again later.",
   "help_gpt": "Play hangman vs bot",
   "leaderboard_lose": "Losses: ",
-  "leaderboard_games": "Games: "
+  "leaderboard_games": "Games: ",
+  "chat_gpt_disabled": "We no longer provide a ChatGPT game."
 }

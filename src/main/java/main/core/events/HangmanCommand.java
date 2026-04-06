@@ -136,34 +136,35 @@ public class HangmanCommand {
                          HangmanBuilder.Builder hangmanBuilder,
                          UserSettings.GameLanguage gameLanguage) {
         try {
-            long userIdLong = slashCommandInteractionEvent.getUser().getIdLong();
+            String chatGptDisabled = jsonParsers.getLocale("chat_gpt_disabled", slashCommandInteractionEvent.getUser().getIdLong());
+            slashCommandInteractionEvent.reply(chatGptDisabled).queue();
 
-            String createGame = jsonParsers.getLocale("create_game", userIdLong);
-            slashCommandInteractionEvent.reply(createGame).setEphemeral(true).queue();
-
-            String word = hangmanAPI.getWord(userIdLong);
-
-            HangmanBuilder.Builder hangmanBuilderGPT = new HangmanBuilder.Builder();
-            hangmanBuilderGPT.setCompetitive(true);
-
-            HangmanPlayer hangmanPlayerGPT = new HangmanPlayer(-userIdLong, null, null, gameLanguage);
-
-            hangmanBuilder.setAgainstPlayerId(-userIdLong);
-            hangmanBuilder.setCompetitive(true);
-
-            //
-            hangmanBuilderGPT.setAgainstPlayerId(userIdLong);
-            hangmanBuilderGPT.addHangmanPlayer(hangmanPlayerGPT);
-
-            //Build
-            Hangman build = hangmanBuilder.build();
-            Hangman buildGPT = hangmanBuilderGPT.build();
-
-            instance.setHangman(userIdLong, build);
-            instance.setHangman(-userIdLong, buildGPT);
-
-            build.startGame(slashCommandInteractionEvent.getMessageChannel(), word, hangmanDataSaving);
-            buildGPT.startGame(word, hangmanDataSaving);
+//            String createGame = jsonParsers.getLocale("create_game", userIdLong);
+//            slashCommandInteractionEvent.reply(createGame).setEphemeral(true).queue();
+//
+//            String word = hangmanAPI.getWord(userIdLong);
+//
+//            HangmanBuilder.Builder hangmanBuilderGPT = new HangmanBuilder.Builder();
+//            hangmanBuilderGPT.setCompetitive(true);
+//
+//            HangmanPlayer hangmanPlayerGPT = new HangmanPlayer(-userIdLong, null, null, gameLanguage);
+//
+//            hangmanBuilder.setAgainstPlayerId(-userIdLong);
+//            hangmanBuilder.setCompetitive(true);
+//
+//            //
+//            hangmanBuilderGPT.setAgainstPlayerId(userIdLong);
+//            hangmanBuilderGPT.addHangmanPlayer(hangmanPlayerGPT);
+//
+//            //Build
+//            Hangman build = hangmanBuilder.build();
+//            Hangman buildGPT = hangmanBuilderGPT.build();
+//
+//            instance.setHangman(userIdLong, build);
+//            instance.setHangman(-userIdLong, buildGPT);
+//
+//            build.startGame(slashCommandInteractionEvent.getMessageChannel(), word, hangmanDataSaving);
+//            buildGPT.startGame(word, hangmanDataSaving);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }

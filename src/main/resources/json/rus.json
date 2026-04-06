@@ -108,5 +108,6 @@
   "hangman_bot_play": "Бот ещё играет попробуйте позже.",
   "help_gpt": "Играть в Виселицу против бота",
   "leaderboard_lose": "Поражений: ",
-  "leaderboard_games": "Игр: "
+  "leaderboard_games": "Игр: ",
+  "chat_gpt_disabled": "Мы больше не предоставляем игру с ChatGPT"
 }
