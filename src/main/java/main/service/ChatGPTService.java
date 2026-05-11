@@ -30,7 +30,6 @@ public class ChatGPTService {
     private final HangmanInputs hangmanInputs;
     private final HangmanGameEndHandler hangmanGameEndHandler;
 
-    //TODO: NPE Language
     public void request() {
         Collection<Hangman> allGames = hangmanRegistry.getAllGames();
         allGames.stream().filter(Hangman::isChatGPT).forEach(hangman -> {
@@ -39,7 +38,7 @@ public class ChatGPTService {
                     .build();
 
             ChatRequest chatRequest = new ChatRequest();
-            chatRequest.setModel("gpt-5-mini");
+            chatRequest.setModel("gpt-4o-mini");
             chatRequest.setMaxTokens(null);
 
             String guesses = HangmanUtils.getGuesses(hangman.getGuesses());
@@ -50,8 +49,10 @@ public class ChatGPTService {
             Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
             UserSettings userSettings = userSettingsMap.get(againstPlayerEmbedded);
 
-            UserSettings.GameLanguage gameLanguage = userSettings.getGameLanguage();
-            UserSettings.Category category = userSettings.getCategory();
+            UserSettings.GameLanguage gameLanguage = (userSettings != null && userSettings.getGameLanguage() != null)
+                    ? userSettings.getGameLanguage() : UserSettings.GameLanguage.RU;
+            UserSettings.Category category = (userSettings != null && userSettings.getCategory() != null)
+                    ? userSettings.getCategory() : UserSettings.Category.ALL;
 
             String gptPrompt = HangmanUtils.getGPTPrompt(gameLanguage, category, guesses, wordHidden);
 
