@@ -94,7 +94,7 @@ public class Hangman {
         this.WORD = word;
         this.WORD_HIDDEN = WORD_HIDDEN;
         this.hangmanErrors = hangmanErrors;
-        this.WORD_OF_CHARS = word.toLowerCase().split("");
+        this.WORD_OF_CHARS = word.split("");
         setTimer(instant);
         return this;
     }
@@ -175,7 +175,7 @@ public class Hangman {
             } else if (Objects.equals(WORD_OF_CHARS[i], " ")) {
                 sb.append("  ");
             } else {
-                sb.append(" _");
+                sb.append(sb.isEmpty() ? "_" : " _");
             }
             i++;
         }
@@ -189,8 +189,8 @@ public class Hangman {
             for (int i = 0; i < WORD_OF_CHARS.length; i++) {
                 if (WORD_OF_CHARS[i].equals(letter)) {
                     sb.replace(
-                            i * 2 + 1,
-                            i * 2 + 2,
+                            i == 0 ? i : i * 2,
+                            i == 0 ? i + 1 : i * 2 + 1,
                             String.valueOf(WORD_OF_CHARS[i]));
                 }
             }

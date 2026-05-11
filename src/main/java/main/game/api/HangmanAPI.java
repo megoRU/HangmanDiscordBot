@@ -20,14 +20,14 @@ public class HangmanAPI {
         this.megoruAPI = new MegoruAPI.Builder().build();
     }
 
+    //TODO: NPE Language
+    @NotNull
     public String getWord(long userId) throws UnsuccessfulHttpException, IOException, NullPointerException {
         Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
         UserSettings userSettings = userSettingsMap.get(userId);
 
-        UserSettings.GameLanguage gameLanguage = (userSettings != null && userSettings.getGameLanguage() != null)
-                ? userSettings.getGameLanguage() : UserSettings.GameLanguage.RU;
-        UserSettings.Category category = (userSettings != null && userSettings.getCategory() != null)
-                ? userSettings.getCategory() : UserSettings.Category.ALL;
+        UserSettings.GameLanguage gameLanguage = userSettings.getGameLanguage();
+        UserSettings.Category category = userSettings.getCategory();
 
         GameWordLanguage gameWordLanguage = new GameWordLanguage();
         gameWordLanguage.setLanguage(gameLanguage.name());
@@ -35,6 +35,6 @@ public class HangmanAPI {
 
         String word = megoruAPI.getWord(gameWordLanguage).getWord();
         if (word == null || word.isEmpty()) throw new NullPointerException("Word is Null");
-        return word;
+        return megoruAPI.getWord(gameWordLanguage).getWord();
     }
 }
