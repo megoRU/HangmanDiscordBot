@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import okhttp3.OkHttpClient;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -96,6 +99,14 @@ public class BotStartConfig {
             jdaBuilder.setActivity(Activity.playing("Starting..."));
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
             jdaBuilder.addEventListeners(coreBot);
+
+            if (Config.IS_PROXY) {
+                Proxy proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(Config.PROXY_IP, 10808));
+                OkHttpClient client = new OkHttpClient.Builder().proxy(proxy).build();
+
+                jdaBuilder.setHttpClient(client);
+            }
+
             jda = jdaBuilder.build();
 
             jda.awaitReady();
