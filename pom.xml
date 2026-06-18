@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.2</version>
+        <version>4.1.0</version>
         <relativePath/>
     </parent>
     <groupId>com.mego</groupId>
@@ -44,21 +44,21 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.42</version>
+            <version>1.18.46</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client -->
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>3.5.7</version>
+            <version>3.5.9</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/net.dv8tion/JDA -->
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>6.3.0</version>
+            <version>6.4.2</version>
         </dependency>
 
         <dependency>
@@ -71,7 +71,7 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>26.0.2-1</version>
+            <version>26.1.0</version>
         </dependency>
 
     </dependencies>
