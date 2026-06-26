@@ -25,6 +25,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.ProxySelector;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -101,11 +102,19 @@ public class BotStartConfig {
             jdaBuilder.addEventListeners(coreBot);
 
             if (Config.IS_PROXY) {
-                System.setProperty("socksProxyHost", Config.PROXY_IP);
-                System.setProperty("socksProxyPort", "10808");
+//                System.setProperty("socksProxyHost", Config.PROXY_IP);
+//                System.setProperty("socksProxyPort", "10808");
 
                 Proxy proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(Config.PROXY_IP, 10808));
-                OkHttpClient client = new OkHttpClient.Builder().proxy(proxy).build();
+
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .proxy(proxy)
+                        .proxySelector(ProxySelector.of(new InetSocketAddress(Config.PROXY_IP, 10808)))
+                        .connectTimeout(30, TimeUnit.SECONDS)
+                        .readTimeout(0, TimeUnit.SECONDS)
+                        .writeTimeout(30, TimeUnit.SECONDS)
+                        .retryOnConnectionFailure(true)
+                        .build();
 
                 jdaBuilder.setHttpClient(client);
             }
