@@ -77,8 +77,8 @@ public class HangmanButton {
                         Matcher matcher = pattern.matcher(input);
                         while (matcher.find()) {
                             String userIdString = matcher.group()
-                                    .replaceAll("<@", "")
-                                    .replaceAll(">", "");
+                                    .replace("<@", "")
+                                    .replace(">", "");
                             usersList.add(Long.parseLong(userIdString));
                         }
                     }

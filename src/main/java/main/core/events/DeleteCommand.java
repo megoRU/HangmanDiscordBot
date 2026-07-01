@@ -16,7 +16,7 @@ public class DeleteCommand {
     public void delete(@NotNull SlashCommandInteractionEvent event) {
         var userIdLong = event.getUser().getIdLong();
 
-        String code = UUID.randomUUID().toString().replaceAll("-", "");
+        String code = UUID.randomUUID().toString().replace("-", "");
         BotStartConfig.getSecretCode().put(userIdLong, code);
 
         String restoreData = jsonParsers.getLocale("restore_Data", userIdLong);
@@ -26,7 +26,7 @@ public class DeleteCommand {
 
         event.getUser().openPrivateChannel()
                 .flatMap(channel -> channel.sendMessage(restoreDataPm))
-                .queue(null, (exception) -> event.getChannel().sendMessage(
+                .queue(null, (_) -> event.getChannel().sendMessage(
                         """
                                 I couldn't send you a message to the DM.
                                 You may have banned sending you messages

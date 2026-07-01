@@ -209,7 +209,7 @@ public class HangmanUtils {
         return guesses
                 .toString()
                 .replaceAll("\\[", "")
-                .replaceAll("]", "");
+                .replace("]", "");
     }
 
     public static String category(Long userId) {

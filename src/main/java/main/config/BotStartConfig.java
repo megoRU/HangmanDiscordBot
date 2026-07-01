@@ -3,7 +3,6 @@ package main.config;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import main.controller.UpdateController;
 import main.core.CoreBot;
 import main.game.utils.HangmanUtils;
 import main.model.entity.UserSettings;
@@ -56,14 +55,11 @@ public class BotStartConfig {
     private final CompetitiveGames competitiveGames;
     private final UpdateStatisticsService updateStatisticsService;
     private final ChatGPTService chatGPTService;
-
-    //REPOSITORY
-    private final UpdateController updateController;
+    private final CoreBot coreBot;
 
     @PostConstruct
     public void startBot() {
         try {
-            CoreBot coreBot = new CoreBot(updateController);
 
             languageService.language();
             userSettingsService.settings();

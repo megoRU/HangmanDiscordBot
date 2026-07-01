@@ -43,7 +43,7 @@ public class ChatGPTService {
             chatRequest.setMaxTokens(null);
 
             String guesses = HangmanUtils.getGuesses(hangman.getGuesses());
-            String wordHidden = hangman.getWORD_HIDDEN().replaceAll(" ", "");
+            String wordHidden = hangman.getWORD_HIDDEN().replace(" ", "");
 
             long againstPlayerEmbedded = hangman.getAgainstPlayerEmbedded();
 

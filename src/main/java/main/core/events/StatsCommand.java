@@ -55,7 +55,7 @@ public class StatsCommand {
 
     public void stats(EmbedBuilder embedBuilder, Long userId) {
         try {
-            String[] statistic = gamesRepository.getStatistic(userId).replaceAll(",", " ").split(" ");
+            String[] statistic = gamesRepository.getStatistic(userId).replace(",", " ").split(" ");
 
             if (statistic.length == 3) {
                 //Формула:

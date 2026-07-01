@@ -48,7 +48,7 @@ public class HangmanEmbedUtils {
             int hangmanErrors = hangman.getHangmanErrors();
             String wordHidden = hangman.getWORD_HIDDEN();
             String guesses = HangmanUtils.getGuesses(hangman.getGuesses());
-            String word = hangman.getWORD().toUpperCase().replaceAll("", " ").trim();
+            String word = hangman.getWORD().toUpperCase().replace("", " ").trim();
             GameStatus gameStatus = hangman.getGameStatus();
 
             Map<Long, UserSettings> userSettingsMap = BotStartConfig.userSettingsMap;
