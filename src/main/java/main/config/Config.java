@@ -11,7 +11,7 @@ public class Config {
     public static final String PROXY_IP = String.valueOf(System.getenv("PROXY_IP"));
 
     @Getter
-    private static final String TOKEN = PRODUCTION_BOT_TOKEN;
+    private static final String TOKEN = DEV_BOT_TOKEN;
     @Getter
     private static final String GPT_TOKEN = System.getenv("GPT_TOKEN");
     private static volatile boolean IS_DEV = true;

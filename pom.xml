@@ -21,12 +21,6 @@
 
     <dependencies>
 
-        <dependency>
-            <groupId>com.github.megoRU</groupId>
-            <artifactId>gptunnel-wrapper</artifactId>
-            <version>1.1.3</version>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -37,7 +31,7 @@
         <dependency>
             <groupId>com.github.megoRU</groupId>
             <artifactId>api.megoru.ru-wrapper</artifactId>
-            <version>5.1.1</version>
+            <version>5.1.3</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->

@@ -1,8 +1,9 @@
 package main.service;
 
+import api.megoru.ru.entity.HangmanChatAI;
+import api.megoru.ru.impl.MegoruAPI;
 import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
-import main.config.Config;
 import main.enums.GameStatus;
 import main.game.Hangman;
 import main.game.HangmanGameEndHandler;
@@ -10,15 +11,11 @@ import main.game.HangmanInputs;
 import main.game.core.HangmanRegistry;
 import main.game.utils.HangmanUtils;
 import main.model.entity.UserSettings;
-import org.gpttunnel.entity.api.ChatRequest;
-import org.gpttunnel.entity.api.response.ChatCompletion;
-import org.gpttunnel.tunnel.GPTTunnelAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -29,19 +26,12 @@ public class ChatGPTService {
     private static final HangmanRegistry hangmanRegistry = HangmanRegistry.getInstance();
     private final HangmanInputs hangmanInputs;
     private final HangmanGameEndHandler hangmanGameEndHandler;
+    private final MegoruAPI megoruAPI = new MegoruAPI.Builder().build();
 
     //TODO: NPE Language
     public void request() {
         Collection<Hangman> allGames = hangmanRegistry.getAllGames();
         allGames.stream().filter(Hangman::isChatGPT).forEach(hangman -> {
-            GPTTunnelAPI gptTunnelAPI = new GPTTunnelAPI.Builder()
-                    .setToken(Config.getGPT_TOKEN())
-                    .build();
-
-            ChatRequest chatRequest = new ChatRequest();
-            chatRequest.setModel("gpt-5-mini");
-            chatRequest.setMaxTokens(null);
-
             String guesses = HangmanUtils.getGuesses(hangman.getGuesses());
             String wordHidden = hangman.getWORD_HIDDEN().replace(" ", "");
 
@@ -55,12 +45,14 @@ public class ChatGPTService {
 
             String gptPrompt = HangmanUtils.getGPTPrompt(gameLanguage, category, guesses, wordHidden);
 
-            ChatRequest.Message userMessage = new ChatRequest.Message(ChatRequest.Role.USER, gptPrompt);
-            chatRequest.setMessages(List.of(userMessage));
+            HangmanChatAI hangmanChatAI = new HangmanChatAI();
+            hangmanChatAI.setLanguage(gameLanguage.name().toLowerCase());
+            hangmanChatAI.setPrompt(gptPrompt);
 
             try {
-                ChatCompletion chatCompletion = gptTunnelAPI.chatCompletion(chatRequest);
-                String letter = chatCompletion.getChoices()[0].getMessage().getContent().toLowerCase();
+                String hangmanLetter = megoruAPI.getHangmanLetter(hangmanChatAI);
+
+                String letter = hangmanLetter.toLowerCase();
                 boolean contains = hangman.getGuesses().contains(letter);
 
                 if (contains) {

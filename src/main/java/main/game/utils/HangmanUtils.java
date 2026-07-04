@@ -135,15 +135,16 @@ public class HangmanUtils {
             if (usedLetters.isEmpty()) usedLetters = "Ты ещё не использовал никакие буквы";
 
             return String.format("""
-                            Отвечай одной буквой без дополнительного текста.
-                            Игра Виселица Тебе нужно хорошо угадывать буквы в слове.
-                            Черточки это скрытые буквы которые ты ещё не отгадал.
+                            Текущее состояние игры "Виселица".
                             
                             Текущее слово: %s
                             Категория: %s
                             Слово состоит из %s букв
                             Использованные буквы: %s
                             Неиспользованные буквы: %s
+                            
+                            Выбери наиболее вероятную следующую букву.
+                            Ответь РОВНО ОДНОЙ буквой русского алфавита из списка доступных букв.
                             """,
                     hiddenWord,
                     gameCategory.name(),
@@ -168,15 +169,15 @@ public class HangmanUtils {
             if (usedLetters.isEmpty()) usedLetters = "You haven't used any letters yet";
 
             return String.format("""
-                            Answer with one letter without additional text.
-                            The Gallows game You need to guess the letters in the word well.
-                            Dashes are hidden letters that you haven't guessed yet.
+                            Current Hangman game.
                             
                             Current word: %s
                             Category: %s
                             The word consists of %s letters
                             Letters used: %s
                             Unused letters: %s
+                            
+                            Respond with exactly one English letter from the remaining letters.
                             """,
                     hiddenWord,
                     gameCategory.name(),
