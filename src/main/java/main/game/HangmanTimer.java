@@ -41,6 +41,7 @@ public class HangmanTimer extends TimerTask {
                     Instant now = Instant.now();
                     Instant hangmanTimestamp = HangmanRegistry.getInstance().getHangmanTimer(hangman);
 
+                    //Такое чувство, что нужно проверка на существование игры
                     if (hangmanTimestamp != null && now.isAfter(hangmanTimestamp)) {
                         hangman.setGameStatus(GameStatus.TIME_OVER);
                         try {
