@@ -30,6 +30,10 @@ public class HangmanTimer extends TimerTask {
         timer.schedule(this, 0, 5000);
     }
 
+    /**
+     * 2026-07-14T14:32:25.036Z ERROR 1 --- [Timer-0] main.game.HangmanTimer: null
+     * java.lang.NullPointerException
+     */
     @Override
     public void run() {
         Collection<Hangman> allGames = HangmanRegistry.getInstance().getAllGames();
@@ -41,7 +45,13 @@ public class HangmanTimer extends TimerTask {
                         hangman.setGameStatus(GameStatus.TIME_OVER);
                         try {
                             HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
+
+                            LOGGER.info("hangman player count: {}", hangmanPlayers.length);
+
                             HangmanPlayer hangmanPlayer = hangmanPlayers[0];
+
+                            LOGGER.info("hangman player: {}", hangmanPlayer);
+
                             long userId = hangmanPlayer.getUserId();
 
                             if (HangmanRegistry.getInstance().hasHangman(userId)) {
