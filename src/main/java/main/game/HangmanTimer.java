@@ -51,9 +51,9 @@ public class HangmanTimer extends TimerTask {
 
                             HangmanPlayer hangmanPlayer = hangmanPlayers[0];
 
-                            LOGGER.info("hangman player: {}", hangmanPlayer);
-
                             long userId = hangmanPlayer.getUserId();
+
+                            LOGGER.info("hangman player: {}", userId);
 
                             if (HangmanRegistry.getInstance().hasHangman(userId)) {
                                 String gameOver = jsonGameParsers.getLocale("gameOver", userId);
