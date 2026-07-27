@@ -59,6 +59,7 @@ public class HangmanTimer extends TimerTask {
                                 String gameOver = jsonGameParsers.getLocale("gameOver", userId);
                                 String timeIsOver = jsonGameParsers.getLocale("timeIsOver", userId);
                                 String gamePlayer;
+
                                 if (hangmanPlayers.length == 1) {
                                     gamePlayer = jsonGameParsers.getLocale("Game_Player", userId);
                                 } else {
@@ -70,6 +71,8 @@ public class HangmanTimer extends TimerTask {
                                 info.setTitle(gameOver);
                                 info.setDescription(timeIsOver);
                                 info.addField(gamePlayer, hangman.getUserIdWithDiscord(), false);
+
+                                LOGGER.info("hangman: {}", hangman);
 
                                 HangmanEmbedUtils.editMessage(info, userId, true, hangmanGameRepository);
                                 hangmanGameRepository.deleteActiveGame(userId);

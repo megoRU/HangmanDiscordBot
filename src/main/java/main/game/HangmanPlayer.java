@@ -27,6 +27,7 @@ public class HangmanPlayer {
         this.gameLanguage = gameLanguage;
     }
 
+    @Nullable
     public Hangman getGame() {
         HangmanRegistry instance = HangmanRegistry.getInstance();
         return instance.getActiveHangman(userId);

@@ -138,25 +138,27 @@ public class HangmanRegistry {
     public void removeHangman(long userIdLong) {
         Hangman hangman = getActiveHangman(userIdLong);
 
-        if (hangman == null) return;
-        hangmanTimer.remove(hangman);
+        if (hangman != null) {
+            HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
+            if (hangmanPlayers == null || hangmanPlayers.length == 0) return;
 
-        HangmanPlayer[] hangmanPlayers = hangman.getHangmanPlayers();
-
-        if (hangman.isCompetitive()) {
-            if (hangman.getGameStatus().equals(GameStatus.WIN_GAME)) {
-                Long againstPlayerId = hangman.getAgainstPlayerId();
-                if (againstPlayerId != null) {
-                    activeHangman.remove(hangman.getAgainstPlayerId());
+            if (hangman.isCompetitive()) {
+                if (hangman.getGameStatus().equals(GameStatus.WIN_GAME)) {
+                    Long againstPlayerId = hangman.getAgainstPlayerId();
+                    if (againstPlayerId != null) {
+                        activeHangman.remove(hangman.getAgainstPlayerId());
+                    }
                 }
+            }
+
+            for (HangmanPlayer hangmanPlayer : hangmanPlayers) {
+                long userId = hangmanPlayer.getUserId();
+
+                activeHangman.remove(userId);
+                HangmanEmbedUtils.removeLocks(userId);
             }
         }
 
-        for (HangmanPlayer hangmanPlayer : hangmanPlayers) {
-            long userId = hangmanPlayer.getUserId();
-
-            activeHangman.remove(userId);
-            HangmanEmbedUtils.removeLocks(userId);
-        }
+        hangmanTimer.remove(hangman);
     }
 }
