@@ -142,9 +142,6 @@ public class HangmanUtils {
                             Слово состоит из %s букв
                             Использованные буквы: %s
                             Неиспользованные буквы: %s
-                            
-                            Выбери наиболее вероятную следующую букву.
-                            Ответь РОВНО ОДНОЙ буквой русского алфавита из списка доступных букв.
                             """,
                     hiddenWord,
                     gameCategory.name(),
@@ -176,8 +173,6 @@ public class HangmanUtils {
                             The word consists of %s letters
                             Letters used: %s
                             Unused letters: %s
-                            
-                            Respond with exactly one English letter from the remaining letters.
                             """,
                     hiddenWord,
                     gameCategory.name(),
