@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import okhttp3.OkHttpClient;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +21,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -96,21 +93,9 @@ public class BotStartConfig {
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
             jdaBuilder.addEventListeners(coreBot);
 
-//            if (Config.IS_PROXY) {
-//                System.setProperty("socksProxyHost", Config.PROXY_IP);
-//                System.setProperty("socksProxyPort", "10808");
-//            }
-
             if (Config.IS_PROXY) {
-                Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(Config.PROXY_IP, 3128));
-
-                OkHttpClient build = new OkHttpClient.Builder()
-                        .proxy(proxy)
-                        .connectTimeout(30, TimeUnit.SECONDS)
-                        .readTimeout(80, TimeUnit.SECONDS)
-                        .writeTimeout(30, TimeUnit.SECONDS)
-                        .build();
-                jdaBuilder.setHttpClient(build);
+                System.setProperty("socksProxyHost", Config.PROXY_IP);
+                System.setProperty("socksProxyPort", "10808");
             }
 
             jda = jdaBuilder.build();
