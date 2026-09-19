@@ -135,17 +135,32 @@ public class HangmanUtils {
             if (usedLetters.isEmpty()) usedLetters = "Ты ещё не использовал никакие буквы";
 
             return String.format("""
-                            Текущее состояние игры "Виселица".
-                            
-                            Текущее слово: %s
-                            Категория: %s
-                            Слово состоит из %s букв
-                            Использованные буквы: %s
-                            Неиспользованные буквы: %s
-                            """,
+                Ты играешь в игру «Виселица».
+                
+                Твоя задача — угадать следующую букву загаданного слова.
+                
+                Правила:
+                - Ответ должен содержать ровно одну букву.
+                - Используй только буквы русского алфавита.
+                - Не пиши слово целиком.
+                - Не пиши объяснения, комментарии или дополнительные символы.
+                - Символ `-` обозначает неоткрытую букву и не является буквой.
+                - Не выбирай буквы, которые уже были использованы.
+                - Анализируй открытые буквы, длину слова, категорию, использованные и неиспользованные буквы.
+                - Выбирай наиболее вероятную букву из списка неиспользованных букв.
+                
+                Текущее состояние игры:
+                Слово: %s
+                Категория: %s
+                Длина слова: %s букв
+                Использованные буквы: %s
+                Неиспользованные буквы: %s
+                
+                Ответь только одной буквой.
+                """,
                     hiddenWord,
                     gameCategory.name(),
-                    hiddenWord.length(),
+                    hiddenWord.replace("-", "").length(),
                     usedLetters,
                     cyrillicLetters.stream()
                             .map(String::valueOf)
@@ -166,17 +181,32 @@ public class HangmanUtils {
             if (usedLetters.isEmpty()) usedLetters = "You haven't used any letters yet";
 
             return String.format("""
-                            Current Hangman game.
+                            You are playing Hangman.
                             
-                            Current word: %s
+                            Your task is to guess the next letter of the hidden word.
+                            
+                            Rules:
+                            - Respond with exactly one letter.
+                            - Use only letters of the English alphabet.
+                            - Do not write the whole word.
+                            - Do not provide explanations, comments, or additional characters.
+                            - The `-` character represents an unrevealed letter and is not a letter.
+                            - Do not choose letters that have already been used.
+                            - Analyze the revealed letters, word length, category, used letters, and unused letters.
+                            - Choose the most likely letter from the unused letters.
+                            
+                            Current game state:
+                            Word: %s
                             Category: %s
-                            The word consists of %s letters
-                            Letters used: %s
+                            Word length: %s letters
+                            Used letters: %s
                             Unused letters: %s
+                            
+                            Respond with exactly one letter.
                             """,
                     hiddenWord,
                     gameCategory.name(),
-                    hiddenWord.length(),
+                    hiddenWord.replace("-", "").length(),
                     usedLetters,
                     latinLetters.stream()
                             .map(String::valueOf)
