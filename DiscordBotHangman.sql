@@ -3,10 +3,10 @@ DROP TABLE IF EXISTS `active_hangman`;
 CREATE TABLE `active_hangman`
 (
     `user_id_long`        bigint(30) NOT NULL,
-    `second_user_id_long` bigint(30) DEFAULT NULL,
-    `message_id_long`     bigint(30),
-    `channel_id_long`     bigint(30),
-    `guild_long_id`       bigint(30) DEFAULT NULL,
+    `players_list`        varchar(255) DEFAULT NULL,
+    `message_id`          bigint(30),
+    `channel_id`          bigint(30),
+    `guild_id`            bigint(30) DEFAULT NULL,
     `word`                varchar(255) DEFAULT NULL,
     `current_hidden_word` varchar(255) DEFAULT NULL,
     `guesses`             varchar(255) DEFAULT NULL,
@@ -14,6 +14,7 @@ CREATE TABLE `active_hangman`
     `game_created_time`   datetime(6) NOT NULL DEFAULT utc_timestamp(),
     `against_player_id`   bigint(20) DEFAULT NULL,
     `is_competitive`      tinyint(1) NOT NULL DEFAULT 0,
+    `is_opponent_lose`    tinyint(1) DEFAULT NULL,
     PRIMARY KEY (`user_id_long`),
     UNIQUE KEY `user_id_long` (`user_id_long`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
